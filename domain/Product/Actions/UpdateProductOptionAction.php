@@ -17,9 +17,8 @@ class UpdateProductOptionAction
 {
     public function execute(Product $product, ProductData $productData): void
     {
-        // dd($productData);
         /** Flush Product Option */
-        if (!filled($productData->product_options) && !filled($productData->product_variants)) {
+        if ( ! filled($productData->product_options) && ! filled($productData->product_variants)) {
             ProductOption::whereProductId($product->id)->delete();
 
             return;
@@ -63,19 +62,24 @@ class UpdateProductOptionAction
                 if ($optionValueModel instanceof ProductOptionValue) {
                     $optionValueModel->name = $productOptionValue->name;
                     $optionValueModel->product_option_id = $productOption->id;
-                    $optionValueModel->data = ['icon_type' => 'colored', 'icon_value' => $productOptionValue->color];
+                    $optionValueModel->data = ['icon_type' => $productOptionValue->icon_type ?? 'colored', 'icon_value' => $productOptionValue->icon_value];
                     $optionValueModel->save();
 
-                    $this->uploadMediaMaterials($optionValueModel, 
-                        [['collection' => 'media', 'materials' => $productOptionValue->images]]);
+                    $this->uploadMediaMaterials(
+                        $optionValueModel,
+                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    );
                 } else {
                     $newOptionValueModel = ProductOptionValue::create([
                         'name' => $productOptionValue->name,
                         'product_option_id' => $productOption->id,
+                        'data' => ['icon_type' => $productOptionValue->icon_type ?? 'colored', 'icon_value' => $productOptionValue->icon_value],
                     ]);
 
-                    $this->uploadMediaMaterials($newOptionValueModel, 
-                        [['collection' => 'media', 'materials' => $productOptionValue->images]]);
+                    $this->uploadMediaMaterials(
+                        $newOptionValueModel,
+                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    );
 
                     $productOptionValue = $productOptionValue
                         ->withId($newOptionValueModel->id, $productOptionValue);

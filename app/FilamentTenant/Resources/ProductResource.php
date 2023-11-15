@@ -33,6 +33,8 @@ use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Rules\UniqueProductSkuRule;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Throwable;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProductResource extends Resource
 {
@@ -122,7 +124,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['length'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                                     Forms\Components\TextInput::make('width')
@@ -132,7 +134,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['width'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                                     Forms\Components\TextInput::make('height')
@@ -142,7 +144,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['height'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
                                 ])->columns(3),
                         ]),
@@ -174,7 +176,7 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
-                                ->hidden(fn (Closure $get) => !$get('allow_stocks'))
+                                ->hidden(fn (Closure $get) => ! $get('allow_stocks'))
                                 ->required(fn (Closure $get) => $get('allow_stocks')),
                         ])->columns(2),
                     Forms\Components\Section::make('Pricing')
@@ -236,7 +238,7 @@ class ProductResource extends Resource
                                 ->helperText('Item can be purchased by guests.')
                                 ->default(false)
                                 ->columnSpan(2)
-                                ->hidden(fn () => !tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
+                                ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
                         ]),
                     Forms\Components\Section::make('Associations')
                         ->translateLabel()
@@ -269,7 +271,7 @@ class ProductResource extends Resource
                                     Forms\Components\Hidden::make('taxonomy_terms')
                                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
-                                ->when(fn () => !empty($taxonomies->toArray())),
+                                ->when(fn () => ! empty($taxonomies->toArray())),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
@@ -389,7 +391,7 @@ class ProductResource extends Resource
                     Forms\Components\Repeater::make('options')
                         ->translateLabel()
                         ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire) {
-                            if (!$record) {
+                            if ( ! $record) {
                                 return $state;
                             }
 
@@ -400,13 +402,27 @@ class ProductResource extends Resource
                                 return;
                             }
 
-                            $record->productOptions->load('productOptionValues');
+                            $record->productOptions->load('productOptionValues.media');
                             $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
+                                $mappedOptionValues = $productOption->productOptionValues->map(function ($optionValue) {
+                                    $optionValueImages = $optionValue->media->map(fn ($medium) => $medium['uuid'])->toArray() ?? [];
+
+                                    return [
+                                        'id' => $optionValue->id,
+                                        'slug' => $optionValue->slug,
+                                        'name' => $optionValue->name,
+                                        'icon_type' => $optionValue->data['icon_type'] ?? 'colored',
+                                        'icon_value' => $optionValue->data['icon_value'] ?? '',
+                                        'images' => $optionValueImages,
+                                        'product_option_id' => $optionValue->product_option_id,
+                                    ];
+                                })->toArray();
+
                                 return [
                                     'id' => $productOption->id,
                                     'name' => $productOption->name,
                                     'slug' => $productOption->slug,
-                                    'productOptionValues' => $productOption->productOptionValues,
+                                    'productOptionValues' => $mappedOptionValues,
                                 ];
                             });
                             $component->state($mappedOptions->toArray());
@@ -425,13 +441,28 @@ class ProductResource extends Resource
                                         ->label('')
                                         ->lazy()
                                         ->required(),
-                                    Forms\Components\ColorPicker::make('color'),
+                                    Forms\Components\ColorPicker::make('icon_value'),
                                     Forms\Components\FileUpload::make('images')
-                                        ->translateLabel()
-                                        ->mediaLibraryCollection('image')
                                         ->image()
+                                        ->mediaLibraryCollection('media')
                                         ->multiple()
-                                        ->required(),
+                                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                            $mediaClass = config('media-library.media_model', Media::class);
+
+                                            /** @var ?Media $media */
+                                            $media = $mediaClass::findByUuid($file);
+
+                                            if ($component->getVisibility() === 'private') {
+                                                try {
+                                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                                } catch (Throwable $exception) {
+                                                    // This driver does not support creating temporary URLs.
+                                                }
+                                            }
+
+                                            return $media?->getUrl();
+                                        }),
+
                                 ])
                                 ->minItems(1)
                                 ->disableItemMovement(),
@@ -445,7 +476,7 @@ class ProductResource extends Resource
                 ->itemLabel(fn (array $state) => $state['name'] ?? null)
                 ->formatStateUsing(
                     function (?Product $record) {
-                        if (!$record) {
+                        if ( ! $record) {
                             return [];
                         }
 
@@ -467,9 +498,9 @@ class ProductResource extends Resource
                                     foreach ($state['combination'] as $key => $combination) {
                                         $schemaArray[$key] =
                                             Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                            ->formatStateUsing(fn () => ucfirst($combination['option_value']))
-                                            ->label(trans(ucfirst($combination['option'])))
-                                            ->disabled();
+                                                ->formatStateUsing(fn () => ucfirst($combination['option_value']))
+                                                ->label(trans(ucfirst($combination['option'])))
+                                                ->disabled();
                                     }
 
                                     return $schemaArray;

@@ -58,16 +58,11 @@ class ProductOptionFormAction extends Action
             }
 
             $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
-            // $optionValueImages = $data['options'][0]['productOptionValues'];
-            // dd($optionValueImages->toArray()[0]['images']);
-            // $data['options'][0]['productOptionValues']->toArray()[0]['images'] = $optionValueImages->toArray()[0]['images'];
-            // dd($data);
-            // \Log::info('DATA SET NEW DATA HHAHAHGA ::: ', [$data]);
+
             data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
             data_set($livewire, 'data.product_options', array_merge($oldData, $data));
             data_set($livewire, 'data.product_variants', $updatedVariants);
             $livewire->unmountProductOptionItem();
-            // dd($livewire);
         });
     }
 
@@ -76,19 +71,20 @@ class ProductOptionFormAction extends Action
         $optionsCollection = collect($options);
 
         $optionsCollection = $optionsCollection->map(function ($option) {
-            $option['id'] ??= uniqid();
-            $option['slug'] ??= $option['name'];
+            $option['id'] = uniqid();
+            $option['slug'] = $option['name'];
 
             $productOptionValues = $option['productOptionValues'];
 
             /** @var array<int, array> $productOptionValues */
             $option['productOptionValues'] = collect($productOptionValues)->map(function ($value) use ($option) {
-                $value['id'] ??= uniqid();
-                $value['slug'] ??= $value['name'];
-                $value['product_option_id'] ??= $option['id'];
+                $value['id'] = uniqid();
+                $value['slug'] = $value['name'];
+                $value['product_option_id'] = $option['id'];
+                $value['icon_type'] = 'colored';
 
                 return $value;
-            });
+            })->toArray();
 
             return $option;
         });
