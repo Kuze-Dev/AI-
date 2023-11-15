@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Pipes\ServiceOrderPaymentUpdated;
 
 use Domain\ServiceOrder\Actions\GenerateServiceTransactionReceiptAction;
+use Domain\ServiceOrder\Actions\SendToCustomerServiceTransactionReceiptEmailAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentUpdatedPipelineData;
 
 class GenerateServiceTransactionReceiptPipe
 {
     public function __construct(
-        private GenerateServiceTransactionReceiptAction $generateServiceTransactionReceiptAction
+        private GenerateServiceTransactionReceiptAction $generateServiceTransactionReceiptAction,
+        private SendToCustomerServiceTransactionReceiptEmailAction $sendToCustomerServiceTransactionReceiptEmailAction
     ) {
     }
 
@@ -18,11 +20,16 @@ class GenerateServiceTransactionReceiptPipe
         ServiceOrderPaymentUpdatedPipelineData $serviceOrderPaymentUpdatedPipelineData,
         callable $next
     ): ServiceOrderPaymentUpdatedPipelineData {
-        $serviceTransaction = $serviceOrderPaymentUpdatedPipelineData->service_transaction;
-
         if ($serviceOrderPaymentUpdatedPipelineData->is_payment_paid) {
             $pdf = $this->generateServiceTransactionReceiptAction
-                ->execute($serviceTransaction);
+                ->execute($serviceOrderPaymentUpdatedPipelineData->service_transaction);
+
+            $this->sendToCustomerServiceTransactionReceiptEmailAction
+                ->execute(
+                    $serviceOrderPaymentUpdatedPipelineData->service_order,
+                    $serviceOrderPaymentUpdatedPipelineData->service_bill,
+                    $pdf
+                );
         }
 
         return $next($serviceOrderPaymentUpdatedPipelineData);
