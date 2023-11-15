@@ -26,16 +26,39 @@ beforeEach(function () {
     ]);
 });
 
-it('can store', function () {
+it('can complete', function () {
     $serviceOrder = ServiceOrderFactory::new()
-        ->inProgress()->has(
+        ->inProgress()
+        ->nonSubscriptionBased()
+        ->has(
+            ServiceBillFactory::new()->paid()
+        )->createOne();
+
+    postJson('api/service-order/complete/'.$serviceOrder->reference)
+        ->assertValid()
+        ->assertSuccessful();
+});
+
+it('can close active', function () {
+    $serviceOrder = ServiceOrderFactory::new()
+        ->active()->subscriptionBased()->has(
+            ServiceBillFactory::new()
+                ->paid()
+        )->createOne();
+    // dd($serviceOrder);
+    postJson('api/service-order/close/'.$serviceOrder->reference)
+        ->assertValid()
+        ->assertSuccessful();
+});
+
+it('can close inactive', function () {
+    $serviceOrder = ServiceOrderFactory::new()
+        ->inactive()->subscriptionBased()->has(
             ServiceBillFactory::new()
                 ->paid()
         )->createOne();
 
-    postJson('api/service-order/complete', [
-        'reference_id' => $serviceOrder->reference,
-    ])
+    postJson('api/service-order/close/'.$serviceOrder->reference)
         ->assertValid()
         ->assertSuccessful();
 });

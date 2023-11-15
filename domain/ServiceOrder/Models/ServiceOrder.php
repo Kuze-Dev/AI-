@@ -81,6 +81,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static ServiceOrderQueryBuilder|ServiceOrder newQuery()
  * @method static ServiceOrderQueryBuilder|ServiceOrder query()
  * @method static ServiceOrderQueryBuilder|ServiceOrder whereActive()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereInactive()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereActiveOrInactive()
  * @method static ServiceOrderQueryBuilder|ServiceOrder whereAdditionalCharges($value)
  * @method static ServiceOrderQueryBuilder|ServiceOrder whereAdminId($value)
  * @method static ServiceOrderQueryBuilder|ServiceOrder whereAutoGenerateBills()

@@ -15,6 +15,16 @@ class ServiceOrderQueryBuilder extends Builder
         return $this->where('status', ServiceOrderStatus::ACTIVE);
     }
 
+    public function whereInactive(): self
+    {
+        return $this->where('status', ServiceOrderStatus::INACTIVE);
+    }
+
+    public function whereInProgress(): self
+    {
+        return $this->where('status', ServiceOrderStatus::INPROGRESS);
+    }
+
     public function whereSubscriptionBased(): self
     {
         return $this->where('is_subscription', true);
