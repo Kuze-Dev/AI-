@@ -231,7 +231,8 @@ class CustomerResource extends Resource
                 Tables\Columns\BadgeColumn::make('tier.name')
                     ->translateLabel()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
+                    ->toggleable(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? false : true, isToggledHiddenByDefault: true)
                     ->wrap(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->translateLabel()
@@ -259,6 +260,7 @@ class CustomerResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->translateLabel(),
                 Tables\Filters\SelectFilter::make('tier')
+                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
                     ->translateLabel()
                     ->relationship('tier', 'name'),
                 Tables\Filters\SelectFilter::make('status')
