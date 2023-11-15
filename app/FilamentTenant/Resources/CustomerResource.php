@@ -299,7 +299,6 @@ class CustomerResource extends Resource
                         ->label(fn (Customer $record) => match ($record->register_status) {
                             RegisterStatus::UNREGISTERED => 'Send register invitation',
                             RegisterStatus::INVITED => 'Resend register invitation',
-                            RegisterStatus::REJECTED => 'Send rejected email notification',
                             default => throw new ErrorException('Invalid register status.'),
                         })
                         ->translateLabel()
@@ -307,7 +306,8 @@ class CustomerResource extends Resource
                         ->icon('heroicon-o-speakerphone')
                         ->action(function (Customer $record, Tables\Actions\Action $action): void {
 
-                            if ($record->register_status == RegisterStatus::UNREGISTERED) {
+                            if ($record->register_status == RegisterStatus::UNREGISTERED ||
+                                $record->register_status == RegisterStatus::INVITED) {
                                 $success = app(SendRegisterInvitationAction::class)
                                     ->execute($record);
 
@@ -389,20 +389,20 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->action(function (Collection $records, Tables\Actions\BulkAction $action) {
 
+                        $success = null;
                         /** @var \Domain\Customer\Models\Customer $customer */
                         foreach ($records as $customer) {
                             if ($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
                                 $success = app(SendRegisterInvitationAction::class)->execute($customer);
-                                if ($success) {
-                                    $action
-                                        ->successNotificationTitle(trans('Invitation Email sent.'))
-                                        ->success();
-                                } else {
-                                    $action->failureNotificationTitle(trans('Failed to send  invitation.'))
-                                        ->failure();
-                                }
-
                             }
+                        }
+                        if ($success) {
+                            $action
+                                ->successNotificationTitle(trans('Invitation Email sent.'))
+                                ->success();
+                        } else {
+                            $action->failureNotificationTitle(trans('Failed to send  invitation. Invite inactive and unregistered users only'))
+                                ->failure();
                         }
                     })
                     ->deselectRecordsAfterCompletion()

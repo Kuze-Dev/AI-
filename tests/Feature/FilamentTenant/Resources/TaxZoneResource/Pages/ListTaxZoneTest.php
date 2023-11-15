@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\Shopconfiguration\TaxZone;
 use App\FilamentTenant\Resources\TaxZoneResource\Pages\ListTaxZones;
 use Domain\Taxation\Database\Factories\TaxZoneFactory;
 use Filament\Facades\Filament;
@@ -14,6 +15,8 @@ beforeEach(function () {
     testInTenantContext();
     Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
+
+    tenancy()->tenant->features()->activate(TaxZone::class);
 });
 
 it('can render page', function () {

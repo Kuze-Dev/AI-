@@ -10,7 +10,7 @@ class AllowGuestOrder
 {
     public string $name = 'ecommerce.guest-order';
 
-    public string $label = 'Guest Order';
+    public string $label = 'Allow Guest Orders';
 
     public function resolve(Tenant $scope): mixed
     {

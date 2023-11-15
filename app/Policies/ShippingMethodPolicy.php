@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Features\ECommerce\ShippingStorePickup;
-use App\Features\ECommerce\ShippingUps;
-use App\Features\ECommerce\ShippingUsps;
+use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
+use App\Features\Shopconfiguration\Shipping\ShippingUps;
+use App\Features\Shopconfiguration\Shipping\ShippingUsps;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Auth\Access\Response;

@@ -164,7 +164,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
     protected function fullName(): Attribute
     {
         return Attribute::get(
-            fn ($value): string => "{$this->first_name} {$this->last_name}"
+            fn ($value): string => "{$this->last_name}, {$this->first_name}"
         );
     }
 
