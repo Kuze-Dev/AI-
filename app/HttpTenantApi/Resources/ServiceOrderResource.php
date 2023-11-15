@@ -48,7 +48,7 @@ class ServiceOrderResource extends JsonApiResource
     {
         return [
             'serviceBills' => fn () => ServiceBillResource::collection($this->serviceBills),
-            'service' => fn () => new ServiceResource($this->service),
+            is_null($this->service) ? '' : 'service' => fn () => new ServiceResource($this->service),
         ];
     }
 }

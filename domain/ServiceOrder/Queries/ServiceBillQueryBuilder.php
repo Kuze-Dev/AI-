@@ -7,6 +7,7 @@ namespace Domain\ServiceOrder\Queries;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 /** @extends \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceBill> */
 class ServiceBillQueryBuilder extends Builder
@@ -29,7 +30,7 @@ class ServiceBillQueryBuilder extends Builder
     public function whereServiceOrderRef(string $reference): self
     {
         /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
+        $customer = Auth::user();
 
         $serviceOrder = ServiceOrder::whereReference($reference)->whereCustomerId($customer->id)->first();
 
