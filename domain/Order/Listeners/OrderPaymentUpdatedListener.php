@@ -47,7 +47,7 @@ class OrderPaymentUpdatedListener
             'status' => OrderStatuses::CANCELLED,
         ]);
 
-        /** @var \Domain\Customer\Models\Customer $customer */
+        /** @var \Domain\Customer\Models\Customer|null $customer */
         $customer = Customer::find($order->customer_id);
 
         if ($customer) {
