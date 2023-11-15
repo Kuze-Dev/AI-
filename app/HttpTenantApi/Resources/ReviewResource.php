@@ -29,7 +29,8 @@ class ReviewResource extends JsonApiResource
     public function toRelationships(Request $request): array
     {
         $relationships = [
-            $this->is_anonymous ? '' : 'customer' => fn () => new CustomerResource($this->customer),
+            $this->is_anonymous || is_null($this->customer) ? '' :
+                'customer' => fn () => new CustomerResource($this->customer),
             'product' => fn () => new ProductResource($this->product),
             'order' => fn () => new OrderResource($this->product),
             'order_line' => fn () => new OrderLineResource($this->order_line),
