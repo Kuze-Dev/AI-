@@ -14,7 +14,7 @@ class ProductOptionValueData
         public readonly string $slug,
         public readonly int|string $product_option_id,
         public readonly string|null $icon_value = null,
-        public readonly string|null $icon_type = 'colored',
+        public readonly string|null $icon_type = 'text',
         public readonly UploadedFile|string|null|array $images = null,
     ) {
     }

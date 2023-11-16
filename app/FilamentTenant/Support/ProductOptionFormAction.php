@@ -81,7 +81,7 @@ class ProductOptionFormAction extends Action
                 $value['id'] = uniqid();
                 $value['slug'] = $value['name'];
                 $value['product_option_id'] = $option['id'];
-                $value['icon_type'] = 'colored';
+                $value['icon_type'] = $value['icon_type'];
 
                 return $value;
             })->toArray();

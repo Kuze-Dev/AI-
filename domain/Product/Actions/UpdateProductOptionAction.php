@@ -62,7 +62,7 @@ class UpdateProductOptionAction
                 if ($optionValueModel instanceof ProductOptionValue) {
                     $optionValueModel->name = $productOptionValue->name;
                     $optionValueModel->product_option_id = $productOption->id;
-                    $optionValueModel->data = ['icon_type' => $productOptionValue->icon_type ?? 'colored', 'icon_value' => $productOptionValue->icon_value];
+                    $optionValueModel->data = ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value];
                     $optionValueModel->save();
 
                     $this->uploadMediaMaterials(
@@ -73,7 +73,7 @@ class UpdateProductOptionAction
                     $newOptionValueModel = ProductOptionValue::create([
                         'name' => $productOptionValue->name,
                         'product_option_id' => $productOption->id,
-                        'data' => ['icon_type' => $productOptionValue->icon_type ?? 'colored', 'icon_value' => $productOptionValue->icon_value],
+                        'data' => ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value],
                     ]);
 
                     $this->uploadMediaMaterials(
