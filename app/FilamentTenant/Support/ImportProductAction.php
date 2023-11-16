@@ -35,9 +35,9 @@ class ImportProductAction
                     'retail_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
                     'selling_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
                     'weight' => ['required', 'numeric', new MinimumValueRule(0.1)],
-                    'length' => ['required', 'numeric', new MinimumValueRule(1)],
-                    'width' => ['required', 'numeric', new MinimumValueRule(1)],
-                    'height' => ['nullable', 'numeric', new MinimumValueRule(1)],
+                    'length' => ['required', 'numeric', new MinimumValueRule(0.01)],
+                    'width' => ['required', 'numeric', new MinimumValueRule(0.01)],
+                    'height' => ['nullable', 'numeric', new MinimumValueRule(0.01)],
                 ],
             );
     }

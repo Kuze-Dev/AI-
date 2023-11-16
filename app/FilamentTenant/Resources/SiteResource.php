@@ -167,6 +167,11 @@ class SiteResource extends Resource
             ]);
     }
 
+    protected static function shouldRegisterNavigation(): bool
+    {
+        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) ?: false;
+    }
+
     /** @return Builder<Site> */
     public static function getEloquentQuery(): Builder
     {

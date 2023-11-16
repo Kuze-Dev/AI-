@@ -40,7 +40,7 @@ class ShippingSettings extends TenantBaseSettings
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUsps::class)
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingUsps::class)
                     ),
                 Forms\Components\Section::make(trans('Ups Shipping'))
                     ->collapsible()
@@ -62,7 +62,7 @@ class ShippingSettings extends TenantBaseSettings
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUps::class)
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingUps::class)
                     ),
 
                 Forms\Components\Section::make(trans('AusPost Shipping'))
@@ -72,7 +72,7 @@ class ShippingSettings extends TenantBaseSettings
                             ->translateLabel(),
 
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingAusPost::class)
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingAusPost::class)
                     ),
 
             ]),

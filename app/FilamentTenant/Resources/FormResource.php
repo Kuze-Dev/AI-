@@ -265,7 +265,9 @@ class FormResource extends Resource
                     ->icon('heroicon-s-mail')
                     ->color(fn (FormModel $record) => $record->store_submission ? 'success' : 'secondary'),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(condition: function () {
+                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                    }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -273,6 +275,7 @@ class FormResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name'),
             ])
 
@@ -281,6 +284,9 @@ class FormResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make(),
                 ]),
+            ])->bulkActions([
+                Tables\Actions\DeleteBulkAction::make()
+                    ->authorize(fn () => Auth::user()?->hasRole(config('domain.role.super_admin'))),
             ])
             ->defaultSort('updated_at', 'desc');
     }

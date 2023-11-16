@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Console\Commands\CreateServiceBillCommand;
+use App\Console\Commands\InactivateServiceOrderCommand;
+use App\Console\Commands\NotifyCustomerServiceBillDueDateCommand;
+use Domain\Tenant\Models\Tenant;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -17,6 +21,29 @@ class Kernel extends ConsoleKernel
     /** Define the application's command schedule. */
     protected function schedule(Schedule $schedule): void
     {
+        $tenants = Tenant::pluck('id')->toArray();
+
+        $schedule->command(
+            NotifyCustomerServiceBillDueDateCommand::class,
+            ['--tenants' => $tenants]
+        )
+            ->daily()
+            ->sentryMonitor();
+
+        $schedule->command(
+            CreateServiceBillCommand::class,
+            ['--tenants' => $tenants]
+        )
+            ->daily()
+            ->sentryMonitor();
+
+        $schedule->command(
+            InactivateServiceOrderCommand::class,
+            ['--tenants' => $tenants]
+        )
+            ->daily()
+            ->sentryMonitor();
+
         $schedule->command(PruneExcelCommand::class)
             ->daily();
 

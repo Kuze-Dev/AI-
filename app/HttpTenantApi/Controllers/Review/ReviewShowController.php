@@ -22,9 +22,8 @@ class ReviewShowController
 {
     public function show(string $review): JsonApiResourceCollection
     {
-
         return ReviewResource::collection(
-            QueryBuilder::for(Review::whereProductId($review))
+            QueryBuilder::for(Review::whereProductId($review)->with('review_likes'))
                 ->allowedIncludes([
                     'product',
                     'customer.media',

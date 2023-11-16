@@ -133,7 +133,10 @@ class GlobalsResource extends Resource
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->toggleable(condition: function () {
+                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                    }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -141,9 +144,11 @@ class GlobalsResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name'),
                 Tables\Filters\SelectFilter::make('blueprint')
                     ->relationship('blueprint', 'name')
+                    ->hidden((bool) ! Auth::user()?->can('blueprint.viewAny'))
                     ->searchable()
                     ->optionsLimit(20),
             ])
@@ -155,7 +160,8 @@ class GlobalsResource extends Resource
                 ]),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->authorize(fn () => Auth::user()?->hasRole(config('domain.role.super_admin'))),
             ])
             ->defaultSort('updated_at', 'desc');
     }
