@@ -15,6 +15,11 @@ class ServiceBillQueryBuilder extends Builder
         return $this->where('status', ServiceBillStatus::PENDING);
     }
 
+    public function whereStatusPaid(): self
+    {
+        return $this->where('status', ServiceBillStatus::PAID);
+    }
+
     public function whereHasBillingDate(): self
     {
         return $this->whereNotNull('bill_date');
