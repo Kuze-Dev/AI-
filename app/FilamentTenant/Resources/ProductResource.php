@@ -124,7 +124,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['length'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                                     Forms\Components\TextInput::make('width')
@@ -134,7 +134,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['width'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                                     Forms\Components\TextInput::make('height')
@@ -144,7 +144,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['height'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
                                 ])->columns(3),
                         ]),
@@ -176,7 +176,7 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
-                                ->hidden(fn (Closure $get) => ! $get('allow_stocks'))
+                                ->hidden(fn (Closure $get) => !$get('allow_stocks'))
                                 ->required(fn (Closure $get) => $get('allow_stocks')),
                         ])->columns(2),
                     Forms\Components\Section::make('Pricing')
@@ -233,12 +233,13 @@ class ProductResource extends Resource
                                 ->label(
                                     fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 )
+                                ->reactive()
                                 ->helperText('This product will be hidden from all sales channels.'),
                             Forms\Components\Toggle::make('allow_guest_purchase')
                                 ->helperText('Item can be purchased by guests.')
                                 ->default(false)
                                 ->columnSpan(2)
-                                ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
+                                ->hidden(fn () => !tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
                         ]),
                     Forms\Components\Section::make('Associations')
                         ->translateLabel()
@@ -271,7 +272,7 @@ class ProductResource extends Resource
                                     Forms\Components\Hidden::make('taxonomy_terms')
                                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
-                                ->when(fn () => ! empty($taxonomies->toArray())),
+                                ->when(fn () => !empty($taxonomies->toArray())),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
@@ -391,7 +392,7 @@ class ProductResource extends Resource
                     Forms\Components\Repeater::make('options')
                         ->translateLabel()
                         ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire) {
-                            if ( ! $record) {
+                            if (!$record) {
                                 return $state;
                             }
 
@@ -420,6 +421,7 @@ class ProductResource extends Resource
 
                                 return [
                                     'id' => $productOption->id,
+                                    'is_regular' => $productOption->is_regular,
                                     'name' => $productOption->name,
                                     'slug' => $productOption->slug,
                                     'productOptionValues' => $mappedOptionValues,
@@ -428,21 +430,50 @@ class ProductResource extends Resource
                             $component->state($mappedOptions->toArray());
                         })
                         ->schema([
-                            Forms\Components\TextInput::make('name')
-                                ->translateLabel()
-                                ->maxLength(100)
-                                ->required(),
-                            Forms\Components\Repeater::make('productOptionValues')
-                                ->translateLabel()
+                            Forms\Components\Fieldset::make('Product Option')
                                 ->schema([
                                     Forms\Components\TextInput::make('name')
                                         ->translateLabel()
                                         ->maxLength(100)
-                                        ->label('')
-                                        ->lazy()
                                         ->required(),
-                                    Forms\Components\ColorPicker::make('icon_value'),
+                                    Forms\Components\Toggle::make('is_regular') // MAY WAY BA NA MA ACCESS KO YUNG VALUE NITO
+                                        ->label(
+                                            fn ($state) => $state ? ucfirst(trans('Regular')) : ucfirst(trans('Custom'))
+                                        )
+                                        ->extraAttributes(['class' => 'mt-2 mb-1'])
+                                        ->default(true)
+                                        ->helperText('Identify whether the option value in the form has customization for color or not.')
+                                        ->reactive()
+                                ])->columns(2),
+                            Forms\Components\Repeater::make('productOptionValues')
+                                ->translateLabel()
+                                ->columnSpan(2)
+                                ->schema([
+                                    Forms\Components\Group::make()
+                                        ->schema(
+                                            [
+                                                Forms\Components\TextInput::make('name')
+                                                    ->translateLabel()
+                                                    ->maxLength(100)
+                                                    ->label('')
+                                                    ->lazy()
+                                                    ->required(),
+                                                Forms\Components\Toggle::make('icon_type')
+                                                    ->label(
+                                                        fn ($state) => $state ? ucfirst(trans('Colored')) : ucfirst(trans('Regular'))
+                                                    )
+                                                    ->extraAttributes(['class' => 'mt-2 mb-1'])
+                                                    ->default(true)
+                                                    ->reactive(),
+                                            ]
+                                        )->columns(2),
+                                    Forms\Components\ColorPicker::make('icon_value')
+                                        ->label(trans('Icon Value (HEX)'))
+                                        ->hidden(
+                                            fn (Closure $get) => !$get('icon_type')
+                                        ),
                                     Forms\Components\FileUpload::make('images')
+                                        ->label(trans('Images (Preview Slides)'))
                                         ->image()
                                         ->mediaLibraryCollection('media')
                                         ->multiple()
@@ -476,7 +507,7 @@ class ProductResource extends Resource
                 ->itemLabel(fn (array $state) => $state['name'] ?? null)
                 ->formatStateUsing(
                     function (?Product $record) {
-                        if ( ! $record) {
+                        if (!$record) {
                             return [];
                         }
 
@@ -498,9 +529,9 @@ class ProductResource extends Resource
                                     foreach ($state['combination'] as $key => $combination) {
                                         $schemaArray[$key] =
                                             Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                                ->formatStateUsing(fn () => ucfirst($combination['option_value']))
-                                                ->label(trans(ucfirst($combination['option'])))
-                                                ->disabled();
+                                            ->formatStateUsing(fn () => ucfirst($combination['option_value']))
+                                            ->label(trans(ucfirst($combination['option'])))
+                                            ->disabled();
                                     }
 
                                     return $schemaArray;

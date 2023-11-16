@@ -10,6 +10,10 @@ return new class () extends Migration {
     /** Run the migrations. */
     public function up(): void
     {
+        Schema::table('product_options', function (Blueprint $table) {
+            $table->boolean('is_regular')->default(true)->after('slug');
+        });
+
         Schema::table('product_option_values', function (Blueprint $table) {
             $table->json('data')->nullable();
         });
@@ -17,6 +21,10 @@ return new class () extends Migration {
 
     public function down(): void
     {
+        Schema::table('product_options', function (Blueprint $table) {
+            $table->dropColumn('is_regular');
+        });
+
         Schema::table('product_option_values', function (Blueprint $table) {
             $table->dropColumn('data');
         });
