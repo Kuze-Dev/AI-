@@ -244,9 +244,15 @@ class ServiceOrderResource extends Resource
                                     ->schema([
                                         TextInput::make('name')->required()->translateLabel(),
                                         TextInput::make('quantity')->required()->numeric()->reactive()->default(1)->translateLabel(),
+                                        DateTimePicker::make('Date')
+                                            ->minDate(now())
+                                            ->withoutSeconds()
+                                            ->default(now())
+                                            ->disabled()
+                                            ->hidden()
+                                            ->timezone(Auth::user()?->timezone),
                                         TextInput::make('price')->required()->reactive()->translateLabel(),
                                     ])
-                                    ->maxItems(3)
                                     ->columns(3),
 
                             ]),
