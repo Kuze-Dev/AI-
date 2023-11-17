@@ -24,13 +24,13 @@ use Throwable;
 #[Middleware('feature.tenant:'.CustomerBase::class)]
 class RegisterController
 {
-    protected $createCustomerAction;
+    protected CreateCustomerAction $createCustomerAction;
 
-    protected $editCustomerAction;
+    protected EditCustomerAction $editCustomerAction;
 
-    protected $verifyEmailAction;
+    protected VerifyEmailAction $verifyEmailAction;
 
-    protected $sendForApprovalRegistrationAction;
+    protected SendForApprovalRegistrationAction $sendForApprovalRegistrationAction;
 
     public function __construct(CreateCustomerAction $createCustomerAction,
         EditCustomerAction $editCustomerAction,
