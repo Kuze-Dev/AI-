@@ -24,6 +24,25 @@ use Throwable;
 #[Middleware('feature.tenant:'.CustomerBase::class)]
 class RegisterController
 {
+    protected $createCustomerAction;
+
+    protected $editCustomerAction;
+
+    protected $verifyEmailAction;
+
+    protected $sendForApprovalRegistrationAction;
+
+    public function __construct(CreateCustomerAction $createCustomerAction,
+        EditCustomerAction $editCustomerAction,
+        VerifyEmailAction $verifyEmailAction,
+        SendForApprovalRegistrationAction $sendForApprovalRegistrationAction)
+    {
+        $this->createCustomerAction = $createCustomerAction;
+        $this->editCustomerAction = $editCustomerAction;
+        $this->verifyEmailAction = $verifyEmailAction;
+        $this->sendForApprovalRegistrationAction = $sendForApprovalRegistrationAction;
+    }
+
     /** @throws Throwable */
     #[Post('register', name: 'customer.register')]
     public function __invoke(CustomerRegisterRequest $request): CustomerResource
@@ -39,21 +58,19 @@ class RegisterController
             $validated = $request->validated();
 
             $customerModel = Customer::whereCuid($validated['invited'])->firstOrFail();
-            
+
             $customer = DB::transaction(
-                fn () => app(EditCustomerAction::class)
-                    ->execute($customerModel, CustomerData::updateInvitedCustomer($validated))
+                fn () => $this->editCustomerAction->execute($customerModel, CustomerData::updateInvitedCustomer($validated))
             );
 
-            app(VerifyEmailAction::class)->execute($customer);
+            $this->verifyEmailAction->execute($customer);
 
         } else {
             $customer = DB::transaction(
-                fn () => app(CreateCustomerAction::class)
-                    ->execute(CustomerData::fromRegistrationRequest($request, $customerTier, $defaultTier))
+                fn () => $this->createCustomerAction->execute(CustomerData::fromRegistrationRequest($request, $customerTier, $defaultTier))
             );
             if ($customerTier?->has_approval) {
-                app(SendForApprovalRegistrationAction::class)->execute($customer);
+                $this->sendForApprovalRegistrationAction->execute($customer);
             }
         }
 
