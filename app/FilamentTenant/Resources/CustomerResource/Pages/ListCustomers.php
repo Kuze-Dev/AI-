@@ -34,8 +34,8 @@ class ListCustomers extends ListRecords
                     function (array $row): Customer {
                         $data = [
                             'email' => $row['email'],
-                            'first_name' => $row['first_name'],
-                            'last_name' => $row['last_name'],
+                            'first_name' => $row['first_name'] ?? null,
+                            'last_name' => $row['last_name'] ?? null,
                             'mobile' => $row['mobile'] ?? null,
                             'gender' => $row['gender'] ?? null,
                             'status' => $row['status'] ?? null,
@@ -47,8 +47,6 @@ class ListCustomers extends ListRecords
                         unset($row);
 
                         if ($customer = Customer::whereEmail($data['email'])->first()) {
-                            unset($data['email']);
-
                             return app(EditCustomerAction::class)
                                 ->execute($customer, CustomerData::fromArrayImportByAdmin($data));
                         }

@@ -207,4 +207,20 @@ final class CustomerData
 
         return RegisterStatus::UNREGISTERED;
     }
+
+    public static function updateInvitedCustomer(array $data): self
+    {
+        return new self(
+            first_name: $data['first_name'],
+            last_name: $data['last_name'],
+            mobile: $data['mobile'],
+            gender: Gender::from($data['gender']),
+            birth_date: now()->parse($data['birth_date']),
+            status: Status::ACTIVE,
+            email: $data['email'],
+            password: $data['password'],
+            image: $data['profile_image'] ?? null,
+            register_status: RegisterStatus::REGISTERED,
+        );
+    }
 }
