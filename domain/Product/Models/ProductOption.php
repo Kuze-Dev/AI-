@@ -44,7 +44,7 @@ class ProductOption extends Model
     protected $fillable = [
         'name',
         'product_id',
-        'is_regular',
+        'is_custom',
     ];
 
     /**
@@ -52,7 +52,7 @@ class ProductOption extends Model
      * to a specific data type.
      */
     protected $casts = [
-        'is_regular' => 'boolean',
+        'is_custom' => 'boolean',
     ];
 
     public function getRouteKeyName(): string

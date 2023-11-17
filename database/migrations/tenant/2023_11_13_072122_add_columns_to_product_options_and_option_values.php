@@ -11,7 +11,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('product_options', function (Blueprint $table) {
-            $table->boolean('is_regular')->default(true)->after('slug');
+            $table->boolean('is_custom')->default(false)->after('slug');
         });
 
         Schema::table('product_option_values', function (Blueprint $table) {
@@ -22,7 +22,7 @@ return new class () extends Migration {
     public function down(): void
     {
         Schema::table('product_options', function (Blueprint $table) {
-            $table->dropColumn('is_regular');
+            $table->dropColumn('is_custom');
         });
 
         Schema::table('product_option_values', function (Blueprint $table) {

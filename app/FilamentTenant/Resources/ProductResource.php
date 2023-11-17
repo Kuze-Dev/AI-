@@ -21,6 +21,7 @@ use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms;
 use Closure;
+use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Product\Models\ProductOption;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -31,6 +32,7 @@ use Domain\Product\Actions\DeleteProductAction;
 use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Rules\UniqueProductSkuRule;
+use Livewire;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
@@ -124,7 +126,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['length'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                                     Forms\Components\TextInput::make('width')
@@ -134,7 +136,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['width'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
 
                                     Forms\Components\TextInput::make('height')
@@ -144,7 +146,7 @@ class ProductResource extends Resource
                                         ->rules([
                                             new MinimumValueRule(0.01),
                                         ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
+                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => !$record ? $state : $component->state($record->dimension['height'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
                                 ])->columns(3),
                         ]),
@@ -176,7 +178,7 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
-                                ->hidden(fn (Closure $get) => ! $get('allow_stocks'))
+                                ->hidden(fn (Closure $get) => !$get('allow_stocks'))
                                 ->required(fn (Closure $get) => $get('allow_stocks')),
                         ])->columns(2),
                     Forms\Components\Section::make('Pricing')
@@ -239,7 +241,7 @@ class ProductResource extends Resource
                                 ->helperText('Item can be purchased by guests.')
                                 ->default(false)
                                 ->columnSpan(2)
-                                ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
+                                ->hidden(fn () => !tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
                         ]),
                     Forms\Components\Section::make('Associations')
                         ->translateLabel()
@@ -272,7 +274,7 @@ class ProductResource extends Resource
                                     Forms\Components\Hidden::make('taxonomy_terms')
                                         ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
-                                ->when(fn () => ! empty($taxonomies->toArray())),
+                                ->when(fn () => !empty($taxonomies->toArray())),
                         ]),
                     MetaDataForm::make('Meta Data'),
                 ])->columnSpan(1),
@@ -385,14 +387,17 @@ class ProductResource extends Resource
     {
         return Forms\Components\Section::make(trans('Variant'))->schema([
             /** For Manage Variant */
+
             ProductOptionSupport::make('product_options')
                 ->translateLabel()
                 ->itemLabel(fn (array $state) => $state['name'] ?? null)
                 ->schema([
                     Forms\Components\Repeater::make('options')
+                        // ->afterStateUpdated(fn(Closure $get) => \Log::info('Testttttt'))
                         ->translateLabel()
-                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire) {
-                            if ( ! $record) {
+                        ->reactive()
+                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire, Closure $get) {
+                            if (!$record) {
                                 return $state;
                             }
 
@@ -421,7 +426,7 @@ class ProductResource extends Resource
 
                                 return [
                                     'id' => $productOption->id,
-                                    'is_regular' => $productOption->is_regular,
+                                    'is_custom' => $productOption->is_custom,
                                     'name' => $productOption->name,
                                     'slug' => $productOption->slug,
                                     'productOptionValues' => $mappedOptionValues,
@@ -430,24 +435,30 @@ class ProductResource extends Resource
                             $component->state($mappedOptions->toArray());
                         })
                         ->schema([
-                            Forms\Components\Fieldset::make('Product Option')
-                                ->schema([
-                                    Forms\Components\TextInput::make('name')
-                                        ->translateLabel()
-                                        ->maxLength(100)
-                                        ->required(),
-                                    Forms\Components\Toggle::make('is_regular')
-                                        ->label(
-                                            fn ($state) => $state ? ucfirst(trans('Regular')) : ucfirst(trans('Custom'))
-                                        )
-                                        ->extraAttributes(['class' => 'mt-2 mb-1'])
-                                        ->default(true)
-                                        ->helperText('Identify whether the option value in the form has customization for color or not.')
-                                        ->reactive(),
-                                ])->columns(2),
+                            Forms\Components\TextInput::make('name')
+                                ->translateLabel()
+                                ->maxLength(100)
+                                ->required(),
+                            Forms\Components\Toggle::make('is_custom')
+                                ->label(
+                                    fn ($state) => $state ? ucfirst(trans('Custom')) : ucfirst(trans('Regular'))
+                                )
+                                // ->hidden(function (Closure $get, ProductOption $record) {
+                                //     dd($record);
+                                //     \Log::info('ALL INFO : ', [$get('../../*')]);
+                                //     $parentRepeaterOptionId = $get('../../*')[0][0]['id'];
+                                //     $currentOptionId = $get('../*')[0]['id'];
+                                //     // \Log::info('OPTION ID ITO SA IS CUSTOM : ', [$parentRepeaterOptionId, $currentOptionId]);
+                                //     return $parentRepeaterOptionId !== $currentOptionId;
+                                // })
+                                ->extraAttributes(['class' => 'mt-2 mb-1'])
+                                ->default(true)
+                                ->helperText('Identify whether the option value in the form has customization.')
+                                ->reactive(),
                             Forms\Components\Repeater::make('productOptionValues')
                                 ->translateLabel()
                                 ->columnSpan(2)
+                                ->collapsible()
                                 ->schema([
                                     Forms\Components\Group::make()
                                         ->schema(
@@ -458,21 +469,23 @@ class ProductResource extends Resource
                                                     ->lazy()
                                                     ->required(),
                                                 Forms\Components\Select::make('icon_type')
+                                                    ->default('text')
+                                                    ->required()
                                                     ->options([
                                                         'text' => 'Text',
                                                         'color_palette' => 'Color Palette',
-                                                        // 'image' => 'Image',
+                                                        // 'image' => 'Image
                                                     ])
-                                                    ->default('text')
-                                                    ->required()
+                                                    ->hidden(fn (Closure $get) => !$get('../../is_custom'))
                                                     ->reactive(),
                                             ]
                                         )->columns(2),
                                     Forms\Components\ColorPicker::make('icon_value')
                                         ->label(trans('Icon Value (HEX)'))
-                                        ->hidden(
-                                            fn (Closure $get) => $get('icon_type') !== 'color_palette'
-                                        ),
+                                        ->hidden(fn (Closure $get) => !($get('icon_type') === 'color_palette' && $get('../../is_custom'))),
+                                    // Forms\Components\FileUpload::make('icon_image')
+                                    //     ->image()
+                                    //     ->hidden(fn (Closure $get) => !($get('icon_type') === 'image' && $get('../../is_custom'))),
                                     Forms\Components\FileUpload::make('images')
                                         ->label(trans('Images (Preview Slides)'))
                                         ->image()
@@ -508,7 +521,7 @@ class ProductResource extends Resource
                 ->itemLabel(fn (array $state) => $state['name'] ?? null)
                 ->formatStateUsing(
                     function (?Product $record) {
-                        if ( ! $record) {
+                        if (!$record) {
                             return [];
                         }
 
@@ -530,9 +543,9 @@ class ProductResource extends Resource
                                     foreach ($state['combination'] as $key => $combination) {
                                         $schemaArray[$key] =
                                             Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                                ->formatStateUsing(fn () => ucfirst($combination['option_value']))
-                                                ->label(trans(ucfirst($combination['option'])))
-                                                ->disabled();
+                                            ->formatStateUsing(fn () => ucfirst($combination['option_value']))
+                                            ->label(trans(ucfirst($combination['option'])))
+                                            ->disabled();
                                     }
 
                                     return $schemaArray;

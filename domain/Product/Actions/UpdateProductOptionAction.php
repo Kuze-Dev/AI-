@@ -31,11 +31,13 @@ class UpdateProductOptionAction
             if ($productOptionModel instanceof ProductOption) {
                 $productOptionModel->product_id = $product->id;
                 $productOptionModel->name = $productOption->name;
+                $productOptionModel->is_custom = $productOption->is_custom;
                 $productOptionModel->save();
             } else {
                 $newProductOptionModel = ProductOption::create([
                     'product_id' => $product->id,
                     'name' => $productOption->name,
+                    'is_custom' => $productOption->is_custom,
                 ]);
 
                 // Update product variant
