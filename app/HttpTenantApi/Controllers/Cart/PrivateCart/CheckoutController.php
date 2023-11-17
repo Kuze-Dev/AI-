@@ -7,13 +7,13 @@ namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CheckoutAction;
 use Domain\Cart\DataTransferObjects\CheckoutData;
+use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CheckoutRequest;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 
@@ -31,7 +31,7 @@ class CheckoutController
 
         $reference = $validated['reference'];
 
-        $cartLineQuery = CartLine::with(['purchasable' => function (MorphTo $query) {
+        $cartLines = CartLine::with(['purchasable' => function (MorphTo $query) {
             $query->morphWith([
                 Product::class => ['media'],
                 ProductVariant::class => ['product.media'],
@@ -42,7 +42,9 @@ class CheckoutController
             })
             ->whereCheckoutReference($reference);
 
-        $model = QueryBuilder::for($cartLineQuery)->jsonPaginate();
+        $cartLineIds = $cartLines->pluck('uuid')->toArray();
+
+        $model = app(CartLineQuery::class)->execute($cartLineIds);
 
         if ($model->isNotEmpty()) {
             $expiredCartLines = $model->where('checkout_expiration', '<=', now());

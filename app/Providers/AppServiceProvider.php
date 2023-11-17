@@ -42,6 +42,9 @@ use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Review\Models\Review;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\ServiceOrder\Models\ServiceTransaction;
 use Domain\Shipment\Models\Shipment;
 use Domain\Shipment\Models\ShippingBox;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -74,9 +77,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict(! $this->app->isProduction());
+        // Model::shouldBeStrict(! $this->app->isProduction());
 
-        Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
+        // Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -140,7 +143,10 @@ class AppServiceProvider extends ServiceProvider
             Locale::class,
             Site::class,
             Service::class,
+            ServiceOrder::class,
+            ServiceBill::class,
             TenantApiCall::class,
+            ServiceTransaction::class,
         ]);
 
         Password::defaults(
@@ -181,5 +187,8 @@ class AppServiceProvider extends ServiceProvider
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
         Feature::discover('App\\Features\\Customer', app_path('Features/Customer'));
         Feature::discover('App\\Features\\Service', app_path('Features/Service'));
+        Feature::discover('App\\Features\\Shopconfiguration', app_path('Features/Shopconfiguration'));
+        Feature::discover('App\\Features\\Shopconfiguration\PaymentGateway', app_path('Features/Shopconfiguration/PaymentGateway'));
+        Feature::discover('App\\Features\\Shopconfiguration\Shipping', app_path('Features/Shopconfiguration/Shipping'));
     }
 }

@@ -216,16 +216,11 @@ class ContentEntryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->sortable()
-                    ->label('title')
-                    ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable()
-                    ->hidden()
                     ->truncate('xs', true),
-                Tables\Columns\TextColumn::make('activeRouteUrl.url')
+                Tables\Columns\TextColumn::make('routeUrls.url')
                     ->label('URL')
                     ->sortable()
                     ->searchable()
@@ -246,7 +241,10 @@ class ContentEntryResource extends Resource
                     ->limit()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->toggleable(condition: function () {
+                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                    }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
@@ -279,8 +277,14 @@ class ContentEntryResource extends Resource
                     ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
                 Tables\Filters\Filter::make('published_at_year_month')
                     ->form([
-                        Forms\Components\TextInput::make('published_at_year')
-                            ->numeric()
+                        Forms\Components\Select::make('published_at_year')
+                            ->placeholder('Select Year')
+                            ->searchable()
+                            ->options(
+                                collect(range(1900, Carbon::now()->addYears(10)->year))
+                                    ->mapWithKeys(fn (int $year) => [$year => $year])
+                                    ->toArray()
+                            )
                             ->debounce(),
                         Forms\Components\Select::make('published_at_month')
                             ->options(

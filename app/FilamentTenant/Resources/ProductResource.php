@@ -120,7 +120,7 @@ class ProductResource extends Resource
                                         ->numeric()
                                         ->required()
                                         ->rules([
-                                            new MinimumValueRule(1),
+                                            new MinimumValueRule(0.01),
                                         ])
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
@@ -130,7 +130,7 @@ class ProductResource extends Resource
                                         ->numeric()
                                         ->required()
                                         ->rules([
-                                            new MinimumValueRule(1),
+                                            new MinimumValueRule(0.01),
                                         ])
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
@@ -140,7 +140,7 @@ class ProductResource extends Resource
                                         ->numeric()
                                         ->required()
                                         ->rules([
-                                            new MinimumValueRule(1),
+                                            new MinimumValueRule(0.01),
                                         ])
                                         ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),

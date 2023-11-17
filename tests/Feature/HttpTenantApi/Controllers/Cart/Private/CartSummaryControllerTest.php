@@ -6,7 +6,7 @@ use App\Features\Customer\AddressBase;
 use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use App\Features\ECommerce\ECommerceBase;
-use App\Features\ECommerce\ShippingStorePickup;
+use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
