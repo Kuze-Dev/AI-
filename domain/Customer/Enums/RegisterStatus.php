@@ -10,4 +10,9 @@ enum RegisterStatus: string
     case INVITED = 'invited';
     case REGISTERED = 'registered';
     case REJECTED = 'rejected';
+
+    public function isAllowedInvite(): bool
+    {
+        return $this === self::UNREGISTERED;
+    }
 }
