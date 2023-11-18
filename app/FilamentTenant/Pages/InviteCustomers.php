@@ -101,7 +101,7 @@ class InviteCustomers extends Page implements HasTable
         ];
     }
 
-    public function getTableBulkActions()
+    public function getTableBulkActions(): array
     {
         return [
             BulkAction::make('invite')
