@@ -29,10 +29,8 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
@@ -387,28 +385,6 @@ class CustomerResource extends Resource
                             $customer->created_at?->format(config('tables.date_time_format')),
                         ]
                     ),
-                BulkAction::make('bulk_invite')
-                    ->translateLabel()
-                    ->action(function (Collection $records, Tables\Actions\BulkAction $action) {
-
-                        $success = null;
-                        /** @var \Domain\Customer\Models\Customer $customer */
-                        foreach ($records as $customer) {
-                            if ($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
-                                $success = app(SendRegisterInvitationAction::class)->execute($customer);
-                            }
-                        }
-                        if ($success) {
-                            $action
-                                ->successNotificationTitle(trans('Invitation Email sent.'))
-                                ->success();
-                        } else {
-                            $action->failureNotificationTitle(trans('Failed to send  invitation. Invite inactive and unregistered users only'))
-                                ->failure();
-                        }
-                    })
-                    ->deselectRecordsAfterCompletion()
-                    ->icon('heroicon-o-speakerphone'),
             ])
             ->defaultSort('updated_at', 'desc');
     }
