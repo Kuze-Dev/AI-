@@ -48,7 +48,7 @@ class ServiceOrderController
 
         return ServiceOrderResource::make(
             QueryBuilder::for(ServiceOrder::whereReference($serviceOrder)->whereBelongsTo($customer))
-                ->allowedIncludes(['serviceBills'])
+                ->allowedIncludes(['serviceBills', 'service.media'])
                 ->firstOrFail()
         );
     }
