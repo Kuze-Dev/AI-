@@ -244,7 +244,7 @@ class ServiceOrderResource extends Resource
                                     ->schema([
                                         TextInput::make('name')->required()->translateLabel(),
                                         TextInput::make('quantity')->required()->numeric()->reactive()->default(1)->translateLabel(),
-                                        DateTimePicker::make('Date')
+                                        DateTimePicker::make('date')
                                             ->minDate(now())
                                             ->withoutSeconds()
                                             ->default(now())
