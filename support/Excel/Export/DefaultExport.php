@@ -13,6 +13,8 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 /**
  * @template TModelClass of \Illuminate\Database\Eloquent\Model
+ *
+ * @phpstan-ignore-next-line
  */
 class DefaultExport implements FromQuery, WithCustomChunkSize, WithHeadings, WithMapping
 {
