@@ -229,4 +229,9 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
     {
         return $this->hasMany(ServiceOrder::class);
     }
+
+    public function isAllowedInvite(): bool
+    {
+        return $this->status?->isAllowedInvite() && $this->register_status->isAllowedInvite();
+    }
 }
