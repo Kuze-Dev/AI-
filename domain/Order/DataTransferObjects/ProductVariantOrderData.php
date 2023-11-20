@@ -28,9 +28,9 @@ class ProductVariantOrderData
             $combinations[] = new ProductVariantCombinationData(
                 option_id: $combinationData['option_id'],
                 option: $combinationData['option'],
-                option_value_id: 1,
+                option_value_id: $combinationData['option_value_id'],
                 option_value: $combinationData['option_value'],
-                option_value_data: []
+                option_value_data: $combinationData['option_value_data'],
             );
         }
 
@@ -49,6 +49,7 @@ class ProductVariantOrderData
     {
         $combinations = [];
         foreach ($productVariant->combination as $combinationData) {
+            /** @var \Domain\Product\Models\ProductOptionValue $productOptionValue */
             $productOptionValue = ProductOptionValue::with('media')
                 ->where('id', $combinationData['option_value_id'])->first();
 

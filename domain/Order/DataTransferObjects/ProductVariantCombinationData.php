@@ -11,7 +11,7 @@ class ProductVariantCombinationData
         public readonly string $option,
         public readonly int $option_value_id,
         public readonly string $option_value,
-        public readonly array $option_value_data,
+        public readonly array|null $option_value_data,
     ) {
     }
 }
