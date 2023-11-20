@@ -295,6 +295,7 @@ return [
         |
         */
         'local_path'          => env('APP_ENV') == 'local' ? storage_path('framework/cache/laravel-excel') : sys_get_temp_dir(),
+        // 'local_path'        => storage_path('framework/cache/laravel-excel'),
 
         /*
         |--------------------------------------------------------------------------
