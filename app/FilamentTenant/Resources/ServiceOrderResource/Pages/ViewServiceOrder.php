@@ -31,6 +31,7 @@ use Domain\Taxation\Enums\PriceDisplay;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action as ComponentsAction;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -372,6 +373,13 @@ class ViewServiceOrder extends EditRecord
                         ->schema([
                             TextInput::make('name')->required(),
                             TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
+                            DateTimePicker::make('date')
+                                ->minDate(now())
+                                ->withoutSeconds()
+                                ->default(now())
+                                ->disabled()
+                                ->hidden()
+                                ->timezone(Auth::user()?->timezone),
                             TextInput::make('price')->required()->numeric()->reactive(),
                         ])
                         ->maxItems(3)

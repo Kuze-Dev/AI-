@@ -138,7 +138,8 @@ class ServiceResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('image')
+                SpatieMediaLibraryImageColumn::make('media')
+                    ->label('Image')
                     ->collection('media')
                     ->default(
                         fn ($record) => $record->getFirstMedia('media') ?? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'

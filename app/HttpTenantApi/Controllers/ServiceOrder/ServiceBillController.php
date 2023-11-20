@@ -24,7 +24,7 @@ class ServiceBillController
                 ->defaultSort('-created_at')
                 ->allowedIncludes(['serviceOrder'])
                 ->allowedFilters(['status', 'reference'])
-                ->allowedSorts(['reference', 'total_amount', 'status', 'created_at'])
+                ->allowedSorts(['reference', 'total_amount', 'status', 'created_at', 'due_date', 'bill_date'])
                 ->jsonPaginate()
         );
     }
