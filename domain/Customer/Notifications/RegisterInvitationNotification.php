@@ -45,6 +45,9 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
             'email' => $customer->email,
             'first_name' => $customer->first_name,
             'last_name' => $customer->last_name,
+            'mobile' => $customer->mobile,
+            'gender' => $customer->gender,
+            'birth_date' => $customer->birth_date?->toDateString(),
             'invited' => $customer->cuid,
         ]);
     }
