@@ -172,6 +172,7 @@ class CustomerResource extends Resource
                         )
                         ->enum(Gender::class),
                     Forms\Components\Select::make('status')
+                        ->reactive()
                         ->translateLabel()
                         ->nullable()
                         ->options(
@@ -180,6 +181,25 @@ class CustomerResource extends Resource
                                 ->toArray()
                         )
                         ->enum(Status::class),
+                    Forms\Components\Select::make('register_status')
+                        ->hidden(fn ($record) => $record?->register_status === RegisterStatus::REGISTERED)
+                        ->placeholder('Select Register status')
+                        ->translateLabel()
+                        ->required()
+                        ->reactive()
+                        ->options(
+                            collect(RegisterStatus::cases())
+                                ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
+                                ->toArray()
+                        )
+                        ->helperText(function ($state, Closure $set) {
+                            if ($state === RegisterStatus::INVITED->value) {
+                                $set('status', Status::INACTIVE->value);
+
+                                return 'Inactive status is required when register status is invited.';
+                            }
+                        })
+                        ->enum(RegisterStatus::class),
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
@@ -284,11 +304,9 @@ class CustomerResource extends Resource
                 Tables\Filters\SelectFilter::make('register_status')
                     ->translateLabel()
                     ->default(RegisterStatus::REGISTERED->value)
-                    ->options(
-                        collect(RegisterStatus::cases())
-                            ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
-                            ->toArray()
-                    ),
+                    ->options([
+                        'Registered' => ucfirst(RegisterStatus::REGISTERED->value),
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

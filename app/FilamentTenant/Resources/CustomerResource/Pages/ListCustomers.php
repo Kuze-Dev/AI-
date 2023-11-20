@@ -9,6 +9,7 @@ use Domain\Customer\Actions\CreateCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
@@ -36,23 +37,29 @@ class ListCustomers extends ListRecords
                             'email' => $row['email'],
                             'first_name' => $row['first_name'] ?? null,
                             'last_name' => $row['last_name'] ?? null,
-                            'mobile' => $row['mobile'] ?? null,
+                            'mobile' => $row['mobile'] ? (string) $row['mobile'] : null,
                             'gender' => $row['gender'] ?? null,
+                            'password' => $row['password'] ?? $row['email'],
                             'status' => $row['status'] ?? null,
                             'birth_date' => $row['birth_date'] ?? null,
                             'tier_id' => isset($row['tier'])
                                 ? (Tier::whereName($row['tier'])->first()?->getKey())
                                 : null,
                         ];
+
                         unset($row);
 
-                        if ($customer = Customer::whereEmail($data['email'])->first()) {
+                        $customer = Customer::whereEmail($data['email'])->first();
+
+                        if ($customer?->register_status === RegisterStatus::REGISTERED) {
+                            $data['password'] = $customer->password;
+
                             return app(EditCustomerAction::class)
-                                ->execute($customer, CustomerData::fromArrayImportByAdmin($data));
+                                ->execute($customer, CustomerData::fromArrayRegisteredImportByAdmin($data));
                         }
 
                         return app(CreateCustomerAction::class)
-                            ->execute(CustomerData::fromArrayImportByAdmin($data));
+                            ->execute(CustomerData::fromArrayRegisteredImportByAdmin($data));
 
                     }
                 )
@@ -64,7 +71,7 @@ class ListCustomers extends ListRecords
                         ],
                         'first_name' => 'required|string|min:3|max:100',
                         'last_name' => 'required|string|min:3|max:100',
-                        'mobile' => 'nullable|string|min:3|max:100',
+                        'mobile' => 'nullable|min:3|max:100',
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'status' => ['nullable', Rule::enum(Status::class)],
                         'birth_date' => 'nullable|date',
