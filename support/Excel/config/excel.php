@@ -10,10 +10,10 @@ return [
 
         'base_directory' => 'filament-excel',
 
-        'local_permissions' => [
-            'dir'  => 0755,
-            'file' => 0644,
-        ],
+        // 'local_permissions' => [
+        //     'dir'  => 0755,
+        //     'file' => 0644,
+        // ],
 
     ],
 
