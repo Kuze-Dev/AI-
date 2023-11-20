@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages;
 
+use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use Artificertech\FilamentMultiContext\Concerns\ContextualPage;
 use Domain\Customer\Actions\CreateCustomerAction;
@@ -41,6 +42,15 @@ class InviteCustomers extends Page implements HasTable
     protected static string $view = 'filament.pages.invite-customers';
 
     protected static ?string $navigationGroup = 'Customer Management';
+
+    public static function registerNavigationItems(): void
+    {
+        if (! tenancy()->tenant?->features()->active(CustomerBase::class)) {
+            return;
+        }
+        Filament::registerNavigationItems(static::getNavigationItems());
+
+    }
 
     /** @return Builder<\Domain\Customer\Models\Customer> */
     protected function getTableQuery(): Builder
