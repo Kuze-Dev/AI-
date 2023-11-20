@@ -7,6 +7,7 @@ namespace Domain\Customer\Notifications;
 use App\Settings\ECommerceSettings;
 use App\Settings\FormSettings;
 use App\Settings\SiteSettings;
+use Domain\Customer\Enums\Gender;
 use Domain\Customer\Models\Customer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -46,7 +47,7 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
             'first_name' => $customer->first_name,
             'last_name' => $customer->last_name,
             'mobile' => $customer->mobile,
-            'gender' => $customer->gender,
+            'gender' =>  $customer->gender->value,
             'birth_date' => $customer->birth_date?->toDateString(),
             'invited' => $customer->cuid,
         ]);
