@@ -131,7 +131,6 @@ class CartSummaryAction
             $initialSellingPrice = (float) $purchasable->selling_price;
 
             $sellingPrice = $this->getTierSellingPrice($purchasable, $initialSellingPrice);
-
             $subTotal = $sellingPrice * $collections->quantity;
         }
 
@@ -147,6 +146,8 @@ class CartSummaryAction
         } elseif ($purchasable instanceof ProductVariant) {
             /** @var \Domain\Product\Models\Product $product */
             $product = $purchasable->product;
+
+            $product->load('productTier');
 
             if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
                 $sellingPrice = app(ComputedTierSellingPrice::class)->execute($product, $sellingPrice);

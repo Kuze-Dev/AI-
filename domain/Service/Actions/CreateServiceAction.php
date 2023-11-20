@@ -48,7 +48,7 @@ class CreateServiceAction
         $this->createMetaData->execute($service, MetaDataData::fromArray($serviceData->meta_data ?? []));
 
         /** @var array<int, array> $mediaMaterials */
-        $mediaMaterials = $serviceData->media_collection['media'] ?? [];
+        $mediaMaterials = $serviceData->media_collection['materials'] ?? [];
 
         $media = collect($mediaMaterials)->map(function ($material): MediaData {
             /** @var UploadedFile|string $material */
