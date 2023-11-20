@@ -29,10 +29,8 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
@@ -174,6 +172,7 @@ class CustomerResource extends Resource
                         )
                         ->enum(Gender::class),
                     Forms\Components\Select::make('status')
+                        ->reactive()
                         ->translateLabel()
                         ->nullable()
                         ->options(
@@ -182,6 +181,25 @@ class CustomerResource extends Resource
                                 ->toArray()
                         )
                         ->enum(Status::class),
+                    Forms\Components\Select::make('register_status')
+                        ->hidden(fn ($record) => $record?->register_status === RegisterStatus::REGISTERED)
+                        ->placeholder('Select Register status')
+                        ->translateLabel()
+                        ->required()
+                        ->reactive()
+                        ->options(
+                            collect(RegisterStatus::cases())
+                                ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
+                                ->toArray()
+                        )
+                        ->helperText(function ($state, Closure $set) {
+                            if ($state === RegisterStatus::INVITED->value) {
+                                $set('status', Status::INACTIVE->value);
+
+                                return 'Inactive status is required when register status is invited.';
+                            }
+                        })
+                        ->enum(RegisterStatus::class),
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
@@ -286,11 +304,9 @@ class CustomerResource extends Resource
                 Tables\Filters\SelectFilter::make('register_status')
                     ->translateLabel()
                     ->default(RegisterStatus::REGISTERED->value)
-                    ->options(
-                        collect(RegisterStatus::cases())
-                            ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
-                            ->toArray()
-                    ),
+                    ->options([
+                        'Registered' => ucfirst(RegisterStatus::REGISTERED->value),
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -387,28 +403,6 @@ class CustomerResource extends Resource
                             $customer->created_at?->format(config('tables.date_time_format')),
                         ]
                     ),
-                BulkAction::make('bulk_invite')
-                    ->translateLabel()
-                    ->action(function (Collection $records, Tables\Actions\BulkAction $action) {
-
-                        $success = null;
-                        /** @var \Domain\Customer\Models\Customer $customer */
-                        foreach ($records as $customer) {
-                            if ($customer->status === Status::INACTIVE && $customer->register_status === RegisterStatus::UNREGISTERED) {
-                                $success = app(SendRegisterInvitationAction::class)->execute($customer);
-                            }
-                        }
-                        if ($success) {
-                            $action
-                                ->successNotificationTitle(trans('Invitation Email sent.'))
-                                ->success();
-                        } else {
-                            $action->failureNotificationTitle(trans('Failed to send  invitation. Invite inactive and unregistered users only'))
-                                ->failure();
-                        }
-                    })
-                    ->deselectRecordsAfterCompletion()
-                    ->icon('heroicon-o-speakerphone'),
             ])
             ->defaultSort('updated_at', 'desc');
     }
