@@ -7,8 +7,11 @@ namespace Domain\Order\DataTransferObjects;
 class ProductVariantCombinationData
 {
     public function __construct(
+        public readonly int $option_id,
         public readonly string $option,
-        public readonly string $option_value
+        public readonly int $option_value_id,
+        public readonly string $option_value,
+        public readonly array $option_value_data,
     ) {
     }
 }

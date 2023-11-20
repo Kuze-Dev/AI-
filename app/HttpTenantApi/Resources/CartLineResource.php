@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Resources;
 use Domain\Order\DataTransferObjects\ProductOrderData;
 use Domain\Order\DataTransferObjects\ProductVariantOrderData;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
 use TiMacDonald\JsonApi\JsonApiResource;
@@ -36,8 +37,27 @@ class CartLineResource extends JsonApiResource
                 if ($this->purchasable instanceof Product) {
                     return MediaResource::collection($this->purchasable->media);
                 } elseif ($this->purchasable instanceof ProductVariant) {
-                    if ($this->purchasable->product) {
-                        return MediaResource::collection(collect($this->purchasable->product->media));
+                    $productVariant = $this->purchasable;
+
+                    $productOptionMedia = collect();
+
+                    foreach ($productVariant->combination as $combinationData) {
+                        /** @var \Domain\Product\Models\ProductOptionValue $productOptionValue */
+                        $productOptionValue = ProductOptionValue::with('media')
+                            ->where('id', $combinationData['option_value_id'])->first();
+
+                        if ($productOptionValue->hasMedia('media')) {
+                            $productOptionMedia = $productOptionMedia->merge($productOptionValue->media);
+                        }
+                    }
+
+                    if ($productOptionMedia->isEmpty()) {
+                        /** @var \Domain\Product\Models\Product $product */
+                        $product = $productVariant->product;
+
+                        return MediaResource::collection(collect($product->media));
+                    } else {
+                        return MediaResource::collection($productOptionMedia);
                     }
                 }
             },
