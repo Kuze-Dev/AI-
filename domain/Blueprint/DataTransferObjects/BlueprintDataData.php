@@ -17,7 +17,7 @@ class BlueprintDataData
         public readonly int $model_id,
         public readonly string $model_type,
         public readonly string $state_path,
-        public readonly null|string|array $value,
+        public readonly null|string|array|bool $value,
         public readonly FieldType $type,
     ) {
     }
