@@ -34,6 +34,7 @@ class CustomerFactory extends Factory
             'mobile' => $this->faker->phoneNumber(),
             'gender' => Arr::random(Gender::cases()),
             'status' => Arr::random(Status::cases()),
+            'register_status' => RegisterStatus::REGISTERED,
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull()),
             'remember_token' => Str::random(10),
         ];

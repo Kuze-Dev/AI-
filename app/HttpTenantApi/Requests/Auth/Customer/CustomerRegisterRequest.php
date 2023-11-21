@@ -33,8 +33,8 @@ class CustomerRegisterRequest extends FormRequest
 
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email',
-            'mobile' => 'required|string|max:255|unique:customers,mobile',
+            'email' => [Rule::when($this->invited != null, 'required|unique:customers,email', 'required')],
+            'mobile' => [Rule::when($this->invited != null, 'required|string|unique:customers,mobile', 'required|string')],
             'gender' => ['required', Rule::enum(Gender::class)],
             'tier_id' => [
                 Rule::when((bool) tenancy()->tenant?->features()->active(TierBase::class), 'required', 'nullable'),
@@ -42,6 +42,7 @@ class CustomerRegisterRequest extends FormRequest
             ],
             'birth_date' => 'required|date',
             'password' => ['required', 'confirmed', Password::default()],
+            'invited' => 'nullable|exists:customers,cuid',
         ];
 
         // Billing and shipping rules

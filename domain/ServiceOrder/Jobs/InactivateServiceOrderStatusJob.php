@@ -29,7 +29,7 @@ class InactivateServiceOrderStatusJob implements ShouldBeUnique, ShouldQueue
 
     public function uniqueId(): string
     {
-        return $this->serviceOrder->getRouteKeyName();
+        return $this->serviceOrder->reference;
     }
 
     public function handle(UpdateServiceOrderStatusAction $updateServiceOrderStatusAction): void
@@ -37,7 +37,7 @@ class InactivateServiceOrderStatusJob implements ShouldBeUnique, ShouldQueue
         $updateServiceOrderStatusAction->execute(
             $this->serviceOrder,
             new UpdateServiceOrderStatusData(
-                service_order_status: ServiceOrderStatus::INACTIVE
+                status: ServiceOrderStatus::INACTIVE
             )
         );
 

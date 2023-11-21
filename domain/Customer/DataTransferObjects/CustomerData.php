@@ -48,14 +48,15 @@ final class CustomerData
         $tierId = null;
         $validated = $request->validated();
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
-        if ($customerTier?->isDefault() || ! tenancy()->tenant?->features()->active(TierBase::class)) {
+
+        if ($customerTier && $customerTier->isDefault() || ! tenancy()->tenant?->features()->active(TierBase::class)) {
 
             $registerStatus = self::getStatus($defaultTier, null, null);
             /** @var \Domain\Tier\Models\Tier $defaultTier */
             $tierId = $defaultTier->getKey();
         }
-        /** @var \Domain\Tier\Models\Tier $customerTier */
-        if ($customerTier->has_approval && ! $customerTier->isDefault()) {
+
+        if ($customerTier && $customerTier->has_approval && ! $customerTier->isDefault()) {
 
             $registerStatus = self::getStatus($customerTier, null, null);
             $tierId = $customerTier->getKey();
@@ -129,7 +130,7 @@ final class CustomerData
             password: $data['password'] ?? null,
             image: $data['image'] ?? null,
             tier_approval_status: TierApprovalStatus::APPROVED,
-            register_status: RegisterStatus::UNREGISTERED,
+            register_status: RegisterStatus::from($data['register_status']),
         );
     }
 
@@ -170,6 +171,22 @@ final class CustomerData
         );
     }
 
+    public static function fromArrayRegisteredImportByAdmin(array $data): self
+    {
+        return new self(
+            first_name: $data['first_name'],
+            last_name: $data['last_name'],
+            mobile: $data['mobile'] ?? null,
+            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+            password: $data['password'],
+            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+            status: isset($data['status']) ? Status::from($data['status']) : null,
+            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
+            email: $data['email'],
+            register_status: RegisterStatus::REGISTERED,
+        );
+    }
+
     private static function getStatus(
         Tier $tier = null,
         TierApprovalStatus $tierApprovalStatus = null,
@@ -205,5 +222,21 @@ final class CustomerData
         }
 
         return RegisterStatus::UNREGISTERED;
+    }
+
+    public static function updateInvitedCustomer(array $data): self
+    {
+        return new self(
+            first_name: $data['first_name'],
+            last_name: $data['last_name'],
+            mobile: $data['mobile'],
+            gender: Gender::from($data['gender']),
+            birth_date: now()->parse($data['birth_date']),
+            status: Status::ACTIVE,
+            email: $data['email'],
+            password: $data['password'],
+            image: $data['profile_image'] ?? null,
+            register_status: RegisterStatus::REGISTERED,
+        );
     }
 }

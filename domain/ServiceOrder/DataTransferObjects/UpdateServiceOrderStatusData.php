@@ -9,7 +9,12 @@ use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 class UpdateServiceOrderStatusData
 {
     public function __construct(
-        public readonly ServiceOrderStatus $service_order_status,
+        public readonly ?ServiceOrderStatus $status,
     ) {
+    }
+
+    public static function fromRequest(ServiceOrderStatus $status): self
+    {
+        return new self(status: $status);
     }
 }

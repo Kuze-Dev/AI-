@@ -7,11 +7,13 @@ namespace Domain\ServiceOrder\Models;
 use App\Casts\MoneyCast;
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Queries\ServiceOrderQueryBuilder;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -81,6 +83,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static ServiceOrderQueryBuilder|ServiceOrder newQuery()
  * @method static ServiceOrderQueryBuilder|ServiceOrder query()
  * @method static ServiceOrderQueryBuilder|ServiceOrder whereActive()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereInactive()
+ * @method static ServiceOrderQueryBuilder|ServiceOrder whereActiveOrInactive()
  * @method static ServiceOrderQueryBuilder|ServiceOrder whereAdditionalCharges($value)
  * @method static ServiceOrderQueryBuilder|ServiceOrder whereAdminId($value)
  * @method static ServiceOrderQueryBuilder|ServiceOrder whereAutoGenerateBills()
@@ -154,9 +158,11 @@ class ServiceOrder extends Model
         'tax_percentage',
         'tax_total',
         'total_price',
+        'schema',
     ];
 
     protected $casts = [
+        'schema' => 'json',
         'customer_form' => 'json',
         'service_price' => MoneyCast::class,
         'additional_charges' => 'json',
@@ -249,6 +255,32 @@ class ServiceOrder extends Model
         return filled($serviceBill) && $serviceBill->status === ServiceBillStatus::PAID
             ? $serviceBill
             : null;
+    }
+
+    public function latestTransaction(): ?ServiceTransaction
+    {
+        return $this->serviceTransactions()
+            ->latest()
+            ->first();
+    }
+
+    public function latestPaidTransaction(): ?ServiceTransaction
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction */
+        $serviceTransaction = $this->latestTransaction();
+
+        return filled($serviceTransaction) && $serviceTransaction->status === ServiceTransactionStatus::PAID
+            ? $serviceTransaction
+            : null;
+    }
+
+    public function latestPaymentMethod(): ?PaymentMethod
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction. */
+        $serviceTransaction = $this->latestPaidTransaction();
+
+        return filled($serviceTransaction) ?
+        $serviceTransaction->payment_method : null;
     }
 
     public function latestPendingServiceBill(): ?ServiceBill

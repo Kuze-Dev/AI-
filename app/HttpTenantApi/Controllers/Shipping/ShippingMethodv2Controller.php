@@ -31,7 +31,7 @@ class ShippingMethodv2Controller extends Controller
             $this->authorize('view', $address);
 
             return ShippingMethodResourcev2::collection(
-                QueryBuilder::for(ShippingMethod::whereActive(true))
+                QueryBuilder::for(ShippingMethod::with('media')->whereActive(true))
                     ->allowedFilters(['name', 'slug'])
                     ->allowedIncludes([
                         'media',

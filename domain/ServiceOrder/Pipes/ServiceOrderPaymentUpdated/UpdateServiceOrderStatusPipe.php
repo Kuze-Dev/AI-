@@ -30,7 +30,7 @@ class UpdateServiceOrderStatusPipe
             $serviceOrder = $this->updateServiceOrderStatusAction->execute(
                 $serviceOrder,
                 new UpdateServiceOrderStatusData(
-                    service_order_status: $serviceOrder->is_subscription
+                    status: $serviceOrder->is_subscription
                         ? ServiceOrderStatus::ACTIVE
                         : ServiceOrderStatus::INPROGRESS
                 )

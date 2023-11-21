@@ -77,9 +77,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Model::shouldBeStrict(! $this->app->isProduction());
+        // Model::shouldBeStrict(! $this->app->isProduction());
 
-        Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
+        // Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
@@ -187,5 +187,8 @@ class AppServiceProvider extends ServiceProvider
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
         Feature::discover('App\\Features\\Customer', app_path('Features/Customer'));
         Feature::discover('App\\Features\\Service', app_path('Features/Service'));
+        Feature::discover('App\\Features\\Shopconfiguration', app_path('Features/Shopconfiguration'));
+        Feature::discover('App\\Features\\Shopconfiguration\PaymentGateway', app_path('Features/Shopconfiguration/PaymentGateway'));
+        Feature::discover('App\\Features\\Shopconfiguration\Shipping', app_path('Features/Shopconfiguration/Shipping'));
     }
 }

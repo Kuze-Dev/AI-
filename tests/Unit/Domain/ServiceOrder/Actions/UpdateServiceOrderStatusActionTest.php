@@ -15,7 +15,7 @@ it('can execute', function () {
     $serviceOrder = app(UpdateServiceOrderStatusAction::class)->execute(
         $serviceOrder,
         new UpdateServiceOrderStatusData(
-            service_order_status: ServiceOrderStatus::ACTIVE
+            status: ServiceOrderStatus::ACTIVE
         )
     );
 

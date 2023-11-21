@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Features\ECommerce;
+namespace App\Features\Shopconfiguration\PaymentGateway;
 
 use Domain\Tenant\Models\Tenant;
 
 class BankTransfer
 {
-    public string $name = 'ecommerce.bank-transfer';
+    public string $name = 'payment-gateway.bank-transfer';
 
     public string $label = 'Bank Transfer';
 

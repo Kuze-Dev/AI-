@@ -27,4 +27,12 @@ class PaymentMethodResource extends JsonApiResource
             'instruction' => $this->instruction,
         ];
     }
+
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'media' => fn () => MediaResource::collection($this->media),
+        ];
+    }
 }

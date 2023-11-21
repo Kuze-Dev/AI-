@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Features\ECommerce;
+namespace App\Features\Shopconfiguration;
 
 use Domain\Tenant\Models\Tenant;
 
-class StripeGateway
+class TaxZone
 {
-    public string $name = 'ecommerce.stripe';
+    public string $name = 'shopconfiguration.taxzone';
 
-    public string $label = 'Stripe';
+    public string $label = 'TaxZone';
 
     public function resolve(Tenant $scope): mixed
     {

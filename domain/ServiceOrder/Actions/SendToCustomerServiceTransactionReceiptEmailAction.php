@@ -22,7 +22,6 @@ class SendToCustomerServiceTransactionReceiptEmailAction
         ])->notify(
             new ServiceBillPaidNotification(
                 $serviceOrder,
-                $serviceBill,
                 $pdf
             )
         );

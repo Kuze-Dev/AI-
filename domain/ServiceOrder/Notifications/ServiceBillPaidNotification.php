@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\ServiceOrder\Notifications;
 
 use App\Settings\ServiceSettings;
-use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,22 +22,13 @@ class ServiceBillPaidNotification extends Notification implements ShouldQueue
 
     private Media $pdf;
 
-    private ServiceBill $serviceBill;
-
-    private string $from;
-
-    private array $replyTo;
-
     public function __construct(
         ServiceOrder $serviceOrder,
-        ServiceBill $serviceBill,
         Media $pdf
     ) {
         $this->serviceSettings = app(ServiceSettings::class);
 
         $this->serviceOrder = $serviceOrder;
-
-        $this->serviceBill = $serviceBill;
 
         $this->pdf = $pdf;
     }
