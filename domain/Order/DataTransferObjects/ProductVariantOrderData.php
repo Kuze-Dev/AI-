@@ -53,12 +53,15 @@ class ProductVariantOrderData
             $productOptionValue = ProductOptionValue::with(['media', 'productOption'])
                 ->where('id', $combinationData['option_value_id'])->first();
 
+            /** @var \Domain\Product\Models\ProductOption $productOption */
+            $productOption = $productOptionValue->productOption;
+
             $combinations[] = new ProductVariantCombinationData(
                 option_id: $combinationData['option_id'],
                 option: $combinationData['option'],
                 option_value_id: $productOptionValue->id,
                 option_value: $combinationData['option_value'],
-                option_value_data: $productOptionValue->productOption->is_custom ? $productOptionValue->data : null
+                option_value_data: $productOption->is_custom ? $productOptionValue->data : null
             );
         }
 
