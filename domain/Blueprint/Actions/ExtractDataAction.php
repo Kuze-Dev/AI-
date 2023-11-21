@@ -40,7 +40,7 @@ class ExtractDataAction
         return $fieldTypes;
     }
 
-    public function mergeFields(array $firstField, array|string|null $values, string $parentStatepath): array
+    public function mergeFields(array $firstField, array|string|null|bool $values, string $parentStatepath): array
     {
         $mergedFields = [
             'type' => $firstField['type'],
