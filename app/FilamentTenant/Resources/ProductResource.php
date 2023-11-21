@@ -444,8 +444,6 @@ class ProductResource extends Resource
                                 )
                                 ->hidden(
                                     function (Closure $get) {
-                                        \Log::info('hey : ', [$get('../*')]);
-
                                         if (!is_null($get('id'))) {
                                             return $get('../*')[0]['id'] !== $get('id');
                                         } else {
@@ -469,6 +467,9 @@ class ProductResource extends Resource
                                                     ->translateLabel()
                                                     ->maxLength(100)
                                                     ->lazy()
+                                                    ->columnSpan(
+                                                        fn (Closure $get) => $get('../../is_custom') ? 1 : 2
+                                                    )
                                                     ->required(),
                                                 Forms\Components\Select::make('icon_type')
                                                     ->default('text')
@@ -490,14 +491,7 @@ class ProductResource extends Resource
                                         ->mediaLibraryCollection('media')
                                         ->multiple()
                                         ->hidden(
-                                            function (Closure $get) {
-                                                return false;
-                                                // if (isset($get('../../../*')[1]) && isset($get('../../../*')[1]['id'])) {
-                                                //     return $get('../../../*')[1]['id'];
-                                                // } else {
-                                                //     return count($get('../../../*')) === 2 ? true : false;
-                                                // }
-                                            }
+                                            fn (Closure $get) => isset($get('../../../*')[1]) && $get('../../../*')[1]['id'] === $get('../../id')
                                         )
                                         ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
                                             $mediaClass = config('media-library.media_model', Media::class);
