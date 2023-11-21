@@ -391,7 +391,6 @@ class ProductResource extends Resource
                 ->itemLabel(fn (array $state) => $state['name'] ?? null)
                 ->schema([
                     Forms\Components\Repeater::make('options')
-                        // ->afterStateUpdated(fn(Closure $get) => \Log::info('Testttttt'))
                         ->translateLabel()
                         ->reactive()
                         ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire, Closure $get) {
@@ -441,16 +440,17 @@ class ProductResource extends Resource
                                 ->label(
                                     fn ($state) => $state ? ucfirst(trans('Custom')) : ucfirst(trans('Regular'))
                                 )
-                                // ->hidden(function (Closure $get, ProductOption $record) {
-                                //     dd($record);
-                                //     \Log::info('ALL INFO : ', [$get('../../*')]);
-                                //     $parentRepeaterOptionId = $get('../../*')[0][0]['id'];
-                                //     $currentOptionId = $get('../*')[0]['id'];
-                                //     // \Log::info('OPTION ID ITO SA IS CUSTOM : ', [$parentRepeaterOptionId, $currentOptionId]);
-                                //     return $parentRepeaterOptionId !== $currentOptionId;
-                                // })
+                                ->hidden(
+                                    function (Closure $get) {
+                                        if ( ! is_null($get('id'))) {
+                                            return $get('../*')[0]['id'] !== $get('id');
+                                        } else {
+                                            return count($get('../*')) === 1 ? false : true;
+                                        }
+                                    }
+                                )
                                 ->extraAttributes(['class' => 'mt-2 mb-1'])
-                                ->default(true)
+                                ->default(false)
                                 ->helperText('Identify whether the option value in the form has customization.')
                                 ->reactive(),
                             Forms\Components\Repeater::make('productOptionValues')
@@ -465,6 +465,9 @@ class ProductResource extends Resource
                                                     ->translateLabel()
                                                     ->maxLength(100)
                                                     ->lazy()
+                                                    ->columnSpan(
+                                                        fn (Closure $get) => $get('../../is_custom') ? 1 : 2
+                                                    )
                                                     ->required(),
                                                 Forms\Components\Select::make('icon_type')
                                                     ->default('text')
@@ -472,7 +475,6 @@ class ProductResource extends Resource
                                                     ->options([
                                                         'text' => 'Text',
                                                         'color_palette' => 'Color Palette',
-                                                        // 'image' => 'Image
                                                     ])
                                                     ->hidden(fn (Closure $get) => ! $get('../../is_custom'))
                                                     ->reactive(),
@@ -481,14 +483,14 @@ class ProductResource extends Resource
                                     Forms\Components\ColorPicker::make('icon_value')
                                         ->label(trans('Icon Value (HEX)'))
                                         ->hidden(fn (Closure $get) => ! ($get('icon_type') === 'color_palette' && $get('../../is_custom'))),
-                                    // Forms\Components\FileUpload::make('icon_image')
-                                    //     ->image()
-                                    //     ->hidden(fn (Closure $get) => !($get('icon_type') === 'image' && $get('../../is_custom'))),
                                     Forms\Components\FileUpload::make('images')
                                         ->label(trans('Images (Preview Slides)'))
                                         ->image()
                                         ->mediaLibraryCollection('media')
                                         ->multiple()
+                                        ->hidden(
+                                            fn (Closure $get) => isset($get('../../../*')[1]) && $get('../../../*')[1]['id'] === $get('../../id')
+                                        )
                                         ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
                                             $mediaClass = config('media-library.media_model', Media::class);
 

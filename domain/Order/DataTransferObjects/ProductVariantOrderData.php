@@ -50,7 +50,7 @@ class ProductVariantOrderData
         $combinations = [];
         foreach ($productVariant->combination as $combinationData) {
             /** @var \Domain\Product\Models\ProductOptionValue $productOptionValue */
-            $productOptionValue = ProductOptionValue::with('media')
+            $productOptionValue = ProductOptionValue::with(['media', 'productOption'])
                 ->where('id', $combinationData['option_value_id'])->first();
 
             $combinations[] = new ProductVariantCombinationData(
@@ -58,7 +58,7 @@ class ProductVariantOrderData
                 option: $combinationData['option'],
                 option_value_id: $productOptionValue->id,
                 option_value: $combinationData['option_value'],
-                option_value_data: $productOptionValue->data
+                option_value_data: $productOptionValue->productOption->is_custom ? $productOptionValue->data : null
             );
         }
 
