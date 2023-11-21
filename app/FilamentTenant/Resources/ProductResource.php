@@ -408,7 +408,7 @@ class ProductResource extends Resource
                             $record->productOptions->load('productOptionValues.media');
                             $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
                                 $mappedOptionValues = $productOption->productOptionValues->map(function ($optionValue) {
-                                    $optionValueImages = $optionValue->media->map(fn ($medium) => $medium['uuid'])->toArray() ?? [];
+                                    $optionValueImages = $optionValue->media->map(fn ($medium) => $medium['uuid'])->toArray();
 
                                     return [
                                         'id' => $optionValue->id,
