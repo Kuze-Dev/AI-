@@ -150,8 +150,7 @@
         },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true,
-            "phpstan/extension-installer": false
+            "php-http/discovery": true
         }
     },
     "minimum-stability": "stable",
