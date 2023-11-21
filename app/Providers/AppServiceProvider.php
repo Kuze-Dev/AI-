@@ -51,6 +51,7 @@ use Domain\Payments\Models\PaymentRefund;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Internationalization\Models\Locale;
+use Domain\Product\Models\ProductOptionValue;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -141,6 +142,7 @@ class AppServiceProvider extends ServiceProvider
             Site::class,
             Service::class,
             TenantApiCall::class,
+            ProductOptionValue::class,
         ]);
 
         Password::defaults(

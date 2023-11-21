@@ -80,6 +80,7 @@ class UpdateOrderAction
                 return $order;
             } catch (Exception $e) {
                 DB::rollBack();
+
                 // Log::info($e);
                 return 'Something went wrong';
             }

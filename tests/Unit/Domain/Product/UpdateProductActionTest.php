@@ -86,12 +86,16 @@ it('can update product', function () {
                             'id' => $productOption->id,
                             'name' => 'size',
                             'slug' => 'size',
+                            'is_custom' => false,
                             'productOptionValues' => [
                                 [
                                     'id' => $optionValue->id,
                                     'name' => 'small',
                                     'slug' => 'small',
                                     'product_option_id' => $productOption->id,
+                                    'icon_type' => 'text',
+                                    'icon_value' => null,
+                                    'images' => [],
                                 ],
                             ],
                         ],

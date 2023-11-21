@@ -31,7 +31,7 @@ it('return list', function () {
 
     getJson('api/notifications')
         ->assertOk()
-        ->assertJson(function (Illuminate\Testing\Fluent\AssertableJson $json) use ($notification, $message) {
+        ->assertJson(function (AssertableJson $json) use ($notification, $message) {
             $json
                 ->count('data', 1)
                 ->where('data.0.attributes.data.message', $message)
