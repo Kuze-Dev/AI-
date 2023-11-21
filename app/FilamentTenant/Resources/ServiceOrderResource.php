@@ -62,7 +62,7 @@ class ServiceOrderResource extends Resource
                     Section::make(trans('Customer'))
                         ->schema([
                             Forms\Components\Select::make('customer_id')
-                                ->label(trans(''))
+                                ->label(trans('Select Customer'))
                                 ->placeholder(trans('Select Customer'))
                                 ->required()
                                 ->preload()
@@ -95,7 +95,7 @@ class ServiceOrderResource extends Resource
                     Section::make(trans('Service Address'))
                         ->schema([
                             Forms\Components\Select::make('service_address_id')
-                                ->label(trans(''))
+                                ->label(trans('Select Address'))
                                 ->placeholder(trans('Select Address'))
                                 ->required()
                                 ->preload()
@@ -137,7 +137,7 @@ class ServiceOrderResource extends Resource
                     Section::make(trans('Billing Address'))
                         ->schema([
                             Forms\Components\Select::make('billing_address_id')
-                                ->label(trans(''))
+                                ->label(trans('Select Address'))
                                 ->placeholder(trans('Select Address'))
                                 ->required()
                                 ->preload()

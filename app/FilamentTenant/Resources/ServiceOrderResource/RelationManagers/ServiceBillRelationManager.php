@@ -26,7 +26,7 @@ class ServiceBillRelationManager extends RelationManager
                     ->url(
                         fn (ServiceBill $record) => ServiceBillResource::getUrl(
                             'view',
-                            [$record]
+                            [$record->serviceOrder, $record]
                         )
                     ),
             ]);
