@@ -26,11 +26,11 @@ class ProductVariantOrderData
         $combinations = [];
         foreach ($data['combination'] as $combinationData) {
             $combinations[] = new ProductVariantCombinationData(
-                option_id: $combinationData['option_id'],
+                option_id: $combinationData['option_id'] ?? null,
                 option: $combinationData['option'],
-                option_value_id: $combinationData['option_value_id'],
+                option_value_id: $combinationData['option_value_id'] ?? null,
                 option_value: $combinationData['option_value'],
-                option_value_data: $combinationData['option_value_data'],
+                option_value_data: $combinationData['option_value_data'] ?? null,
             );
         }
 
