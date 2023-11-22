@@ -7,6 +7,7 @@ namespace Tests\RequestFactories;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\State;
 use Domain\Customer\Enums\Gender;
+use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
@@ -30,6 +31,7 @@ class CustomerRequestFactory extends RequestFactory
             },
             'gender' => Arr::random(Gender::cases())->value,
             'status' => Arr::random(Status::cases())->value,
+            'register_status' => RegisterStatus::REGISTERED->value,
             'password' => 'secret',
             'password_confirmation' => 'secret',
             'mobile' => $this->faker->phoneNumber(),

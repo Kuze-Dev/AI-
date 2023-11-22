@@ -24,6 +24,7 @@ class ServiceOrderResource extends JsonApiResource
             'service_price' => $this->service_price,
             'currency_symbol' => $this->currency_symbol,
             'form' => $this->customer_form,
+            'schema' => $this->schema,
             'schedule' => $this->schedule,
             'tax_total' => $this->tax_total,
             'tax_percentage' => $this->tax_percentage,
@@ -38,6 +39,8 @@ class ServiceOrderResource extends JsonApiResource
             'bill_date' => $this->latestServiceBill()?->bill_date,
             'due_date' => $this->latestServiceBill()?->due_date,
             'last_payment_date' => $this->latestPaidServiceBill()?->updated_at,
+            'last_payment_method' => $this->latestPaymentMethod()?->slug,
+            'created_by' => $this->admin?->first_name.' '.$this->admin?->last_name,
         ];
     }
 

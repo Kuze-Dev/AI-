@@ -22,6 +22,7 @@ class ReviewResource extends JsonApiResource
             'is_anonymous' => $this->is_anonymous,
             'data' => $this->data,
             'like_count' => $this->review_likes->count(),
+            'created_at' => $this->created_at,
         ];
     }
 

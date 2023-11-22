@@ -20,11 +20,11 @@ use Illuminate\Http\UploadedFile;
 final class CustomerData
 {
     private function __construct(
-        public readonly string $first_name,
-        public readonly string $last_name,
-        public readonly ?string $mobile,
-        public readonly ?Gender $gender,
-        public readonly ?Carbon $birth_date,
+        public readonly ?string $first_name = null,
+        public readonly ?string $last_name = null,
+        public readonly ?string $mobile = null,
+        public readonly ?Gender $gender = null,
+        public readonly ?Carbon $birth_date = null,
         public readonly ?Status $status = null,
         public readonly ?int $tier_id = null,
         public readonly ?string $email = null,
@@ -130,7 +130,7 @@ final class CustomerData
             password: $data['password'] ?? null,
             image: $data['image'] ?? null,
             tier_approval_status: TierApprovalStatus::APPROVED,
-            register_status: RegisterStatus::UNREGISTERED,
+            register_status: RegisterStatus::from($data['register_status']),
         );
     }
 
@@ -159,8 +159,8 @@ final class CustomerData
     public static function fromArrayImportByAdmin(array $data): self
     {
         return new self(
-            first_name: $data['first_name'],
-            last_name: $data['last_name'],
+            first_name: $data['first_name'] ?? null,
+            last_name: $data['last_name'] ?? null,
             mobile: $data['mobile'] ?? null,
             gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
@@ -168,6 +168,22 @@ final class CustomerData
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
             register_status: RegisterStatus::UNREGISTERED,
+        );
+    }
+
+    public static function fromArrayRegisteredImportByAdmin(array $data): self
+    {
+        return new self(
+            first_name: $data['first_name'],
+            last_name: $data['last_name'],
+            mobile: $data['mobile'] ?? null,
+            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+            password: $data['password'],
+            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+            status: isset($data['status']) ? Status::from($data['status']) : null,
+            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
+            email: $data['email'],
+            register_status: RegisterStatus::REGISTERED,
         );
     }
 
@@ -206,5 +222,21 @@ final class CustomerData
         }
 
         return RegisterStatus::UNREGISTERED;
+    }
+
+    public static function updateInvitedCustomer(array $data): self
+    {
+        return new self(
+            first_name: $data['first_name'],
+            last_name: $data['last_name'],
+            mobile: $data['mobile'],
+            gender: Gender::from($data['gender']),
+            birth_date: now()->parse($data['birth_date']),
+            status: Status::ACTIVE,
+            email: $data['email'],
+            password: $data['password'],
+            image: $data['profile_image'] ?? null,
+            register_status: RegisterStatus::REGISTERED,
+        );
     }
 }

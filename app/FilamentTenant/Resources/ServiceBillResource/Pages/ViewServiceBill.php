@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ServiceBillResource\Pages;
 
 use App\FilamentTenant\Resources\ServiceBillResource;
+use App\FilamentTenant\Resources\ServiceOrderResource;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\Divider;
@@ -25,9 +26,27 @@ class ViewServiceBill extends ViewRecord
 {
     protected static string $resource = ServiceBillResource::class;
 
+    public mixed $ownerRecord;
+
     protected function getHeading(): string|Htmlable
     {
         return trans('Service Bill Details #').$this->record->reference;
+    }
+
+    protected function getBreadcrumbs(): array
+    {
+        $resource = static::getResource();
+
+        $breadcrumb = $this->getBreadcrumb();
+
+        return array_merge(
+            [
+                ServiceOrderResource::getUrl('index') => ServiceOrderResource::getBreadcrumb(),
+                ServiceOrderResource::getUrl('view', [$this->ownerRecord]) => $this->ownerRecord,
+                $resource::getUrl('view', [$this->ownerRecord, $this->record->reference]) => $this->record->reference,
+            ],
+            (filled($breadcrumb) ? [$breadcrumb] : []),
+        );
     }
 
     protected function getFormSchema(): array

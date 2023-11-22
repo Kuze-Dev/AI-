@@ -30,7 +30,7 @@ class CreateServiceBillJob implements ShouldBeUnique, ShouldQueue
 
     public function uniqueId(): string
     {
-        return $this->serviceOrder->getRouteKeyName();
+        return $this->serviceOrder->reference;
     }
 
     public function handle(CreateServiceBillAction $createServiceBillAction): void
