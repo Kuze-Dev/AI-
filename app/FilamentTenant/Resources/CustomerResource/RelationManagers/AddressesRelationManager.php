@@ -111,9 +111,17 @@ class AddressesRelationManager extends RelationManager
                     ->sortable()
                     ->searchable()
                     ->wrap(),
-                Tables\Columns\TextColumn::make('state.country.name')
+                Tables\Columns\TextColumn::make('country')
+                    ->formatStateUsing(function ($record) {
+                        return $record->state->country->name;
+                    })
+                    ->sortable(query: function (Builder $query, string $direction) {
+                        return $query
+                            ->join('states', 'addresses.state_id', '=', 'states.id')
+                            ->join('countries', 'states.country_id', '=', 'countries.id')
+                            ->orderBy('countries.name', $direction);
+                    })
                     ->translateLabel()
-                    ->sortable()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('state.name')
                     ->sortable()

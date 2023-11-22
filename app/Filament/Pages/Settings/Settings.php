@@ -52,7 +52,7 @@ class Settings extends Page
             return true;
         }
 
-        return Auth::user()?->can('settings.' . $settingsPermissionsParts->join(',')) ?? false;
+        return Auth::user()?->can('settings.'.$settingsPermissionsParts->join(',')) ?? false;
     }
 
     protected function getBreadcrumbs(): array

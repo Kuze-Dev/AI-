@@ -28,17 +28,17 @@ class ProductOption extends Field
         $this->registerListeners([
             'productOption::createItem' => [
                 function (self $component, string $statePath): void {
-                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                    if (! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 
                     $livewire = $component->getLivewire();
 
-                    if ( ! $livewire instanceof HasProductOptions) {
+                    if (! $livewire instanceof HasProductOptions) {
                         throw new InvalidArgumentException();
                     }
 
-                    $livewire->mountProductOptionItem($this->getName(), "{$statePath}." . (string) Str::uuid());
+                    $livewire->mountProductOptionItem($this->getName(), "{$statePath}.".(string) Str::uuid());
                 },
             ],
         ]);

@@ -18,7 +18,7 @@ class PaymentOrderResource extends JsonApiResource
         /** @var \Domain\PaymentMethod\Models\PaymentMethod $paymentMethod */
         $paymentMethod = $this->paymentMethod;
 
-        return  [
+        return [
             'gateway' => $this->gateway,
             'currency' => $this->currency,
             'amount' => $this->amount,

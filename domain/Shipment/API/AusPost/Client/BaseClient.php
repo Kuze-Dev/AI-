@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Shipment\API\AusPost\Client;
 
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 abstract class BaseClient
 {

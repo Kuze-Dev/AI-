@@ -11,7 +11,6 @@ use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Filament\Facades\Filament;
-
 use Illuminate\Http\UploadedFile;
 
 use function Pest\Laravel\assertDatabaseHas;

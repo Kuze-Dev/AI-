@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notification;
 class NewRegisterNotification extends Notification
 {
     use Queueable;
+
     private Customer $customer;
 
     /** Create a new notification instance. */

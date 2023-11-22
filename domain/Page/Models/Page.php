@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models;
 
-use Illuminate\Support\Str;
-use Domain\Site\Traits\Sites;
-use Spatie\Sluggable\HasSlug;
 use Domain\Admin\Models\Admin;
 use Domain\Page\Enums\Visibility;
-use Spatie\Sluggable\SlugOptions;
-use Support\MetaData\HasMetaData;
-use Support\RouteUrl\HasRouteUrl;
-use Spatie\Activitylog\LogOptions;
+use Domain\Page\Models\Builders\PageBuilder;
+use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Domain\Page\Models\Builders\PageBuilder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
+use Support\MetaData\HasMetaData;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContact;
+use Support\RouteUrl\HasRouteUrl;
 
 /**
  * Domain\Page\Models\Page
@@ -50,6 +50,7 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @property-read int|null $route_urls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Site\Models\Site> $sites
  * @property-read int|null $sites_count
+ *
  * @method static PageBuilder|Page newModelQuery()
  * @method static PageBuilder|Page newQuery()
  * @method static PageBuilder|Page query()
@@ -64,17 +65,17 @@ use Support\MetaData\Contracts\HasMetaData as HasMetaDataContract;
  * @method static PageBuilder|Page whereSlug($value)
  * @method static PageBuilder|Page whereUpdatedAt($value)
  * @method static PageBuilder|Page whereVisibility($value)
+ *
  * @mixin \Eloquent
  */
-
 #[OnDeleteCascade(['blockContents', 'metaData', 'routeUrls'])]
 class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
 {
-    use LogsActivity;
-    use HasSlug;
-    use HasRouteUrl;
-    use HasMetaData;
     use ConstraintsRelationships;
+    use HasMetaData;
+    use HasRouteUrl;
+    use HasSlug;
+    use LogsActivity;
     use Sites;
 
     protected $fillable = [
@@ -102,8 +103,6 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     /**
      * Define default reference
      * for meta data properties.
-     *
-     * @return array
      */
     public function defaultMetaData(): array
     {
@@ -112,7 +111,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         ];
     }
 
-    #create a titleAttribute for name field
+    //create a titleAttribute for name field
     public function getTitleAttribute(): string
     {
         return $this->draftable_id ? $this->name.' (Draft)' : $this->name;

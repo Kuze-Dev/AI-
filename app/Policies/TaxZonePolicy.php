@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Features\ECommerce\ECommerceBase;
+use App\Features\Shopconfiguration\TaxZone as ShopconfigurationTaxZone;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Auth\Access\Response;
@@ -16,7 +16,7 @@ class TaxZonePolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
+        if (! tenancy()->tenant?->features()->active(ShopconfigurationTaxZone::class)) {
             return Response::denyAsNotFound();
         }
 

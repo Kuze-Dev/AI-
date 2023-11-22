@@ -10,12 +10,14 @@ use Domain\Auth\Contracts\HasEmailVerificationOTP;
 use Domain\Auth\EmailVerificationOTP;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
-use Domain\Customer\Notifications\ResetPassword;
 use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Notifications\VerifyEmail;
 use Domain\Customer\Enums\Status;
+use Domain\Customer\Notifications\ResetPassword;
+use Domain\Customer\Notifications\VerifyEmail;
+use Domain\Customer\Queries\CustomerQueryBuilder;
 use Domain\Discount\Models\DiscountLimit;
 use Domain\Favorite\Models\Favorite;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Shipment\Models\VerifiedAddress;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
@@ -68,11 +70,13 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ServiceOrder> $serviceOrders
  * @property-read int|null $notifications_count
  * @property-read Tier|null $tier
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @property-read VerifiedAddress|null $verifiedAddress
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer onlyTrashed()
@@ -97,18 +101,19 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @method static \Illuminate\Database\Eloquent\Builder|Customer whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Customer withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['addresses'])]
-class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, HasEmailVerificationOTP
+class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMedia, MustVerifyEmail
 {
-    use SoftDeletes;
-    use LogsActivity;
-    use InteractsWithMedia;
-    use Notifiable;
-    use HasApiTokens;
     use ConstraintsRelationships;
     use EmailVerificationOTP;
+    use HasApiTokens;
+    use InteractsWithMedia;
+    use LogsActivity;
+    use Notifiable;
+    use SoftDeletes;
 
     protected $fillable = [
         'tier_id',
@@ -159,7 +164,7 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
     protected function fullName(): Attribute
     {
         return Attribute::get(
-            fn ($value): string => "{$this->first_name} {$this->last_name}"
+            fn ($value): string => "{$this->last_name}, {$this->first_name}"
         );
     }
 
@@ -169,6 +174,14 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
             ->singleFile()
             ->useFallbackUrl(app(SiteSettings::class)->getLogoUrl())
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
+
+        $this->addMediaCollection('receipts')
+            ->acceptsFile(fn () => ['application/pdf']);
+    }
+
+    public function newEloquentBuilder($query): CustomerQueryBuilder
+    {
+        return new CustomerQueryBuilder($query);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Customer\Models\Customer> */
@@ -209,5 +222,16 @@ class Customer extends Authenticatable implements HasMedia, MustVerifyEmail, Has
     public function verifiedAddress(): HasOne
     {
         return $this->hasOne(VerifiedAddress::class);
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrder>*/
+    public function serviceOrders(): HasMany
+    {
+        return $this->hasMany(ServiceOrder::class);
+    }
+
+    public function isAllowedInvite(): bool
+    {
+        return $this->status?->isAllowedInvite() && $this->register_status->isAllowedInvite();
     }
 }

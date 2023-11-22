@@ -11,7 +11,9 @@ use Illuminate\Notifications\Notification;
 class OrderBankPaymentNotification extends Notification
 {
     use Queueable;
+
     private Order $order;
+
     private string $paymentRemarks;
 
     /** Create a new notification instance. */

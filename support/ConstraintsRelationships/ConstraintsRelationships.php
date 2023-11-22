@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Support\ConstraintsRelationships;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use ReflectionClass;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\ConstraintsRelationships\Exceptions\InvalidRelationshipConstraintException;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
-use ReflectionClass;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait ConstraintsRelationships
 {
@@ -45,8 +45,11 @@ trait ConstraintsRelationships
 
     /**
      * @template T of object
-     * @param class-string<T> $attributeClass
+     *
+     * @param  class-string<T>  $attributeClass
      * @return ?T
+     *
+     * @phpstan-ignore-next-line Model property accessors should not be used.
      */
     protected function getClassAttribute(string $attributeClass): ?object
     {

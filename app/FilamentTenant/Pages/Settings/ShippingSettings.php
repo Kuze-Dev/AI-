@@ -34,13 +34,13 @@ class ShippingSettings extends TenantBaseSettings
                             ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
-                                    'If the feature is activated, it is necessary to provide production keys. ' .
+                                    'If the feature is activated, it is necessary to provide production keys. '.
                                         'However, if the feature is deactivated, payment processing will occur in sandbox mode'
                                 )
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUsps::class)
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingUsps::class)
                     ),
                 Forms\Components\Section::make(trans('Ups Shipping'))
                     ->collapsible()
@@ -56,13 +56,13 @@ class ShippingSettings extends TenantBaseSettings
                             ->label(fn ($state) => trans('Usps (:value)', ['value' => $state ? 'Live' : 'Sandbox']))
                             ->helperText(
                                 trans(
-                                    'If the feature is activated, it is necessary to provide production keys. ' .
+                                    'If the feature is activated, it is necessary to provide production keys. '.
                                         'However, if the feature is deactivated, payment processing will occur in sandbox mode'
                                 )
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingUps::class)
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingUps::class)
                     ),
 
                 Forms\Components\Section::make(trans('AusPost Shipping'))
@@ -72,7 +72,7 @@ class ShippingSettings extends TenantBaseSettings
                             ->translateLabel(),
 
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\ShippingAusPost::class)
+                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingAusPost::class)
                     ),
 
             ]),

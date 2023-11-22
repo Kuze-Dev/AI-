@@ -11,16 +11,16 @@ use Domain\Address\Models\State;
 use Domain\ShippingMethod\Actions\GetAvailableShippingDriverAction;
 use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Database\Eloquent\Builder;
+use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
-use Exception;
 
 class ShippingmethodResource extends Resource
 {
@@ -70,7 +70,8 @@ class ShippingmethodResource extends Resource
 
                             return $media?->getUrl();
                         }),
-                    Forms\Components\Toggle::make('status')
+                    Forms\Components\Toggle::make('active')
+                        ->label('Status')
                         ->inline(false)
                         ->helperText('If enabled, message here')
                         ->reactive(),

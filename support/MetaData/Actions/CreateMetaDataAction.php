@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Support\MetaData\Actions;
 
+use Illuminate\Database\Eloquent\Model;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\MetaData\Contracts\HasMetaData;
 use Support\MetaData\DataTransferObjects\MetaDataData;
-use Illuminate\Database\Eloquent\Model;
 
 class CreateMetaDataAction
 {

@@ -14,7 +14,7 @@ class SyncNodeTreeAction
 {
     protected Menu $menu;
 
-    /** @param array<NodeData> $nodeDataSet */
+    /** @param  array<NodeData>  $nodeDataSet */
     public function execute(Menu $menu, array $nodeDataSet): Menu
     {
         $this->menu = $menu;
@@ -26,7 +26,7 @@ class SyncNodeTreeAction
         return $this->menu;
     }
 
-    /** @param array<NodeData> $nodeDataSet */
+    /** @param  array<NodeData>  $nodeDataSet */
     protected function pruneMissingNodes(array $nodeDataSet): void
     {
         $flatNodes = $this->flatMapNodes($nodeDataSet);
@@ -40,7 +40,7 @@ class SyncNodeTreeAction
         }
     }
 
-    /** @param array<NodeData> $nodeDataSet */
+    /** @param  array<NodeData>  $nodeDataSet */
     protected function syncNodes(array $nodeDataSet, Node $parentNode = null): void
     {
         $nodeIds = [];
@@ -67,7 +67,7 @@ class SyncNodeTreeAction
             'url' => $nodeData->type === NodeType::URL ? $nodeData->url : null,
         ])->save();
 
-        if ( ! empty($nodeData->children)) {
+        if (! empty($nodeData->children)) {
             $this->syncNodes($nodeData->children, $node);
         }
 
@@ -81,7 +81,7 @@ class SyncNodeTreeAction
 
     protected function inlineChildren(NodeData $nodeData): array
     {
-        if ( ! empty($nodeData->children)) {
+        if (! empty($nodeData->children)) {
             $children = Arr::map($nodeData->children, $this->inlineChildren(...));
         }
 

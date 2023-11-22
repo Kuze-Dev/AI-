@@ -10,8 +10,11 @@ use Filament\Widgets\Widget;
 class TotalOrder extends Widget
 {
     protected static string $view = 'filament.widgets.total-order';
+
     public array $widgetData = [];
+
     public string $filter = 'allTime';
+
     public array $status = ['pending', 'cancelled', 'packed', 'delivered', 'shipped', 'refunded',  'fulfilled'];
 
     protected function getViewData(): array

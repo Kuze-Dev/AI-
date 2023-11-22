@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Fixtures;
 
+use Illuminate\Database\Eloquent\Model;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
 use Support\RouteUrl\HasRouteUrl;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string $name
+ *
  * @mixin \Eloquent
  */
 class TestSecondModelForRouteUrl extends Model implements HasRouteUrlContract

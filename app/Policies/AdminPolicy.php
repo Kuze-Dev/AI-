@@ -11,10 +11,10 @@ use Illuminate\Foundation\Auth\User;
 
 class AdminPolicy
 {
-    use HandlesAuthorization;
     use ChecksWildcardPermissions;
+    use HandlesAuthorization;
 
-    public function before(?User $user, string $ability, mixed $admin = null): bool|null
+    public function before(?User $user, string $ability, mixed $admin = null): ?bool
     {
         if ($admin instanceof Admin && $admin->isZeroDayAdmin()) {
             return false;
@@ -84,7 +84,7 @@ class AdminPolicy
 
     public function sendPasswordReset(User $user, Admin $admin): bool
     {
-        if ( ! is_null($admin->deleted_at)) {
+        if (! is_null($admin->deleted_at)) {
             return false;
         }
 
@@ -93,10 +93,15 @@ class AdminPolicy
 
     public function impersonate(User $user, Admin $admin): bool
     {
-        if ( ! is_null($admin->deleted_at)) {
+        if (! is_null($admin->deleted_at)) {
             return false;
         }
 
+        return $this->checkWildcardPermissions($user);
+    }
+
+    public function customerPrintReceipt(User $user, Admin $admin): bool
+    {
         return $this->checkWildcardPermissions($user);
     }
 }

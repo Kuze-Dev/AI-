@@ -10,12 +10,12 @@ use Filament\Tables\Columns\Concerns;
 
 class BadgeLabel extends Field
 {
-    use HasState;
-    use Concerns\HasColors;
-    use Concerns\HasIcons;
-    use Concerns\HasAlignment;
     use Concerns\CanBeCopied;
     use Concerns\CanBeInline;
+    use Concerns\HasAlignment;
+    use Concerns\HasColors;
+    use Concerns\HasIcons;
+    use HasState;
 
     protected string $view = 'filament.forms.components.badge-label';
 }

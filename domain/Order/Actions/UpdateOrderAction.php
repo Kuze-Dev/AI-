@@ -9,10 +9,10 @@ use Domain\Order\Events\OrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Exception;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Log;
-use Throwable;
 use Illuminate\Support\Facades\DB;
+use Log;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Throwable;
 
 class UpdateOrderAction
 {

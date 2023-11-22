@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Product\Database\Factories\ProductFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
-use App\Features\ECommerce\AllowGuestOrder;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
@@ -26,11 +26,11 @@ beforeEach(function () {
 
     $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-    $sessionId = time() . $uuid;
+    $sessionId = time().$uuid;
 
     $cart = CartFactory::new()->setGuestId($sessionId)->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $sessionId);
+    withHeader('Authorization', 'Bearer '.$sessionId);
 
     $this->cart = $cart;
 });
@@ -46,14 +46,9 @@ it('can show cart', function () {
                     'id' => $this->cart->uuid,
                     'coupon_code' => null,
                 ],
-                'relationships' => [],
-                'meta' => [],
-                'links' => [],
             ],
-            'included' => [],
             'jsonapi' => [
                 'version' => '1.0',
-                'meta' => [],
             ],
         ])
         ->assertOk();
@@ -64,7 +59,7 @@ it('can show cart with includes', function (string $include) {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    getJson('api/guest/carts?' . http_build_query(['include' => $include]))
+    getJson('api/guest/carts?'.http_build_query(['include' => $include]))
         ->assertValid()
         ->assertJson(function (AssertableJson $json) use ($cart, $cartLine) {
             $json
@@ -87,7 +82,7 @@ it('can show cart with includes', function (string $include) {
 })->with(['cartLines.media']);
 
 it('can delete cart', function () {
-    deleteJson('api/guest/carts/' . $this->cart->uuid)
+    deleteJson('api/guest/carts/'.$this->cart->uuid)
         ->assertValid()
         ->assertNoContent();
 });

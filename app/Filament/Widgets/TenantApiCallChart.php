@@ -53,6 +53,9 @@ class TenantApiCallChart extends BarChartWidget
                 [
                     'label' => 'Total API calls',
                     'data' => array_values($data),
+                    'backgroundColor' => [
+                        'rgb(1 100 141 / 1)',
+                    ],
                 ],
             ],
             'labels' => array_keys($data),

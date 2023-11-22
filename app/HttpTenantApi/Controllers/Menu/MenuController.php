@@ -7,15 +7,15 @@ namespace App\HttpTenantApi\Controllers\Menu;
 use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\MenuResource;
 use Domain\Menu\Models\Menu;
-use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('menus', only: ['index', 'show']),
-    Middleware('feature.tenant:' . CMSBase::class)
+    Middleware('feature.tenant:'.CMSBase::class)
 ]
 class MenuController
 {

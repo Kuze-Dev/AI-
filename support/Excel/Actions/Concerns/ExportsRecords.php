@@ -30,7 +30,7 @@ trait ExportsRecords
 
     protected Closure $mapUsing;
 
-    protected Closure|null $query = null;
+    protected ?Closure $query = null;
 
     protected string|array|null $writerType = null;
 
@@ -39,7 +39,8 @@ trait ExportsRecords
     protected int $chunkSize = 100;
 
     /**
-     * @param array<int, string> $headings
+     * @param  array<int, string>  $headings
+     *
      * @throws \Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException
      */
     public function mapUsing(array $headings, Closure $mapUsing): self
@@ -82,7 +83,7 @@ trait ExportsRecords
     public function writerType(string|array $writerType): self
     {
         if (count($invalidWriterTypes = array_diff(Arr::wrap($writerType), [Excel::XLS, Excel::XLSX, Excel::CSV])) > 0) {
-            throw new InvalidArgumentException('The following writer types are not supported: ' . implode(', ', $invalidWriterTypes));
+            throw new InvalidArgumentException('The following writer types are not supported: '.implode(', ', $invalidWriterTypes));
         }
 
         $this->writerType = $writerType;
@@ -98,7 +99,7 @@ trait ExportsRecords
         return $this;
     }
 
-    /** @param class-string|Closure $exportClass */
+    /** @param  class-string|Closure  $exportClass */
     public function exportClass(string|Closure $exportClass): self
     {
         $this->exportClass = $exportClass;
@@ -122,7 +123,7 @@ trait ExportsRecords
         /** @var class-string<\Illuminate\Database\Eloquent\Model>|null $model */
         $model = $this->getModel();
 
-        if ( ! $model) {
+        if (! $model) {
             throw new InvalidArgumentException('No model provided.');
         }
 
@@ -141,12 +142,12 @@ trait ExportsRecords
     }
 
     /** @throws \Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException */
-    protected function processExport(string $writerType): BinaryFileResponse|null
+    protected function processExport(string $writerType): ?BinaryFileResponse
     {
         $fileName = $this->getFileName($writerType);
         $exportClass = $this->getExportClass();
 
-        if ( ! $this->isQueued) {
+        if (! $this->isQueued) {
             return ExcelFacade::download($exportClass, $fileName, $writerType);
         }
 
@@ -155,7 +156,7 @@ trait ExportsRecords
 
         ExcelFacade::queue(
             export: $exportClass,
-            filePath: Str::finish(config('support.excel.temporary_files.base_directory'), '/exports/') . $fileName,
+            filePath: Str::finish(config('support.excel.temporary_files.base_directory'), '/exports/').$fileName,
             disk: config('support.excel.temporary_files.disk'),
             writerType: $writerType
         )
@@ -205,6 +206,6 @@ trait ExportsRecords
         $dateTime = now(Filament::auth()->user()?->timezone)->toDateTimeString();
         $fileExtension = Str::lower($writerType);
 
-        return $modelLabel . '-' . $dateTime . '.' . $fileExtension;
+        return $modelLabel.'-'.$dateTime.'.'.$fileExtension;
     }
 }

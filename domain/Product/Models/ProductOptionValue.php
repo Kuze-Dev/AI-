@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Domain\Product\Models;
 
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Spatie\Image\Manipulations;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Product\Models\ProductOptionValue
@@ -21,6 +21,7 @@ use Spatie\Image\Manipulations;
  * @property string $slug
  * @property int $product_option_id
  * @property-read \Domain\Product\Models\ProductOption|null $productOption
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue query()
@@ -28,12 +29,13 @@ use Spatie\Image\Manipulations;
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereProductOptionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue whereSlug($value)
+ *
  * @mixin \Eloquent
  */
 class ProductOptionValue extends Model implements HasMedia
 {
-    use HasSlug;
     use ConstraintsRelationships;
+    use HasSlug;
     use InteractsWithMedia;
 
     public $timestamps = false;

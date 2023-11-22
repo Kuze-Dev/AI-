@@ -14,21 +14,21 @@ use Domain\Discount\Models\Discount;
 use Domain\Product\Models\ProductVariant;
 use Domain\Shipment\Actions\GetBoxAction;
 use Domain\Shipment\Actions\GetShippingfeeAction;
+use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
+use Domain\Shipment\DataTransferObjects\ReceiverData;
+use Domain\Shipment\DataTransferObjects\ShippingAddressData;
+use Domain\Shipment\Enums\UnitEnum;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Facades\Taxation;
 use Domain\Taxation\Models\TaxZone;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Domain\Shipment\API\Box\DataTransferObjects\BoxData;
-use Domain\Shipment\DataTransferObjects\ReceiverData;
-use Domain\Shipment\DataTransferObjects\ShippingAddressData;
-use Domain\Shipment\Enums\UnitEnum;
-use Domain\Taxation\Enums\PriceDisplay;
 
 class GuestCartSummaryAction
 {
-    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    /** @param  \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine>  $collections */
     public function execute(
         CartLine|Collection $collections,
         CartSummaryTaxData $cartSummaryTaxData,
@@ -64,19 +64,21 @@ class GuestCartSummaryAction
 
         $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $initialTotal);
 
-        if ($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL) {
-            if ($discountTotal >= $initialSubTotal) {
-                $subtotal = 0;
-            } else {
-                $subtotal = $initialSubTotal - $discountTotal;
+        if ($discountMessages->status == 'valid') {
+            if ($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL) {
+                if ($discountTotal >= $initialSubTotal) {
+                    $subtotal = 0;
+                } else {
+                    $subtotal = $initialSubTotal - $discountTotal;
+                }
             }
-        }
 
-        if ($discount?->discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE) {
-            if ($discountTotal >= $initialShippingTotal) {
-                $shippingTotal = 0;
-            } else {
-                $shippingTotal = $initialShippingTotal - $discountTotal;
+            if ($discount?->discountCondition?->discount_type === DiscountConditionType::DELIVERY_FEE) {
+                if ($discountTotal >= $initialShippingTotal) {
+                    $shippingTotal = 0;
+                } else {
+                    $shippingTotal = $initialShippingTotal - $discountTotal;
+                }
             }
         }
 
@@ -99,7 +101,7 @@ class GuestCartSummaryAction
         return SummaryData::fromArray($summaryData);
     }
 
-    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    /** @param  \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine>  $collections */
     public function getSubTotal(CartLine|Collection $collections): float
     {
         $subTotal = 0;
@@ -123,7 +125,7 @@ class GuestCartSummaryAction
         return $subTotal;
     }
 
-    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    /** @param  \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine>  $collections */
     public function getShippingFee(
         CartLine|Collection $collections,
         ?ReceiverData $receiverData,
@@ -171,7 +173,7 @@ class GuestCartSummaryAction
         return $shippingFeeTotal;
     }
 
-    /** @param \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> $collections */
+    /** @param  \Domain\Cart\Models\CartLine|\Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine>  $collections */
     public function getProducts(CartLine|Collection $collections, ?UnitEnum $unit = UnitEnum::CM): array
     {
         $productlist = [];
@@ -181,7 +183,7 @@ class GuestCartSummaryAction
             default => 1,
         };
 
-        if ( ! is_iterable($collections)) {
+        if (! is_iterable($collections)) {
             /** @var \Domain\Product\Models\Product $product */
             $product = $collections->purchasable;
 
@@ -190,7 +192,7 @@ class GuestCartSummaryAction
                 $product = $collections->purchasable->product;
             }
 
-            if ( ! is_null($product->dimension)) {
+            if (! is_null($product->dimension)) {
                 $purchasableId = $product->id;
 
                 $length = $product->dimension['length'];
@@ -219,7 +221,7 @@ class GuestCartSummaryAction
                     /** @var \Domain\Product\Models\Product $product */
                     $product = $collection->purchasable->product;
                 }
-                if ( ! is_null($product->dimension)) {
+                if (! is_null($product->dimension)) {
                     $purchasableId = $product->id;
 
                     $length = $product->dimension['length'];
@@ -245,7 +247,7 @@ class GuestCartSummaryAction
 
     public function getTax(
         ?int $countryId,
-        ?int $stateId = null
+        int $stateId = null
     ): array {
         if (is_null($countryId)) {
             return [
@@ -257,7 +259,7 @@ class GuestCartSummaryAction
 
         $taxZone = Taxation::getTaxZone($countryId, $stateId);
 
-        if ( ! $taxZone instanceof TaxZone) {
+        if (! $taxZone instanceof TaxZone) {
             return [
                 'taxZone' => null,
                 'taxDisplay' => null,
@@ -280,7 +282,7 @@ class GuestCartSummaryAction
     {
         $discountTotal = 0;
 
-        if ( ! is_null($discount)) {
+        if (! is_null($discount)) {
             $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal) ?? 0;
         }
 

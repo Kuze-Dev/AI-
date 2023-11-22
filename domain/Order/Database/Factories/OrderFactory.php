@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Domain\Order\Database\Factories;
 
 use Domain\Address\Enums\AddressLabelAs;
-use Domain\Order\Models\Order;
-use Domain\Taxation\Enums\PriceDisplay;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
 use Domain\Discount\Actions\AutoGenerateCode;
 use Domain\Order\Enums\OrderAddressTypes;
 use Domain\Order\Enums\OrderStatuses;
+use Domain\Order\Models\Order;
 use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Product\Models\Product;
+use Domain\Taxation\Enums\PriceDisplay;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\Order\Models\Order>

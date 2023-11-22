@@ -70,9 +70,9 @@ class GetUSPSRateDataAction
             new RateV4RequestData(
                 Service: ServiceType::PRIORITY,
                 ZipOrigination: $parcelData->zip_origin,
-                ZipDestination:$zipDestination,
+                ZipDestination: $zipDestination,
                 Pounds: $parcelData->pounds,
-                Ounces:$parcelData->ounces,
+                Ounces: $parcelData->ounces,
             )
         );
     }

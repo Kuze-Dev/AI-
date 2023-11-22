@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.1/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
 >
   <testsuites>
     <testsuite name="Unit">
-      <directory suffix="Test.php">./tests/Unit</directory>
+      <directory>tests/Unit</directory>
     </testsuite>
     <testsuite name="Feature">
-      <directory suffix="Test.php">./tests/Feature</directory>
+      <directory>tests/Feature</directory>
     </testsuite>
   </testsuites>
-  <coverage/>
+  <source>
+    <include>
+      <directory>app</directory>
+      <directory>domain</directory>
+      <directory>support</directory>
+    </include>
+  </source>
   <php>
     <env name="APP_ENV" value="testing"/>
     <env name="BCRYPT_ROUNDS" value="4"/>
@@ -28,11 +34,4 @@
     <env name="SETTINGS_CACHE_ENABLED" value="false"/>
     <env name="SENTRY_LARAVEL_DSN" value="null"/>
   </php>
-  <source>
-    <include>
-      <directory suffix=".php">./app</directory>
-      <directory suffix=".php">./domain</directory>
-      <directory suffix=".php">./support</directory>
-    </include>
-  </source>
 </phpunit>

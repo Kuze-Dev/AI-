@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Eloquent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Domain\Cart\Models\CartLine
@@ -34,6 +34,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @property-read Model|Eloquent $purchasable
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine query()
@@ -49,13 +50,14 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereRemarks($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartLine whereUuid($value)
+ *
  * @mixin Eloquent
  */
 class CartLine extends Model implements HasMedia
 {
-    use LogsActivity;
     use HasFactory;
     use InteractsWithMedia;
+    use LogsActivity;
 
     protected $fillable = [
         'uuid',

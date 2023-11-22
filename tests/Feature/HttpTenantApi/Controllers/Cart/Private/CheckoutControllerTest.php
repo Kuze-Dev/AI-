@@ -36,7 +36,7 @@ beforeEach(function () {
             $cartLine->save();
         })->create();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
         ->plainTextToken);
 
@@ -94,7 +94,7 @@ it('can show checkout items', function () {
     $result = app(CheckoutAction::class)
         ->execute(CheckoutData::fromArray(['cart_line_ids' => $cartLineIds]));
 
-    getJson('api/carts/checkouts?' . http_build_query(['reference' => $result]))
+    getJson('api/carts/checkouts?'.http_build_query(['reference' => $result]))
         ->assertValid()
         ->assertJsonCount(3, 'data')
         ->assertJson(function (AssertableJson $json) use ($cartLineIds) {

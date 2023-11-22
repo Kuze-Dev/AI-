@@ -30,7 +30,7 @@ class TenantFactory extends Factory
         ]);
     }
 
-    /** @param string|array<string> $domains */
+    /** @param  string|array<string>  $domains */
     public function withDomains(string|array $domains = null): self
     {
         return $this->afterCreating(function (Tenant $tenant) use ($domains) {

@@ -7,8 +7,8 @@ namespace App\HttpTenantApi\Requests\Shipping;
 use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Http\FormRequest;
 
 class ShippingRateRequestv2 extends FormRequest
 {

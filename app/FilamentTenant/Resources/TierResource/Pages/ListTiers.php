@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\TierResource\Pages;
 
 use App\FilamentTenant\Resources\TierResource;
+use Exception;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Exception;
 
 class ListTiers extends ListRecords
 {

@@ -57,6 +57,7 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Internationalization\Models\Locale::class => \App\Policies\LocalePolicy::class,
         \Domain\Site\Models\Site::class => \App\Policies\SitePolicy::class,
         \Domain\Service\Models\Service::class => \App\Policies\ServicePolicy::class,
+        \Domain\ServiceOrder\Models\ServiceOrder::class => \App\Policies\ServiceOrderPolicy::class,
     ];
 
     /** Register any authentication / authorization services. */
@@ -81,7 +82,7 @@ class AuthServiceProvider extends ServiceProvider
                     )
                     ->subject(trans('Verify Email Address'))
                     ->line(trans('Please copy OTP below to verify your email address.'))
-                    ->line('OTP: ' . $notifiable->generateEmailVerificationOTP())
+                    ->line('OTP: '.$notifiable->generateEmailVerificationOTP())
                     ->line(trans('If you did not create an account, no further action is required.'));
             }
 
@@ -109,9 +110,9 @@ class AuthServiceProvider extends ServiceProvider
                 /** @var Tenant $tenant */
                 $tenant = tenancy()->tenant;
 
-                $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                $hostName = (app()->environment('local') ? 'http://' : 'https://').$tenant->domains->first()?->domain;
 
-                return $hostName . URL::temporarySignedRoute(
+                return $hostName.URL::temporarySignedRoute(
                     'tenant.api.customer.verification.verify',
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
@@ -127,14 +128,14 @@ class AuthServiceProvider extends ServiceProvider
                     /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
-                    $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                    $hostName = (app()->environment('local') ? 'http://' : 'https://').$tenant->domains->first()?->domain;
                     $routeName = 'filament-tenant.auth.verification.verify';
                 } else {
                     $hostName = url('/', secure: app()->environment('local'));
                     $routeName = 'filament.auth.verification.verify';
                 }
 
-                return $hostName . URL::temporarySignedRoute(
+                return $hostName.URL::temporarySignedRoute(
                     $routeName,
                     now()->addMinutes(Config::get('auth.verification.expire', 60)),
                     [
@@ -151,7 +152,7 @@ class AuthServiceProvider extends ServiceProvider
                 $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
                     ?? app(SiteSettings::class)->domainWithScheme();
 
-                return $baseUrl . '/password/reset' . '?' . http_build_query([
+                return $baseUrl.'/password/reset'.'?'.http_build_query([
                     'token' => $token,
                     'expired_at' => now()->addMinutes(config('auth.passwords.customer.expire'))->timestamp,
                     'email' => $notifiable->getEmailForPasswordReset(),
@@ -163,14 +164,14 @@ class AuthServiceProvider extends ServiceProvider
                     /** @var Tenant $tenant */
                     $tenant = tenancy()->tenant;
 
-                    $hostName = (app()->environment('local') ? 'http://' : 'https://') . $tenant->domains->first()?->domain;
+                    $hostName = (app()->environment('local') ? 'http://' : 'https://').$tenant->domains->first()?->domain;
                     $routeName = 'filament-tenant.auth.password.reset';
                 } else {
                     $hostName = url('/', secure: app()->environment('local'));
                     $routeName = 'filament.auth.password.reset';
                 }
 
-                return $hostName . URL::route(
+                return $hostName.URL::route(
                     $routeName,
                     [
                         'token' => $token,

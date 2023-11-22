@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Auth\Address;
 
 use App\Features\Customer\AddressBase;
-use App\Features\ECommerce\ShippingUsps;
+use App\Features\Shopconfiguration\Shipping\ShippingUsps;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Requests\Auth\Address\AddressRequest;
 use App\HttpTenantApi\Resources\AddressResource;
@@ -32,7 +32,7 @@ use Throwable;
 
 #[
     Resource('addresses', apiResource: true),
-    Middleware(['auth:sanctum', 'feature.tenant:' . AddressBase::class])
+    Middleware(['auth:sanctum', 'feature.tenant:'.AddressBase::class])
 ]
 class AddressController extends Controller
 {
@@ -100,7 +100,7 @@ class AddressController extends Controller
             return AddressResource::make($address);
 
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
 
     }
@@ -127,7 +127,6 @@ class AddressController extends Controller
             if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
 
                 $USaddress = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
-
                 $newAddressDto = new AddressData(
                     $addressDto->state_id,
                     $addressDto->label_as,
@@ -151,7 +150,7 @@ class AddressController extends Controller
             return AddressResource::make($address);
 
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
 
     }
@@ -167,9 +166,9 @@ class AddressController extends Controller
                     ->execute($address)
             );
         } catch (CantDeleteDefaultAddressException) {
-            abort(400,  trans('Deleting default address not allowed.'));
+            abort(400, trans('Deleting default address not allowed.'));
         } catch (DeleteRestrictedException) {
-            abort(400,  trans('Failed to delete.'));
+            abort(400, trans('Failed to delete.'));
         }
 
         return response()->noContent();

@@ -27,7 +27,7 @@ class ExportBulkAction extends BulkAction
             ->deselectRecordsAfterCompletion()
             ->withActivityLog(
                 event: 'bulk-exported',
-                description: fn (self $action) => 'Bulk Exported ' . $action->getModelLabel(),
+                description: fn (self $action) => 'Bulk Exported '.$action->getModelLabel(),
                 properties: fn (self $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
             );
     }

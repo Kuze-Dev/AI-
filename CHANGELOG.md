@@ -1,5 +1,30 @@
 # Release Notes
-## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.7)
+
+## [Unreleased](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.3.0)
+
+## [v0.3.0](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.3.0)
+
+### Added
+
+- Add causer activity for admin resource.
+- Added `earlyTerminatingFunctionCalls` in phpstan.neon.
+- Install `canvural/larastan-strict-rules` to add strict rules for laravel.
+- Install `phpstan/extension-installer` to ease installation of phpstan extensions.
+- Install `phpstan/phpstan-deprecation-rules` to detect deprecated code.
+
+### Changed
+
+- Set minimum support `timacdonald/json-api` to `^1.0.0-beta.6`.
+- Remove `composer-runtime-api` on composer require.
+- Update dependencies.
+- Use `laravel` preset for `laravel/pint` formatter.
+
+### Fixed
+- Fix phpstan errors with new rules.
+
+### Removed
+
+- Remove `phpstan/phpstan` as direct dependencies.
 
 ## [v0.2.7](https://bitbucket.org/halcyonlaravel/tall-boilerplate/branches/compare/master%0Dv0.2.7)
 
@@ -25,6 +50,7 @@
 
 - Check for resource permission when rendering url for subject in `ActivityResource`.
 - Add `TextColumn::truncate()` macro.
+- Add `Select::optionsFromEnum()` macro.
 
 ### Fixed
 

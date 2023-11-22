@@ -8,9 +8,9 @@ use App\Filament\Resources\ActivityResource;
 use Closure;
 use Exception;
 use Filament\Resources\Form;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables\Actions\ViewAction;
-use Filament\Resources\RelationManagers\RelationManager;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 class ActivitiesRelationManager extends RelationManager
 {
     protected static string $relationship = 'activities';
+
     protected static ?string $recordTitleAttribute = 'description';
 
     /** @throws Exception */
@@ -55,6 +56,6 @@ class ActivitiesRelationManager extends RelationManager
         return (string) Str::of($this->getOwnerRecord()::class)
             ->classBasename()
             ->headline()
-            ->append(' ' . static::getTitle());
+            ->append(' '.static::getTitle());
     }
 }

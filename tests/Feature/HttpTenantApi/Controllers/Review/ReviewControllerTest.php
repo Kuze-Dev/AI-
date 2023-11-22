@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Domain\Review\Database\Factories\ReviewFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Order\Database\Factories\OrderFactory;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Product\Database\Factories\ProductFactory;
+use Domain\Review\Database\Factories\ReviewFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 
@@ -18,7 +18,7 @@ beforeEach(function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
         ->plainTextToken);
 
@@ -60,7 +60,7 @@ it('can delete review', function () {
     $review = ReviewFactory::new()
         ->createOne();
 
-    deleteJson('api/reviews/' . $review->product_id)
+    deleteJson('api/reviews/'.$review->product_id)
         ->assertValid();
 
     $this->assertDatabaseMissing('reviews', ['id' => $review->id]);

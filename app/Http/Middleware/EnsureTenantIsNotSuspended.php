@@ -13,11 +13,11 @@ class EnsureTenantIsNotSuspended
     public function handle(Request $request, Closure $next, string $redirectTo = null): Response
     {
 
-        #check if tenant is suspended
+        //check if tenant is suspended
 
-        if(tenancy()->tenant?->is_suspended) {
-
-            abort(403, 'Your account has been suspended. Please contact the administrator.');
+        if (tenancy()->tenant?->is_suspended) {
+            throw new \Domain\Tenant\Exceptions\SuspendTenantException();
+            // abort(403, 'ACCESS TO THIS PAGE IS RESTRICTED. PLEASE CONTACT ADMINISTRATOR.');
         }
 
         return $next($request);

@@ -37,6 +37,7 @@ class UpdateServiceAction
             'is_subscription' => $serviceData->is_subscription,
             'status' => $serviceData->status,
             'needs_approval' => $serviceData->needs_approval,
+            'is_auto_generated_bill' => $serviceData->is_auto_generated_bill,
         ]);
 
         $service->taxonomyTerms()->sync([$serviceData->taxonomy_term_id]);
@@ -44,7 +45,7 @@ class UpdateServiceAction
         $this->updateMetaData->execute($service, MetaDataData::fromArray($serviceData->meta_data ?? []));
 
         /** @var array<int, array> $mediaMaterials */
-        $mediaMaterials = $serviceData->media_collection['media'] ?? [];
+        $mediaMaterials = $serviceData->media_collection['materials'] ?? [];
 
         $media = collect($mediaMaterials)->map(function ($material) {
             /** @var UploadedFile|string $material */

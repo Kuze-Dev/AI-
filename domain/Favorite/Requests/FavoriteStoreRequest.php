@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Favorite\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class FavoriteStoreRequest extends FormRequest
 {
@@ -35,7 +35,7 @@ class FavoriteStoreRequest extends FormRequest
                 Rule::unique('favorites', 'product_id')
                     ->where(function ($query) {
                         $customer = auth()->user();
-                        if($customer) {
+                        if ($customer) {
                             $query->where('customer_id', $customer->id);
                         }
                     }),
@@ -47,7 +47,6 @@ class FavoriteStoreRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return void
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException

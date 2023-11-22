@@ -179,7 +179,7 @@ it('can bulk export', function () {
         logName: 'admin',
         event: 'bulk-exported',
         description: 'Bulk Exported Admin',
-        properties: ['selected_record_ids' => $admins->modelKeys(), ],
+        properties: ['selected_record_ids' => $admins->modelKeys()],
         causedBy: Filament::auth()->user(),
     );
 });
@@ -245,8 +245,8 @@ it('can import', function () {
     );
 
     assertActivityLogged(
-        logName:'admin',
-        event:'imported',
+        logName: 'admin',
+        event: 'imported',
         description: 'Imported Admin',
         causedBy: Filament::auth()->user(),
     );

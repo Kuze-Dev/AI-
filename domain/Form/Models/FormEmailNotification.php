@@ -28,6 +28,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Domain\Form\Models\Form|null $form
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification query()
@@ -43,6 +44,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereTemplate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereTo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class FormEmailNotification extends Model

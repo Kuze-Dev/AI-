@@ -22,7 +22,7 @@ beforeEach(function () {
 it('can render globals', function () {
     $record = GlobalsFactory::new()->withDummyBlueprint()->createOne();
 
-    livewire(EditGlobals::class,  ['record' => $record->getRouteKey()])
+    livewire(EditGlobals::class, ['record' => $record->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful();
 });

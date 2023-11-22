@@ -18,7 +18,7 @@ class UpdateProductOptionAction
     public function execute(Product $product, ProductData $productData): void
     {
         /** Flush Product Option */
-        if ( ! filled($productData->product_options) && ! filled($productData->product_variants)) {
+        if (! filled($productData->product_options) && ! filled($productData->product_variants)) {
             ProductOption::whereProductId($product->id)->delete();
 
             return;
@@ -105,7 +105,7 @@ class UpdateProductOptionAction
         $this->sanitizeOptions($productData, $product->id);
     }
 
-    protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, ?int $productId = null): void
+    protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, int $productId = null): void
     {
         $arrayForMapping = [];
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
-use Filament\Forms\Components\Component;
 use Closure;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
+use Filament\Forms\Components\Component;
 
 class SchemaInterpolations extends Component
 {
@@ -14,7 +14,7 @@ class SchemaInterpolations extends Component
 
     protected SchemaData|Closure|null $schemaData = null;
 
-    final public function __construct(string $name, Closure|null $schemaData)
+    final public function __construct(string $name, ?Closure $schemaData)
     {
         $this->statePath($name);
         $this->schemaData($schemaData);

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Product\Models;
 
-use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Product\Models\ProductOption
@@ -24,6 +24,7 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @property-read \Domain\Product\Models\Product|null $product
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Product\Models\ProductOptionValue> $productOptionValues
  * @property-read int|null $product_option_values_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOption newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOption newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOption query()
@@ -33,13 +34,14 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOption whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['productOptionValues'])]
 class ProductOption extends Model
 {
-    use HasSlug;
     use ConstraintsRelationships;
+    use HasSlug;
 
     protected $fillable = [
         'name',
