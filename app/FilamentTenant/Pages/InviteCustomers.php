@@ -27,6 +27,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
@@ -49,16 +50,6 @@ class InviteCustomers extends Page implements HasTable
             return;
         }
         Filament::registerNavigationItems(static::getNavigationItems());
-
-    }
-
-    /** @return Builder<\Domain\Customer\Models\Customer> */
-    protected function getTableQuery(): Builder
-    {
-        return Customer::query()
-            ->where('register_status', '=', RegisterStatus::UNREGISTERED)
-            ->orWhere('register_status', '=', RegisterStatus::INVITED)
-            ->latest();
 
     }
 
@@ -228,5 +219,20 @@ class InviteCustomers extends Page implements HasTable
                     ],
                 ),
         ];
+    }
+
+    protected function paginateTableQuery(Builder $query): Paginator
+    {
+        return $query->paginate(10);
+    }
+
+    /** @return Builder<\Domain\Customer\Models\Customer> */
+    protected function getTableQuery(): Builder
+    {
+        return Customer::query()
+            ->where('register_status', '=', RegisterStatus::UNREGISTERED)
+            ->orWhere('register_status', '=', RegisterStatus::INVITED)
+            ->latest();
+
     }
 }
