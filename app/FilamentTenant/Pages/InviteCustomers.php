@@ -27,6 +27,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
@@ -49,16 +50,6 @@ class InviteCustomers extends Page implements HasTable
             return;
         }
         Filament::registerNavigationItems(static::getNavigationItems());
-
-    }
-
-    /** @return Builder<\Domain\Customer\Models\Customer> */
-    protected function getTableQuery(): Builder
-    {
-        return Customer::query()
-            ->where('register_status', '=', RegisterStatus::UNREGISTERED)
-            ->orWhere('register_status', '=', RegisterStatus::INVITED)
-            ->latest();
 
     }
 
@@ -185,12 +176,12 @@ class InviteCustomers extends Page implements HasTable
                     function (array $row): Customer {
                         $data = [
                             'email' => $row['email'],
-                            'first_name' => $row['first_name'] ?? null,
-                            'last_name' => $row['last_name'] ?? null,
+                            'first_name' => $row['first_name'] ?? '',
+                            'last_name' => $row['last_name'] ?? '',
                             'mobile' => $row['mobile'] ? (string) $row['mobile'] : null,
                             'gender' => $row['gender'] ?? null,
                             'status' => $row['status'] ?? null,
-                            'birth_date' => $row['birth_date'] ?? null,
+                            'birth_date' => $row['birth_date'] ?? '',
                             'tier_id' => isset($row['tier'])
                                 ? (Tier::whereName($row['tier'])->first()?->getKey())
                                 : null,
@@ -215,8 +206,8 @@ class InviteCustomers extends Page implements HasTable
                             'required',
                             Rule::email(),
                         ],
-                        'first_name' => 'required|string|min:3|max:100',
-                        'last_name' => 'required|string|min:3|max:100',
+                        'first_name' => 'nullable|string|min:3|max:100',
+                        'last_name' => 'nullable|string|min:3|max:100',
                         'mobile' => 'nullable|min:3|max:100',
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'status' => ['nullable', Rule::enum(Status::class)],
@@ -228,5 +219,26 @@ class InviteCustomers extends Page implements HasTable
                     ],
                 ),
         ];
+    }
+
+    /**
+     * Paginate the table query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder <\Domain\Customer\Models\Customer>  $query
+     * @return \Illuminate\Contracts\Pagination\Paginator<\Domain\Customer\Models\Customer>
+     */
+    protected function paginateTableQuery(Builder $query): Paginator
+    {
+        return $query->paginate(10);
+    }
+
+    /** @return Builder<\Domain\Customer\Models\Customer> */
+    protected function getTableQuery(): Builder
+    {
+        return Customer::query()
+            ->where('register_status', '=', RegisterStatus::UNREGISTERED)
+            ->orWhere('register_status', '=', RegisterStatus::INVITED)
+            ->latest();
+
     }
 }

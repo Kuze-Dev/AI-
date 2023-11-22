@@ -20,11 +20,11 @@ use Illuminate\Http\UploadedFile;
 final class CustomerData
 {
     private function __construct(
-        public readonly string $first_name,
-        public readonly string $last_name,
-        public readonly ?string $mobile,
-        public readonly ?Gender $gender,
-        public readonly ?Carbon $birth_date,
+        public readonly ?string $first_name = null,
+        public readonly ?string $last_name = null,
+        public readonly ?string $mobile = null,
+        public readonly ?Gender $gender = null,
+        public readonly ?Carbon $birth_date = null,
         public readonly ?Status $status = null,
         public readonly ?int $tier_id = null,
         public readonly ?string $email = null,
@@ -159,8 +159,8 @@ final class CustomerData
     public static function fromArrayImportByAdmin(array $data): self
     {
         return new self(
-            first_name: $data['first_name'],
-            last_name: $data['last_name'],
+            first_name: $data['first_name'] ?? null,
+            last_name: $data['last_name'] ?? null,
             mobile: $data['mobile'] ?? null,
             gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,

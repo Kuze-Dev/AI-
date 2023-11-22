@@ -159,25 +159,6 @@
         <td></td>
     </tr>
     <tr>
-        <td scope="row" align="right">{{ trans('Subtotal') }}</td>
-        <td align="right">
-            <strong>
-                {{
-                    money(
-                        $sub_total,
-                        $transaction->serviceOrder
-                            ->currency_code
-                    )
-                        ->format()
-                }}
-            </strong>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2"><hr></td>
-        <td></td>
-    </tr>
-    <tr>
         <td scope="row" align="right">{{ trans('Additional Charges') }}</td>
         <td align="right">
             <strong>
@@ -189,6 +170,25 @@
                         $transaction->serviceOrder
                             ->currency_code
                     )->format()
+                }}
+            </strong>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><hr></td>
+        <td></td>
+    </tr>
+        <tr>
+        <td scope="row" align="right">{{ trans('Subtotal') }}</td>
+        <td align="right">
+            <strong>
+                {{
+                    money(
+                        $sub_total,
+                        $transaction->serviceOrder
+                            ->currency_code
+                    )
+                        ->format()
                 }}
             </strong>
         </td>
