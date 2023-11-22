@@ -18,8 +18,10 @@ use Closure;
 use DateTimeZone;
 use Domain\Admin\Models\Admin;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
+use Domain\ServiceOrder\Actions\UpdateServiceBillAction;
 use Domain\ServiceOrder\Actions\UpdateServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
+use Domain\ServiceOrder\DataTransferObjects\UpdateServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
@@ -73,17 +75,30 @@ class ViewServiceOrder extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateServiceOrderAction::class)
-            ->execute(
-                $record,
-                new UpdateServiceOrderData(
-                    sub_total: $data['sub_total'],
-                    tax_total: $data['tax_total'],
-                    total_price: $data['total_price'],
-                    additional_charges: $data['additional_charges'],
-                    customer_form: $data['customer_form'],
-                )
+        $amountInfo = self::calculateTaxInfo($record, $data['additional_charges']);
+
+        $serviceOrder = app(UpdateServiceOrderAction::class)->execute(
+            $record,
+            new UpdateServiceOrderData(
+                sub_total: $amountInfo->sub_total,
+                tax_total: $amountInfo->tax_total,
+                total_price: $amountInfo->total_price,
+                additional_charges: $data['additional_charges'],
+                customer_form: $data['customer_form'],
             ));
+
+        $serviceBill = $serviceOrder->serviceBills()->first();
+
+        if ($serviceOrder instanceof ServiceOrder && $serviceBill && ! $record->is_subscription) {
+            app(UpdateServiceBillAction::class)->execute($serviceBill, new UpdateServiceBillData(
+                sub_total: $serviceOrder->sub_total,
+                tax_total: $serviceOrder->tax_total,
+                total_amount: $serviceOrder->total_price,
+                additional_charges: $serviceOrder->additional_charges,
+            ));
+        }
+
+        return DB::transaction(fn () => $serviceOrder);
     }
 
     protected function getActions(): array
@@ -382,7 +397,6 @@ class ViewServiceOrder extends EditRecord
                                 ->timezone(Auth::user()?->timezone),
                             TextInput::make('price')->required()->numeric()->reactive(),
                         ])
-                        ->maxItems(3)
                         ->columns(3),
                 ])
                 ->columns(2),
