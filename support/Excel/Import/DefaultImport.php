@@ -28,7 +28,7 @@ class DefaultImport implements ShouldQueue, ToModel, WithChunkReading, WithEvent
 
     public function chunkSize(): int
     {
-        return 100;
+        return 10;
     }
 
     /** @throws \Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException */
