@@ -488,7 +488,9 @@ class ProductResource extends Resource
                                         ->mediaLibraryCollection('media')
                                         ->multiple()
                                         ->hidden(
-                                            fn (Closure $get) => isset($get('../../../*')[1]) && $get('../../../*')[1]['id'] === $get('../../id')
+                                            fn (Closure $get) => isset($get('../../../*')[1])
+                                                && isset($get('../../../*')[1]['id'])
+                                                && $get('../../../*')[1]['id'] === $get('../../id')
                                         )
                                         ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
                                             $mediaClass = config('media-library.media_model', Media::class);
