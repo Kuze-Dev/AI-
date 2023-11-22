@@ -221,6 +221,12 @@ class InviteCustomers extends Page implements HasTable
         ];
     }
 
+    /**
+     * Paginate the table query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder <\Domain\Customer\Models\Customer>  $query
+     * @return \Illuminate\Contracts\Pagination\Paginator<\Domain\Customer\Models\Customer>
+     */
     protected function paginateTableQuery(Builder $query): Paginator
     {
         return $query->paginate(10);
