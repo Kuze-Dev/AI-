@@ -35,13 +35,12 @@ class ListCustomers extends ListRecords
                     function (array $row): Customer {
                         $data = [
                             'email' => $row['email'],
-                            'first_name' => $row['first_name'] ?? null,
-                            'last_name' => $row['last_name'] ?? null,
+                            'first_name' => $row['first_name'] ?? '',
+                            'last_name' => $row['last_name'] ?? '',
                             'mobile' => $row['mobile'] ? (string) $row['mobile'] : null,
                             'gender' => $row['gender'] ?? null,
-                            'password' => $row['password'] ?? $row['email'],
                             'status' => $row['status'] ?? null,
-                            'birth_date' => $row['birth_date'] ?? null,
+                            'birth_date' => $row['birth_date'] ?? '',
                             'tier_id' => isset($row['tier'])
                                 ? (Tier::whereName($row['tier'])->first()?->getKey())
                                 : null,
