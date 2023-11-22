@@ -8,8 +8,8 @@ use Domain\Product\Database\Factories\ProductOptionFactory;
 use Domain\Product\Database\Factories\ProductOptionValueFactory;
 use Domain\Product\Database\Factories\ProductVariantFactory;
 use Filament\Facades\Filament;
-use Support\MetaData\Database\Factories\MetaDataFactory;
 use Filament\Pages\Actions\DeleteAction;
+use Support\MetaData\Database\Factories\MetaDataFactory;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;

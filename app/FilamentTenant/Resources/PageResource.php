@@ -4,36 +4,36 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Closure;
-use Exception;
-use Carbon\Carbon;
-use Filament\Forms;
-use Filament\Tables;
-use Illuminate\Support\Str;
-use Domain\Page\Models\Page;
-use Domain\Site\Models\Site;
-use Filament\Resources\Form;
-use Domain\Page\Models\Block;
-use Filament\Resources\Table;
-use Filament\Resources\Resource;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use Domain\Page\Enums\Visibility;
-use Domain\Page\Models\BlockContent;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Component;
-use Domain\Page\Actions\DeletePageAction;
-use Illuminate\Database\Eloquent\Builder;
 use App\FilamentTenant\Support\MetaDataForm;
-use Illuminate\Database\Eloquent\Collection;
-use Domain\Internationalization\Models\Locale;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Carbon\Carbon;
+use Closure;
+use Domain\Internationalization\Models\Locale;
+use Domain\Page\Actions\DeletePageAction;
+use Domain\Page\Enums\Visibility;
+use Domain\Page\Models\Block;
+use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Page;
+use Domain\Site\Models\Site;
+use Exception;
+use Filament\Forms;
+use Filament\Forms\Components\Component;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 
 class PageResource extends Resource
 {
@@ -63,11 +63,11 @@ class PageResource extends Resource
                                     ignoreRecord: true,
                                     callback: function (Unique $rule, $state, $livewire) {
 
-                                        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
                                             return false;
                                         }
 
-                                        if($livewire->record?->parentPage?->name == $state) {
+                                        if ($livewire->record?->parentPage?->name == $state) {
                                             return false;
                                         }
 
@@ -87,7 +87,7 @@ class PageResource extends Resource
                             // ->disabled(fn (?Page $record) => $record?->isHomePage()),
                             Forms\Components\Select::make('locale')
                                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                                ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                                ->default((string) Locale::where('is_default', true)->first()?->code)
                                 ->searchable()
                                 ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                                 ->reactive()
@@ -126,19 +126,19 @@ class PageResource extends Resource
                                 ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                                 ->options(function () {
 
-                                    if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+                                    if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
                                         return Site::orderBy('name')
                                             ->pluck('name', 'id')
                                             ->toArray();
                                     }
 
-                                    return  Site::orderBy('name')
+                                    return Site::orderBy('name')
                                         ->whereHas('siteManager', fn ($query) => $query->where('admin_id', Auth::user()?->id))
                                         ->pluck('name', 'id')
                                         ->toArray();
                                 })
                                 ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Page $record): void {
-                                    if ( ! $record) {
+                                    if (! $record) {
                                         $component->state([]);
 
                                         return;
@@ -239,7 +239,10 @@ class PageResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(isToggledHiddenByDefault:true),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->toggleable(condition: function () {
+                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                    }, isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
                     ->options([
@@ -273,6 +276,7 @@ class PageResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name'),
                 Tables\Filters\TernaryFilter::make('published_at')
                     ->label(trans('Published'))
@@ -301,11 +305,11 @@ class PageResource extends Resource
     /** @return Builder<\Domain\Page\Models\Page> */
     public static function getEloquentQuery(): Builder
     {
-        if(Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
-        if(tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {
@@ -336,7 +340,7 @@ class PageResource extends Resource
         $maxLength = 60; // Maximum length for the title before truncating
         $truncatedTitle = Str::limit($recordTitle, $maxLength, '...');
 
-        return $truncatedTitle . ''. $status;
+        return $truncatedTitle.''.$status;
     }
 
     public static function getRelations(): array
@@ -358,7 +362,7 @@ class PageResource extends Resource
     /** @return Collection<int, Block> $cachedBlocks */
     protected static function getCachedBlocks(): Collection
     {
-        if ( ! isset(self::$cachedBlocks)) {
+        if (! isset(self::$cachedBlocks)) {
             self::$cachedBlocks = Block::with(['blueprint', 'media'])->get();
         }
 

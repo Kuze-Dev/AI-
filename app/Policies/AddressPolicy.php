@@ -17,7 +17,7 @@ class AddressPolicy
 
     public function before(?User $user, string $ability, mixed $address = null): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(AddressBase::class)) {
+        if (! tenancy()->tenant?->features()->active(AddressBase::class)) {
             return Response::denyAsNotFound();
         }
 

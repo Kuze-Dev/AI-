@@ -14,7 +14,7 @@ class CreateOrUpdateProductVariantAction
     public function execute(Product $product, ProductData $productData, bool $isCreate = true): void
     {
         /** If met, flush product variants */
-        if ( ! filled($productData->product_variants)) {
+        if (! filled($productData->product_variants)) {
             ProductVariant::whereProductId($product->id)->delete();
 
             return;
@@ -58,7 +58,7 @@ class CreateOrUpdateProductVariantAction
                         )->isEmpty();
             });
 
-            if ( ! $found) {
+            if (! $found) {
                 $variant->delete();
             }
         });
@@ -70,13 +70,13 @@ class CreateOrUpdateProductVariantAction
             $variant = ProductVariant::where(
                 'combination',
                 'LIKE',
-                '%"option_value_id": ' . $productVariant->combination[0]->option_value_id . '%'
+                '%"option_value_id": '.$productVariant->combination[0]->option_value_id.'%'
             )
                 ->when(isset($productVariant->combination[1]), function ($query) use ($productVariant) {
                     return $query->where(
                         'combination',
                         'LIKE',
-                        '%"option_value_id": ' . $productVariant->combination[1]->option_value_id . '%'
+                        '%"option_value_id": '.$productVariant->combination[1]->option_value_id.'%'
                     );
                 })
                 ->where('product_id', $productId)

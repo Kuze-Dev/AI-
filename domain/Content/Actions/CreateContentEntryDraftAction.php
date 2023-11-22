@@ -7,9 +7,9 @@ namespace Domain\Content\Actions;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Models\Locale;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
-use Domain\Internationalization\Models\Locale;
 
 class CreateContentEntryDraftAction
 {

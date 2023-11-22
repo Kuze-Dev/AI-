@@ -12,12 +12,12 @@ use Domain\ShippingMethod\Models\ShippingMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Get;
-use TiMacDonald\JsonApi\JsonApiResourceCollection;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Throwable;
+use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-#[Middleware(['feature.tenant:'. ECommerceBase::class, 'auth:sanctum'])]
+#[Middleware(['feature.tenant:'.ECommerceBase::class, 'auth:sanctum'])]
 class ShippingMethodv2Controller extends Controller
 {
     #[Get('v2/shipping-methods')]
@@ -31,7 +31,7 @@ class ShippingMethodv2Controller extends Controller
             $this->authorize('view', $address);
 
             return ShippingMethodResourcev2::collection(
-                QueryBuilder::for(ShippingMethod::whereActive(true))
+                QueryBuilder::for(ShippingMethod::with('media')->whereActive(true))
                     ->allowedFilters(['name', 'slug'])
                     ->allowedIncludes([
                         'media',

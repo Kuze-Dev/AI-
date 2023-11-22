@@ -19,14 +19,14 @@ class SanitizeCartSummaryAction
                 /** @var \Domain\Product\Models\Product $product */
                 $product = $cartLine->purchasable;
 
-                if ( ! $product->allow_guest_purchase) {
+                if (! $product->allow_guest_purchase) {
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
             } elseif ($cartLine->purchasable instanceof ProductVariant) {
                 /** @var \Domain\Product\Models\Product $product */
                 $product = $cartLine->purchasable->product;
 
-                if ( ! $product->allow_guest_purchase) {
+                if (! $product->allow_guest_purchase) {
                     $cartLineIdsTobeRemoved[] = $cartLine->uuid;
                 }
             }
@@ -38,7 +38,7 @@ class SanitizeCartSummaryAction
             return $cartLine->purchasable !== null;
         });
 
-        if ( ! empty($cartLineIdsTobeRemoved)) {
+        if (! empty($cartLineIdsTobeRemoved)) {
             event(new SanitizeCartEvent(
                 $cartLineIdsTobeRemoved,
             ));

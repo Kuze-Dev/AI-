@@ -82,8 +82,8 @@ class Account extends Page
                     ->required()
                     ->rules(Rule::email())
                     ->unique(Admin::class, ignorable: $this->admin)
-                    ->helperText( ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : null)
-                    ->disabled( ! config('domain.admin.can_change_email'))
+                    ->helperText(! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : null)
+                    ->disabled(! config('domain.admin.can_change_email'))
                     ->dehydrated((bool) config('domain.admin.can_change_email')),
                 Forms\Components\TextInput::make('password')
                     ->password()
@@ -118,7 +118,7 @@ class Account extends Page
             ->execute($this->admin, new AdminData(...$this->form->getState())));
 
         if ($this->admin->wasChanged('password')) {
-            session()->forget('password_hash_' . config('filament.auth.guard'));
+            session()->forget('password_hash_'.config('filament.auth.guard'));
             Filament::auth()->login($this->admin);
         }
 

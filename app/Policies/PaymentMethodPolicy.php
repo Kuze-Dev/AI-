@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Features\ECommerce\BankTransfer;
-use App\Features\ECommerce\OfflineGateway;
-use App\Features\ECommerce\PaypalGateway;
-use App\Features\ECommerce\StripeGateway;
+use App\Features\Shopconfiguration\PaymentGateway\BankTransfer;
+use App\Features\Shopconfiguration\PaymentGateway\OfflineGateway;
+use App\Features\Shopconfiguration\PaymentGateway\PaypalGateway;
+use App\Features\Shopconfiguration\PaymentGateway\StripeGateway;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Auth\Access\Response;
@@ -19,7 +19,7 @@ class PaymentMethodPolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->someAreActive([
+        if (! tenancy()->tenant?->features()->someAreActive([
             PaypalGateway::class,
             OfflineGateway::class,
             StripeGateway::class,
@@ -48,6 +48,10 @@ class PaymentMethodPolicy
 
     public function update(User $user, PaymentMethod $paymentMethod): bool
     {
+        if ($paymentMethod->trashed()) {
+            return false;
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 

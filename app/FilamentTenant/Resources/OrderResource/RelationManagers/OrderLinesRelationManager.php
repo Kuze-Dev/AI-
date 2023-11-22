@@ -9,8 +9,8 @@ use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 
@@ -55,7 +55,7 @@ class OrderLinesRelationManager extends RelationManager
                         /** @var \Domain\Order\Models\Order $order */
                         $order = $livewire->getOwnerRecord();
 
-                        return $order->currency_symbol . ' ' . number_format($record->unit_price, 2, '.', '');
+                        return $order->currency_symbol.' '.number_format($record->unit_price, 2, '.', '');
                     })
                     ->label(trans('Unit Price')),
                 Tables\Columns\TextColumn::make('quantity')->label(trans('Quantity')),
@@ -64,7 +64,7 @@ class OrderLinesRelationManager extends RelationManager
                         /** @var \Domain\Order\Models\Order $order */
                         $order = $livewire->getOwnerRecord();
 
-                        return $order->currency_symbol . ' ' . number_format($record->sub_total, 2, '.', '');
+                        return $order->currency_symbol.' '.number_format($record->sub_total, 2, '.', '');
                     })
                     ->label(trans('Amount')),
             ])

@@ -7,9 +7,9 @@ namespace App\FilamentTenant\Resources\SiteResource\Pages;
 use App\FilamentTenant\Resources\SiteResource;
 use Domain\Site\Actions\CreateSiteAction;
 use Domain\Site\DataTransferObjects\SiteData;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Filament\Pages\Actions\Action;
 use Illuminate\Support\Facades\DB;
 
 class CreateSite extends CreateRecord
@@ -20,7 +20,7 @@ class CreateSite extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];

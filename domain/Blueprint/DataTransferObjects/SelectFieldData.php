@@ -10,8 +10,8 @@ use Illuminate\Support\Str;
 class SelectFieldData extends FieldData
 {
     /**
-     * @param array<string> $rules
-     * @param array<string, OptionData> $options
+     * @param  array<string>  $rules
+     * @param  array<string, OptionData>  $options
      */
     public function __construct(
         public readonly string $title,
@@ -28,11 +28,11 @@ class SelectFieldData extends FieldData
 
     public static function fromArray(array $data): self
     {
-        if ( ! $data['type'] instanceof FieldType) {
+        if (! $data['type'] instanceof FieldType) {
             $data['type'] = FieldType::from($data['type']);
         }
 
-        if ( ! empty($data['options'] ?? [])) {
+        if (! empty($data['options'] ?? [])) {
             $data['options'] = array_map(
                 fn (array $option) => OptionData::fromArray($option),
                 $data['options']

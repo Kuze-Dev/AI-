@@ -14,14 +14,17 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('paymentmethod', only: ['index']),
-    Middleware('feature.tenant:' . CMSBase::class)
+    Middleware('feature.tenant:'.CMSBase::class)
 ]
 class PaymentMethodController
 {
     public function index(): JsonApiResourceCollection
     {
         return PaymentMethodResource::collection(
-            QueryBuilder::for(PaymentMethod::where('status', true))
+            QueryBuilder::for(PaymentMethod::with('media')->where('status', true))
+                ->allowedIncludes([
+                    'media',
+                ])
                 ->allowedFilters(['title', 'slug'])
                 ->jsonPaginate()
         );

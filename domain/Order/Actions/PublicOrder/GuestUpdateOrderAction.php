@@ -18,10 +18,10 @@ use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Models\Payment;
 use Illuminate\Database\Eloquent\Builder;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class GuestUpdateOrderAction
 {
@@ -67,7 +67,7 @@ class GuestUpdateOrderAction
         return $order;
     }
 
-    private function updateStatus(Order $order, string $status, ?string $notes = null): Order
+    private function updateStatus(Order $order, string $status, string $notes = null): Order
     {
         $orderData = [
             'status' => $status,
@@ -100,7 +100,7 @@ class GuestUpdateOrderAction
     private function updateBankTransfer(
         Order $order,
         string $proofOfPayment,
-        ?string $notes = null
+        string $notes = null
     ): void {
         /** @var \Domain\Payments\Models\Payment $payment */
         $payment = $order->payments->first();
@@ -150,7 +150,7 @@ class GuestUpdateOrderAction
             $query->where('payable_id', $order->id);
         })->whereNot('status', 'paid')->first();
 
-        if ( ! $payment) {
+        if (! $payment) {
             throw new BadRequestHttpException('Your order is already paid');
         }
 

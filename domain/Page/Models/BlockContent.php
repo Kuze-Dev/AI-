@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use Domain\Blueprint\Models\BlueprintData;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -24,6 +24,7 @@ use Spatie\EloquentSortable\SortableTrait;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Domain\Page\Models\Block $block
+ *
  * @method static Builder|BlockContent newModelQuery()
  * @method static Builder|BlockContent newQuery()
  * @method static Builder|BlockContent ordered(string $direction = 'asc')
@@ -35,6 +36,7 @@ use Spatie\EloquentSortable\SortableTrait;
  * @method static Builder|BlockContent whereOrder($value)
  * @method static Builder|BlockContent wherePageId($value)
  * @method static Builder|BlockContent whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class BlockContent extends Model implements Sortable
@@ -60,7 +62,7 @@ class BlockContent extends Model implements Sortable
     /** @return MorphMany<BlueprintData> */
     public function blueprintData(): MorphMany
     {
-        return $this->morphMany(BlueprintData::class,  'model');
+        return $this->morphMany(BlueprintData::class, 'model');
     }
 
     /** @return Builder<BlockContent> */

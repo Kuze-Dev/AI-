@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Support\RouteUrl\Rules;
 
-use Support\RouteUrl\Contracts\HasRouteUrl;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
-use Support\RouteUrl\Models\RouteUrl;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Support\RouteUrl\Contracts\HasRouteUrl;
+use Support\RouteUrl\Models\RouteUrl;
 
 class MicroSiteUniqueRouteUrlRule implements ValidationRule
 {
     public function __construct(
-        protected readonly ?HasRouteUrl $ignoreModel = null,
+        protected readonly ?HasRouteUrl $ignoreModel,
         protected readonly array $route_url,
     ) {
     }
@@ -59,7 +59,7 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
             }
 
             $query->whereNot(fn (EloquentBuilder $query) => $query
-                ->where('model_type',  $this->ignoreModel->getMorphClass())
+                ->where('model_type', $this->ignoreModel->getMorphClass())
                 ->whereIn('model_id', array_filter($ignoreModelIds)));
 
         }

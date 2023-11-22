@@ -14,7 +14,7 @@ class DisableTwoFactorAuthenticationAction
 {
     public function execute(User&TwoFactorAuthenticatable $authenticatable): ?bool
     {
-        if ( ! $authenticatable->hasEnabledTwoFactorAuthentication()) {
+        if (! $authenticatable->hasEnabledTwoFactorAuthentication()) {
             return null;
         }
 

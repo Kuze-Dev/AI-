@@ -11,10 +11,10 @@ use Domain\Review\DataTransferObjects\CreateReviewData;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\RouteAttributes\Attributes\Get;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Spatie\RouteAttributes\Attributes\Middleware;
-use Spatie\RouteAttributes\Attributes\Get;
 
 #[
     Resource('reviews', apiResource: true, only: ['destroy', 'store']),

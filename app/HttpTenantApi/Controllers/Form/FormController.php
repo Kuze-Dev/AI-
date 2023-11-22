@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Form;
 
-use Domain\Form\Models\Form;
 use App\Features\CMS\CMSBase;
 use App\Http\Controllers\Controller;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
 use App\HttpTenantApi\Resources\FormResource;
-use Spatie\RouteAttributes\Attributes\Middleware;
+use Domain\Form\Models\Form;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Middleware;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('forms', only: ['index', 'show']),
-    Middleware('feature.tenant:' . CMSBase::class)
+    Middleware('feature.tenant:'.CMSBase::class)
 ]
 class FormController extends Controller
 {

@@ -7,12 +7,12 @@ namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Actions\UpdateGlobalsAction;
+use Domain\Globals\DataTransferObjects\GlobalsData;
 use Filament\Pages\Actions;
+use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Domain\Globals\DataTransferObjects\GlobalsData;
-use Filament\Pages\Actions\Action;
 use Throwable;
 
 class EditGlobals extends EditRecord
@@ -25,7 +25,7 @@ class EditGlobals extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -38,7 +38,8 @@ class EditGlobals extends EditRecord
     }
 
     /**
-     * @param \Domain\Globals\Models\Globals $record
+     * @param  \Domain\Globals\Models\Globals  $record
+     *
      * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model

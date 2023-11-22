@@ -13,7 +13,7 @@ class SyncTermTreeAction
 {
     protected Taxonomy $taxonomy;
 
-    /** @param array<TaxonomyTermData> $taxonomyTermDataSet */
+    /** @param  array<TaxonomyTermData>  $taxonomyTermDataSet */
     public function execute(Taxonomy $taxonomy, array $taxonomyTermDataSet): Taxonomy
     {
         $this->taxonomy = $taxonomy;
@@ -25,7 +25,7 @@ class SyncTermTreeAction
         return $this->taxonomy;
     }
 
-    /** @param array<TaxonomyTermData> $taxonomyTermDataSet */
+    /** @param  array<TaxonomyTermData>  $taxonomyTermDataSet */
     protected function pruneMissingTerms(array $taxonomyTermDataSet): void
     {
         $flatTerms = $this->flatMapTerms($taxonomyTermDataSet);
@@ -39,7 +39,7 @@ class SyncTermTreeAction
         }
     }
 
-    /** @param array<TaxonomyTermData> $taxonomyTermDataSet */
+    /** @param  array<TaxonomyTermData>  $taxonomyTermDataSet */
     protected function syncTerms(array $taxonomyTermDataSet, TaxonomyTerm $parentTerm = null): void
     {
         $termIds = [];
@@ -62,7 +62,7 @@ class SyncTermTreeAction
             'data' => $termData->data,
         ])->save();
 
-        if ( ! empty($termData->children)) {
+        if (! empty($termData->children)) {
             $this->syncTerms($termData->children, $term);
         }
 
@@ -76,7 +76,7 @@ class SyncTermTreeAction
 
     protected function inlineChildren(TaxonomyTermData $termData): array
     {
-        if ( ! empty($termData->children)) {
+        if (! empty($termData->children)) {
             $children = Arr::map($termData->children, $this->inlineChildren(...));
         }
 

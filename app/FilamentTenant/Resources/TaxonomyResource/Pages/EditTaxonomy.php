@@ -24,7 +24,7 @@ class EditTaxonomy extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -36,7 +36,7 @@ class EditTaxonomy extends EditRecord
         return $this->getCachedActions();
     }
 
-    /** @param \Domain\Taxonomy\Models\Taxonomy $record */
+    /** @param  \Domain\Taxonomy\Models\Taxonomy  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data)));

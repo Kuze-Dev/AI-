@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Features\ECommerce\OfflineGateway;
+use App\Features\Shopconfiguration\PaymentGateway\OfflineGateway;
 use App\FilamentTenant\Resources\PaymentMethodResource\Pages\CreatePaymentMethod;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Filament\Facades\Filament;

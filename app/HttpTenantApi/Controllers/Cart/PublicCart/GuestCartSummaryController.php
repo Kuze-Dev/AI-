@@ -6,8 +6,8 @@ namespace App\HttpTenantApi\Controllers\Cart\PublicCart;
 
 use App\Features\ECommerce\AllowGuestOrder;
 use App\Http\Controllers\Controller;
-use Domain\Cart\Actions\SanitizeCartSummaryAction;
 use Domain\Cart\Actions\PublicCart\GuestCartSummaryAction;
+use Domain\Cart\Actions\SanitizeCartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\DataTransferObjects\GuestCartSummaryShippingData;
 use Domain\Cart\Models\CartLine;
@@ -21,7 +21,7 @@ use Spatie\RouteAttributes\Attributes\Post;
 use Throwable;
 
 #[
-    Middleware(['feature.tenant:' . AllowGuestOrder::class])
+    Middleware(['feature.tenant:'.AllowGuestOrder::class])
 ]
 class GuestCartSummaryController extends Controller
 {
@@ -105,7 +105,7 @@ class GuestCartSummaryController extends Controller
                 ],
             ];
 
-            if ( ! $discountCode) {
+            if (! $discountCode) {
                 unset($responseArray['discount']);
             }
 

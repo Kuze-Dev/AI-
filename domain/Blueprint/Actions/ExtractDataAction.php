@@ -24,7 +24,7 @@ class ExtractDataAction
     {
         $fieldTypes = [];
         foreach ($fields as $field) {
-            $newPath = $currentpath . '.' . $field->state_name;
+            $newPath = $currentpath.'.'.$field->state_name;
             if ($field->type == FieldType::REPEATER) {
                 $fieldTypes[$field->state_name] = array_merge($this->recursivelyExtractFields($field->fields, $newPath));
                 $fieldTypes[$field->state_name]['type'] = $field->type;
@@ -40,7 +40,7 @@ class ExtractDataAction
         return $fieldTypes;
     }
 
-    public function mergeFields(array $firstField, array|string|null $values, string $parentStatepath): array
+    public function mergeFields(array $firstField, array|string|null|bool $values, string $parentStatepath): array
     {
         $mergedFields = [
             'type' => $firstField['type'],
@@ -56,7 +56,7 @@ class ExtractDataAction
                             $mergedField[$repeaterFieldKey] = $this->mergeFields(
                                 $firstField[$repeaterFieldKey],
                                 $mergedField[$repeaterFieldKey],
-                                $statepath . '.' . $mergedFieldkey . '.' . $repeaterFieldKey
+                                $statepath.'.'.$mergedFieldkey.'.'.$repeaterFieldKey
                             );
 
                             $mergedFields['value'][$mergedFieldkey] = $mergedField;

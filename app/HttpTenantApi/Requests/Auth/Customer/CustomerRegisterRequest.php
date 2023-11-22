@@ -11,11 +11,10 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
-use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -23,7 +22,7 @@ class CustomerRegisterRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
-        logger('register', $this->all());
+        Log::debug('register', $this->all());
     }
 
     public function rules(): array
@@ -34,15 +33,8 @@ class CustomerRegisterRequest extends FormRequest
 
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                Rule::email(),
-                Rule::unique(Customer::class)
-                    ->where('register_status', RegisterStatus::REGISTERED)
-                    ->where('register_status', RegisterStatus::UNREGISTERED),
-                'max:255',
-            ],
-            'mobile' => 'required|string|max:255|unique:customers,mobile',
+            'email' => [Rule::when($this->invited != null, 'required|unique:customers,email', 'required')],
+            'mobile' => [Rule::when($this->invited != null, 'required|string|unique:customers,mobile', 'required|string')],
             'gender' => ['required', Rule::enum(Gender::class)],
             'tier_id' => [
                 Rule::when((bool) tenancy()->tenant?->features()->active(TierBase::class), 'required', 'nullable'),
@@ -50,6 +42,7 @@ class CustomerRegisterRequest extends FormRequest
             ],
             'birth_date' => 'required|date',
             'password' => ['required', 'confirmed', Password::default()],
+            'invited' => 'nullable|exists:customers,cuid',
         ];
 
         // Billing and shipping rules
@@ -109,42 +102,59 @@ class CustomerRegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'billing.country_id.required_if' => trans('validation.required'),
-            'billing.state_id.required_if' => trans('validation.required'),
-            'billing.address_line_1.required_if' => trans('validation.required'),
-            'billing.zip_code.required_if' => trans('validation.required'),
-            'billing.city.required_if' => trans('validation.required'),
-            'billing.label_as.required_if' => trans('validation.required'),
+            'billing.country_id.required_if' => trans('Country field is required.'),
+            'billing.state_id.required_if' => trans('State field is required.'),
+            'billing.address_line_1.required_if' => trans('Address line 1 field is required.'),
+            'billing.zip_code.required_if' => trans('Zip code field is required.'),
+            'billing.city.required_if' => trans('City field is required.'),
+            'billing.label_as.required_if' => trans('Label as field is required.'),
 
-            'email.required' => trans('The email addresss field is required.'),
-            'email.email' => trans('The email address must be valid.'),
-            'email.unique' => trans('The email address has already been taken.'),
-            'email.max' => trans('The email address must not exceed :max characters.'),
+            'shipping.country_id.required' => trans('Country field is required.'),
+            'shipping.state_id.required' => trans('State field is required.'),
+            'shipping.address_line_1.required' => trans('Address line 1 is required'),
+            'shipping.zip_code.required' => trans('Zip code field is required.'),
+            'shipping.city.required' => trans('City field is required.'),
+            'shipping.label_as.required' => trans('Label as field is required.'),
 
-            'mobile.required' => trans('The mobile field is required.'),
-            'mobile.string' => trans('The mobile field must be a string.'),
-            'mobile.max' => trans('The mobile field must not exceed :max characters.'),
-            'mobile.unique' => trans('The mobile number has already been taken.'),
+            'email.required' => trans('Email addresss field is required.'),
+            'email.email' => trans('Email address must be valid.'),
+            'email.unique' => trans('Email address has already been taken.'),
+            'email.max' => trans('Email address must not exceed :max characters.'),
+
+            'mobile.required' => trans('Mobile field is required.'),
+            'mobile.string' => trans('Mobile field must be a string.'),
+            'mobile.max' => trans('Mobile field must not exceed :max characters.'),
+            'mobile.unique' => trans('Mobile number has already been taken.'),
+
+            'first_name.required' => trans('First name field is required.'),
+            'last_name.required' => trans('Last name field is required.'),
+
+            'gender.required' => trans('Last name field is required.'),
+
+            'birth_date.required' => trans('Birthdate field is required.'),
+
+            'password.required' => trans('Password field is required.'),
+
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'shipping.country_id' => 'shipping country',
-            'shipping.state_id' => 'shipping state',
-            'shipping.address_line_1' => 'shipping address line 1',
-            'shipping.zip_code' => 'shipping zip code',
-            'shipping.city' => 'shipping city',
-            'shipping.label_as' => 'shipping label as',
+            'shipping.country_id' => 'country',
+            'shipping.state_id' => 'state',
+            'shipping.address_line_1' => 'address line 1',
+            'shipping.zip_code' => 'zip code',
+            'shipping.city' => 'city',
+            'shipping.label_as' => 'label_as',
 
-            'billing.same_as_shipping' => 'billing same as shipping',
-            'billing.country_id' => 'billing country',
-            'billing.state_id' => 'billing state',
-            'billing.address_line_1' => 'shipping address line 1',
-            'billing.zip_code' => 'shipping zip code',
-            'billing.city' => 'shipping city',
-            'billing.label_as' => 'shipping label_as',
+            'billing.same_as_shipping' => 'same as shipping',
+            'billing.country_id' => 'country',
+            'billing.state_id' => 'state',
+            'billing.address_line_1' => 'address line 1',
+            'billing.zip_code' => 'zip code',
+            'billing.city' => 'city',
+            'billing.label_as' => 'label_as',
         ];
     }
 }

@@ -89,7 +89,7 @@ class Login extends Component implements HasForms
     {
         return view('filament.auth.login')
             ->layout('filament::components.layouts.login-card', [
-                'title' => __('filament::login.title'),
+                'title' => trans('filament::login.title'),
             ]);
     }
 }

@@ -8,6 +8,7 @@ use Domain\Service\DataTransferObjects\ServiceData;
 use Domain\Service\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
@@ -26,6 +27,7 @@ class CreateServiceAction
     {
         $service = Service::create([
             'blueprint_id' => $serviceData->blueprint_id,
+            'uuid' => (string) Str::uuid(),
             'name' => $serviceData->name,
             'description' => $serviceData->description,
             'retail_price' => $serviceData->retail_price,
@@ -38,6 +40,7 @@ class CreateServiceAction
             'is_subscription' => $serviceData->is_subscription,
             'status' => $serviceData->status,
             'needs_approval' => $serviceData->needs_approval,
+            'is_auto_generated_bill' => $serviceData->is_auto_generated_bill,
         ]);
 
         $service->taxonomyTerms()->attach($serviceData->taxonomy_term_id);
@@ -45,7 +48,7 @@ class CreateServiceAction
         $this->createMetaData->execute($service, MetaDataData::fromArray($serviceData->meta_data ?? []));
 
         /** @var array<int, array> $mediaMaterials */
-        $mediaMaterials = $serviceData->media_collection['media'] ?? [];
+        $mediaMaterials = $serviceData->media_collection['materials'] ?? [];
 
         $media = collect($mediaMaterials)->map(function ($material): MediaData {
             /** @var UploadedFile|string $material */

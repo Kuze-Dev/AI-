@@ -9,8 +9,8 @@ use Domain\Cart\Exceptions\InvalidPurchasableException;
 use Domain\Cart\Helpers\ValidateRemarksMedia;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Throwable;
 
 class UpdateCartLineRequest extends FormRequest

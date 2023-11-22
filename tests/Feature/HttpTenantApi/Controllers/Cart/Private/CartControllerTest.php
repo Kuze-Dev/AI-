@@ -25,7 +25,7 @@ beforeEach(function () {
 
     $cart = CartFactory::new()->setCustomerId($customer->id)->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
         ->plainTextToken);
 
@@ -43,14 +43,9 @@ it('can show cart', function () {
                     'id' => $this->cart->uuid,
                     'coupon_code' => null,
                 ],
-                'relationships' => [],
-                'meta' => [],
-                'links' => [],
             ],
-            'included' => [],
             'jsonapi' => [
                 'version' => '1.0',
-                'meta' => [],
             ],
         ])
         ->assertOk();
@@ -61,7 +56,7 @@ it('can show cart with includes', function (string $include) {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    getJson('api/carts?' . http_build_query(['include' => $include]))
+    getJson('api/carts?'.http_build_query(['include' => $include]))
         ->assertValid()
         ->assertJson(function (AssertableJson $json) use ($cart, $cartLine) {
             $json
@@ -84,7 +79,7 @@ it('can show cart with includes', function (string $include) {
 })->with(['cartLines.media']);
 
 it('can delete cart', function () {
-    deleteJson('api/carts/' . $this->cart->uuid)
+    deleteJson('api/carts/'.$this->cart->uuid)
         ->assertValid()
         ->assertNoContent();
 });

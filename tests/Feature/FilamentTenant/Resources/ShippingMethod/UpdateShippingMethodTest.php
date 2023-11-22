@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\ECommerceBase;
+use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingmethod;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use App\Features\ECommerce\ECommerceBase;
-use App\Features\ECommerce\ShippingStorePickup;
 use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -76,7 +76,7 @@ it('can edit update shipping method status', function () {
             'subtitle' => 'InStore Pickup',
             'description' => 'test',
             'driver' => 'store-pickup',
-            'status' => true,
+            'active' => true,
             'shipper_country_id' => '1',
             'shipper_state_id' => '1',
             'shipper_address' => '123 Test',

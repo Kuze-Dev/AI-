@@ -15,7 +15,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Events\ImportFailed;
 use Support\Excel\Listeners\SendImportFailedNotification;
 
-class DefaultImport implements ShouldQueue, ToModel, WithValidation, WithChunkReading, WithHeadingRow, WithEvents
+class DefaultImport implements ShouldQueue, ToModel, WithChunkReading, WithEvents, WithHeadingRow, WithValidation
 {
     public function __construct(
         private readonly Model $user,
@@ -28,7 +28,7 @@ class DefaultImport implements ShouldQueue, ToModel, WithValidation, WithChunkRe
 
     public function chunkSize(): int
     {
-        return 500;
+        return 100;
     }
 
     /** @throws \Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException */

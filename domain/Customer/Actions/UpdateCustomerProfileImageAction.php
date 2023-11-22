@@ -22,7 +22,7 @@ class UpdateCustomerProfileImageAction
         $media = $this->syncMediaCollection->execute($customer, new MediaCollectionData(
             collection: 'image',
             media: [
-                new MediaData(media:$uploadedFile),
+                new MediaData(media: $uploadedFile),
             ],
         ));
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Filament\Pages\Auth\Account;
 use Domain\Admin\Database\Factories\AdminFactory;
-use Illuminate\Support\Facades\Notification;
 use Domain\Admin\Notifications\VerifyEmail;
+use Illuminate\Support\Facades\Notification;
 
 use function Pest\Livewire\livewire;
 
@@ -61,13 +61,13 @@ it('can update email', function (bool $enabled) {
     Notification::fake();
 
     livewire(Account::class)
-        ->fillForm(['email' => 'new' . $this->admin->email])
+        ->fillForm(['email' => 'new'.$this->admin->email])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertOk();
 
     expect($this->admin->refresh())
-        ->email->not->toBe('new' . $this->admin->email);
+        ->email->not->toBe('new'.$this->admin->email);
 
     if ($enabled) {
         Notification::assertSentTo($this->admin, VerifyEmail::class);

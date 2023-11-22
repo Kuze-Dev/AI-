@@ -13,6 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
 
 /**
  * @mixin \Domain\Page\Models\BlockContent
+ *
  * @property-read \Domain\Page\Models\Block $block
  * @property-read \Domain\Blueprint\Models\Blueprint $blueprint
  */
@@ -22,7 +23,7 @@ class BlockContentResource extends JsonApiResource
 
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'data' => $this->transformSchemaPayload($this->data ?? []),
             'order' => $this->order,
             'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),

@@ -39,9 +39,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class SchemaFormBuilder extends Component
@@ -128,10 +128,10 @@ class SchemaFormBuilder extends Component
             MediaFieldData::class => $this->makeMediaComponent($field),
             TinyEditorData::class => $this->makeTinyEditorComponent($field),
 
-            default => throw new InvalidArgumentException('Cannot generate field component for `' . $field::class . '` as its not supported.'),
+            default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
         };
 
-        if ( ! $this->isDehydrated()) {
+        if (! $this->isDehydrated()) {
             return $fieldComponent
                 ->label($field->title)
                 ->helperText($field->helper_text);
@@ -181,7 +181,7 @@ class SchemaFormBuilder extends Component
             $fileUpload->enableReordering($fileFieldData->reorder);
         }
 
-        if ( ! empty($fileFieldData->accept)) {
+        if (! empty($fileFieldData->accept)) {
             $fileUpload->acceptedFileTypes($fileFieldData->accept);
         }
 
@@ -234,7 +234,7 @@ class SchemaFormBuilder extends Component
 
         $media->getUploadedFileUrlUsing(function ($file) {
 
-            if ( ! is_null($file)) {
+            if (! is_null($file)) {
                 $media = Media::where('uuid', $file)->first();
                 if ($media) {
                     return $media->getUrl();
@@ -245,7 +245,7 @@ class SchemaFormBuilder extends Component
 
         });
 
-        if ( ! empty($mediaFieldData->accept)) {
+        if (! empty($mediaFieldData->accept)) {
             $media->acceptedFileTypes($mediaFieldData->accept);
         }
 

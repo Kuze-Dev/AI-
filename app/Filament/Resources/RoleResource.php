@@ -10,9 +10,10 @@ use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Closure;
 use Domain\Role\Actions\DeleteRoleAction;
+use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Role\Models\Role;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -21,6 +22,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class RoleResource extends Resource
 {
@@ -91,7 +93,31 @@ class RoleResource extends Resource
                         ->using(function (Role $record) {
                             try {
                                 return app(DeleteRoleAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (\Exception $e) {
+
+                                if ($e instanceof DeleteRestrictedException) {
+
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Delete of this Record is Restricted')
+                                        ->body($e->getMessage())
+                                        ->send();
+
+                                    return $e->getMessage();
+                                }
+
+                                if ($e instanceof CantDeleteRoleWithAssociatedUsersException) {
+
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Cannot Delete this Record')
+                                        ->body('Cannot Delete Role with Associated Users!')
+                                        ->send();
+
+                                    return false;
+
+                                }
+
                                 return false;
                             }
                         })
@@ -191,7 +217,7 @@ class RoleResource extends Resource
                                             ->columns(2)
                                             ->reactive()
                                             ->formatStateUsing(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): array {
-                                                if ( ! $record) {
+                                                if (! $record) {
                                                     return [];
                                                 }
 
@@ -221,6 +247,7 @@ class RoleResource extends Resource
 
     private static function hideFeaturePermission(string $groupName): bool
     {
+
         /** @var bool */
         return match ($groupName) {
             'site' => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class),
@@ -234,7 +261,8 @@ class RoleResource extends Resource
             'taxZone' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
             'ecommerceSettings' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
             'customers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class),
-            'tiers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
+            'tier' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
+            'service' => tenancy()->tenant?->features()->inactive(\App\Features\Service\ServiceBase::class),
             default => false
         };
     }

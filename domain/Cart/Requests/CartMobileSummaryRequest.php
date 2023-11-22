@@ -13,15 +13,16 @@ use Domain\Discount\Models\Discount;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CartMobileSummaryRequest extends FormRequest
 {
     /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     private Collection $cartLinesCache;
+
     private array $cartLineIds;
 
     public function rules(): array
@@ -98,7 +99,6 @@ class CartMobileSummaryRequest extends FormRequest
         return $this->cartLinesCache;
     }
 
-    /** @return \Domain\Address\Models\Country|null */
     public function getCountry(): ?Country
     {
         if ($id = $this->validated('billing_address_id')) {

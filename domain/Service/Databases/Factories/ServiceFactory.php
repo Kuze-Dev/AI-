@@ -11,6 +11,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Service>
@@ -22,6 +23,7 @@ class ServiceFactory extends Factory
     public function definition(): array
     {
         return [
+            'uuid' => (string) Str::uuid(),
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
             'retail_price' => $this->faker->numberBetween(1, 99_999),
@@ -34,6 +36,7 @@ class ServiceFactory extends Factory
             'is_subscription' => $this->faker->boolean(),
             'status' => $this->faker->boolean(),
             'needs_approval' => $this->faker->boolean(),
+            'is_auto_generated_bill' => $this->faker->boolean(),
         ];
     }
 
@@ -53,7 +56,7 @@ class ServiceFactory extends Factory
 
     public function isSubscription(bool $isSubscription = true): self
     {
-        if($isSubscription === false) {
+        if ($isSubscription === false) {
             $this->state([
                 'billing_cycle' => null,
                 'due_date_every' => null,
@@ -79,6 +82,13 @@ class ServiceFactory extends Factory
         ]);
     }
 
+    public function autoGenerateBill(bool $autoGenerateBill = true): self
+    {
+        return $this->state([
+            'is_auto_generated_bill' => $autoGenerateBill,
+        ]);
+    }
+
     public function withDummyBlueprint(): self
     {
         return $this->for(BlueprintFactory::new()->withDummySchema());
@@ -87,5 +97,16 @@ class ServiceFactory extends Factory
     public function withTaxonomyTerm(): self
     {
         return $this->hasAttached(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint()));
+    }
+
+    public function withBillingCycle(): self
+    {
+        $billing_cycle = Arr::random(BillingCycleEnum::cases());
+
+        return $this->state([
+            'billing_cycle' => $billing_cycle,
+            'due_date_every' => $billing_cycle !== BillingCycleEnum::DAILY
+                ? Arr::random(range(1, now()->daysInMonth)) : null,
+        ]);
     }
 }

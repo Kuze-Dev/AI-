@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Payments\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Eloquent;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Domain\Payments\Models\Payment
@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
  * @property-read \Domain\Payments\Models\Payment|null $payment
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentRefund newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentRefund newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentRefund query()
@@ -41,6 +42,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentRefund whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentRefund whereTransactionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentRefund whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class PaymentRefund extends Model implements HasMedia

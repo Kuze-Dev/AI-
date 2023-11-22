@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Domain\Review\Database\Factories\ReviewFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\Review\Database\Factories\ReviewFactory;
 use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\withHeader;
@@ -13,7 +13,7 @@ beforeEach(function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
         ->plainTextToken);
 

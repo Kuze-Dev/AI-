@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\OrderResource\Pages;
 
 use App\FilamentTenant\Resources\OrderResource;
-use Domain\Product\Models\ProductVariant;
-use Filament\Resources\Pages\ViewRecord;
-use Illuminate\Contracts\Support\Htmlable;
-use Filament\Forms;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Throwable;
 use App\FilamentTenant\Support;
 use Domain\Order\Models\OrderLine;
+use Domain\Product\Models\ProductVariant;
+use Filament\Forms;
+use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Contracts\Support\Htmlable;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
 
 class ViewOrderDetails extends ViewRecord
 {
@@ -20,7 +20,7 @@ class ViewOrderDetails extends ViewRecord
 
     protected function getHeading(): string|Htmlable
     {
-        return trans('Order Details #') . $this->record->reference;
+        return trans('Order Details #').$this->record->reference;
     }
 
     protected function getRelationManagers(): array
@@ -61,10 +61,10 @@ class ViewOrderDetails extends ViewRecord
                                         ->schema([
                                             Forms\Components\Grid::make(2)
                                                 ->schema([
-                                                    Forms\Components\Placeholder::make('product_'  . $sectionIndex)
+                                                    Forms\Components\Placeholder::make('product_'.$sectionIndex)
                                                         ->label(trans('Product'))
                                                         ->content($orderLine->name),
-                                                    Forms\Components\Placeholder::make('variant_'  . $sectionIndex)
+                                                    Forms\Components\Placeholder::make('variant_'.$sectionIndex)
                                                         ->label(trans('Variant'))
                                                         ->content(function () use ($orderLine) {
                                                             if ($orderLine->purchasable_type == ProductVariant::class) {
@@ -80,13 +80,13 @@ class ViewOrderDetails extends ViewRecord
                                                 ]),
                                             Forms\Components\Grid::make(2)
                                                 ->schema([
-                                                    Forms\Components\Placeholder::make('quantity_' . $sectionIndex)
+                                                    Forms\Components\Placeholder::make('quantity_'.$sectionIndex)
                                                         ->label(trans('Quantity'))
                                                         ->content($orderLine->quantity),
-                                                    Forms\Components\Placeholder::make('amount_' . $sectionIndex)
+                                                    Forms\Components\Placeholder::make('amount_'.$sectionIndex)
                                                         ->label(trans('Amount'))
                                                         ->content(function () use ($orderLine) {
-                                                            return $orderLine->order->currency_symbol . ' ' . number_format($orderLine->sub_total, 2, '.', '');
+                                                            return $orderLine->order->currency_symbol.' '.number_format($orderLine->sub_total, 2, '.', '');
                                                         }),
                                                 ]),
                                         ]),
@@ -104,10 +104,10 @@ class ViewOrderDetails extends ViewRecord
 
     private function viewRemarksButton(OrderLine $orderLine, int $sectionIndex): Support\ButtonAction
     {
-        return Support\ButtonAction::make('view_remarks_' . $sectionIndex)
+        return Support\ButtonAction::make('view_remarks_'.$sectionIndex)
             ->disableLabel()
             ->execute(function () use ($sectionIndex, $orderLine) {
-                return Forms\Components\Actions\Action::make('view_remarks_btn_' . $sectionIndex)
+                return Forms\Components\Actions\Action::make('view_remarks_btn_'.$sectionIndex)
                     ->color('secondary')
                     ->label(trans('View Remarks'))
                     ->size('sm')
@@ -117,11 +117,11 @@ class ViewOrderDetails extends ViewRecord
                     ->modalHeading(trans('Customer Remarks'))
                     ->modalWidth('lg')
                     ->form([
-                        Forms\Components\Placeholder::make('remarks_' . $sectionIndex)
+                        Forms\Components\Placeholder::make('remarks_'.$sectionIndex)
                             ->label(trans('Remarks'))
                             ->hidden(is_null($orderLine->remarks_data) ? true : false)
                             ->content($orderLine->remarks_data['notes'] ?? ''),
-                        Forms\Components\FileUpload::make('customer_upload_' . $sectionIndex)
+                        Forms\Components\FileUpload::make('customer_upload_'.$sectionIndex)
                             ->label(trans('Customer Upload'))
                             ->formatStateUsing(function () use ($orderLine) {
                                 return $orderLine->getMedia('order_line_notes')

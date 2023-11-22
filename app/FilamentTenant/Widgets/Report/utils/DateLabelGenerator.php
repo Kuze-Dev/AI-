@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Widgets\Report\utils;
 
 class DateLabelGenerator
 {
-    public static function generateLabels(string|null $activeFilter): array
+    public static function generateLabels(?string $activeFilter): array
     {
         if ($activeFilter === 'perDay') {
             $daysInMonth = (int) now()->endOfYear()->format('t');

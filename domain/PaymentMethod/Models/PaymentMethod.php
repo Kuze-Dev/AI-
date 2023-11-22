@@ -32,6 +32,7 @@ use Spatie\Sluggable\SlugOptions;
  * @property-read int|null $activities_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media> $media
  * @property-read int|null $media_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod onlyTrashed()
@@ -49,15 +50,16 @@ use Spatie\Sluggable\SlugOptions;
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class PaymentMethod extends Model implements HasMedia
 {
     use HasFactory;
-    use LogsActivity;
-    use InteractsWithMedia;
-    use SoftDeletes;
     use HasSlug;
+    use InteractsWithMedia;
+    use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -74,7 +76,6 @@ class PaymentMethod extends Model implements HasMedia
         'status' => 'bool',
     ];
 
-    /** @return LogOptions */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -98,7 +99,6 @@ class PaymentMethod extends Model implements HasMedia
         return 'slug';
     }
 
-    /** @return SlugOptions */
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

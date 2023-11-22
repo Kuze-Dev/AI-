@@ -16,11 +16,11 @@ class CheckIfOnSafeDeviceAction
 
     public function execute(TwoFactorAuthenticatable $authenticatable): bool
     {
-        if ( ! $authenticatable->hasEnabledTwoFactorAuthentication()) {
+        if (! $authenticatable->hasEnabledTwoFactorAuthentication()) {
             return false;
         }
 
-        if ( ! $token = $this->request->cookie(config('domain.auth.two_factor.safe_devices.cookie'))) {
+        if (! $token = $this->request->cookie(config('domain.auth.two_factor.safe_devices.cookie'))) {
             return false;
         }
 

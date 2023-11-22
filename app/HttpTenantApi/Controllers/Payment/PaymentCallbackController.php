@@ -8,16 +8,16 @@ use App\Settings\ECommerceSettings;
 use App\Settings\SiteSettings;
 use Domain\Page\Models\Page;
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Payments\Contracts\PaymentManagerInterface;
-use Domain\Payments\Models\Payment;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Spatie\RouteAttributes\Attributes\Get;
 use Domain\Payments\Actions\CreatePaymentAction;
+use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\DataTransferObjects\AmountData;
 use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\TransactionData;
+use Domain\Payments\Models\Payment;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Spatie\RouteAttributes\Attributes\Get;
 use Throwable;
 
 class PaymentCallbackController

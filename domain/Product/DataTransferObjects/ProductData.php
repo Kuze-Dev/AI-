@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Product\DataTransferObjects;
 
-use Support\MetaData\DataTransferObjects\MetaDataData;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Support\MetaData\DataTransferObjects\MetaDataData;
 
 class ProductData
 {

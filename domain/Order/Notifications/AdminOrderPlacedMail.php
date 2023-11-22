@@ -15,8 +15,11 @@ class AdminOrderPlacedMail extends Notification implements ShouldQueue
     use Queueable;
 
     private ?array $cc = [];
+
     private ?array $bcc = [];
+
     private string $url;
+
     private string $reference;
 
     /** Create a new notification instance. */

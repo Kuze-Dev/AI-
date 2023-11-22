@@ -29,7 +29,7 @@ use Throwable;
 
 #[
     Prefix('account/password'),
-    Middleware('feature.tenant:' . CustomerBase::class)
+    Middleware('feature.tenant:'.CustomerBase::class)
 ]
 class PasswordController extends Controller
 {
@@ -64,7 +64,7 @@ class PasswordController extends Controller
 
         $customer = Customer::whereEmail($request->email)->first();
 
-        if ( ! $result->failed() && ! is_null($customer)) {
+        if (! $result->failed() && ! is_null($customer)) {
             Notification::send($customer, new SuccessResetPasswordNotification());
 
             return response()->json(['message' => $result->getMessage()], 200);
@@ -85,7 +85,7 @@ class PasswordController extends Controller
                 'required',
                 'string',
                 function ($attributes, $value, $failed) use ($customer) {
-                    if( ! Hash::check($value, $customer->password)) {
+                    if (! Hash::check($value, $customer->password)) {
                         $failed(trans('Invalid :attribute.'));
                     }
                 },

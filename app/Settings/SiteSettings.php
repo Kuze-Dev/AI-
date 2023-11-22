@@ -37,6 +37,10 @@ class SiteSettings extends Settings
 
     public function getLogoUrl(): string
     {
+        if (blank($this->logo)) {
+            return '';
+        }
+
         return Storage::disk(config('filament.default_filesystem_disk'))
             ->url($this->logo);
     }

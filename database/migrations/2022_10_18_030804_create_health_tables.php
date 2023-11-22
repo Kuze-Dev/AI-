@@ -7,7 +7,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Health\ResultStores\EloquentHealthResultStore;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         /** @phpstan-ignore-next-line */

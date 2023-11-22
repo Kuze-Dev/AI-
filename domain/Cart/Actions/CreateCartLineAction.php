@@ -24,7 +24,7 @@ class CreateCartLineAction
     {
         $product = Product::where((new Product())->getRouteKeyName(), $cartLineData->purchasable_id)->first();
 
-        if ( ! $product) {
+        if (! $product) {
             throw new BadRequestHttpException('Product not found');
         }
 

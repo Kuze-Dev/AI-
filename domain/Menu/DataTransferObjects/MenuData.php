@@ -6,7 +6,7 @@ namespace Domain\Menu\DataTransferObjects;
 
 class MenuData
 {
-    /** @param \Domain\Menu\DataTransferObjects\NodeData[] $nodes */
+    /** @param  \Domain\Menu\DataTransferObjects\NodeData[]  $nodes */
     public function __construct(
         public readonly string $name,
         public readonly array $nodes = [],

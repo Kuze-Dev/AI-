@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Support\MetaData\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Eloquent;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -23,6 +23,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|Eloquent $model
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData query()
@@ -35,6 +36,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData whereModelType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MetaData whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class MetaData extends Model implements HasMedia

@@ -8,7 +8,12 @@ return [
 
         'disk' => null,
 
-        'base_directory' => 'filament-excel'
+        'base_directory' => 'filament-excel',
+
+        'local_permissions' => [
+            'dir'  => 0755,
+            'file' => 0644,
+        ],
 
     ],
 

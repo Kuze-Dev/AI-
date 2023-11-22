@@ -6,13 +6,13 @@ namespace Domain\Tenant\DataTransferObjects;
 
 class TenantData
 {
-    /** @param array<DomainData> $domains */
+    /** @param  array<DomainData>  $domains */
     public function __construct(
         public readonly string $name,
         public readonly bool $is_suspended = true,
         public readonly ?DatabaseData $database = null,
         public readonly array $domains = [],
-        public readonly null|array $features = [],
+        public readonly ?array $features = [],
     ) {
     }
 

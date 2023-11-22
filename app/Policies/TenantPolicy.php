@@ -11,8 +11,8 @@ use Illuminate\Foundation\Auth\User;
 
 class TenantPolicy
 {
-    use HandlesAuthorization;
     use ChecksWildcardPermissions;
+    use HandlesAuthorization;
 
     public function viewAny(User $user): bool
     {
