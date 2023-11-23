@@ -129,10 +129,10 @@ class CheckoutServiceOrderAction
             ),
             payment_driver: $this->paymentMethod->slug
         );
-       
+
         $result = $this->createPaymentAction
             ->execute($this->serviceBill, $providerData);
-            
+
         if ($result->success) {
             $this->createServiceTransaction();
 
