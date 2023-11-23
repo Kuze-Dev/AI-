@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\Features\ECommerce\AllowGuestOrder;
+use App\Features\ECommerce\ColorPallete;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
@@ -471,9 +472,11 @@ class ProductResource extends Resource
                                                 Forms\Components\Select::make('icon_type')
                                                     ->default('text')
                                                     ->required()
-                                                    ->options([
+                                                    ->options(fn () => tenancy()->tenant?->features()->active(ColorPallete::class) ? [
                                                         'text' => 'Text',
                                                         'color_palette' => 'Color Palette',
+                                                    ] : [
+                                                        'text' => 'Text',
                                                     ])
                                                     ->hidden(fn (Closure $get) => ! $get('../../is_custom'))
                                                     ->reactive(),
