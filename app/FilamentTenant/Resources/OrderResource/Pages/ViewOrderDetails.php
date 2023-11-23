@@ -57,6 +57,43 @@ class ViewOrderDetails extends ViewRecord
                                 }),
                             Forms\Components\Group::make()
                                 ->schema([
+                                    Forms\Components\FileUpload::make('image_'.$sectionIndex)
+                                        ->formatStateUsing(function () use ($orderLine) {
+
+                                            return $orderLine?->getMedia('order_line_images')
+                                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                                ->toArray() ?? [];
+                                        })
+                                        ->disableLabel()
+                                        ->hidden(function () use ($orderLine) {
+                                            return (bool) (empty($orderLine->getFirstMediaUrl('order_line_images')));
+                                        })
+                                        ->image()
+                                        ->imagePreviewHeight('120')
+                                        ->getUploadedFileUrlUsing(static function (
+                                            Forms\Components\FileUpload $component,
+                                            string $file
+                                        ): ?string {
+                                            $mediaClass = config('media-library.media_model', Media::class);
+
+                                            /** @var ?Media $media */
+                                            $media = $mediaClass::findByUuid($file);
+
+                                            if ($component->getVisibility() === 'private') {
+                                                try {
+                                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                                } catch (Throwable $exception) {
+                                                    // This driver does not support creating temporary URLs.
+                                                }
+                                            }
+
+                                            return $media?->getUrl();
+                                        })
+                                        ->columnSpan(1),
+                                ])
+                                ->columnSpan(1),
+                            Forms\Components\Group::make()
+                                ->schema([
                                     Forms\Components\Grid::make(4)
                                         ->schema([
                                             Forms\Components\Grid::make(2)
