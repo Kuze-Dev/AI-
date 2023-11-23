@@ -17,6 +17,7 @@ class ProductOptionResource extends JsonApiResource
         return [
             'name' => $this->name,
             'slug' => $this->slug,
+            'is_custom' => $this->is_custom,
         ];
     }
 
