@@ -9,6 +9,7 @@ use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
+use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -89,7 +90,7 @@ class ImportProductAction
         // If the product does not exist, create a new one
         if ( ! $foundProduct instanceof Product) {
             Log::info(
-                'Import row(s) of product ',
+                'Import row(s) of product in CREATE ',
                 [
                     'name' => $data['name'],
                     'product_id' => $data['product_sku'] ?? $data['sku'],
@@ -106,6 +107,8 @@ class ImportProductAction
         // Merge the product options and variants with the existing product
         $data['product_options'] = self::mergingProductOptions($foundProduct, $data['product_options']);
         $data['product_variants'] = self::mergingProductVariants($foundProduct, $data);
+
+        // dd($data['product_options']);
 
         // Check for possible sku duplication
         $foundProductViaSku = Product::where('sku', $data['product_sku'])->first();
@@ -179,6 +182,7 @@ class ImportProductAction
                     'id' => $item->id,
                     'name' => $item->name,
                     'slug' => $item->slug,
+                    'is_custom' => $item->is_custom,
                     'productOptionValues' => $item->productOptionValues->toArray(),
                 ];
             }
@@ -204,9 +208,25 @@ class ImportProductAction
                             ];
                         })->toArray();
 
+                    $mappedExistingOptions = array_map(function ($optionValue) {
+                        $optionValueModel = ProductOptionValue::with('media')
+                            ->where('id', $optionValue['id'])
+                            ->first();
+
+                        if ( ! $optionValueModel) {
+                            return [];
+                        }
+
+                        return [
+                            ...$optionValue,
+                            ...$optionValue['data'],
+                            'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
+                        ];
+                    }, $existingOptions[$index]['productOptionValues']);
+
                     $existingOptions[$index]['productOptionValues'] =
                         array_merge(
-                            $existingOptions[$index]['productOptionValues'],
+                            $mappedExistingOptions,
                             $collectedCsvRowOptionValues,
                         );
 
@@ -336,6 +356,9 @@ class ImportProductAction
                     'id' => uniqid(),
                     'name' => $row["product_option_{$i}_name"],
                     'slug' => $row["product_option_{$i}_name"],
+                    'is_custom' => isset($row["product_option_{$i}_is_custom"])
+                        && $row["product_option_{$i}_is_custom"]
+                        == 'yes' ? true : false,
                     'productOptionValues' => [],
                 ];
 
@@ -345,6 +368,9 @@ class ImportProductAction
                         'id' => uniqid(),
                         'name' => $row["product_option_{$i}_value_{$j}"],
                         'slug' => $row["product_option_{$i}_value_{$j}"],
+                        'icon_type' => $row["product_option_{$i}_value_{$j}_icon_type"],
+                        'icon_value' => $row["product_option_{$i}_value_{$j}_icon_value"],
+                        'images' => isset($row["product_option_{$i}_value_{$j}_preview_image"]) ? [$row["product_option_{$i}_value_{$j}_preview_image"]] : null,
                         'product_option_id' => $productOption['id'],
                     ]);
 
