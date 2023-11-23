@@ -39,6 +39,7 @@ use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
 use Domain\Payments\Models\PaymentRefund;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 use Domain\Review\Models\Review;
 use Domain\Service\Models\Service;
@@ -146,6 +147,7 @@ class AppServiceProvider extends ServiceProvider
             ServiceOrder::class,
             ServiceBill::class,
             TenantApiCall::class,
+            ProductOptionValue::class,
             ServiceTransaction::class,
         ]);
 

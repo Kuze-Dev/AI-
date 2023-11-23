@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Order\DataTransferObjects;
 
 use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
+use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 
 class ProductVariantOrderData
@@ -25,8 +26,11 @@ class ProductVariantOrderData
         $combinations = [];
         foreach ($data['combination'] as $combinationData) {
             $combinations[] = new ProductVariantCombinationData(
+                option_id: $combinationData['option_id'] ?? null,
                 option: $combinationData['option'],
-                option_value: $combinationData['option_value']
+                option_value_id: $combinationData['option_value_id'] ?? null,
+                option_value: $combinationData['option_value'],
+                option_value_data: $combinationData['option_value_data'] ?? null,
             );
         }
 
@@ -45,9 +49,19 @@ class ProductVariantOrderData
     {
         $combinations = [];
         foreach ($productVariant->combination as $combinationData) {
+            /** @var \Domain\Product\Models\ProductOptionValue $productOptionValue */
+            $productOptionValue = ProductOptionValue::with(['media', 'productOption'])
+                ->where('id', $combinationData['option_value_id'])->first();
+
+            /** @var \Domain\Product\Models\ProductOption $productOption */
+            $productOption = $productOptionValue->productOption;
+
             $combinations[] = new ProductVariantCombinationData(
+                option_id: $combinationData['option_id'],
                 option: $combinationData['option'],
-                option_value: $combinationData['option_value']
+                option_value_id: $productOptionValue->id,
+                option_value: $combinationData['option_value'],
+                option_value_data: $productOption->is_custom ? $productOptionValue->data : null
             );
         }
 
