@@ -9,6 +9,9 @@ use Domain\Product\DataTransferObjects\ProductOptionData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
+use Support\Common\Actions\SyncMediaCollectionAction;
+use Support\Common\DataTransferObjects\MediaCollectionData;
+use Support\Common\DataTransferObjects\MediaData;
 
 class UpdateProductOptionAction
 {
@@ -28,11 +31,13 @@ class UpdateProductOptionAction
             if ($productOptionModel instanceof ProductOption) {
                 $productOptionModel->product_id = $product->id;
                 $productOptionModel->name = $productOption->name;
+                $productOptionModel->is_custom = $productOption->is_custom;
                 $productOptionModel->save();
             } else {
                 $newProductOptionModel = ProductOption::create([
                     'product_id' => $product->id,
                     'name' => $productOption->name,
+                    'is_custom' => $productOption->is_custom,
                 ]);
 
                 // Update product variant
@@ -59,12 +64,24 @@ class UpdateProductOptionAction
                 if ($optionValueModel instanceof ProductOptionValue) {
                     $optionValueModel->name = $productOptionValue->name;
                     $optionValueModel->product_option_id = $productOption->id;
+                    $optionValueModel->data = ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value];
                     $optionValueModel->save();
+
+                    $this->uploadMediaMaterials(
+                        $optionValueModel,
+                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    );
                 } else {
                     $newOptionValueModel = ProductOptionValue::create([
                         'name' => $productOptionValue->name,
                         'product_option_id' => $productOption->id,
+                        'data' => ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value],
                     ]);
+
+                    $this->uploadMediaMaterials(
+                        $newOptionValueModel,
+                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    );
 
                     $productOptionValue = $productOptionValue
                         ->withId($newOptionValueModel->id, $productOptionValue);
@@ -147,5 +164,25 @@ class UpdateProductOptionAction
 
             return $variant->withCombination($newCombinations->toArray(), $variant);
         })->toArray();
+    }
+
+    protected function uploadMediaMaterials(ProductOptionValue $productOptionValue, array $mediaCollection): void
+    {
+        collect($mediaCollection)->each(function ($media, $key) use ($productOptionValue) {
+            /** @var array<int, array> $mediaMaterials */
+            $mediaMaterials = $media['materials'];
+
+            $mediaData = collect($mediaMaterials)->map(function ($material) {
+                /** @var \Illuminate\Http\UploadedFile|string $material */
+                return new MediaData(media: $material);
+            })->toArray();
+
+            $syncMediaCollection = new SyncMediaCollectionAction();
+
+            $syncMediaCollection->execute($productOptionValue, new MediaCollectionData(
+                collection: $media['collection'],
+                media: $mediaData,
+            ));
+        });
     }
 }
