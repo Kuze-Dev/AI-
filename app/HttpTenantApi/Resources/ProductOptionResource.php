@@ -27,7 +27,7 @@ class ProductOptionResource extends JsonApiResource
     {
         return [
             'product' => fn () => ProductResource::make($this->product),
-            'productOptionValues' => fn () => ProductResource::make($this->productOptionValues),
+            'productOptionValues' => fn () => ProductOptionValueResource::make($this->productOptionValues),
         ];
     }
 }

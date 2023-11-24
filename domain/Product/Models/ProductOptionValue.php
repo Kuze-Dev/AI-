@@ -46,6 +46,10 @@ class ProductOptionValue extends Model implements HasMedia
         'data',
     ];
 
+    protected $with = [
+        'media',
+    ];
+
     /**
      * Columns that are converted
      * to a specific data type.
