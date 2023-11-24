@@ -393,6 +393,7 @@ class ProductResource extends Resource
                     Forms\Components\Repeater::make('options')
                         ->translateLabel()
                         ->reactive()
+                        ->itemLabel(fn (array $state): ?string => $state['name'])
                         ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire, Closure $get) {
                             if (! $record) {
                                 return $state;
@@ -457,6 +458,7 @@ class ProductResource extends Resource
                                 ->translateLabel()
                                 ->columnSpan(2)
                                 ->collapsible()
+                                ->itemLabel(fn (array $state): ?string => $state['name'])
                                 ->schema([
                                     Forms\Components\Group::make()
                                         ->schema(

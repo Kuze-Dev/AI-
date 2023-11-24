@@ -49,6 +49,10 @@ class ProductOption extends Model
         'is_custom',
     ];
 
+    protected $with = [
+        'productOptionValues',
+    ];
+
     /**
      * Columns that are converted
      * to a specific data type.
