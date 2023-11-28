@@ -28,6 +28,8 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
     private string $url;
 
+    private string $payment_method = 'bank-transfer';
+
     private array $replyTo;
 
     private ?string $footer = null;
@@ -35,6 +37,8 @@ class ServiceBillNotification extends Notification implements ShouldQueue
     public function __construct(ServiceBill $serviceBill)
     {
         $this->serviceBill = $serviceBill;
+
+        $this->payment_method = $serviceBill->serviceOrder->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
 
@@ -44,7 +48,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
-        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.'/'.$serviceBill->reference;
+        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.'?reference='.$serviceBill->reference.'&payment_method='.$this->payment_method;
 
         $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];
 
