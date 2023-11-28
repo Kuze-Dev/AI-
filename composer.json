@@ -52,6 +52,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
         "barryvdh/laravel-ide-helper": "^2.12",
+        "beyondcode/helo-laravel": "^1.6",
         "canvural/larastan-strict-rules": "^2.1",
         "laravel/pint": "^1.2",
         "laravel/sail": "^1.18",

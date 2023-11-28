@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3b9c7c946f2d5135937a0fc75982dcfa",
+    "content-hash": "957a3cf822a4bda281deb88ad5e58ff5",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -281,16 +281,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.288.1",
+            "version": "3.290.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "a1dfa12c7165de0b731ae8074c4ba1f3ae733f89"
+                "reference": "7726a0dc30a70f2ccf0e2fae3836d6ca6edb2881"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/a1dfa12c7165de0b731ae8074c4ba1f3ae733f89",
-                "reference": "a1dfa12c7165de0b731ae8074c4ba1f3ae733f89",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/7726a0dc30a70f2ccf0e2fae3836d6ca6edb2881",
+                "reference": "7726a0dc30a70f2ccf0e2fae3836d6ca6edb2881",
                 "shasum": ""
             },
             "require": {
@@ -370,9 +370,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.288.1"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.290.0"
             },
-            "time": "2023-11-22T19:35:38+00:00"
+            "time": "2023-11-27T20:01:41+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -6281,16 +6281,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.24.3",
+            "version": "1.24.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "12f01d214f1c73b9c91fdb3b1c415e4c70652083"
+                "reference": "6bd0c26f3786cd9b7c359675cb789e35a8e07496"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/12f01d214f1c73b9c91fdb3b1c415e4c70652083",
-                "reference": "12f01d214f1c73b9c91fdb3b1c415e4c70652083",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/6bd0c26f3786cd9b7c359675cb789e35a8e07496",
+                "reference": "6bd0c26f3786cd9b7c359675cb789e35a8e07496",
                 "shasum": ""
             },
             "require": {
@@ -6322,9 +6322,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.3"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.4"
             },
-            "time": "2023-11-18T20:15:32+00:00"
+            "time": "2023-11-26T18:29:22+00:00"
         },
         {
             "name": "pragmarx/google2fa",
@@ -8179,16 +8179,16 @@
         },
         {
             "name": "spatie/laravel-health",
-            "version": "1.23.6",
+            "version": "1.23.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-health.git",
-                "reference": "afa8485488b3bf9284f13e4ff04e1e80f3156c7a"
+                "reference": "15e216d30c31048cf4174608a579355300f25017"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-health/zipball/afa8485488b3bf9284f13e4ff04e1e80f3156c7a",
-                "reference": "afa8485488b3bf9284f13e4ff04e1e80f3156c7a",
+                "url": "https://api.github.com/repos/spatie/laravel-health/zipball/15e216d30c31048cf4174608a579355300f25017",
+                "reference": "15e216d30c31048cf4174608a579355300f25017",
                 "shasum": ""
             },
             "require": {
@@ -8259,7 +8259,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/laravel-health/tree/1.23.6"
+                "source": "https://github.com/spatie/laravel-health/tree/1.23.7"
             },
             "funding": [
                 {
@@ -8267,7 +8267,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-11-08T08:32:57+00:00"
+            "time": "2023-11-27T11:41:37+00:00"
         },
         {
             "name": "spatie/laravel-json-api-paginate",
@@ -8745,16 +8745,16 @@
         },
         {
             "name": "spatie/laravel-route-attributes",
-            "version": "1.19.0",
+            "version": "1.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-route-attributes.git",
-                "reference": "3c9f932910252c92dd59e867b140cb04a46187f7"
+                "reference": "4769a0723613386ff38bc63ab9ab6f85e56634cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-route-attributes/zipball/3c9f932910252c92dd59e867b140cb04a46187f7",
-                "reference": "3c9f932910252c92dd59e867b140cb04a46187f7",
+                "url": "https://api.github.com/repos/spatie/laravel-route-attributes/zipball/4769a0723613386ff38bc63ab9ab6f85e56634cb",
+                "reference": "4769a0723613386ff38bc63ab9ab6f85e56634cb",
                 "shasum": ""
             },
             "require": {
@@ -8800,7 +8800,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-route-attributes/issues",
-                "source": "https://github.com/spatie/laravel-route-attributes/tree/1.19.0"
+                "source": "https://github.com/spatie/laravel-route-attributes/tree/1.20.0"
             },
             "funding": [
                 {
@@ -8812,7 +8812,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-08-09T09:46:54+00:00"
+            "time": "2023-11-24T09:12:48+00:00"
         },
         {
             "name": "spatie/laravel-settings",
@@ -12913,6 +12913,68 @@
             "time": "2023-06-14T05:06:27+00:00"
         },
         {
+            "name": "beyondcode/helo-laravel",
+            "version": "1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/beyondcode/helo-laravel.git",
+                "reference": "c2b964bcffbe1c76c8701b90c0cdcedd64b338a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/beyondcode/helo-laravel/zipball/c2b964bcffbe1c76c8701b90c0cdcedd64b338a7",
+                "reference": "c2b964bcffbe1c76c8701b90c0cdcedd64b338a7",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^6.0|^7.0|^8.0|^9.0|^10.0",
+                "illuminate/mail": "^6.0|^7.0|^8.0|^9.0|^10.0",
+                "illuminate/view": "^6.0|^7.0|^8.0|^9.0|^10.0",
+                "php": "^7.3|^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^5.1|^6.3|^7.0|^8.0",
+                "pestphp/pest": "1.x-dev",
+                "phpunit/phpunit": "^8.0|^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "BeyondCode\\HeloLaravel\\HeloLaravelServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "BeyondCode\\HeloLaravel\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marcel Pociot",
+                    "email": "marcel@beyondco.de",
+                    "homepage": "https://beyondcode.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "HELO Laravel debug helper",
+            "homepage": "https://github.com/beyondcode/helo-laravel",
+            "keywords": [
+                "HELO",
+                "beyondcode"
+            ],
+            "support": {
+                "issues": "https://github.com/beyondcode/helo-laravel/issues",
+                "source": "https://github.com/beyondcode/helo-laravel/tree/1.6.1"
+            },
+            "time": "2023-03-29T21:30:43+00:00"
+        },
+        {
             "name": "brianium/paratest",
             "version": "v7.3.1",
             "source": {
@@ -15033,16 +15095,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.44",
+            "version": "1.10.45",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "bf84367c53a23f759513985c54ffe0d0c249825b"
+                "reference": "2f024fbb47432e2e62ad8a8032387aa2dd631c73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/bf84367c53a23f759513985c54ffe0d0c249825b",
-                "reference": "bf84367c53a23f759513985c54ffe0d0c249825b",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2f024fbb47432e2e62ad8a8032387aa2dd631c73",
+                "reference": "2f024fbb47432e2e62ad8a8032387aa2dd631c73",
                 "shasum": ""
             },
             "require": {
@@ -15091,7 +15153,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-11-21T16:30:46+00:00"
+            "time": "2023-11-27T14:15:06+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
