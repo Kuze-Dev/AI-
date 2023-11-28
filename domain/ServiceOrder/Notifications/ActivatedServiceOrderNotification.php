@@ -39,7 +39,7 @@ class ActivatedServiceOrderNotification extends Notification implements ShouldQu
     public function __construct(ServiceBill $serviceBill)
     {
         $this->serviceBill = $serviceBill;
-        $this->payment_method = $serviceBill->serviceOrder->latestPaymentMethod()?->slug ?? 'bank-transfer';
+        $this->payment_method = $serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;
