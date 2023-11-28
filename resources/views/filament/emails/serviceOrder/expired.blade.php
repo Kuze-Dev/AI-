@@ -30,15 +30,17 @@
             But worry no more! You can gain immediate access our service by renewing your subscription here.
         </p>
 
-        <div
-            style="display: block;  margin: 0 auto; text-align: center; margin-bottom: 30px; padding: 10px 20px; background-color: #40414b; color: #fff; font-weight: bold; cursor: pointer; max-width: 200px">
+        <div style="margin: 0 auto; text-align: center; margin-bottom: 30px;">
             <a href={{$url}} style=" 
-        text-decoration: none;
-        border: none;
-        color: inherit
-        ">Renew Subscription</button>
+            text-decoration: none;
+            padding: 10px 20px; 
+            background-color: 
+            #40414b; color: #fff; 
+            font-weight: bold; 
+            cursor: pointer;
+            border: none;
+            ">Renew Subscription</a>
         </div>
-
     </div>
 
     <div style="border-top: 1px solid #ddd; padding-top: 15px; max-width: 600px; margin: 0 auto; text-align: center">

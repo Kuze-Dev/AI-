@@ -76,13 +76,16 @@
             </tbody>
         </table>
 
-        <div
-            style="display: block;  margin: 0 auto; text-align: center; margin-bottom: 30px; padding: 10px 20px; background-color: #40414b; color: #fff; font-weight: bold; cursor: pointer; max-width: 200px">
+        <div style="margin: 0 auto; text-align: center; margin-bottom: 30px;">
             <a href={{$url}} style=" 
             text-decoration: none;
+            padding: 10px 20px; 
+            background-color: 
+            #40414b; color: #fff; 
+            font-weight: bold; 
+            cursor: pointer;
             border: none;
-            color: inherit
-            ">Proceed to payment</button>
+            ">Proceed to payment</a>
         </div>
     </div>
     <div style="border-top: 1px solid #ddd; padding-top: 15px; max-width: 600px; margin: 0 auto; text-align: center">
