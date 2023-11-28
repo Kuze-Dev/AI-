@@ -9,6 +9,7 @@ definitions:
     composer install --prefer-dist --no-interaction &&
     cp .env.example .env &&
     php artisan key:generate
+    php artisan about
   steps:
     - step: &common-step
         caches:
