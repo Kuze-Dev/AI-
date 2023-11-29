@@ -31,6 +31,11 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
     ) {
     }
 
+    public function uniqueBy(): string
+    {
+        return $this->uniqueBy;
+    }
+
     public function batchSize(): int
     {
         return $this->batchSize;
@@ -67,10 +72,5 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
         return [
             ImportFailed::class => new SendImportFailedNotification($this->user),
         ];
-    }
-
-    public function uniqueBy(): string
-    {
-        return $this->uniqueBy;
     }
 }
