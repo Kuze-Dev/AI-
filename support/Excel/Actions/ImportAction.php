@@ -31,7 +31,9 @@ class ImportAction extends Action
 
     protected string $uniqueBy;
 
-    protected int $batchSize = 1_000;
+    protected int $batchSize = 5_00;
+
+    protected int $chunkSize = 5_00;
 
     public static function getDefaultName(): ?string
     {
@@ -114,6 +116,13 @@ class ImportAction extends Action
         return $this;
     }
 
+    public function chunkSize(int $chunkSize): self
+    {
+        $this->chunkSize = $chunkSize;
+
+        return $this;
+    }
+
     public function processRowsUsing(Closure $processRowsUsing): self
     {
         $this->processRowsUsing = $processRowsUsing;
@@ -161,7 +170,8 @@ class ImportAction extends Action
             validateRules: $this->validateRules,
             validateMessages: $this->validateMessages,
             validateAttributes: $this->validateAttributes,
-            batchSize: $this->batchSize
+            batchSize: $this->batchSize,
+            chunkSize: $this->batchSize,
         );
     }
 }

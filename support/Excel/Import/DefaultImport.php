@@ -26,7 +26,8 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
         private readonly array $validateRules,
         private readonly array $validateMessages = [],
         private readonly array $validateAttributes = [],
-        private readonly int $batchSize = 1_000,
+        private readonly int $batchSize = 5_00,
+        private readonly int $chunkSize = 5_00,
     ) {
     }
 
@@ -37,7 +38,7 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
 
     public function chunkSize(): int
     {
-        return 100;
+        return $this->chunkSize;
     }
 
     /** @throws \Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException */
