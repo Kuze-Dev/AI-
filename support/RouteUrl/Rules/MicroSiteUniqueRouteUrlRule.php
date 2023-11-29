@@ -40,27 +40,35 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
 
         $query = RouteUrl::whereUrl($this->route_url['url'])->whereIn('model_id', $pagesIds);
 
-        if ($this->ignoreModel) {
+        if ($this->ignoreModel !== null) {
 
-            if ($this->ignoreModel->parentPage) {
+            if ($this->ignoreModel->parentPage ?? false) {
 
                 $ignoreModelIds = [
                     $this->ignoreModel->getKey(),
                     $this->ignoreModel->parentPage->getKey(),
                 ];
 
+            } elseif ($this->ignoreModel->pageDraft ?? false) {
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->pageDraft->getKey(),
+                ];
+
             } else {
 
                 $ignoreModelIds = [
                     $this->ignoreModel->getKey(),
-                    $this->ignoreModel->pageDraft?->getKey() ?: null,
                 ];
 
             }
 
-            $query->whereNot(fn (EloquentBuilder $query) => $query
-                ->where('model_type', $this->ignoreModel->getMorphClass())
-                ->whereIn('model_id', array_filter($ignoreModelIds)));
+            $query->whereNot(
+                fn (EloquentBuilder $query) => $query
+                    ->where('model_type', $this->ignoreModel->getMorphClass())
+                    ->whereIn('model_id', array_filter($ignoreModelIds))
+            );
 
         }
 
