@@ -30,6 +30,7 @@ class ListAdmins extends ListRecords
         return [
             ImportAction::make()
                 ->model(Admin::class)
+                ->uniqueBy('email')
                 ->processRowsUsing(
                     function (array $row): Admin {
                         $data = [
@@ -62,6 +63,7 @@ class ListAdmins extends ListRecords
                             'required',
                             Rule::email(),
                             'prohibited_if:email,'.Admin::whereKey(1)->value('email'),
+                            'distinct',
                         ],
                         'first_name' => 'required|string|min:3|max:100',
                         'last_name' => 'required|string|min:3|max:100',

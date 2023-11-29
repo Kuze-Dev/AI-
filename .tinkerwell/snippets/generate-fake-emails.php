@@ -2,7 +2,7 @@
 
 $emails = '';
 foreach(range(1, 21_000) as $i) {
-    $emails .= fake()->unique()->email."\n";
+    $emails .= fake()->unique()->safeEmail()."\n";
 }
 
 ray()->clearAll();

@@ -41,9 +41,9 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
     }
 
     /** @throws \Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException */
-    public function model(array $row): void
+    public function model(array $row)
     {
-        $this->processRowsUsing->getClosure()($row);
+        return $this->processRowsUsing->getClosure()($row);
     }
 
     public function rules(): array
