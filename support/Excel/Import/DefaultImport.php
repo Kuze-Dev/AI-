@@ -24,11 +24,16 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
         private readonly SerializableClosure $processRowsUsing,
         private readonly string $uniqueBy,
         private readonly array $validateRules,
+        private readonly int $batchSize,
+        private readonly int $chunkSize,
         private readonly array $validateMessages = [],
         private readonly array $validateAttributes = [],
-        private readonly int $batchSize = 5_00,
-        private readonly int $chunkSize = 5_00,
     ) {
+    }
+
+    public function uniqueBy(): string
+    {
+        return $this->uniqueBy;
     }
 
     public function batchSize(): int
@@ -67,10 +72,5 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
         return [
             ImportFailed::class => new SendImportFailedNotification($this->user),
         ];
-    }
-
-    public function uniqueBy(): string
-    {
-        return $this->uniqueBy;
     }
 }
