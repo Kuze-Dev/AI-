@@ -172,6 +172,7 @@ class InviteCustomers extends Page implements HasTable
         return [
             ImportAction::make()
                 ->model(Customer::class)
+                ->uniqueBy('email')
                 ->processRowsUsing(
                     function (array $row): Customer {
                         $data = [
@@ -205,6 +206,7 @@ class InviteCustomers extends Page implements HasTable
                         'email' => [
                             'required',
                             Rule::email(),
+                            'distinct',
                         ],
                         'first_name' => 'nullable|string|min:3|max:100',
                         'last_name' => 'nullable|string|min:3|max:100',

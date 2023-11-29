@@ -29,6 +29,10 @@ class ImportAction extends Action
 
     protected array $validateAttributes;
 
+    protected string $uniqueBy;
+
+    protected int $batchSize = 1_000;
+
     public static function getDefaultName(): ?string
     {
         return 'import';
@@ -93,6 +97,23 @@ class ImportAction extends Action
             );
     }
 
+    /**
+     * @param  non-empty-string  $uniqueBy
+     */
+    public function uniqueBy(string $uniqueBy): self
+    {
+        $this->uniqueBy = $uniqueBy;
+
+        return $this;
+    }
+
+    public function batchSize(int $batchSize): self
+    {
+        $this->batchSize = $batchSize;
+
+        return $this;
+    }
+
     public function processRowsUsing(Closure $processRowsUsing): self
     {
         $this->processRowsUsing = $processRowsUsing;
@@ -136,9 +157,11 @@ class ImportAction extends Action
         return new DefaultImport(
             user: $user,
             processRowsUsing: new SerializableClosure($this->processRowsUsing),
+            uniqueBy: $this->uniqueBy,
             validateRules: $this->validateRules,
             validateMessages: $this->validateMessages,
-            validateAttributes: $this->validateAttributes
+            validateAttributes: $this->validateAttributes,
+            batchSize: $this->batchSize
         );
     }
 }
