@@ -150,7 +150,7 @@
                     $transaction->serviceOrder
                         ->currency_code
                 )
-                    ->format()
+                    ->formatLocale()
             }}
         </td>
     </tr>
@@ -169,7 +169,7 @@
                             ->multiply(100),
                         $transaction->serviceOrder
                             ->currency_code
-                    )->format()
+                    )->formatLocale()
                 }}
             </strong>
         </td>
@@ -188,7 +188,7 @@
                         $transaction->serviceOrder
                             ->currency_code
                     )
-                        ->format()
+                        ->formatLocale()
                 }}
             </strong>
         </td>
@@ -206,7 +206,7 @@
                         $tax_total,
                         $transaction->serviceOrder
                             ->currency_code
-                    )->format()
+                    )->formatLocale()
                 }}
             </strong>
         </td>
@@ -225,7 +225,7 @@
                         $transaction->serviceOrder
                             ->currency_code
                     )
-                        ->format()
+                        ->formatLocale()
                 }}
             </strong>
         </td>
@@ -280,7 +280,7 @@
                             $transaction->serviceOrder
                                 ->currency_code
                         )
-                            ->format()
+                            ->formatLocale()
                     }}
                 </strong>
             </td>
