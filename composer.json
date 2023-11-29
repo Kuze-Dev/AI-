@@ -4,7 +4,7 @@
     "description": "SaaS Platform",
     "license": "proprietary",
     "require": {
-        "php": "^8.1.9",
+        "php": "^8.2.11",
         "artificertech/filament-multi-context": "^2.0",
         "awcodes/drop-in-action": "^0.2.2",
         "aws/aws-sdk-php": "^3.252",
@@ -149,7 +149,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.1.9"
+            "php": "8.2.11"
         },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
