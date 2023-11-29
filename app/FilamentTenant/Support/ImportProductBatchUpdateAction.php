@@ -118,7 +118,7 @@ class ImportProductBatchUpdateAction
 
     protected static function processProductBatchUpdate(array $row): Product
     {
-        $foundProduct = Product::whereId($row['product_id'])->with(['productOptions.productOptionValues', 'productVariants', 'media'])->first();
+        $foundProduct = Product::whereId($row['product_id'])->with(['productOptions.productOptionValues.media', 'productVariants', 'media'])->first();
 
         if ( ! $foundProduct instanceof Product) {
             throw ValidationException::withMessages([
@@ -144,7 +144,20 @@ class ImportProductBatchUpdateAction
                 'id' => $option->id,
                 'name' => $option->name,
                 'slug' => $option->slug,
-                'productOptionValues' => $option->productOptionValues->toArray(),
+                'is_custom' => $option->is_custom,
+                'productOptionValues' => $option->productOptionValues->map(function ($optionValue) {
+                    $optionValueToArray = $optionValue->toArray();
+
+                    return [
+                        'id' => $optionValueToArray['id'],
+                        'name' => $optionValueToArray['name'],
+                        'slug' => $optionValueToArray['slug'],
+                        'product_option_id' => $optionValueToArray['product_option_id'],
+                        'icon_type' => $optionValueToArray['data']['icon_type'] ?? 'text',
+                        'icon_value' => $optionValueToArray['data']['icon_value'] ?? null,
+                        'images' => array_map(fn ($image) => $image['uuid'], $optionValueToArray['media']) ?? null,
+                    ];
+                })->toArray(),
             ];
         })->toArray();
 

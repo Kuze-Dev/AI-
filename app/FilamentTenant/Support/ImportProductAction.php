@@ -151,6 +151,18 @@ class ImportProductAction
 
     protected static function validateIncomingProductOptions(array $row): void
     {
+        for ($i = 1; $i <= 10; $i++) {
+            if (
+                isset($row["product_option_2_value_{$i}_image_link"])
+                || isset($row["product_option_2_value_{$i}_icon_type"])
+                || isset($row["product_option_2_value_{$i}_icon_value"])
+            ) {
+                throw ValidationException::withMessages([
+                    'product_option_2_name' => trans("{$row['name']}'s option 2 must not have details related to icon and image customization"),
+                ]);
+            }
+        }
+
         $productOptions = ProductOption::select('id', 'name')
             ->where('product_id', function ($query) use ($row) {
                 $query->select('id')
@@ -370,7 +382,7 @@ class ImportProductAction
                         'slug' => $row["product_option_{$i}_value_{$j}"],
                         'icon_type' => $row["product_option_{$i}_value_{$j}_icon_type"],
                         'icon_value' => $row["product_option_{$i}_value_{$j}_icon_value"],
-                        'images' => isset($row["product_option_{$i}_value_{$j}_preview_image"]) ? [$row["product_option_{$i}_value_{$j}_preview_image"]] : null,
+                        'images' => isset($row["product_option_{$i}_value_{$j}_image_link"]) ? [$row["product_option_{$i}_value_{$j}_image_link"]] : null,
                         'product_option_id' => $productOption['id'],
                     ]);
 
