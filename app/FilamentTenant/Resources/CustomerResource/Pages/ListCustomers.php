@@ -31,6 +31,7 @@ class ListCustomers extends ListRecords
         return [
             ImportAction::make()
                 ->model(Customer::class)
+                ->uniqueBy('email')
                 ->processRowsUsing(
                     function (array $row): Customer {
                         $data = [
@@ -67,6 +68,7 @@ class ListCustomers extends ListRecords
                         'email' => [
                             'required',
                             Rule::email(),
+                            'distinct',
                         ],
                         'first_name' => 'required|string|min:3|max:100',
                         'last_name' => 'required|string|min:3|max:100',

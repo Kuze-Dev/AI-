@@ -139,7 +139,7 @@ class CheckoutServiceOrderAction
             return $result;
         }
 
-        throw new PaymentException();
+        throw new PaymentException($result->message ?? 'Payment Unauthorized');
     }
 
     /** @throws Throwable */
