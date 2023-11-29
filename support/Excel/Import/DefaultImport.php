@@ -24,10 +24,10 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
         private readonly SerializableClosure $processRowsUsing,
         private readonly string $uniqueBy,
         private readonly array $validateRules,
+        private readonly int $batchSize,
+        private readonly int $chunkSize,
         private readonly array $validateMessages = [],
         private readonly array $validateAttributes = [],
-        private readonly int $batchSize = 5_00,
-        private readonly int $chunkSize = 5_00,
     ) {
     }
 
