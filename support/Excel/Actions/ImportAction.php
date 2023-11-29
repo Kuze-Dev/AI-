@@ -31,9 +31,9 @@ class ImportAction extends Action
 
     protected string $uniqueBy;
 
-    protected int $batchSize = 1_000;
+    protected int $batchSize = 2_000;
 
-    protected int $chunkSize = 1_000;
+    protected int $chunkSize = 5_00;
 
     public static function getDefaultName(): ?string
     {
