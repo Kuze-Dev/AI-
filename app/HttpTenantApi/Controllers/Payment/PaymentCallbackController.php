@@ -51,7 +51,7 @@ class PaymentCallbackController
 
             if ($payableModel instanceof ServiceBill) {
                 return redirect()->away(
-                    $baseUrl.'/services/subscription-service/payment'.'/'.$status.'?reference='.$payableModel->getReferenceNumber()
+                    $baseUrl.'/services/payment'.'/'.$status.'?ServiceOrder='.$payableModel->serviceOrder?->reference.'&ServiceBill='.$payableModel->getReferenceNumber()
                 );
             }
 
