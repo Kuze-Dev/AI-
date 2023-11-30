@@ -15,7 +15,6 @@ use Filament\Navigation\UserMenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
-use romanzipp\QueueMonitor\Middleware\CheckQueueMonitorUiConfig;
 
 class FilamentTenantServiceProvider extends ContextServiceProvider
 {
@@ -120,19 +119,6 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
 
                             return redirect()->route(static::$name.'.auth.login');
                         })->name('logout');
-                    });
-
-                Route::middleware([
-                    Authenticate::class,
-                    //                    CheckQueueMonitorUiConfig::class
-                ])
-                    ->prefix('jobs-monitoring')
-                    ->group(function () {
-                        $this->loadRoutesFrom(
-                            base_path(
-                                'vendor/romanzipp/laravel-queue-monitor/routes/queue-monitor.php'
-                            )
-                        );
                     });
             });
     }

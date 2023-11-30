@@ -29,7 +29,6 @@
         "maatwebsite/excel": "^3.1.50",
         "mohamedsabil83/filament-forms-tinyeditor": "^1.7",
         "pragmarx/google2fa": "^8.0",
-        "romanzipp/laravel-queue-monitor": "^5.0.2",
         "saade/filament-laravel-log": "^1.2",
         "sentry/sentry-laravel": "^4.1",
         "shuvroroy/filament-spatie-laravel-health": "^1.5",

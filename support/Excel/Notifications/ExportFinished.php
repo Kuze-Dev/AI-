@@ -12,11 +12,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
-use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ExportFinished extends Notification implements ShouldQueue
 {
-    use IsMonitored;
     use Queueable;
 
     public function __construct(
