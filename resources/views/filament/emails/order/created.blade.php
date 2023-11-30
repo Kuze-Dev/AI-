@@ -1,188 +1,24 @@
-<style>
-    .main-container {
-        padding-top: 2em;
-        padding-bottom: 2em;
-        padding-left: 16em;
-        padding-right: 16em;
-        font-size: medium;
-        font-family: 'Arial', 'Helvetica', 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
-    }
-
-    .header {
-        margin: auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-bottom: 1.3px solid #e5e7eb;
-        padding-bottom: 1em;
-        font-family: 'Arial', 'Helvetica', 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
-    }
-
-    .header img {
-        width: 100px;
-        height: 100px;
-        object-fit: cover
-    }
-
-    .header .col-2 {
-        padding-left: 1em;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-
-    }
-
-    .title {
-        font-size: xx-large;
-        font-weight: bold;
-    }
-
-    .subtitle {
-        color: #3f3f3f;
-        padding-left: 4px;
-    }
-
-    .card {
-        border: 1.5px solid #E5E7EB;
-        margin-top: 1.5em;
-        padding-top: 0.5em;
-        padding-bottom: 1.5em;
-        padding-left: 1.3em;
-        padding-right: 1.3em;
-        text-align: left;
-        border-radius: 0.8em;
-    }
-
-    .card-title {
-        border-bottom: 1.3px solid #E5E7EB;
-        margin-bottom: 0.3em;
-    }
-
-    .card-title p {
-        font-weight: bold
-    }
-
-    .summary-list {
-        display: flex;
-        justify-content: space-between
-    }
-
-    .horizontal-line {
-        border-bottom: 1.3px solid #E5E7EB
-    }
-
-    .order-details {
-        display: flex;
-        justify-content: flex-start;
-        border-bottom: 1.3px solid #E5E7EB;
-        padding-bottom: 0.5em;
-        align-items: flex-start;
-    }
-
-    .order-details img {
-        width: 120px;
-        height: 120px;
-        object-fit: cover
-    }
-
-    .footer {
-        margin: auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        border-top: 1px solid #e5e7eb;
-        padding-top: 15px;
-    }
-
-    .footer p {
-        margin: 0;
-        padding: 0;
-    }
-
-    @media (max-width: 1024px) and (min-width: 769px) {
-        .main-container {
-            padding-left: 8em;
-            padding-right: 8em;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .main-container {
-            padding-left: 1.5em;
-            padding-right: 1.5em;
-        }
-
-        .summary-list .col-1 {
-            width: 70%;
-        }
-
-        .summary-list .col-2 {
-            width: 30%;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .main-container {
-            padding-left: 2px;
-            padding-right: 2px;
-            font-size: small;
-        }
-
-        .summary-list {
-            padding: 0.8em;
-        }
-
-        .summary-list .col-1 {
-            width: 50%;
-        }
-
-        .summary-list .col-2 {
-            width: 50%;
-        }
-
-        .order-details img {
-            width: 80px;
-            height: 80px
-        }
-
-        .title {
-            font-size: medium;
-        }
-
-        .subtitle {
-            font-size: small;
-        }
-
-        .header img {
-            width: 70px;
-            height: 70px;
-            object-fit: cover
-        }
-    }
-</style>
-
-<div style="width: 100%;">
-
-    <div class="header">
+<div style="font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border-bottom: 1.3px solid #e5e7eb;">
         @if ($logo)
-            <div>
-                <img src={{ $logo }} alt="" />
-            </div>
+        <div style="text-align: center;">
+            <img style="display: block; margin: 0 auto;" height="100" width="100" src={{ $logo }} alt="" />
+        </div>
         @endif
-        <div class="col-2">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; text-align: center">
             <div>
-                <span class="title">{{ $title }}</span>
+                <span style="font-size: xx-large; font-weight: bold;">{{ $title }}</span>
             </div>
-            <div><span class="subtitle">{{ $description }}</span></div>
+            <div><span style="color: #3f3f3f; padding-left: 4px;">{{ $description }}</span></div>
         </div>
     </div>
 
-    <div class="main-container">
-        <h3 style="margin-bottom: 1em; font-weight: bold">
-            Your Order has been Placed.
-        </h3>
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center">
+            <h3 style="margin-bottom: 3em; font-weight: bold">
+                Your Order has been Placed.
+            </h3>
+        </div>
 
         <p style="line-height: 1.5em">Hi {{ $customer->first_name . ' ' . $customer->last_name }},</p>
 
@@ -197,122 +33,144 @@
             to serving you again soon.
         </p>
 
-        <div class="card">
-            <div class="card-title">
-                <p class=>Delivery Details:</p>
-            </div>
-
-            <p style="line-height: 1.5em">
-                Name: <span> {{ $customer->first_name . ' ' . $customer->last_name }}</span>
-            </p>
-            <p style="line-height: 1.5em">Address: <span> {{ $address }}</span></p>
-            <p style="line-height: 1.5em">Phone: <span> {{ $customer->mobile }} </span></p>
-            <p style="line-height: 1.5em">
-                Email: <span> {{ $customer->email }}</span>
-            </p>
-        </div>
-
-        <div class="card">
-            <div class="card-title" style="margin-bottom: 1em">
-                <p class=>Order Details:</p>
-            </div>
-
-            @foreach ($order->orderLines as $orderLine)
-                <div style="margin-bottom:1.5em">
-                    <div class="order-details">
-                        <div>
-                            <img src="{{ $orderLine->getFirstMediaUrl('order_line_images') }}" alt="" />
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 40px;">
+            <tbody>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px; font-weight: bold">
+                        Delivery Details
+                    </td>
+                    <td></td>
+                </tr>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px;">
+                        Name:
+                    </td>
+                    <td>{{ $customer->first_name . ' ' . $customer->last_name }}</td>
+                </tr>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px;">
+                        Address:
+                    </td>
+                    <td>{{ $address }}</td>
+                </tr>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px;">
+                        Phone:
+                    </td>
+                    <td>{{ $customer->mobile }}</td>
+                </tr>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px;">
+                        Phone:
+                    </td>
+                    <td>{{ $customer->mobile }}</td>
+                </tr>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px;">
+                        Email:
+                    </td>
+                    <td>{{ $customer->email }}</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 40px;">
+            <tbody>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px; font-weight: bold">
+                        Order Details
+                    </td>
+                    <td></td>
+                </tr>
+                @foreach ($order->orderLines as $orderLine)
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px;">
+                        <div style="text-align: center;">
+                            <img style="display: block; margin: 0 auto;" height="100" width="100" src="{{ $orderLine->getFirstMediaUrl('order_line_images') }}" alt="" />
                         </div>
-                        <div
-                            style="
-                            display: flex;
-                            align-items: flex-start;
-                            justify-content: flex-end;
-                            flex-direction: column;
-                            gap: 0.7em;
-                            padding-left: 1em;
-                            font-size: 1em;
-                        ">
-                            <div>{{ $orderLine->name }}</div>
-                            <div>
-                                {{ $order->currency_symbol }}
-                                {{ number_format((float) $orderLine->sub_total, 2, '.', ',') }}
-                            </div>
-                            @if (isset($orderLine->purchasable_data['combination']))
-                                @php
-                                    $combinations = array_values($orderLine->purchasable_data['combination']);
-                                    $optionValues = array_column($combinations, 'option_value');
-                                    $variantString = implode(' / ', array_map('ucfirst', $optionValues));
-                                @endphp
-
-                                <div style="height: 20px;">
-                                    <div><span style="color:#3f3f3f;">{{ $variantString }}</span> </div>
-                                </div>
-                            @endif
-
-                            <div style="height: 20px;">
-                                <span style="color:#3f3f3f">Quantity:</span>
-                                <span>{{ $orderLine->quantity }}</span>
-                            </div>
+                    </td>
+                    <td>
+                        <div style="padding: 10px">{{ $orderLine->name }}</div>
+                        <div style="padding: 10px">
+                            {{ $order->currency_symbol }}
+                            {{ number_format((float) $orderLine->sub_total, 2, '.', ',') }}
                         </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+                        @if (isset($orderLine->purchasable_data['combination']))
+                            @php
+                            $combinations = array_values($orderLine->purchasable_data['combination']);
+                            $optionValues = array_column($combinations, 'option_value');
+                            $variantString = implode(' / ', array_map('ucfirst', $optionValues));
+                            @endphp
+                            <div style="padding: 10px">
+                                <div><span style="color:#3f3f3f;">{{ $variantString }}</span> </div>
+                            </div>
+                        @endif
+                        <div style="padding: 10px">
+                            <span style="color:#3f3f3f">Quantity:</span>
+                            <span>{{ $orderLine->quantity }}</span>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-        <div class="card">
-            <div class="card-title">
-                <p class=>Order Summary:</p>
-            </div>
-            <div class="summary-list horizontal-line">
-                <div>
-                    <p>Shipping Method:</p>
-                    <p>Payment Method:</p>
-                </div>
-                <div style="text-align: right">
-                    <p>{{ $shippingMethod->title }}</p>
-                    <p>{{ $paymentMethod->title }}</p>
-                </div>
-            </div>
-
-            <div class="summary-list horizontal-line">
-                <div>
-                    <p>Subtotal:</p>
-                    <p>Tax fee:</p>
-                    <p>Shipping fee:</p>
-                    <p>Total Saving:</p>
-                </div>
-                <div style="text-align: right">
-                    <p>{{ $order->currency_symbol }}
-                        {{ number_format((float) $order->sub_total, 2, '.', ',') }}
-                    </p>
-                    <p>{{ $order->currency_symbol }}
-                        {{ number_format((float) $order->tax_total, 2, '.', ',') }}
-                    </p>
-                    <p>{{ $order->currency_symbol }}
-                        {{ number_format((float) $order->shipping_total, 2, '.', ',') }}
-                    </p>
-                    <p>{{ $order->currency_symbol }}
-                        {{ number_format((float) $order->discount_total, 2, '.', ',') }}
-                    </p>
-                </div>
-            </div>
-            <div class="summary-list ">
-                <div>
-                    <p>Grand Total:</p>
-                </div>
-                <div style="text-align: right">
-                    <p>{{ $order->currency_symbol }}
-                        {{ number_format((float) $order->total, 2, '.', ',') }}
-                    </p>
-                </div>
-            </div>
-        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 40px;">
+            <tbody>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px; font-weight: bold">
+                        Order Summary
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="border-right: 1px solid #ddd; border-left: 1px solid #ddd;">
+                    <td style="padding: 10px;">Shipping Method:</td>
+                    <td style="padding: 10px;"></td>
+                    <td style="padding: 10px;">{{ $shippingMethod->title }}</td>
+                </tr>
+                <tr style="border-right: 1px solid #ddd; border-left: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;">Payment Method:</td>
+                    <td style="padding: 10px;"></td>
+                    <td style="padding: 10px;">{{ $paymentMethod->title }}</td>
+                </tr>
+                <tr style="border-right: 1px solid #ddd; border-left: 1px solid #ddd;">
+                    <td style="padding: 10px;">Subtotal:</td>
+                    <td style="padding: 10px;"></td>
+                    <td style="padding: 10px;">{{ $order->currency_symbol }}
+                        {{ number_format((float) $order->sub_total, 2, '.', ',') }}</td>
+                </tr>
+                <tr style="border-right: 1px solid #ddd; border-left: 1px solid #ddd;">
+                    <td style="padding: 10px;">Tax fee:</td>
+                    <td style="padding: 10px;"></td>
+                    <td style="padding: 10px;">{{ $order->currency_symbol }}
+                        {{ number_format((float) $order->tax_total, 2, '.', ',') }}</td>
+                </tr>
+                <tr style="border-right: 1px solid #ddd; border-left: 1px solid #ddd;">
+                    <td style="padding: 10px;">Shipping fee:</td>
+                    <td style="padding: 10px;"></td>
+                    <td style="padding: 10px;">{{ $order->currency_symbol }}
+                        {{ number_format((float) $order->shipping_total, 2, '.', ',') }}</td>
+                </tr>
+                <tr style="border-right: 1px solid #ddd; border-left: 1px solid #ddd;">
+                    <td style="padding: 10px;">Total Savings:</td>
+                    <td style="padding: 10px;"></td>
+                    <td style="padding: 10px;">{{ $order->currency_symbol }}
+                        {{ number_format((float) $order->discount_total, 2, '.', ',') }}</td>
+                </tr>
+                <tr style="border: 1px solid #ddd;">
+                    <td style="padding: 10px;">Grand Total:</td>
+                    <td style="padding: 10px;"></td>
+                    <td style="padding: 10px;">{{ $order->currency_symbol }}
+                        {{ number_format((float) $order->total, 2, '.', ',') }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <div class="footer">
+    <div style="border-top: 1px solid #ddd; padding-top: 15px; max-width: 600px; margin: 0 auto; text-align: center">
         @php
-            $htmlFooter = $footer;
+        $htmlFooter = $footer;
         @endphp
         {!! $htmlFooter !!}
     </div>
