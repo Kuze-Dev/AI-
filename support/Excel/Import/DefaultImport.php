@@ -15,10 +15,13 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithUpserts;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Events\ImportFailed;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 use Support\Excel\Listeners\SendImportFailedNotification;
 
 class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunkReading, WithEvents, WithHeadingRow, WithUpserts, WithValidation
 {
+    use IsMonitored;
+
     public function __construct(
         private readonly Model $user,
         private readonly SerializableClosure $processRowsUsing,
@@ -71,6 +74,13 @@ class DefaultImport implements ShouldQueue, ToModel, WithBatchInserts, WithChunk
     {
         return [
             ImportFailed::class => new SendImportFailedNotification($this->user),
+        ];
+    }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
         ];
     }
 }

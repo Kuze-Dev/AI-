@@ -168,10 +168,10 @@ class ImportAction extends Action
             processRowsUsing: new SerializableClosure($this->processRowsUsing),
             uniqueBy: $this->uniqueBy,
             validateRules: $this->validateRules,
-            validateMessages: $this->validateMessages,
-            validateAttributes: $this->validateAttributes,
             batchSize: $this->batchSize,
             chunkSize: $this->batchSize,
+            validateMessages: $this->validateMessages,
+            validateAttributes: $this->validateAttributes,
         );
     }
 }
