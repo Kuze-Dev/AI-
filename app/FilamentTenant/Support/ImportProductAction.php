@@ -23,6 +23,7 @@ class ImportProductAction
     public static function proceed(): ImportAction
     {
         return ImportAction::make()
+            ->uniqueBy('sku')
             ->processRowsUsing(fn (array $row): Product => self::processProductUpload($row))
             ->withValidation(
                 rules: [
