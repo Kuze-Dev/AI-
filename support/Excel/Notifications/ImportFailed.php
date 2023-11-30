@@ -10,9 +10,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ImportFailed extends Notification implements ShouldQueue
 {
+    use IsMonitored;
     use Queueable;
 
     public function __construct(
@@ -41,5 +43,12 @@ class ImportFailed extends Notification implements ShouldQueue
         return (new MailMessage())
             ->greeting('Import Failed')
             ->line($this->error);
+    }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
+        ];
     }
 }

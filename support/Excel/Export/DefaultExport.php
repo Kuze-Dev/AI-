@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
  * @template TModelClass of \Illuminate\Database\Eloquent\Model
@@ -18,6 +19,8 @@ use Maatwebsite\Excel\Concerns\WithMapping;
  */
 class DefaultExport implements FromQuery, WithCustomChunkSize, WithHeadings, WithMapping
 {
+    use IsMonitored;
+
     /**
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @param  array<int, string>  $headings
@@ -62,5 +65,12 @@ class DefaultExport implements FromQuery, WithCustomChunkSize, WithHeadings, Wit
     public function chunkSize(): int
     {
         return $this->chunkSize;
+    }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
+        ];
     }
 }

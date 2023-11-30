@@ -12,9 +12,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ExportFinished extends Notification implements ShouldQueue
 {
+    use IsMonitored;
     use Queueable;
 
     public function __construct(
@@ -68,5 +70,12 @@ class ExportFinished extends Notification implements ShouldQueue
             now()->minutes(config('support.excel.export_expires_in_minute')),
             ['path' => $this->fileName]
         );
+    }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
+        ];
     }
 }

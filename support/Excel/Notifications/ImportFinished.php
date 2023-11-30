@@ -10,9 +10,11 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ImportFinished extends Notification implements ShouldQueue
 {
+    use IsMonitored;
     use Queueable;
 
     public function via(object $notifiable): array
@@ -34,5 +36,12 @@ class ImportFinished extends Notification implements ShouldQueue
     {
         return (new MailMessage())
             ->greeting('Import finished');
+    }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
+        ];
     }
 }
