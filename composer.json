@@ -95,9 +95,7 @@
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan vendor:publish --provider=\"romanzipp\\QueueMonitor\\Providers\\QueueMonitorProvider\" --tag=assets --ansi --force",
             "@php artisan vendor:publish --tag=horizon-assets --ansi --force",
-            "@php artisan filament:upgrade",
-            "@php artisan ide-helper:generate --ansi",
-            "@php artisan ide-helper:meta --ansi"
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
