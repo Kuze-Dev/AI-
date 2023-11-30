@@ -10,11 +10,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ImportFailed extends Notification implements ShouldQueue
 {
-    use IsMonitored;
     use Queueable;
 
     public function __construct(
