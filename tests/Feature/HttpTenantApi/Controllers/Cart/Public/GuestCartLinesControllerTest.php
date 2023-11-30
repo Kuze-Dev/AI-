@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Product\Database\Factories\ProductFactory;
-use App\Features\ECommerce\AllowGuestOrder;
 use Domain\Product\Database\Factories\ProductVariantFactory;
 
 use function Pest\Laravel\deleteJson;
@@ -28,11 +28,11 @@ beforeEach(function () {
 
     $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-    $sessionId = time() . $uuid;
+    $sessionId = time().$uuid;
 
     CartFactory::new()->setGuestId($sessionId)->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $sessionId);
+    withHeader('Authorization', 'Bearer '.$sessionId);
 
     $this->product = $product;
 });
@@ -113,7 +113,7 @@ it('can update cart line quantity', function () {
 
     $cartLine = CartLineFactory::new()->setPurchasableId($product->id)->createOne();
 
-    patchJson('api/guest/carts/cartlines/' . $cartLine->uuid, [
+    patchJson('api/guest/carts/cartlines/'.$cartLine->uuid, [
         'type' => 'quantity',
         'quantity' => 2,
     ])
@@ -125,7 +125,7 @@ it('can update cart line remarks', function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    patchJson('api/guest/carts/cartlines/' . $cartLine->uuid, [
+    patchJson('api/guest/carts/cartlines/'.$cartLine->uuid, [
         'type' => 'remarks',
         'remarks' => [
             'notes' => 'test remarks',
@@ -139,7 +139,7 @@ it('can delete cart line', function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    deleteJson('api/guest/carts/cartlines/' . $cartLine->uuid)
+    deleteJson('api/guest/carts/cartlines/'.$cartLine->uuid)
         ->assertValid()
         ->assertNoContent();
 });

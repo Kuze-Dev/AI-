@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
-use Filament\Resources\Resource;
-use App\FilamentTenant\Resources;
-use App\FilamentTenant\Support\Tree;
-use Domain\Taxonomy\Models\Taxonomy;
-use Illuminate\Support\Facades\Auth;
-use Domain\Blueprint\Models\Blueprint;
-use Illuminate\Database\Eloquent\Model;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Illuminate\Database\Eloquent\Builder;
-use Domain\Internationalization\Models\Locale;
-use App\FilamentTenant\Support\SchemaFormBuilder;
-use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\FilamentTenant\Resources;
+use App\FilamentTenant\Support\SchemaFormBuilder;
+use App\FilamentTenant\Support\Tree;
+use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Domain\Blueprint\Models\Blueprint;
+use Domain\Internationalization\Models\Locale;
+use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Forms;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class TaxonomyResource extends Resource
 {
@@ -41,7 +41,7 @@ class TaxonomyResource extends Resource
         return ['name', 'taxonomyTerms.name'];
     }
 
-    /** @param Taxonomy $record */
+    /** @param  Taxonomy  $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @phpstan-ignore-next-line */
@@ -81,7 +81,7 @@ class TaxonomyResource extends Resource
                 ]),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                    ->default((string) optional(Locale::where('is_default', true)->first())->code)
+                    ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
@@ -142,7 +142,8 @@ class TaxonomyResource extends Resource
                 ]),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->authorize(fn () => Auth::user()?->hasRole(config('domain.role.super_admin'))),
             ]);
     }
 

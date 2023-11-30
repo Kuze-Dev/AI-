@@ -16,7 +16,9 @@ use Flowframe\Trend\TrendValue;
 class TotalSales extends BarChartWidget
 {
     protected static ?string $heading = 'Total sales';
+
     public ?string $filter = 'perMonth';
+
     protected static ?string $pollingInterval = null;
 
     protected function getFilters(): ?array

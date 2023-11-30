@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Support\RouteUrl\Rules;
 
-use Support\RouteUrl\Contracts\HasRouteUrl;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Closure;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
-use Support\RouteUrl\Models\RouteUrl;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Support\RouteUrl\Contracts\HasRouteUrl;
+use Support\RouteUrl\Models\RouteUrl;
 
 class MicroSiteUniqueRouteUrlRule implements ValidationRule
 {
     public function __construct(
-        protected readonly ?HasRouteUrl $ignoreModel = null,
+        protected readonly ?HasRouteUrl $ignoreModel,
         protected readonly array $route_url,
     ) {
     }
@@ -40,27 +40,35 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
 
         $query = RouteUrl::whereUrl($this->route_url['url'])->whereIn('model_id', $pagesIds);
 
-        if ($this->ignoreModel) {
+        if ($this->ignoreModel !== null) {
 
-            if ($this->ignoreModel->parentPage) {
+            if ($this->ignoreModel->parentPage ?? false) {
 
                 $ignoreModelIds = [
                     $this->ignoreModel->getKey(),
                     $this->ignoreModel->parentPage->getKey(),
                 ];
 
+            } elseif ($this->ignoreModel->pageDraft ?? false) {
+
+                $ignoreModelIds = [
+                    $this->ignoreModel->getKey(),
+                    $this->ignoreModel->pageDraft->getKey(),
+                ];
+
             } else {
 
                 $ignoreModelIds = [
                     $this->ignoreModel->getKey(),
-                    $this->ignoreModel->pageDraft?->getKey() ?: null,
                 ];
 
             }
 
-            $query->whereNot(fn (EloquentBuilder $query) => $query
-                ->where('model_type',  $this->ignoreModel->getMorphClass())
-                ->whereIn('model_id', array_filter($ignoreModelIds)));
+            $query->whereNot(
+                fn (EloquentBuilder $query) => $query
+                    ->where('model_type', $this->ignoreModel->getMorphClass())
+                    ->whereIn('model_id', array_filter($ignoreModelIds))
+            );
 
         }
 

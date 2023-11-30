@@ -11,6 +11,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListReport extends ListRecords
 {
     protected static string $resource = ReportResource::class;
+
     protected static string $view = 'filament.pages.Report';
 
     protected function getWidgets(): array

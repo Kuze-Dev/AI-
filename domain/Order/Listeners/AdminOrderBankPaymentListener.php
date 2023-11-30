@@ -12,9 +12,6 @@ class AdminOrderBankPaymentListener
 {
     /**
      * Handle the event.
-     *
-     * @param  \Domain\Order\Events\AdminOrderBankPaymentEvent  $event
-     * @return void
      */
     public function handle(AdminOrderBankPaymentEvent $event): void
     {

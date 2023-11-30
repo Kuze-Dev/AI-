@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Support\Captcha;
 
 use Closure;
-use Support\Captcha\Providers\BaseProvider;
-use Support\Captcha\Providers\CloudflareTurnstileProvider;
-use Support\Captcha\Providers\GoogleRecaptchaProvider;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
+use Support\Captcha\Providers\BaseProvider;
+use Support\Captcha\Providers\CloudflareTurnstileProvider;
+use Support\Captcha\Providers\GoogleRecaptchaProvider;
 
 class CaptchaManager
 {

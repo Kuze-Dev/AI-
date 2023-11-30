@@ -8,16 +8,17 @@ use App\Settings\ECommerceSettings;
 use App\Settings\SiteSettings;
 use Domain\Page\Models\Page;
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Domain\Payments\Contracts\PaymentManagerInterface;
-use Domain\Payments\Models\Payment;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Spatie\RouteAttributes\Attributes\Get;
 use Domain\Payments\Actions\CreatePaymentAction;
+use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\DataTransferObjects\AmountData;
 use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\TransactionData;
+use Domain\Payments\Models\Payment;
+use Domain\ServiceOrder\Models\ServiceBill;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Spatie\RouteAttributes\Attributes\Get;
 use Throwable;
 
 class PaymentCallbackController
@@ -47,6 +48,12 @@ class PaymentCallbackController
 
             $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
                     ?? app(SiteSettings::class)->domainWithScheme();
+
+            if ($payableModel instanceof ServiceBill) {
+                return redirect()->away(
+                    $baseUrl.'/services/subscription-service/payment'.'/'.$status.'?reference='.$payableModel->getReferenceNumber()
+                );
+            }
 
             return redirect()->away(
                 $baseUrl.'/checkout'.'/'.$status.'?reference='.$payableModel->getReferenceNumber()

@@ -19,21 +19,24 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions as PageActions;
+use Filament\Pages\Page;
 use Filament\Support\Actions as SupportActions;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Saade\FilamentLaravelLog\Pages\ViewLog;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Illuminate\Support\HtmlString;
 use Throwable;
 
 /** @property \Illuminate\Foundation\Application $app */
@@ -48,11 +51,11 @@ class FilamentServiceProvider extends ServiceProvider
         Filament::serving(function () {
             /** @phpstan-ignore-next-line `pushMeta()` is defined in the facade's accessor but not doc blocked. */
             Filament::pushMeta([
-                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="' . asset('/apple-touch-icon.png') . '">'),
-                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="' . asset('/favicon-32x32.png') . '">'),
-                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="' . asset('/favicon-16x16.png') . '">'),
-                new HtmlString('<link rel="manifest" href="' . asset('/site.webmanifest') . '">'),
-                new HtmlString('<link rel="mask-icon" href="' . asset('/safari-pinned-tab.svg') . '" color="#5bbad5">'),
+                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="'.asset('/apple-touch-icon.png').'">'),
+                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="'.asset('/favicon-32x32.png').'">'),
+                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="'.asset('/favicon-16x16.png').'">'),
+                new HtmlString('<link rel="manifest" href="'.asset('/site.webmanifest').'">'),
+                new HtmlString('<link rel="mask-icon" href="'.asset('/safari-pinned-tab.svg').'" color="#5bbad5">'),
                 new HtmlString('<meta name="msapplication-TileColor" content="#da532c">'),
                 new HtmlString('<meta name="theme-color" content="#ffffff">'),
             ]);
@@ -82,7 +85,7 @@ class FilamentServiceProvider extends ServiceProvider
 
         Filament::registerRenderHook(
             'footer.start',
-            fn () => <<<HTML
+            fn () => <<<'HTML'
                     <p>
                         Powered by
                         <a
@@ -109,6 +112,13 @@ class FilamentServiceProvider extends ServiceProvider
         $this->registerMacros();
 
         $this->configureComponents();
+
+        Page::$reportValidationErrorUsing = function (ValidationException $exception) {
+            Notification::make()
+                ->title($exception->getMessage())
+                ->danger()
+                ->send();
+        };
     }
 
     protected function registerRoutes(): void
@@ -159,10 +169,10 @@ class FilamentServiceProvider extends ServiceProvider
             'withActivityLog',
             function (
                 string $logName = 'admin',
-                Closure|string|null $event = null,
-                Closure|string|null $description = null,
-                Closure|array|null $properties = null,
-                Model|int|string|null $causedBy = null,
+                Closure|string $event = null,
+                Closure|string $description = null,
+                Closure|array $properties = null,
+                Model|int|string $causedBy = null,
             ): SupportActions\Action {
                 /** @var SupportActions\Action $this */
                 return $this->after(function (SupportActions\Action $action) use ($logName, $event, $description, $properties, $causedBy) {
@@ -216,9 +226,8 @@ class FilamentServiceProvider extends ServiceProvider
 
         Forms\Components\Select::macro(
             'optionsFromModel',
-            function (string|Closure $model, string|Closure $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
+            function (string|Closure $model, string|Closure $titleColumnName, Closure $callback = null): Forms\Components\Select {
                 /** @var Forms\Components\Select $this */
-
                 if (blank($this->getSearchColumns())) {
                     $this->searchable([$this->evaluate($titleColumnName)]);
                 }
@@ -307,7 +316,7 @@ class FilamentServiceProvider extends ServiceProvider
 
                     $record = $query->where($query->getModel()->getKeyName(), $value)->first();
 
-                    if ( ! $record) {
+                    if (! $record) {
                         return null;
                     }
 
@@ -403,7 +412,6 @@ class FilamentServiceProvider extends ServiceProvider
 
         Tables\Columns\TextColumn::macro('truncate', function (string $size = 'md', bool|Closure $tooltip = false): Tables\Columns\TextColumn {
             /** @var Tables\Columns\TextColumn $this */
-
             $this->tooltip(function (Tables\Columns\TextColumn $column) use ($tooltip): ?string {
                 if ($tooltip instanceof Closure) {
                     return $column->evaluate($tooltip);
@@ -470,9 +478,9 @@ class FilamentServiceProvider extends ServiceProvider
                     default => throw new Exception(),
                 },
                 description: fn (PageActions\Action|Tables\Actions\Action $action) => match ($action->getName()) {
-                    'delete' => $action->getRecordTitle() . ' deleted',
-                    'restore' => $action->getRecordTitle() . ' restored',
-                    'forceDelete' => $action->getRecordTitle() . ' force deleted',
+                    'delete' => $action->getRecordTitle().' deleted',
+                    'restore' => $action->getRecordTitle().' restored',
+                    'forceDelete' => $action->getRecordTitle().' force deleted',
                     default => throw new Exception(),
                 }
             )

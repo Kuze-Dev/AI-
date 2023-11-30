@@ -69,7 +69,7 @@ class AdminFactory extends Factory
         return $this->afterCreating(function (Admin $admin) {
             app(SetupTwoFactorAuthenticationAction::class)->execute($admin);
 
-            if ( ! $admin->twoFactorAuthentication?->secret) {
+            if (! $admin->twoFactorAuthentication?->secret) {
                 return;
             }
 

@@ -119,18 +119,8 @@ class TenantResource extends Resource
                                 Features\ECommerce\ECommerceBase::class => [
                                     'label' => trans('eCommerce'),
                                     'extras' => [
-                                        'Payments' => [
-                                            Features\ECommerce\PaypalGateway::class => app(Features\ECommerce\PaypalGateway::class)->label,
-                                            Features\ECommerce\StripeGateway::class => app(Features\ECommerce\StripeGateway::class)->label,
-                                            Features\ECommerce\OfflineGateway::class => app(Features\ECommerce\OfflineGateway::class)->label,
-                                            Features\ECommerce\BankTransfer::class => app(Features\ECommerce\BankTransfer::class)->label,
-                                        ],
-                                        'shipping' => [
-                                            Features\ECommerce\ShippingStorePickup::class => app(Features\ECommerce\ShippingStorePickup::class)->label,
-                                            Features\ECommerce\ShippingUsps::class => app(Features\ECommerce\ShippingUsps::class)->label,
-                                            Features\ECommerce\ShippingUps::class => app(Features\ECommerce\ShippingUps::class)->label,
-                                            Features\ECommerce\ShippingAusPost::class => app(Features\ECommerce\ShippingAusPost::class)->label,
-                                        ],
+                                        Features\ECommerce\ColorPallete::class => 'Collor Pallete (Color Selector)',
+
                                         Features\ECommerce\AllowGuestOrder::class => 'Allow Guest Orders',
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
                                     ],
@@ -139,9 +129,29 @@ class TenantResource extends Resource
                                     'label' => trans('Service'),
                                     'extras' => [],
                                 ],
+
+                                Features\Shopconfiguration\ShopconfigurationBase::class => [
+                                    'label' => trans('Shop Configuration'),
+                                    'extras' => [
+                                        Features\Shopconfiguration\TaxZone::class => app(Features\Shopconfiguration\TaxZone::class)->label,
+                                        'Payments' => [
+                                            Features\Shopconfiguration\PaymentGateway\PaypalGateway::class => app(Features\Shopconfiguration\PaymentGateway\PaypalGateway::class)->label,
+                                            Features\Shopconfiguration\PaymentGateway\StripeGateway::class => app(Features\Shopconfiguration\PaymentGateway\StripeGateway::class)->label,
+                                            Features\Shopconfiguration\PaymentGateway\OfflineGateway::class => app(Features\Shopconfiguration\PaymentGateway\OfflineGateway::class)->label,
+                                            Features\Shopconfiguration\PaymentGateway\BankTransfer::class => app(Features\Shopconfiguration\PaymentGateway\BankTransfer::class)->label,
+                                        ],
+                                        'shipping' => [
+                                            Features\Shopconfiguration\Shipping\ShippingStorePickup::class => app(Features\Shopconfiguration\Shipping\ShippingStorePickup::class)->label,
+                                            Features\Shopconfiguration\Shipping\ShippingUsps::class => app(Features\Shopconfiguration\Shipping\ShippingUsps::class)->label,
+                                            Features\Shopconfiguration\Shipping\ShippingUps::class => app(Features\Shopconfiguration\Shipping\ShippingUps::class)->label,
+                                            Features\Shopconfiguration\Shipping\ShippingAusPost::class => app(Features\Shopconfiguration\Shipping\ShippingAusPost::class)->label,
+                                        ],
+                                    ],
+                                ],
+
                             ]),
                     ])->hidden(
-                        fn () => ! auth()->user()?->can('updateFeatures')
+                        fn () => ! auth()->user()?->can('tenant.updateFeatures')
                     ),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->view('filament.forms.components.redbgheading-section')
@@ -151,7 +161,7 @@ class TenantResource extends Resource
                             ->label('Suspend')
                             ->helpertext('Warning this will suspend the current tenant are you sure with this action?')
                             ->inline(false),
-                    ])->hidden(fn () => ! auth()->user()?->can('canSuspendTenant')),
+                    ])->hidden(fn () => ! auth()->user()?->can('tenant.canSuspendTenant')),
             ])->columns(2);
     }
 

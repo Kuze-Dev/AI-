@@ -15,7 +15,9 @@ use Flowframe\Trend\TrendValue;
 class AverageOrderValue extends BarChartWidget
 {
     protected static ?string $heading = 'Average Order Value';
+
     protected static ?string $pollingInterval = null;
+
     public ?string $filter = 'perMonth';
 
     protected function getFilters(): ?array
@@ -37,7 +39,7 @@ class AverageOrderValue extends BarChartWidget
 
         $salesData = Trend::model(Order::class)
             ->between(
-                start:  $startDate,
+                start: $startDate,
                 end: $endDate
             )
             ->$activeFilter()

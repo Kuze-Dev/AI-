@@ -12,12 +12,12 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable;
 use Domain\Auth\Contracts\TwoFactorAuthenticationProvider;
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Eloquent;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Auth\Model\TwoFactorAuthentication
@@ -34,6 +34,7 @@ use Eloquent;
  * @property-read int|null $recovery_codes_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Auth\Model\SafeDevice> $safeDevices
  * @property-read int|null $safe_devices_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication query()
@@ -44,6 +45,7 @@ use Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication whereSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TwoFactorAuthentication whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 #[OnDeleteCascade(['recoveryCodes', 'safeDevices'])]

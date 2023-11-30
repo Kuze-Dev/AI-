@@ -6,7 +6,6 @@ namespace Domain\Favorite\Actions;
 
 use Domain\Favorite\DataTransferObjects\FavoriteData;
 use Domain\Favorite\Models\Favorite;
-
 use Exception;
 
 class CreateFavoriteAction

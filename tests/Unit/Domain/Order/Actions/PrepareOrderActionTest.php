@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Settings\OrderSettings;
 use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Address\Database\Factories\CountryFactory;
+use Domain\Address\Database\Factories\StateFactory;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Address;
 use Domain\Cart\Actions\CheckoutAction;
@@ -34,7 +35,9 @@ use function PHPUnit\Framework\assertInstanceOf;
 beforeEach(function () {
     testInTenantContext();
 
-    app(OrderSettings::class)->fill(['email_sender_name' => fake()->safeEmail()])->save();
+    OrderSettings::fake([
+        'email_sender_name' => fake()->safeEmail(),
+    ]);
 
     CurrencyFactory::new()->createOne([
         'code' => 'USD',
@@ -43,32 +46,35 @@ beforeEach(function () {
         'enabled' => true,
     ]);
 
-    $country = CountryFactory::new()->createOne([
-        'code' => 'US',
-        'name' => 'United States',
-        'capital' => 'Washington',
-        'timezone' => 'UTC-10:00',
-        'active' => true,
-    ]);
+    $country = CountryFactory::new()
+        ->has(StateFactory::new([
+            'name' => 'CA',
+            'code' => 'BH',
+        ]))
+        ->createOne([
+            'code' => 'US',
+            'name' => 'United States',
+            'capital' => 'Washington',
+            'timezone' => 'UTC-10:00',
+            'active' => true,
+        ]);
 
-    $state = $country->states()->create([
-        'name' => 'CA',
-        'code' => 'BH',
-    ]);
+    $state = $country->states[0];
 
     $customer = CustomerFactory::new()
         ->createOne();
 
-    $address = AddressFactory::new()->createOne([
-        'customer_id' => $customer->id,
-        'state_id' => $state->id,
-        'label_as' => AddressLabelAs::HOME,
-        'address_line_1' => '185 Berry Street',
-        'zip_code' => '94107',
-        'city' => 'San Francisco',
-        'is_default_shipping' => true,
-        'is_default_billing' => true,
-    ]);
+    $address = AddressFactory::new()
+        ->for($customer)
+        ->for($state)
+        ->createOne([
+            'label_as' => AddressLabelAs::HOME,
+            'address_line_1' => '185 Berry Street',
+            'zip_code' => '94107',
+            'city' => 'San Francisco',
+            'is_default_shipping' => true,
+            'is_default_billing' => true,
+        ]);
 
     $shippingMethod = ShippingMethodFactory::new()->createOne(['title' => 'Store Pickup']);
 

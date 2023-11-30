@@ -24,10 +24,10 @@ class CreateOrUpdateRouteUrlAction
 
         /** @var ?RouteUrl $routeUrl */
         $routeUrl = RouteUrl::whereModelType($model->getMorphClass())
-            ->where('model_id', $model->id)
+            ->where('model_id', $model->getKey())
             ->first();
 
-        if ( ! $routeUrl) {
+        if (! $routeUrl) {
 
             return $model->routeUrls()
                 ->create([

@@ -14,7 +14,9 @@ use Filament\Widgets\PieChartWidget;
 class MostSoldProduct extends PieChartWidget
 {
     protected static ?string $heading = 'Most Sold Product';
+
     protected static ?string $pollingInterval = null;
+
     public ?string $filter = 'allTime';
 
     protected function getFilters(): ?array

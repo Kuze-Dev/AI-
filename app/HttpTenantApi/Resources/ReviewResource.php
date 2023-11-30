@@ -20,21 +20,27 @@ class ReviewResource extends JsonApiResource
             'customer_name' => $this->is_anonymous ? '*' : $this->customer_name,
             'customer_email' => $this->is_anonymous ? '*' : $this->customer_email,
             'is_anonymous' => $this->is_anonymous,
-            // 'personalized' => ! empty($this->order_line->remarks_data) || count($this->order_line->media->filter(fn ($media) => $media->collection_name === 'order_line_notes')) > 0,
             'data' => $this->data,
             'like_count' => $this->review_likes->count(),
+            'created_at' => $this->created_at,
         ];
     }
 
     /** @return array<string, callable> */
     public function toRelationships(Request $request): array
     {
-        return [
-            $this->is_anonymous ? '' : 'customer' => fn () => new CustomerResource($this->customer),
+        $relationships = [
+            $this->is_anonymous || is_null($this->customer) ? '' :
+                'customer' => fn () => new CustomerResource($this->customer),
             'product' => fn () => new ProductResource($this->product),
             'order' => fn () => new OrderResource($this->product),
             'order_line' => fn () => new OrderLineResource($this->order_line),
-            'media' => fn () => MediaResource::collection($this->media),
         ];
+
+        if (isset($this->media)) {
+            $relationships['media'] = fn () => MediaResource::collection($this->media);
+        }
+
+        return $relationships;
     }
 }

@@ -74,7 +74,7 @@ class ProductSeeder extends Seeder
         $blueprintId = null;
         $blueprintId = Blueprint::whereName($this->data()['blueprint_for_taxonomy']['name'])->value('id');
 
-        if ( ! $blueprintId) {
+        if (! $blueprintId) {
             $blueprintId = BlueprintFactory::new($this->data()['blueprint_for_taxonomy'])->create()->id ?? null;
         }
 

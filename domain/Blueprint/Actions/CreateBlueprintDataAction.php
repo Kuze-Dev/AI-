@@ -37,7 +37,7 @@ class CreateBlueprintDataAction
                     return $value;
                 }
             });
-            if(empty($filtered)) {
+            if (empty($filtered)) {
                 return $blueprintData;
             }
         }
@@ -69,7 +69,7 @@ class CreateBlueprintDataAction
             return;
         }
 
-        if ( ! $model->data) {
+        if (! $model->data) {
             return;
         }
 

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Features\ECommerce\ECommerceBase;
+use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages\ListShippingmethods;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
-use Filament\Pages\Actions\DeleteAction;
-use App\Features\ECommerce\ECommerceBase;
-use App\Features\ECommerce\ShippingStorePickup;
 use Filament\Facades\Filament;
+use Filament\Pages\Actions\DeleteAction;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;

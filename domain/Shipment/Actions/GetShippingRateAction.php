@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Domain\Shipment\Actions;
 
 use Domain\Shipment\Contracts\API\RateResponse;
-use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\Contracts\ShippingManagerInterface;
+use Domain\Shipment\DataTransferObjects\AddressValidateRequestData;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Enums\Driver;

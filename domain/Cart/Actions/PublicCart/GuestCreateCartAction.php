@@ -35,7 +35,7 @@ class GuestCreateCartAction
     {
         $uuid = uuid_create(UUID_TYPE_RANDOM);
 
-        $sessionId = time() . $uuid;
+        $sessionId = time().$uuid;
 
         return $sessionId;
     }

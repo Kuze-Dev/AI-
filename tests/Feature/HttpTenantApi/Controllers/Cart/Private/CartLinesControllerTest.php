@@ -31,7 +31,7 @@ beforeEach(function () {
 
     CartFactory::new()->setCustomerId($customer->id)->createOne();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
         ->plainTextToken);
 
@@ -99,7 +99,7 @@ it('can update cart line quantity', function () {
 
     $cartLine = CartLineFactory::new()->setPurchasableId($product->id)->createOne();
 
-    patchJson('api/carts/cartlines/' . $cartLine->uuid, [
+    patchJson('api/carts/cartlines/'.$cartLine->uuid, [
         'type' => 'quantity',
         'quantity' => 2,
     ])
@@ -111,7 +111,7 @@ it('can update cart line remarks', function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    patchJson('api/carts/cartlines/' . $cartLine->uuid, [
+    patchJson('api/carts/cartlines/'.$cartLine->uuid, [
         'type' => 'remarks',
         'remarks' => [
             'notes' => 'test remarks',
@@ -125,7 +125,7 @@ it('can delete cart line', function () {
 
     $cartLine = CartLineFactory::new()->createOne();
 
-    deleteJson('api/carts/cartlines/' . $cartLine->uuid)
+    deleteJson('api/carts/cartlines/'.$cartLine->uuid)
         ->assertValid()
         ->assertNoContent();
 });

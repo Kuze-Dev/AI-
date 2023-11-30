@@ -26,7 +26,7 @@ class ExportAction extends Action
             ->form($this->buildExportForm(...))
             ->withActivityLog(
                 event: 'exported',
-                description: fn (self $action) => 'Exported ' . $action->getModelLabel(),
+                description: fn (self $action) => 'Exported '.$action->getModelLabel(),
             );
     }
 }

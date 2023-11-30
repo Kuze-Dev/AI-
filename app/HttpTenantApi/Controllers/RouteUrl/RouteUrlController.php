@@ -9,15 +9,15 @@ use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
-use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Support\Str;
-use Spatie\RouteAttributes\Attributes\Get;
-use Spatie\RouteAttributes\Attributes\Where;
-use TiMacDonald\JsonApi\JsonApiResource;
 use InvalidArgumentException;
+use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Where;
+use Support\RouteUrl\Models\RouteUrl;
+use TiMacDonald\JsonApi\JsonApiResource;
 
-#[Middleware('feature.tenant:'. CMSBase::class)]
+#[Middleware('feature.tenant:'.CMSBase::class)]
 class RouteUrlController
 {
     #[
@@ -29,7 +29,7 @@ class RouteUrlController
         $queryRouteUrl = RouteUrl::whereUrl(Str::start($url, '/'))
             ->with('model');
 
-        if(
+        if (
             tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             request('site')
         ) {

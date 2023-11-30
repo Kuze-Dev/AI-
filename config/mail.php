@@ -84,6 +84,18 @@ return [
                 'log',
             ],
         ],
+
+        'helo' => [
+            // https://usehelo.com/
+            'transport' => 'smtp',
+            'host' => env('MAIL_HOST', '10.0.2.2'),
+            'port' => env('MAIL_PORT', 2525),
+            'encryption' => env('MAIL_ENCRYPTION', null),
+            'username' => env('APP_NAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN'),
+        ],
     ],
 
     /*

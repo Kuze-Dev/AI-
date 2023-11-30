@@ -35,4 +35,11 @@ class ImportFinished extends Notification implements ShouldQueue
         return (new MailMessage())
             ->greeting('Import finished');
     }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
+        ];
+    }
 }

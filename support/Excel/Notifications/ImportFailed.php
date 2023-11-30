@@ -42,4 +42,11 @@ class ImportFailed extends Notification implements ShouldQueue
             ->greeting('Import Failed')
             ->line($this->error);
     }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
+        ];
+    }
 }

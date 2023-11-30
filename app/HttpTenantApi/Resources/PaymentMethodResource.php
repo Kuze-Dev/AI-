@@ -16,7 +16,7 @@ class PaymentMethodResource extends JsonApiResource
     {
         $image = $this->getFirstMedia('logo');
 
-        return  [
+        return [
             'name' => $this->title,
             'slug' => $this->slug,
             'subtitle' => $this->subtitle,
@@ -25,6 +25,14 @@ class PaymentMethodResource extends JsonApiResource
             'status' => $this->status,
             'description' => $this->description,
             'instruction' => $this->instruction,
+        ];
+    }
+
+    /** @return array<string, callable> */
+    public function toRelationships(Request $request): array
+    {
+        return [
+            'media' => fn () => MediaResource::collection($this->media),
         ];
     }
 }

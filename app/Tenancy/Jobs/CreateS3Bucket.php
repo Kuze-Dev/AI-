@@ -39,7 +39,7 @@ class CreateS3Bucket implements ShouldQueue
 
         $bucketManager = new BucketManager($this->tenant);
 
-        if ( ! $bucketManager->bucketExists()) {
+        if (! $bucketManager->bucketExists()) {
             $bucketManager->createBucket();
         }
 
@@ -48,6 +48,6 @@ class CreateS3Bucket implements ShouldQueue
 
     protected function generateBucketName(): string
     {
-        return Str::of(config('app.name'))->slug() . '-' . Str::of($this->tenant->name)->slug();
+        return Str::of(config('app.name'))->slug().'-'.Str::of($this->tenant->name)->slug();
     }
 }

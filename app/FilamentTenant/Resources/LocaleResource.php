@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Closure;
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Resources\Form;
-use Filament\Resources\Table;
-use Filament\Resources\Resource;
-use Filament\Tables\Filters\Layout;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Domain\Internationalization\Models\Locale;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\LocaleResource\Pages\ListLocale;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use Closure;
+use Domain\Internationalization\Models\Locale;
+use Filament\Forms;
+use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Filament\Tables\Filters\Layout;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class LocaleResource extends Resource
 {

@@ -43,19 +43,19 @@ class AddressRequest extends FormRequest
         ];
     }
 
-    public function toDTO(?Customer $customer = null, ?Address $address = null): AddressData
+    public function toDTO(Customer $customer = null, Address $address = null): AddressData
     {
         $validated = $this->validated();
 
         $default_shipping = true;
         $default_billing = true;
 
-        if ( ! is_null($customer) && isset($validated['is_default_shipping'], $validated['is_default_billing'])) {
+        if (! is_null($customer) && isset($validated['is_default_shipping'], $validated['is_default_billing'])) {
             $default_shipping = $validated['is_default_shipping'];
             $default_billing = $validated['is_default_billing'];
         }
 
-        if ( ! is_null($address) && isset($address->is_default_billing, $address->is_default_shipping)) {
+        if (! is_null($address) && isset($address->is_default_billing, $address->is_default_shipping)) {
             $default_shipping = $address->is_default_shipping;
             $default_billing = $address->is_default_billing;
         }
@@ -67,7 +67,7 @@ class AddressRequest extends FormRequest
             zip_code: $validated['zip_code'],
             city: $validated['city'],
             is_default_shipping: $default_shipping,
-            is_default_billing:  $default_billing,
+            is_default_billing: $default_billing,
             customer_id: ($customer ? $customer->getKey() : null) ?? ($address && $address->customer ? $address->customer->getKey() : null),
         );
     }

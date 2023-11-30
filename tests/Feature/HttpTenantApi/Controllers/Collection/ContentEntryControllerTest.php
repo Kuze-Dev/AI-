@@ -3,15 +3,14 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
-use Domain\Blueprint\Enums\FieldType;
-use Illuminate\Testing\Fluent\AssertableJson;
-use Domain\Site\Database\Factories\SiteFactory;
-use Domain\Content\Database\Factories\ContentFactory;
-use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
+use Domain\Blueprint\Enums\FieldType;
 use Domain\Content\Database\Factories\ContentEntryFactory;
-
+use Domain\Content\Database\Factories\ContentFactory;
+use Domain\Site\Database\Factories\SiteFactory;
+use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 use function Pest\Laravel\getJson;
 
@@ -72,7 +71,7 @@ it('can filter content entries by published at start', function () {
         )
         ->create([]);
 
-    getJson("api/contents/{$content->getRouteKey()}/entries?" . http_build_query(['filter' => ['published_at_start' => (string) Carbon::now()]]))
+    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_start' => (string) Carbon::now()]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('data', 1)
@@ -96,7 +95,7 @@ it('can filter content entries by published at end', function () {
         )
         ->create();
 
-    getJson("api/contents/{$content->getRouteKey()}/entries?" . http_build_query(['filter' => ['published_at_end' => (string) Carbon::now()]]))
+    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_end' => (string) Carbon::now()]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('data', 1)
@@ -123,7 +122,7 @@ it('can filter content entries by published at year month', function () {
 
     $queryDate = Carbon::now();
 
-    getJson("api/contents/{$content->getRouteKey()}/entries?" . http_build_query(['filter' => ['published_at_year_month' => $queryDate->year]]))
+    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_year_month' => $queryDate->year]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('data', 2)
@@ -131,7 +130,7 @@ it('can filter content entries by published at year month', function () {
                 ->etc();
         });
 
-    getJson("api/contents/{$content->getRouteKey()}/entries?" . http_build_query(['filter' => ['published_at_year_month' => "{$queryDate->year},{$queryDate->month}"]]))
+    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_year_month' => "{$queryDate->year},{$queryDate->month}"]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('data', 1)
@@ -168,7 +167,7 @@ it('can filter content entries by taxonomies', function () {
         ->for($content)
         ->create();
 
-    getJson("api/contents/{$content->getRouteKey()}/entries?" . http_build_query(['filter' => ['taxonomies' => ['category' => 'laravel']]]))
+    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['taxonomies' => ['category' => 'laravel']]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('data', 1)
@@ -237,7 +236,7 @@ it('can show content entry with includes', function (string $include) {
 
     // dd($contentEntry->routeUrls);
 
-    getJson("api/contents/{$content->getRouteKey()}/entries/{$contentEntry->getRouteKey()}?" . http_build_query(['include' => $include]))
+    getJson("api/contents/{$content->getRouteKey()}/entries/{$contentEntry->getRouteKey()}?".http_build_query(['include' => $include]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) use ($contentEntry, $include) {
             $json->where('data.type', 'contentEntries')

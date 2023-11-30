@@ -51,7 +51,7 @@ class GuestPlaceOrderRequest extends AddressRequest
                         ->whereNull('checked_out_at')
                         ->count();
 
-                    if ( ! $cartLines) {
+                    if (! $cartLines) {
                         $fail('No cart lines for checkout');
 
                         return;
@@ -74,7 +74,7 @@ class GuestPlaceOrderRequest extends AddressRequest
                     try {
                         //stock check
                         $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($cartLineIds, $userId, $type);
-                        if ($checkStocks !== count($value)) {
+                        if ($checkStocks !== count($cartLineIds)) {
                             $fail('Invalid stocks');
                         }
                     } catch (Throwable $th) {
@@ -110,7 +110,7 @@ class GuestPlaceOrderRequest extends AddressRequest
                     if (is_int($value) || is_string($value)) {
                         return true;
                     } else {
-                        $fail($attribute . ' is invalid.');
+                        $fail($attribute.' is invalid.');
                     }
                 },
             ],

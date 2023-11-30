@@ -43,7 +43,7 @@ class CartSummaryController extends Controller
                 return $cartLine->purchasable !== null;
             });
 
-            if ( ! empty($cartLineIdsTobeRemoved)) {
+            if (! empty($cartLineIdsTobeRemoved)) {
                 event(new SanitizeCartEvent(
                     $cartLineIdsTobeRemoved,
                 ));
@@ -103,7 +103,7 @@ class CartSummaryController extends Controller
                 ],
             ];
 
-            if ( ! $discountCode) {
+            if (! $discountCode) {
                 unset($responseArray['discount']);
             }
 

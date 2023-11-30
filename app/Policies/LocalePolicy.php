@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Features\CMS\Internationalization;
+use App\Policies\Concerns\ChecksWildcardPermissions;
+use Domain\Internationalization\Models\Locale;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
-use App\Features\CMS\Internationalization;
-use Domain\Internationalization\Models\Locale;
-use App\Policies\Concerns\ChecksWildcardPermissions;
 
 class LocalePolicy
 {

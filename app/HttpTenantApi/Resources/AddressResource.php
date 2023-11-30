@@ -14,10 +14,13 @@ class AddressResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
+            'country_code' => $this->state->country->code,
             'label_as' => $this->label_as,
             'address_line_1' => $this->address_line_1,
             'zip_code' => $this->zip_code,
+            'state_code' => $this->state->code,
+            'state_name' => $this->state->name,
             'city' => $this->city,
             'is_default_shipping' => $this->is_default_shipping,
             'is_default_billing' => $this->is_default_billing,

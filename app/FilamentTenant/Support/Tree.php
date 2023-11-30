@@ -28,7 +28,7 @@ class Tree extends Field
         $this->registerListeners([
             'tree::createItem' => [
                 function (self $component, string $statePath): void {
-                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                    if (! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 
@@ -38,13 +38,13 @@ class Tree extends Field
                     $livewire->mountFormComponentAction(
                         $component->getStatePath(),
                         'tree-form',
-                        ['activeTreeStatePath' => "{$statePath}." . (string) Str::uuid()]
+                        ['activeTreeStatePath' => "{$statePath}.".(string) Str::uuid()]
                     );
                 },
             ],
             'tree::editItem' => [
                 function (self $component, string $statePath): void {
-                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                    if (! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 
@@ -60,7 +60,7 @@ class Tree extends Field
             ],
             'tree::deleteItem' => [
                 function (self $component, string $statePath): void {
-                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                    if (! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 
@@ -78,7 +78,7 @@ class Tree extends Field
             ],
             'tree::moveItems' => [
                 function (self $component, string $statePath, array $childrenStatePaths): void {
-                    if ( ! Str::startsWith($statePath, $component->getStatePath())) {
+                    if (! Str::startsWith($statePath, $component->getStatePath())) {
                         return;
                     }
 

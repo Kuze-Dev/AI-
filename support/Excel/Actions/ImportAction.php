@@ -29,6 +29,12 @@ class ImportAction extends Action
 
     protected array $validateAttributes;
 
+    protected string $uniqueBy;
+
+    protected int $batchSize = 1_000;
+
+    protected int $chunkSize = 5_00;
+
     public static function getDefaultName(): ?string
     {
         return 'import';
@@ -89,8 +95,32 @@ class ImportAction extends Action
             ])
             ->withActivityLog(
                 event: 'imported',
-                description: fn (self $action) => 'Imported ' . $action->getModelLabel()
+                description: fn (self $action) => 'Imported '.$action->getModelLabel()
             );
+    }
+
+    /**
+     * @param  non-empty-string  $uniqueBy
+     */
+    public function uniqueBy(string $uniqueBy): self
+    {
+        $this->uniqueBy = $uniqueBy;
+
+        return $this;
+    }
+
+    public function batchSize(int $batchSize): self
+    {
+        $this->batchSize = $batchSize;
+
+        return $this;
+    }
+
+    public function chunkSize(int $chunkSize): self
+    {
+        $this->chunkSize = $chunkSize;
+
+        return $this;
     }
 
     public function processRowsUsing(Closure $processRowsUsing): self
@@ -109,7 +139,7 @@ class ImportAction extends Action
         return $this;
     }
 
-    /** @param class-string|Closure $importClass */
+    /** @param  class-string|Closure  $importClass */
     public function importClass(string|Closure $importClass): self
     {
         $this->importClass = $importClass;
@@ -136,9 +166,12 @@ class ImportAction extends Action
         return new DefaultImport(
             user: $user,
             processRowsUsing: new SerializableClosure($this->processRowsUsing),
+            uniqueBy: $this->uniqueBy,
             validateRules: $this->validateRules,
+            batchSize: $this->batchSize,
+            chunkSize: $this->batchSize,
             validateMessages: $this->validateMessages,
-            validateAttributes: $this->validateAttributes
+            validateAttributes: $this->validateAttributes,
         );
     }
 }

@@ -16,7 +16,7 @@ class TierPolicy
 
     public function before(?User $user, string $ability, mixed $tier = null): Response|false|null
     {
-        if ( ! tenancy()->tenant?->features()->active(TierBase::class)) {
+        if (! tenancy()->tenant?->features()->active(TierBase::class)) {
             return Response::denyAsNotFound();
         }
 

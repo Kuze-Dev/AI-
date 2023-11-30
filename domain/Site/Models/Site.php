@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Domain\Site\Models;
 
 use Domain\Admin\Models\Admin;
-use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Domain\Site\Models\Site
@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Admin> $siteManager
  * @property-read int|null $site_manager_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Site newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Site newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Site onlyTrashed()
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|Site whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Site withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Site withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Site extends Model
@@ -68,6 +70,6 @@ class Site extends Model
 
     public function getActivitySubjectDescription(Activity $activity): string
     {
-        return 'Site: ' . $this->name;
+        return 'Site: '.$this->name;
     }
 }

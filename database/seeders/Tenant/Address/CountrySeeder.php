@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders\Tenant\Address;
 
 use Domain\Address\Models\Country;
-use Illuminate\Database\Seeder;
 use Exception;
+use Illuminate\Database\Seeder;
 
 class CountrySeeder extends Seeder
 {
@@ -51,7 +51,7 @@ class CountrySeeder extends Seeder
     {
         $response = file_get_contents('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates.json');
 
-        if ( ! $response) {
+        if (! $response) {
             throw new Exception();
         }
 

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @template TModelClass of \Domain\Content\Models\ContentEntry
+ *
  * @extends Builder<TModelClass>
  */
 class ContentEntryBuilder extends Builder

@@ -14,7 +14,7 @@ class FormResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        return  [
+        return [
             'name' => $this->name,
             'store_submission' => $this->store_submission,
             'uses_captcha' => $this->uses_captcha,

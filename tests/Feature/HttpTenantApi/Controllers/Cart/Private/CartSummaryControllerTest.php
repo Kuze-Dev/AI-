@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use App\Features\Customer\AddressBase;
 use App\Features\Customer\CustomerBase;
-use Domain\Address\Enums\AddressLabelAs;
 use App\Features\Customer\TierBase;
+use App\Features\ECommerce\ECommerceBase;
+use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
+use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
-use App\Features\ECommerce\ECommerceBase;
-use App\Features\ECommerce\ShippingStorePickup;
 use Domain\Cart\Database\Factories\CartFactory;
 use Domain\Cart\Database\Factories\CartLineFactory;
 use Domain\Cart\Models\CartLine;
@@ -81,7 +81,7 @@ beforeEach(function () {
             $cartLine->save();
         })->create();
 
-    withHeader('Authorization', 'Bearer ' . $customer
+    withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
         ->plainTextToken);
 
@@ -105,7 +105,7 @@ it('can show cart summary', function () {
 
     $commaSeparatedIds = implode(',', $cartLineIds);
 
-    getJson('api/carts/summary?' . http_build_query(
+    getJson('api/carts/summary?'.http_build_query(
         [
             'cart_line_ids' => $commaSeparatedIds,
             'shipping_address_id' => $this->address->id,

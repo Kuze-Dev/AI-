@@ -11,7 +11,7 @@ class ProductTierDiscountResource extends JsonApiResource
 {
     public function toId(Request $request): string
     {
-        if ( ! isset($this->pivot)) {
+        if (! isset($this->pivot)) {
             return '';
         }
 
@@ -25,11 +25,11 @@ class ProductTierDiscountResource extends JsonApiResource
 
     public function toAttributes(Request $request): array
     {
-        if ( ! isset($this->pivot)) {
+        if (! isset($this->pivot)) {
             return [];
         }
 
-        return  [
+        return [
             'tier_id' => $this->pivot->tier_id,
             'discount' => $this->pivot->discount,
             'discount_amount_type' => $this->pivot->discount_amount_type,

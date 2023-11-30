@@ -168,6 +168,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\FilamentServiceProvider::class,
         App\Providers\HealthCheckServiceProvider::class,
@@ -185,6 +186,7 @@ return [
         Domain\Tier\TierServiceProvider::class,
         Domain\Tier\TierServiceProvider::class,
         Domain\Taxation\TaxationServiceProvider::class,
+        Domain\ServiceOrder\ServiceOrderServiceProvider::class,
 
         /*
         * Support Service Providers...

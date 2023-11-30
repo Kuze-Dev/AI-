@@ -9,13 +9,13 @@ use Domain\Product\Actions\UpdateProductVariantFromCsvAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\DataTransferObjects\ProductVariantData;
 use Domain\Product\Enums\Decision;
+use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Support\Common\Rules\MinimumValueRule;
 use Support\Excel\Actions\ImportAction;
-use Illuminate\Validation\Rules\Enum;
-use Domain\Product\Enums\Status;
 
 class ImportProductBatchUpdateAction
 {
@@ -74,7 +74,7 @@ class ImportProductBatchUpdateAction
 
         $productVariant = ProductVariant::find($row['variant_id']);
 
-        if ( ! $productVariant instanceof ProductVariant) {
+        if (! $productVariant instanceof ProductVariant) {
             throw ValidationException::withMessages([
                 'variant_id' => trans('There is no matching variant record for the Variant ID.'),
             ]);
@@ -95,7 +95,7 @@ class ImportProductBatchUpdateAction
 
         $product = Product::find($productVariant->product_id);
 
-        if ( ! $product instanceof Product) {
+        if (! $product instanceof Product) {
             throw ValidationException::withMessages([
                 'product_id' => trans('There is no matching product record for the Product ID.'),
             ]);
@@ -120,7 +120,7 @@ class ImportProductBatchUpdateAction
     {
         $foundProduct = Product::whereId($row['product_id'])->with(['productOptions.productOptionValues.media', 'productVariants', 'media'])->first();
 
-        if ( ! $foundProduct instanceof Product) {
+        if (! $foundProduct instanceof Product) {
             throw ValidationException::withMessages([
                 'product_id' => trans('There is no matching product record for the Product ID.'),
             ]);

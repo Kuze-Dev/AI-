@@ -17,7 +17,7 @@ class PagePolicy
 
     public function before(): ?Response
     {
-        if ( ! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (! tenancy()->tenant?->features()->active(CMSBase::class)) {
             return Response::denyAsNotFound();
         }
 
@@ -56,7 +56,7 @@ class PagePolicy
 
             $intersection = array_intersect($pageSites, $userSites);
 
-            return ((count($intersection) === count($pageSites)) && $this->checkWildcardPermissions($user));
+            return (count($intersection) === count($pageSites)) && $this->checkWildcardPermissions($user);
         }
 
         return $this->checkWildcardPermissions($user);

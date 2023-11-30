@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
-use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
-use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
@@ -13,7 +12,8 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Domain\Site\Traits\Sites;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
+use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
  * Domain\Menu\Models\Menu
@@ -30,6 +30,7 @@ use Domain\Site\Traits\Sites;
  * @property-read int|null $nodes_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Menu\Models\Node> $parentNodes
  * @property-read int|null $parent_nodes_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Menu newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Menu newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Menu query()
@@ -38,14 +39,15 @@ use Domain\Site\Traits\Sites;
  * @method static \Illuminate\Database\Eloquent\Builder|Menu whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Menu whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Menu whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['parentNodes'])]
 class Menu extends Model
 {
+    use ConstraintsRelationships;
     use HasSlug;
     use LogsActivity;
-    use ConstraintsRelationships;
     use Sites;
 
     protected $fillable = [

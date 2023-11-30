@@ -13,8 +13,8 @@ use Domain\Blueprint\DataTransferObjects\SectionData;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
-use TiMacDonald\JsonApi\JsonApiResource;
 use InvalidArgumentException;
+use TiMacDonald\JsonApi\JsonApiResource;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 trait TransformsSchemaPayload
@@ -95,6 +95,6 @@ trait TransformsSchemaPayload
             return $resourceClass;
         }
 
-        throw new InvalidArgumentException('Can not guess the `JsonApiResource` for `' . $model::class . '`');
+        throw new InvalidArgumentException('Can not guess the `JsonApiResource` for `'.$model::class.'`');
     }
 }

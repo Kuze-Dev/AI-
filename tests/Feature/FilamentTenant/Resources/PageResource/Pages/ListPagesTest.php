@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\PageResource\Pages\ListPages;
-use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Database\Factories\BlockFactory;
-use Support\MetaData\Database\Factories\MetaDataFactory;
-use Support\RouteUrl\Database\Factories\RouteUrlFactory;
+use Domain\Page\Database\Factories\PageFactory;
 use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
+use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;

@@ -12,8 +12,8 @@ use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Support\Excel\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
+use Support\Excel\Actions\ExportAction;
 
 class ListProducts extends ListRecords
 {
