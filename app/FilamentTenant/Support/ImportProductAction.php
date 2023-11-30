@@ -88,7 +88,7 @@ class ImportProductAction
             ->first();
 
         // If the product does not exist, create a new one
-        if ( ! $foundProduct instanceof Product) {
+        if (! $foundProduct instanceof Product) {
             Log::info(
                 'Import row(s) of product in CREATE ',
                 [
@@ -198,7 +198,7 @@ class ImportProductAction
                             ->where('id', $optionValue['id'])
                             ->first();
 
-                        if ( ! $optionValueModel) {
+                        if (! $optionValueModel) {
                             return [];
                         }
 
@@ -237,7 +237,7 @@ class ImportProductAction
                             ->where('id', $optionValue['id'])
                             ->first();
 
-                        if ( ! $optionValueModel) {
+                        if (! $optionValueModel) {
                             return [];
                         }
 
