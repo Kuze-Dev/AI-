@@ -108,8 +108,6 @@ class ImportProductAction
         $data['product_options'] = self::mergingProductOptions($foundProduct, $data['product_options']);
         $data['product_variants'] = self::mergingProductVariants($foundProduct, $data);
 
-        // dd($data['product_options']);
-
         // Check for possible sku duplication
         $foundProductViaSku = Product::where('sku', $data['product_sku'])->first();
 
@@ -134,7 +132,7 @@ class ImportProductAction
         }
 
         Log::info(
-            'Import row(s) of product ',
+            'Import row(s) of product for UPDATE ',
             [
                 'name' => $data['name'],
                 'product_id' => $data['product_sku'] ?? $data['sku'],
@@ -195,7 +193,21 @@ class ImportProductAction
                     'name' => $item->name,
                     'slug' => $item->slug,
                     'is_custom' => $item->is_custom,
-                    'productOptionValues' => $item->productOptionValues->toArray(),
+                    'productOptionValues' => array_map(function ($optionValue) {
+                        $optionValueModel = ProductOptionValue::with('media')
+                            ->where('id', $optionValue['id'])
+                            ->first();
+
+                        if ( ! $optionValueModel) {
+                            return [];
+                        }
+
+                        return [
+                            ...$optionValue,
+                            ...$optionValue['data'],
+                            'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
+                        ];
+                    }, $item->productOptionValues->toArray()),
                 ];
             }
         )->toArray();
@@ -380,9 +392,9 @@ class ImportProductAction
                         'id' => uniqid(),
                         'name' => $row["product_option_{$i}_value_{$j}"],
                         'slug' => $row["product_option_{$i}_value_{$j}"],
-                        'icon_type' => $row["product_option_{$i}_value_{$j}_icon_type"],
-                        'icon_value' => $row["product_option_{$i}_value_{$j}_icon_value"],
-                        'images' => isset($row["product_option_{$i}_value_{$j}_image_link"]) ? [$row["product_option_{$i}_value_{$j}_image_link"]] : null,
+                        'icon_type' => $i === 1 ? $row["product_option_{$i}_value_{$j}_icon_type"] : 'text',
+                        'icon_value' => $i === 1 ? $row["product_option_{$i}_value_{$j}_icon_value"] : '',
+                        'images' => $i === 1 ? (isset($row["product_option_{$i}_value_{$j}_image_link"]) ? [$row["product_option_{$i}_value_{$j}_image_link"]] : null) : [],
                         'product_option_id' => $productOption['id'],
                     ]);
 

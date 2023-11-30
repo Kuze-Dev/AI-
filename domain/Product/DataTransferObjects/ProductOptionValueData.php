@@ -25,9 +25,9 @@ class ProductOptionValueData
             id: $data['id'],
             name: $data['name'],
             slug: $data['slug'],
-            icon_type: $data['icon_type'],
-            icon_value: $data['icon_value'],
-            images: $data['images'],
+            icon_type: $data['icon_type'] ?? 'text',
+            icon_value: $data['icon_value'] ?? '',
+            images: $data['images'] ?? [],
             product_option_id: $data['product_option_id'],
         );
     }
