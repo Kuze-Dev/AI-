@@ -54,6 +54,15 @@ class CustomerFactory extends Factory
     //            });
     //    }
 
+    public function hasAddress(): self
+    {
+        return $this->has(
+            AddressFactory::new()
+                ->defaultShipping()
+                ->defaultBilling()
+        );
+    }
+
     public function deleted(): self
     {
         return $this->state(['deleted_at' => now()]);
