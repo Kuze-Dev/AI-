@@ -35,7 +35,7 @@ environments:
     cache: hasp-cache
     memory: 2048
     cli-memory: 512
-    cli-timeout: 600 # 10 minutes
+    cli-timeout: 1800 # 30 minutes
     runtime: 'php-8.2:al2'
     build:
       - 'COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev'
