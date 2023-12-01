@@ -78,8 +78,7 @@
             "Domain\\": "domain/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Support\\": "support/",
-            "HalcyonAgile\\FilamentImport\\": "packages/filament-import/src/"
+            "Support\\": "support/"
         }
     },
     "autoload-dev": {
