@@ -27,7 +27,7 @@ class CustomerFactory extends Factory
         return [
             'tier_id' => TierFactory::new(),
             'cuid' => $this->faker->unique()->uuid(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => $this->faker->unique()->companyEmail(),
             'password' => $this->faker->password(),
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
