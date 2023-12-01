@@ -33,7 +33,7 @@ class ExportFinished extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->success()
             ->title('Export finished')
-            ->body('Your file [ '.$this->fileName.' ] is ready for download.')
+            ->body(trans('Your file [:filename] is ready for download.', ['filename' => $this->fileName]))
             ->icon('heroicon-o-download')
             ->actions([
                 Action::make('download')
@@ -47,19 +47,20 @@ class ExportFinished extends Notification implements ShouldQueue
     {
         return (new MailMessage())
             ->greeting('Export finished')
-            ->line('Your file [ '.$this->fileName.' ] is ready for download.')
+            ->line(trans('Your file [:filename] is ready for download.', ['filename' => $this->fileName]))
             ->action('Download', $this->downloadUrl());
     }
 
     protected function downloadUrl(): string
     {
         if (tenancy()->initialized) {
-            /** @var \Domain\Tenant\Models\Tenant */
+            /** @var \Domain\Tenant\Models\Tenant $tenant */
             $tenant = tenancy()->tenant;
 
-            URL::formatHostUsing(function () use ($tenant) {
-                return app()->environment('local') ? 'http://' : 'https://'.$tenant->domains->first()?->domain;
-            });
+            URL::formatHostUsing(
+                fn (): string => (parse_url(config('app.url'))['scheme'] ?? 'https').
+                '://'.$tenant->domains[0]?->domain
+            );
         }
 
         // return route('filament-excel.download-export', ['path' => $this->fileName]);
