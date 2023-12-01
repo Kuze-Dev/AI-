@@ -13,10 +13,10 @@ use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Validation\ValidationException;
 use Log;
 use Support\Common\Rules\MinimumValueRule;
-use Support\Excel\Actions\ImportAction;
 
 class ImportProductAction
 {

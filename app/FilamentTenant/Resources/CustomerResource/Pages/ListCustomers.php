@@ -16,10 +16,10 @@ use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 use Support\Excel\Actions\ExportAction;
-use Support\Excel\Actions\ImportAction;
 
 class ListCustomers extends ListRecords
 {
@@ -32,6 +32,9 @@ class ListCustomers extends ListRecords
             ImportAction::make()
                 ->model(Customer::class)
                 ->uniqueBy('email')
+                ->tags([
+                    'tenant:'.(tenant('id') ?? 'central'),
+                ])
                 ->processRowsUsing(
                     function (array $row): Customer {
                         $data = [

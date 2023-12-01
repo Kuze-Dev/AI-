@@ -8,6 +8,7 @@ use App\Console\Commands\CreateServiceBillCommand;
 use App\Console\Commands\InactivateServiceOrderCommand;
 use App\Console\Commands\NotifyCustomerServiceBillDueDateCommand;
 use Domain\Tenant\Models\Tenant;
+use HalcyonAgile\FilamentImport\Commands\PruneImportCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -45,6 +46,8 @@ class Kernel extends ConsoleKernel
             ->sentryMonitor();
 
         $schedule->command(PruneExcelCommand::class)
+            ->daily();
+        $schedule->command(PruneImportCommand::class)
             ->daily();
 
         $schedule->command(ClearResetsCommand::class, ['name' => 'customer'])

@@ -12,10 +12,10 @@ use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Support\Common\Rules\MinimumValueRule;
-use Support\Excel\Actions\ImportAction;
 
 class ImportProductBatchUpdateAction
 {
