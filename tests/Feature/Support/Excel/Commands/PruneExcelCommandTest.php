@@ -21,33 +21,8 @@ beforeEach(function () {
 
 dataset('expires_dataset', ['expired' => true, 'not expired' => false]);
 
-it('prune import', function (bool $expired) {
-    $importsDirectory = Str::finish(config('support.excel.temporary_files.base_directory'), '/imports/');
-
-    Storage::disk(config('support.excel.temporary_files.disk'))
-        ->put($importsDirectory.'test-import.csv', '');
-
-    $minutes = config('support.excel.import_expires_in_minute');
-
-    if ($expired) {
-        $minutes++;
-    }
-
-    travelTo(now()->addMinutes($minutes));
-
-    artisan(PruneExcelCommand::class)
-        ->assertSuccessful();
-
-    if ($expired) {
-        Storage::disk(config('support.excel.temporary_files.disk'))->assertDirectoryEmpty($importsDirectory);
-    } else {
-        Storage::disk(config('support.excel.temporary_files.disk'))->assertExists($importsDirectory.'test-import.csv');
-    }
-})
-    ->with('expires_dataset');
-
 it('prune export', function (bool $expired) {
-    $exportsDirectory = Str::finish(config('support.excel.temporary_files.base_directory'), '/imports/');
+    $exportsDirectory = Str::finish(config('support.excel.temporary_files.base_directory'), '/exports/');
 
     Storage::disk(config('support.excel.temporary_files.disk'))
         ->put($exportsDirectory.'test-export.csv', '');

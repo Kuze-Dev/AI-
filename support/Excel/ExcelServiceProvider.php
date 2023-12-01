@@ -16,9 +16,6 @@ class ExcelServiceProvider extends EventServiceProvider
         Events\ExportFinished::class => [
             Listeners\SendExportFinishedNotification::class,
         ],
-        Events\ImportFinished::class => [
-            Listeners\SendImportFinishedNotification::class,
-        ],
     ];
 
     public function register(): void

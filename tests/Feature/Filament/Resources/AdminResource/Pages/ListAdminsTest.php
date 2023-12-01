@@ -11,14 +11,14 @@ use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\ForceDeleteAction;
 use Filament\Pages\Actions\RestoreAction;
 use Filament\Tables\Filters\TrashedFilter;
+use HaclyonAgile\TallBoilerplate\Importer\DefaultImport;
+use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use STS\FilamentImpersonate\Impersonate;
 use Support\Excel\Actions\ExportAction;
 use Support\Excel\Actions\ExportBulkAction;
-use Support\Excel\Actions\ImportAction;
 use Support\Excel\Export\DefaultExport;
-use Support\Excel\Import\DefaultImport;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;

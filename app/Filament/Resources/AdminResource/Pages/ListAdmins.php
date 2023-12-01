@@ -13,12 +13,12 @@ use Domain\Role\Models\Role;
 use Exception;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\ValidationRules\Rules\Delimited;
 use Support\Excel\Actions\ExportAction;
-use Support\Excel\Actions\ImportAction;
 
 class ListAdmins extends ListRecords
 {
@@ -31,6 +31,9 @@ class ListAdmins extends ListRecords
             ImportAction::make()
                 ->model(Admin::class)
                 ->uniqueBy('email')
+                ->tags([
+                    'tenant:'.(tenant('id') ?? 'central'),
+                ])
                 ->processRowsUsing(
                     function (array $row): Admin {
                         $data = [
