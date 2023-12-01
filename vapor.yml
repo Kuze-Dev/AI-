@@ -42,6 +42,7 @@ environments:
       # - 'npm ci && npm run build && rm -rf node_modules'
     firewall:
       rate-limit: 1000
+    cli-timeout: 60*10 # 10 minutes
 ignore:
     - node_modules
     - public/storage
