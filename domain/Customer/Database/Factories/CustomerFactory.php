@@ -40,19 +40,19 @@ class CustomerFactory extends Factory
         ];
     }
 
-    public function configure(): self
-    {
-        return $this
-            ->afterCreating(function (Customer $customer) {
-                if ($customer->addresses->isEmpty()) {
-                    AddressFactory::new()
-                        ->for($customer)
-                        ->defaultShipping()
-                        ->defaultBilling()
-                        ->createOne();
-                }
-            });
-    }
+    //    public function configure(): self
+    //    {
+    //        return $this
+    //            ->afterCreating(function (Customer $customer) {
+    //                if ($customer->addresses->isEmpty()) {
+    //                    AddressFactory::new()
+    //                        ->for($customer)
+    //                        ->defaultShipping()
+    //                        ->defaultBilling()
+    //                        ->createOne();
+    //                }
+    //            });
+    //    }
 
     public function deleted(): self
     {
