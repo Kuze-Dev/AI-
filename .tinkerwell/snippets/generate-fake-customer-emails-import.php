@@ -7,3 +7,5 @@ foreach(range(1, 21_000) as $i) {
 
 ray()->clearAll();
 ray([$emails]); // wrap to array, to be copyable on ray app
+
+//tenancy()->initialize(\Domain\Tenant\Models\Tenant::where('name','Yantra Seeds')->first());\Domain\Customer\Database\Factories\CustomerFactory::new()->for(Domain\Tier\Models\Tier::first())->create(['email' => 'lloricode@gmail.com']);
