@@ -86,7 +86,9 @@ class ServiceOrderController
                 ['message' => trans('Service Bill not found')],
                 Response::HTTP_NOT_FOUND
             );
-        } catch (Exception) {
+        } catch (Exception $e) {
+            report($e);
+
             return response(
                 ['message' => trans('Something went wrong!')],
                 Response::HTTP_INTERNAL_SERVER_ERROR
