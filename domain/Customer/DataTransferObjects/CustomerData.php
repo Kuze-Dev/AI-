@@ -197,10 +197,6 @@ final class CustomerData
             return RegisterStatus::REGISTERED;
         }
 
-        if ($customer?->tier_approval_status === TierApprovalStatus::APPROVED) {
-            return RegisterStatus::REGISTERED;
-        }
-
         if ($tierApprovalStatus !== null) {
             if (
                 $tier?->has_approval &&
@@ -222,6 +218,10 @@ final class CustomerData
             $customer?->tier_approval_status == TierApprovalStatus::APPROVED &&
             $customer?->register_status == RegisterStatus::INVITED
         ) {
+            return RegisterStatus::REGISTERED;
+        }
+
+        if ($customer?->tier_approval_status === TierApprovalStatus::APPROVED) {
             return RegisterStatus::REGISTERED;
         }
 
