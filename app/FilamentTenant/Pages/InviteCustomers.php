@@ -27,11 +27,11 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
-use Support\Excel\Actions\ImportAction;
 
 class InviteCustomers extends Page implements HasTable
 {
@@ -167,12 +167,18 @@ class InviteCustomers extends Page implements HasTable
         ];
     }
 
+    /**
+     * @throws \Exception
+     */
     protected function getActions(): array
     {
         return [
             ImportAction::make()
                 ->model(Customer::class)
                 ->uniqueBy('email')
+                ->tags([
+                    'tenant:'.(tenant('id') ?? 'central'),
+                ])
                 ->processRowsUsing(
                     function (array $row): Customer {
                         $data = [
