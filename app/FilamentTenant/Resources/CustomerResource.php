@@ -208,9 +208,9 @@ class CustomerResource extends Resource
                         ->label(trans('Is Verified: '))
                         ->content(function ($record) {
                             if ($record?->hasVerifiedEmail()) {
-                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-green-500 text-white">Verified</span>');
+                                return new HtmlString('<span class="px-2 py-1 text-white bg-green-500 rounded-full">Verified</span>');
                             } else {
-                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-red-500 text-white">Unverified</span>');
+                                return new HtmlString('<span class="px-2 py-1 text-white bg-red-500 rounded-full">Unverified</span>');
                             }
                         }),
                 ])
@@ -306,6 +306,7 @@ class CustomerResource extends Resource
                     ->default(RegisterStatus::REGISTERED->value)
                     ->options([
                         'Registered' => ucfirst(RegisterStatus::REGISTERED->value),
+                        'Unregistered' => ucfirst(RegisterStatus::UNREGISTERED->value),
                     ]),
             ])
             ->actions([
