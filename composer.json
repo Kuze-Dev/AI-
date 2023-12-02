@@ -57,7 +57,6 @@
         "barryvdh/laravel-ide-helper": "^2.12",
         "beyondcode/helo-laravel": "^1.6",
         "canvural/larastan-strict-rules": "^2.1",
-        "drfraker/snipe-migrations": "^1.4",
         "laravel/pint": "^1.2",
         "laravel/sail": "^1.18",
         "nunomaduro/collision": "^7.2",
