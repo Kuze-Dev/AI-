@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Fixtures\User;
@@ -43,17 +42,12 @@ uses(
             app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
 
-        config()->set(
-            'tenancy.database.prefix',
-            ($token = ParallelTesting::token())
-                ? "test_{$token}_"
-                : 'test_'
-        );
-        config()->set('tenancy.database.template_tenant_connection', 'sqlite');
     })
     ->afterEach(function () {
-        tenancy()->end();
-        Tenant::all()->each->delete();
+        if (tenancy()->initialized) {
+            tenancy()->end();
+            Tenant::all()->each->delete();
+        }
     })
     ->in('Feature');
 
@@ -80,16 +74,11 @@ uses(
 
         Relation::morphMap(['test_user' => User::class]);
 
-        config()->set(
-            'tenancy.database.prefix',
-            ($token = ParallelTesting::token())
-                ? "test_{$token}_"
-                : 'test_'
-        );
-        config()->set('tenancy.database.template_tenant_connection', 'sqlite');
     })
     ->afterEach(function () {
-        tenancy()->end();
-        Tenant::all()->each->delete();
+        if (tenancy()->initialized) {
+            tenancy()->end();
+            Tenant::all()->each->delete();
+        }
     })
     ->in('Unit');

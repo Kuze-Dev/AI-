@@ -12,6 +12,7 @@ use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -66,6 +67,13 @@ function assertActivityLogged(
 
 function testInTenantContext(): Tenant
 {
+    config([
+        'tenancy.database.template_tenant_connection' => 'sqlite',
+        'tenancy.database.prefix' => ($token = ParallelTesting::token())
+            ? "test_{$token}_"
+            : 'test_',
+    ]);
+
     /** @var Tenant */
     $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
 
