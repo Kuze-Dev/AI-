@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Fixtures\User;
@@ -41,6 +42,12 @@ uses(
             }
             app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
+        config([
+            'tenancy.database.template_tenant_connection' => 'sqlite',
+            'tenancy.database.prefix' => ($token = ParallelTesting::token())
+                ? "test_{$token}_"
+                : 'test_',
+        ]);
 
     })
     ->afterEach(function () {
@@ -73,6 +80,12 @@ uses(
         });
 
         Relation::morphMap(['test_user' => User::class]);
+        config([
+            'tenancy.database.template_tenant_connection' => 'sqlite',
+            'tenancy.database.prefix' => ($token = ParallelTesting::token())
+                ? "test_{$token}_"
+                : 'test_',
+        ]);
 
     })
     ->afterEach(function () {
