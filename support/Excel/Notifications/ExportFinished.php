@@ -11,6 +11,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 
 class ExportFinished extends Notification implements ShouldQueue
@@ -58,8 +59,7 @@ class ExportFinished extends Notification implements ShouldQueue
             $tenant = tenancy()->tenant;
 
             URL::formatHostUsing(
-                fn (): string => (parse_url(config('app.url'))['scheme'] ?? 'https').
-                '://'.$tenant->domains[0]?->domain
+                fn (): string => Request::getScheme().'://'.$tenant->domains[0]?->domain
             );
         }
 
