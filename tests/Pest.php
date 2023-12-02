@@ -51,10 +51,10 @@ uses(
         ]);
     })
     ->afterEach(function () {
-        if (tenancy()->initialized) {
-            tenancy()->end();
-            Tenant::all()->each->delete();
-        }
+        //        if (tenancy()->initialized) {
+        tenancy()->end();
+        Tenant::all()->each->delete();
+        //        }
     })
     ->in('Feature');
 
@@ -89,9 +89,9 @@ uses(
         ]);
     })
     ->afterEach(function () {
-        if (tenancy()->initialized) {
-            tenancy()->end();
-            Tenant::all()->each->delete();
-        }
+        //        if (tenancy()->initialized) {
+        tenancy()->end();
+        Tenant::all()->each->delete();
+        //        }
     })
     ->in('Unit');
