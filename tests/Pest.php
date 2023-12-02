@@ -42,13 +42,13 @@ uses(
             }
             app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
+
         config([
             'tenancy.database.template_tenant_connection' => 'sqlite',
             'tenancy.database.prefix' => ($token = ParallelTesting::token())
                 ? "test_{$token}_"
                 : 'test_',
         ]);
-
     })
     ->afterEach(function () {
         if (tenancy()->initialized) {
@@ -80,13 +80,13 @@ uses(
         });
 
         Relation::morphMap(['test_user' => User::class]);
+
         config([
             'tenancy.database.template_tenant_connection' => 'sqlite',
             'tenancy.database.prefix' => ($token = ParallelTesting::token())
                 ? "test_{$token}_"
                 : 'test_',
         ]);
-
     })
     ->afterEach(function () {
         if (tenancy()->initialized) {
