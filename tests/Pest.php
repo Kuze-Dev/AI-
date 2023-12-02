@@ -22,7 +22,8 @@ use function Pest\Laravel\seed;
 uses(
     Illuminate\Foundation\Testing\TestCase::class,
     Tests\CreatesApplication::class,
-    Illuminate\Foundation\Testing\LazilyRefreshDatabase::class
+    Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
+    Drfraker\SnipeMigrations\SnipeMigrations::class,
 )
     ->beforeEach(function () {
         Http::preventStrayRequests();
@@ -60,6 +61,7 @@ uses(
     Illuminate\Foundation\Testing\TestCase::class,
     Tests\CreatesApplication::class,
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
+    Drfraker\SnipeMigrations\SnipeMigrations::class,
 )
     ->beforeEach(function () {
         Http::preventStrayRequests();
