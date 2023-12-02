@@ -5,6 +5,7 @@ name: Tests
 on:
   push:
     branches:
+      - master
       - main
       - develop
   #      - '*.x'
