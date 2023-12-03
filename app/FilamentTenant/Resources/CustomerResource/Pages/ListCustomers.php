@@ -29,62 +29,62 @@ class ListCustomers extends ListRecords
     protected function getActions(): array
     {
         return [
-            ImportAction::make()
-                ->model(Customer::class)
-                ->uniqueBy('email')
-                ->tags([
-                    'tenant:'.(tenant('id') ?? 'central'),
-                ])
-                ->processRowsUsing(
-                    function (array $row): Customer {
-                        $data = [
-                            'email' => $row['email'],
-                            'first_name' => $row['first_name'] ?? '',
-                            'last_name' => $row['last_name'] ?? '',
-                            'mobile' => $row['mobile'] ? (string) $row['mobile'] : null,
-                            'gender' => $row['gender'] ?? null,
-                            'status' => $row['status'] ?? null,
-                            'birth_date' => $row['birth_date'] ?? '',
-                            'tier_id' => isset($row['tier'])
-                                ? (Tier::whereName($row['tier'])->first()?->getKey())
-                                : null,
-                        ];
+            // ImportAction::make()
+            //     ->model(Customer::class)
+            //     ->uniqueBy('email')
+            //     ->tags([
+            //         'tenant:'.(tenant('id') ?? 'central'),
+            //     ])
+            //     ->processRowsUsing(
+            //         function (array $row): Customer {
+            //             $data = [
+            //                 'email' => $row['email'],
+            //                 'first_name' => $row['first_name'] ?? '',
+            //                 'last_name' => $row['last_name'] ?? '',
+            //                 'mobile' => $row['mobile'] ? (string) $row['mobile'] : null,
+            //                 'gender' => $row['gender'] ?? null,
+            //                 'status' => $row['status'] ?? null,
+            //                 'birth_date' => $row['birth_date'] ?? '',
+            //                 'tier_id' => isset($row['tier'])
+            //                     ? (Tier::whereName($row['tier'])->first()?->getKey())
+            //                     : null,
+            //             ];
 
-                        unset($row);
+            //             unset($row);
 
-                        $customer = Customer::whereEmail($data['email'])->first();
+            //             $customer = Customer::whereEmail($data['email'])->first();
 
-                        if ($customer?->register_status === RegisterStatus::REGISTERED) {
-                            $data['password'] = $customer->password;
+            //             if ($customer?->register_status === RegisterStatus::REGISTERED) {
+            //                 $data['password'] = $customer->password;
 
-                            return app(EditCustomerAction::class)
-                                ->execute($customer, CustomerData::fromArrayRegisteredImportByAdmin($data));
-                        }
+            //                 return app(EditCustomerAction::class)
+            //                     ->execute($customer, CustomerData::fromArrayRegisteredImportByAdmin($data));
+            //             }
 
-                        return app(CreateCustomerAction::class)
-                            ->execute(CustomerData::fromArrayRegisteredImportByAdmin($data));
+            //             return app(CreateCustomerAction::class)
+            //                 ->execute(CustomerData::fromArrayRegisteredImportByAdmin($data));
 
-                    }
-                )
-                ->withValidation(
-                    rules: [
-                        'email' => [
-                            'required',
-                            Rule::email(),
-                            'distinct',
-                        ],
-                        'first_name' => 'required|string|min:3|max:100',
-                        'last_name' => 'required|string|min:3|max:100',
-                        'mobile' => 'nullable|min:3|max:100',
-                        'gender' => ['nullable', Rule::enum(Gender::class)],
-                        'status' => ['nullable', Rule::enum(Status::class)],
-                        'birth_date' => 'nullable|date',
-                        'tier' => [
-                            'nullable',
-                            Rule::exists(Tier::class, 'name'),
-                        ],
-                    ],
-                ),
+            //         }
+            //     )
+            //     ->withValidation(
+            //         rules: [
+            //             'email' => [
+            //                 'required',
+            //                 Rule::email(),
+            //                 'distinct',
+            //             ],
+            //             'first_name' => 'required|string|min:3|max:100',
+            //             'last_name' => 'required|string|min:3|max:100',
+            //             'mobile' => 'nullable|min:3|max:100',
+            //             'gender' => ['nullable', Rule::enum(Gender::class)],
+            //             'status' => ['nullable', Rule::enum(Status::class)],
+            //             'birth_date' => 'nullable|date',
+            //             'tier' => [
+            //                 'nullable',
+            //                 Rule::exists(Tier::class, 'name'),
+            //             ],
+            //         ],
+            //     ),
             ExportAction::make()
                 ->model(Customer::class)
                 ->queue()

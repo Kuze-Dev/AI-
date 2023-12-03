@@ -221,6 +221,10 @@ final class CustomerData
             return RegisterStatus::REGISTERED;
         }
 
+        if ($customer?->tier_approval_status === TierApprovalStatus::APPROVED) {
+            return RegisterStatus::REGISTERED;
+        }
+
         return RegisterStatus::UNREGISTERED;
     }
 
