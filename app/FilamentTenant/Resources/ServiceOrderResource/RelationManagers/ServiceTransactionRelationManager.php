@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers;
 
-use App\Settings\SiteSettings;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Domain\ServiceOrder\Actions\GenerateServiceTransactionReceiptAction;
 use Domain\ServiceOrder\Models\ServiceTransaction;
 use Exception;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Str;
 
 class ServiceTransactionRelationManager extends RelationManager
 {
@@ -64,44 +63,17 @@ class ServiceTransactionRelationManager extends RelationManager
                     ->action(
                         function (ServiceTransaction $record, Tables\Actions\Action $action) {
                             try {
-                                /** @var \Illuminate\Support\Carbon $createdAt */
-                                $createdAt = $record->created_at;
-
-                                /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
-                                $serviceOrder = $record->serviceOrder;
-
-                                /** @var \Domain\Customer\Models\Customer $customer */
-                                $customer = $serviceOrder->customer;
-
-                                /** @var string $filename */
-                                $filename = $record->getKey().'-'.
-                                    $serviceOrder->getKey().
-                                    $customer->getKey().DIRECTORY_SEPARATOR.
-                                    Str::snake(app(SiteSettings::class)->name).'_'.
-                                    $createdAt->format('m_Y').
-                                    '.pdf';
-
-                                $disk = config('domain.service-order.disks.receipt-files.driver');
-
-                                Pdf::loadView(
-                                    'web.layouts.service-order.receipts.default',
-                                    ['transaction' => $record]
-                                )
-                                    ->save($filename, $disk);
-
-                                $customer->addMediaFromDisk($filename, $disk)
-                                    ->toMediaCollection('receipts');
-
-                                $action->successNotificationTitle(trans('Success'))
-                                    ->success();
-
-                                /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media $pdf */
-                                $pdf = $customer->getMedia('receipts')
-                                    ->sortByDesc('id')
-                                    ->first();
+                                $pdf = app(GenerateServiceTransactionReceiptAction::class)
+                                    ->execute($record);
 
                                 Redirect::away($pdf->original_url);
 
+                            } catch (ModelNotFoundException $m) {
+                                $action
+                                    ->failureNotificationTitle(trans('Unable to generate receipt'))
+                                    ->failure();
+
+                                report($m);
                             } catch (Exception $e) {
                                 $action
                                     ->failureNotificationTitle(trans('Something went wrong!'))

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
@@ -250,7 +251,11 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
-            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
+            ->registerMediaConversions(function () {
+                $this->addMediaConversion('original');
+                $this->addMediaConversion('preview')
+                    ->fit(Manipulations::FIT_CROP, 300, 300);
+            });
 
         $this->addMediaCollection('video')
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));

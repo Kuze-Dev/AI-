@@ -12,6 +12,14 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 
 class UpdateServiceOrderStatusAction
 {
+    public function execute(ServiceOrder $serviceOrder, UpdateServiceOrderStatusData $updateServiceOrderStatusData): ServiceOrder
+    {
+        $serviceOrder->update([
+            'status' => $updateServiceOrderStatusData->status]);
+
+        return $serviceOrder;
+    }
+
     private function validateServiceOrder(string $referenceId): ServiceOrder
     {
         $serviceOrder = ServiceOrder::whereReference($referenceId)->first();
@@ -38,9 +46,7 @@ class UpdateServiceOrderStatusAction
             throw new ServiceOrderNotYetPaidException('Service order not yet paid!');
         }
 
-        $serviceOrder->update([
-            'status' => $updateServiceOrderData->status,
-        ]);
+        $serviceOrder = $this->execute($serviceOrder, $updateServiceOrderData);
 
         return $serviceOrder;
     }
@@ -57,9 +63,7 @@ class UpdateServiceOrderStatusAction
             throw new ServiceOrderNotFoundException('Service Order not found!');
         }
 
-        $serviceOrder->update([
-            'status' => $updateServiceOrderData->status,
-        ]);
+        $serviceOrder = $this->execute($serviceOrder, $updateServiceOrderData);
 
         return $serviceOrder;
     }

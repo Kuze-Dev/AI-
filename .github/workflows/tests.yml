@@ -5,6 +5,7 @@ name: Tests
 on:
   push:
     branches:
+      - master
       - main
       - develop
   #      - '*.x'
@@ -50,7 +51,7 @@ jobs:
 
       - name: Execute tests
         #        run: vendor/bin/pest --ci --parallel --coverage-clover coverage.xml
-        run: vendor/bin/pest --ci --parallel --profile --processes=10
+        run: vendor/bin/pest --ci --parallel
 
 #      - name: Upload coverage reports to Codecov
 #        uses: codecov/codecov-action@v3

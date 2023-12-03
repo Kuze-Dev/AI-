@@ -31,6 +31,7 @@ beforeEach(function () {
     $tenant->features()->activate(TierBase::class);
 
     $this->customer = CustomerFactory::new()
+        ->hasAddress()
         ->createOne();
 
     Sanctum::actingAs($this->customer);

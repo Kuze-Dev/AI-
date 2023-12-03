@@ -58,7 +58,8 @@ it('can create cart lines with product_variant as purchasable', function () {
             'minimum_order_quantity' => 1,
         ]);
 
-    $productVariant = ProductVariantFactory::new()->setProductId($product->id)
+    $productVariant = ProductVariantFactory::new()
+        ->for($product)
         ->createOne();
 
     $payload = [

@@ -13,6 +13,8 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 /**
  * @template TModelClass of \Illuminate\Database\Eloquent\Model
+ *
+ * @phpstan-ignore-next-line
  */
 class DefaultExport implements FromQuery, WithCustomChunkSize, WithHeadings, WithMapping
 {
@@ -60,5 +62,12 @@ class DefaultExport implements FromQuery, WithCustomChunkSize, WithHeadings, Wit
     public function chunkSize(): int
     {
         return $this->chunkSize;
+    }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
+        ];
     }
 }

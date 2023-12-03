@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- * @property-read int $id
  * @property-read \Illuminate\Database\Eloquent\Collection|\Support\RouteUrl\Models\RouteUrl[] $routeUrls
  * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read ContentEntry|Page|null $pageDraft

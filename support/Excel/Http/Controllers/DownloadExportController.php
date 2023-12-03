@@ -18,7 +18,7 @@ class DownloadExportController
             abort(404);
         }
 
-        dispatch(fn () => Storage::disk(config('support.excel.temporary_files.disk'))->delete($path))->afterResponse();
+        // dispatch(fn () => Storage::disk(config('support.excel.temporary_files.disk'))->delete($path))->afterResponse();
 
         return Storage::disk(config('support.excel.temporary_files.disk'))->download($path);
     }

@@ -30,6 +30,12 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 class EventServiceProvider extends ServiceProvider
 {
     /**
+     * @var array<class-string<\Illuminate\Database\Eloquent\Model>, array<int, class-string>>
+     */
+    protected $observers = [
+    ];
+
+    /**
      * The event to listener mappings for the application.
      *
      * @var array<class-string, array<int, class-string>>

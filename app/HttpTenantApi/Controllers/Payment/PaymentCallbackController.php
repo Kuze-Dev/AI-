@@ -15,6 +15,7 @@ use Domain\Payments\DataTransferObjects\CreatepaymentData;
 use Domain\Payments\DataTransferObjects\PaymentDetailsData;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Models\Payment;
+use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Get;
@@ -47,6 +48,12 @@ class PaymentCallbackController
 
             $baseUrl = app(ECommerceSettings::class)->domainWithScheme()
                     ?? app(SiteSettings::class)->domainWithScheme();
+
+            if ($payableModel instanceof ServiceBill) {
+                return redirect()->away(
+                    $baseUrl.'/services/payment'.'/'.$status.'?ServiceOrder='.$payableModel->serviceOrder?->reference.'&ServiceBill='.$payableModel->getReferenceNumber()
+                );
+            }
 
             return redirect()->away(
                 $baseUrl.'/checkout'.'/'.$status.'?reference='.$payableModel->getReferenceNumber()
