@@ -182,7 +182,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['default'],//App\Jobs\QueueJobPriority::PRIORITIES,
+            'queue' => \App\Jobs\QueueJobPriority::PRIORITIES,
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,
@@ -216,6 +216,7 @@ return [
             'supervisor-1' => [
                 'maxProcesses' => 3,
                 'tries' => 1,
+                'timeout' => 60*60,
             ],
         ],
     ],
