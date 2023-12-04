@@ -5,7 +5,8 @@ use Domain\Tenant\Models\Tenant;
 use Domain\Tier\Models\Tier;
 
 tenancy()->initialize(
-    Tenant::where('name', 'Yantra Seeds')->first()
+//    Tenant::where('name', 'xxxxxxxxxxxxxxxxx')->first()
+    Tenant::first()
 );
 
 CustomerFactory::new()
