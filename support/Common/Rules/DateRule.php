@@ -19,8 +19,8 @@ class DateRule implements ValidationRule
 
             return;
         }
-
-        $dateTimeObject = Date::excelToDateTimeObject($value);
+        $excelTimestamp = (float) $value;
+        $dateTimeObject = Date::excelToDateTimeObject($excelTimestamp);
         $currentDate = Carbon::now();
 
         if ($dateTimeObject > $currentDate) {
