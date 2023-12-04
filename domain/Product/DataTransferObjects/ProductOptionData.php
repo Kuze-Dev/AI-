@@ -11,6 +11,7 @@ class ProductOptionData
         public readonly string $name,
         public readonly string $slug,
         public array $productOptionValues,
+        public bool $is_custom = false,
     ) {
     }
 
@@ -24,6 +25,7 @@ class ProductOptionData
                 fn ($optionValue) => (ProductOptionValueData::fromArray($optionValue)),
                 $data['productOptionValues']
             ),
+            is_custom: $data['is_custom'],
         );
     }
 
@@ -34,6 +36,7 @@ class ProductOptionData
             name: $data->name,
             slug: $data->slug,
             productOptionValues: $data->productOptionValues,
+            is_custom: $data->is_custom,
         );
     }
 
@@ -44,6 +47,7 @@ class ProductOptionData
             name: $data->name,
             slug: $data->slug,
             productOptionValues: $productOptionValues,
+            is_custom: $data->is_custom,
         );
     }
 }

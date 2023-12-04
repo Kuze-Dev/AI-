@@ -84,6 +84,29 @@ return [
                 'log',
             ],
         ],
+
+        'helo-homestead' => [
+            // https://usehelo.com/
+            'transport' => 'smtp',
+            'host' => '10.0.2.2',
+            'port' =>  2525,
+            'encryption' =>  null,
+            'username' => env('APP_NAME'),
+            'password' => 'MAIL_PASSWORD',
+            'timeout' => null,
+            'local_domain' => 'MAIL_EHLO_DOMAIN',
+        ],
+        'helo-sail' => [
+            // https://usehelo.com/
+            'transport' => 'smtp',
+            'host' => 'host.docker.internal',
+            'port' =>  2525,
+            'encryption' =>  null,
+            'username' => env('APP_NAME'),
+            'password' => 'MAIL_PASSWORD',
+            'timeout' => null,
+            'local_domain' => 'MAIL_EHLO_DOMAIN',
+        ],
     ],
 
     /*

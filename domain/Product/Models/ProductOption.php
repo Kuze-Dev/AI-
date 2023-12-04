@@ -46,13 +46,20 @@ class ProductOption extends Model
     protected $fillable = [
         'name',
         'product_id',
+        'is_custom',
+    ];
+
+    protected $with = [
+        'productOptionValues',
     ];
 
     /**
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [];
+    protected $casts = [
+        'is_custom' => 'boolean',
+    ];
 
     public function getRouteKeyName(): string
     {

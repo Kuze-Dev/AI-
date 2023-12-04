@@ -58,6 +58,7 @@ class ProductOptionFormAction extends Action
             }
 
             $oldData = data_get($livewire, $activeProductOptionStatePath) ?? [];
+
             data_set($livewire, $activeProductOptionStatePath, array_merge($oldData, $data));
             data_set($livewire, 'data.product_options', array_merge($oldData, $data));
             data_set($livewire, 'data.product_variants', $updatedVariants);
@@ -70,19 +71,20 @@ class ProductOptionFormAction extends Action
         $optionsCollection = collect($options);
 
         $optionsCollection = $optionsCollection->map(function ($option) {
-            $option['id'] ??= uniqid();
-            $option['slug'] ??= $option['name'];
+            $option['id'] = uniqid();
+            $option['slug'] = $option['name'];
 
             $productOptionValues = $option['productOptionValues'];
 
             /** @var array<int, array> $productOptionValues */
             $option['productOptionValues'] = collect($productOptionValues)->map(function ($value) use ($option) {
-                $value['id'] ??= uniqid();
-                $value['slug'] ??= $value['name'];
-                $value['product_option_id'] ??= $option['id'];
+                $value['id'] = uniqid();
+                $value['slug'] = $value['name'];
+                $value['product_option_id'] = $option['id'];
+                $value['icon_type'] = $value['icon_type'];
 
                 return $value;
-            });
+            })->toArray();
 
             return $option;
         });

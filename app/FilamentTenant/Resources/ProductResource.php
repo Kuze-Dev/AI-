@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\Features\ECommerce\AllowGuestOrder;
+use App\Features\ECommerce\ColorPallete;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
@@ -31,8 +32,10 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Throwable;
 
 class ProductResource extends Resource
 {
@@ -108,7 +111,7 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->rules([
-                                    new MinimumValueRule(0.1),
+                                    new MinimumValueRule(0.01),
                                 ])
                                 ->dehydrateStateUsing(fn ($state) => (float) $state),
 
@@ -231,6 +234,7 @@ class ProductResource extends Resource
                                 ->label(
                                     fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 )
+                                ->reactive()
                                 ->helperText('This product will be hidden from all sales channels.'),
                             Forms\Components\Toggle::make('allow_guest_purchase')
                                 ->helperText('Item can be purchased by guests.')
@@ -388,7 +392,9 @@ class ProductResource extends Resource
                 ->schema([
                     Forms\Components\Repeater::make('options')
                         ->translateLabel()
-                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire) {
+                        ->reactive()
+                        ->itemLabel(fn (array $state): ?string => $state['name'])
+                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire, Closure $get) {
                             if (! $record) {
                                 return $state;
                             }
@@ -400,13 +406,28 @@ class ProductResource extends Resource
                                 return;
                             }
 
-                            $record->productOptions->load('productOptionValues');
+                            $record->productOptions->load('productOptionValues.media');
                             $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
+                                $mappedOptionValues = $productOption->productOptionValues->map(function ($optionValue) {
+                                    $optionValueImages = $optionValue->media->map(fn ($medium) => $medium['uuid'])->toArray();
+
+                                    return [
+                                        'id' => $optionValue->id,
+                                        'slug' => $optionValue->slug,
+                                        'name' => $optionValue->name,
+                                        'icon_type' => $optionValue->data['icon_type'] ?? 'colored',
+                                        'icon_value' => $optionValue->data['icon_value'] ?? '',
+                                        'images' => $optionValueImages,
+                                        'product_option_id' => $optionValue->product_option_id,
+                                    ];
+                                })->toArray();
+
                                 return [
                                     'id' => $productOption->id,
+                                    'is_custom' => $productOption->is_custom,
                                     'name' => $productOption->name,
                                     'slug' => $productOption->slug,
-                                    'productOptionValues' => $productOption->productOptionValues,
+                                    'productOptionValues' => $mappedOptionValues,
                                 ];
                             });
                             $component->state($mappedOptions->toArray());
@@ -416,15 +437,83 @@ class ProductResource extends Resource
                                 ->translateLabel()
                                 ->maxLength(100)
                                 ->required(),
+                            Forms\Components\Toggle::make('is_custom')
+                                ->label(
+                                    fn ($state) => $state ? ucfirst(trans('Custom')) : ucfirst(trans('Regular'))
+                                )
+                                ->hidden(
+                                    function (Closure $get) {
+                                        if (! is_null($get('id'))) {
+                                            return $get('../*')[0]['id'] !== $get('id');
+                                        } else {
+                                            return count($get('../*')) === 1 ? false : true;
+                                        }
+                                    }
+                                )
+                                ->extraAttributes(['class' => 'mt-2 mb-1'])
+                                ->default(false)
+                                ->helperText('Identify whether the option value in the form has customization.')
+                                ->reactive(),
                             Forms\Components\Repeater::make('productOptionValues')
                                 ->translateLabel()
+                                ->columnSpan(2)
+                                ->collapsible()
+                                ->itemLabel(fn (array $state): ?string => $state['name'])
                                 ->schema([
-                                    Forms\Components\TextInput::make('name')
-                                        ->translateLabel()
-                                        ->maxLength(100)
-                                        ->label('')
-                                        ->lazy()
-                                        ->required(),
+                                    Forms\Components\Group::make()
+                                        ->schema(
+                                            [
+                                                Forms\Components\TextInput::make('name')
+                                                    ->translateLabel()
+                                                    ->maxLength(100)
+                                                    ->lazy()
+                                                    ->columnSpan(
+                                                        fn (Closure $get) => $get('../../is_custom') ? 1 : 2
+                                                    )
+                                                    ->required(),
+                                                Forms\Components\Select::make('icon_type')
+                                                    ->default('text')
+                                                    ->required()
+                                                    ->options(fn () => tenancy()->tenant?->features()->active(ColorPallete::class) ? [
+                                                        'text' => 'Text',
+                                                        'color_palette' => 'Color Palette',
+                                                    ] : [
+                                                        'text' => 'Text',
+                                                    ])
+                                                    ->hidden(fn (Closure $get) => ! $get('../../is_custom'))
+                                                    ->reactive(),
+                                            ]
+                                        )->columns(2),
+                                    Forms\Components\ColorPicker::make('icon_value')
+                                        ->label(trans('Icon Value (HEX)'))
+                                        ->hidden(fn (Closure $get) => ! ($get('icon_type') === 'color_palette' && $get('../../is_custom'))),
+                                    Forms\Components\FileUpload::make('images')
+                                        ->label(trans('Images (Preview Slides)'))
+                                        ->image()
+                                        ->mediaLibraryCollection('media')
+                                        ->multiple()
+                                        ->hidden(
+                                            fn (Closure $get) => isset($get('../../../*')[1])
+                                                && isset($get('../../../*')[1]['id'])
+                                                && $get('../../../*')[1]['id'] === $get('../../id')
+                                        )
+                                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                            $mediaClass = config('media-library.media_model', Media::class);
+
+                                            /** @var ?Media $media */
+                                            $media = $mediaClass::findByUuid($file);
+
+                                            if ($component->getVisibility() === 'private') {
+                                                try {
+                                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                                } catch (Throwable $exception) {
+                                                    // This driver does not support creating temporary URLs.
+                                                }
+                                            }
+
+                                            return $media?->getUrl();
+                                        }),
+
                                 ])
                                 ->minItems(1)
                                 ->disableItemMovement(),

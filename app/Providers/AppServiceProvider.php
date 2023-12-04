@@ -39,6 +39,7 @@ use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Models\Payment;
 use Domain\Payments\Models\PaymentRefund;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 use Domain\Review\Models\Review;
 use Domain\Service\Models\Service;
@@ -146,6 +147,7 @@ class AppServiceProvider extends ServiceProvider
             ServiceOrder::class,
             ServiceBill::class,
             TenantApiCall::class,
+            ProductOptionValue::class,
             ServiceTransaction::class,
         ]);
 
@@ -164,9 +166,9 @@ class AppServiceProvider extends ServiceProvider
 
         Rule::macro(
             'email',
-            fn (): string => app()->environment('local', 'testing')
-                ? 'email'
-                : 'email:rfc,dns'
+            fn (): string => app()->isProduction()
+                ? 'email:rfc,dns'
+                : 'email'
         );
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());

@@ -11,6 +11,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 
 class ExportFinished extends Notification implements ShouldQueue
@@ -33,7 +34,7 @@ class ExportFinished extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->success()
             ->title('Export finished')
-            ->body('Your file [ '.$this->fileName.' ] is ready for download.')
+            ->body(trans('Your file [:filename] is ready for download.', ['filename' => $this->fileName]))
             ->icon('heroicon-o-download')
             ->actions([
                 Action::make('download')
@@ -47,19 +48,19 @@ class ExportFinished extends Notification implements ShouldQueue
     {
         return (new MailMessage())
             ->greeting('Export finished')
-            ->line('Your file [ '.$this->fileName.' ] is ready for download.')
+            ->line(trans('Your file [:filename] is ready for download.', ['filename' => $this->fileName]))
             ->action('Download', $this->downloadUrl());
     }
 
     protected function downloadUrl(): string
     {
         if (tenancy()->initialized) {
-            /** @var \Domain\Tenant\Models\Tenant */
+            /** @var \Domain\Tenant\Models\Tenant $tenant */
             $tenant = tenancy()->tenant;
 
-            URL::formatHostUsing(function () use ($tenant) {
-                return app()->environment('local') ? 'http://' : 'https://'.$tenant->domains->first()?->domain;
-            });
+            URL::formatHostUsing(
+                fn (): string => Request::getScheme().'://'.$tenant->domains[0]?->domain
+            );
         }
 
         // return route('filament-excel.download-export', ['path' => $this->fileName]);
@@ -68,5 +69,12 @@ class ExportFinished extends Notification implements ShouldQueue
             now()->minutes(config('support.excel.export_expires_in_minute')),
             ['path' => $this->fileName]
         );
+    }
+
+    public function tags(): array
+    {
+        return [
+            'tenant:'.(tenant('id') ?? 'central'),
+        ];
     }
 }

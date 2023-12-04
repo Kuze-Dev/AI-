@@ -19,7 +19,9 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions as PageActions;
+use Filament\Pages\Page;
 use Filament\Support\Actions as SupportActions;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +31,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Saade\FilamentLaravelLog\Pages\ViewLog;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -109,6 +112,13 @@ class FilamentServiceProvider extends ServiceProvider
         $this->registerMacros();
 
         $this->configureComponents();
+
+        Page::$reportValidationErrorUsing = function (ValidationException $exception) {
+            Notification::make()
+                ->title($exception->getMessage())
+                ->danger()
+                ->send();
+        };
     }
 
     protected function registerRoutes(): void

@@ -20,8 +20,6 @@ class PruneExcelCommand extends Command
     {
         $this->prune('exports/', now()->subMinutes(config('support.excel.export_expires_in_minute')));
 
-        $this->prune('imports/', now()->subMinutes(config('support.excel.import_expires_in_minute')));
-
         return self::SUCCESS;
     }
 

@@ -66,6 +66,7 @@ function assertActivityLogged(
 
 function testInTenantContext(): Tenant
 {
+
     /** @var Tenant */
     $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
 

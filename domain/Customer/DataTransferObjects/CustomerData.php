@@ -129,8 +129,8 @@ final class CustomerData
             email: $data['email'],
             password: $data['password'] ?? null,
             image: $data['image'] ?? null,
-            tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::from($data['register_status']),
+            tier_approval_status: TierApprovalStatus::APPROVED,
         );
     }
 
@@ -151,8 +151,8 @@ final class CustomerData
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
             image: $data['image'],
-            tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
             register_status: $registerStatus,
+            tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
         );
     }
 
@@ -178,11 +178,11 @@ final class CustomerData
             last_name: $data['last_name'],
             mobile: $data['mobile'] ?? null,
             gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
-            password: $data['password'],
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
             status: isset($data['status']) ? Status::from($data['status']) : null,
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
+            password: $data['password'],
             register_status: RegisterStatus::REGISTERED,
         );
     }
@@ -218,6 +218,10 @@ final class CustomerData
             $customer?->tier_approval_status == TierApprovalStatus::APPROVED &&
             $customer?->register_status == RegisterStatus::INVITED
         ) {
+            return RegisterStatus::REGISTERED;
+        }
+
+        if ($customer?->tier_approval_status === TierApprovalStatus::APPROVED) {
             return RegisterStatus::REGISTERED;
         }
 

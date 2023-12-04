@@ -20,11 +20,8 @@ beforeEach(function () {
         ->createOne([
             'status' => true,
             'minimum_order_quantity' => 1,
+            'allow_customer_remarks' => true,
         ]);
-
-    $product->update([
-        'allow_customer_remarks' => true,
-    ]);
 
     $customer = CustomerFactory::new()
         ->createOne();
@@ -49,7 +46,7 @@ it('can add to cart a purchasable product', function () {
 });
 
 it('can add to cart a purchasable product with variant', function () {
-    $productVariant = ProductVariantFactory::new()->setProductId($this->product->id)
+    $productVariant = ProductVariantFactory::new()->for($this->product)
         ->createOne();
 
     postJson('api/carts/cartlines', [
@@ -63,7 +60,8 @@ it('can add to cart a purchasable product with variant', function () {
 });
 
 it('can add to cart a purchasable product with remarks', function () {
-    $productVariant = ProductVariantFactory::new()->setProductId($this->product->id)
+    $productVariant = ProductVariantFactory::new()
+        ->for($this->product)
         ->createOne();
 
     postJson('api/carts/cartlines', [

@@ -12,6 +12,7 @@ use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
@@ -63,6 +64,18 @@ class CreateOrderLineAction
                 $product = $cartLine->purchasable->product;
 
                 $name = $product->name;
+
+                $newCombination = $cartLine->purchasable->combination;
+
+                foreach ($newCombination as &$combinationData) {
+                    /** @var \Domain\Product\Models\ProductOptionValue $productOptionValue */
+                    $productOptionValue = ProductOptionValue::with('media')
+                        ->where('id', $combinationData['option_value_id'])->first();
+
+                    $combinationData['option_value_data'] = $productOptionValue->data;
+                }
+
+                $cartLine->purchasable->combination = $newCombination;
             }
 
             $total = $summary->initialSubTotal + $summary->taxTotal;
@@ -90,11 +103,32 @@ class CreateOrderLineAction
                 $purchasableMedias = $cartLine->purchasable->getMedia('image');
                 $this->copyMediaToOrderLine($orderLine, $purchasableMedias, 'order_line_images');
             } elseif ($cartLine->purchasable instanceof ProductVariant) {
-                /** @var \Domain\Product\Models\Product $product */
-                $product = $cartLine->purchasable->product;
+                /** @var \Domain\Product\Models\ProductVariant $productVariant */
+                $productVariant = $cartLine->purchasable;
 
-                $purchasableMedias = $product->getMedia('image');
-                $this->copyMediaToOrderLine($orderLine, $purchasableMedias, 'order_line_images');
+                $productOptionMedia = collect();
+
+                foreach ($productVariant->combination as $combinationData) {
+                    /** @var \Domain\Product\Models\ProductOptionValue $productOptionValue */
+                    $productOptionValue = ProductOptionValue::with('media')
+                        ->where('id', $combinationData['option_value_id'])->first();
+
+                    if ($productOptionValue->hasMedia('media')) {
+                        $productOptionMedia = $productOptionMedia->merge($productOptionValue->media);
+                    }
+                }
+
+                if ($productOptionMedia->isEmpty()) {
+                    /** @var \Domain\Product\Models\Product $product */
+                    $product = $productVariant->product;
+
+                    $purchasableMedias = $product->getMedia('image');
+                    $this->copyMediaToOrderLine($orderLine, $purchasableMedias, 'order_line_images');
+                } else {
+                    $productOptionMedias = MediaCollection::make($productOptionMedia);
+
+                    $this->copyMediaToOrderLine($orderLine, $productOptionMedias, 'order_line_images');
+                }
             }
 
             $cartLineRemarks = $cartLine->getMedia('cart_line_notes');
