@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Support\Excel\Export;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Queue\SerializesModels;
 use Laravel\SerializableClosure\SerializableClosure;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
@@ -16,8 +18,10 @@ use Maatwebsite\Excel\Concerns\WithMapping;
  *
  * @phpstan-ignore-next-line
  */
-class DefaultExport implements FromQuery, WithCustomChunkSize, WithHeadings, WithMapping
+class DefaultExport implements FromQuery, ShouldQueue, WithCustomChunkSize, WithHeadings, WithMapping
 {
+    use SerializesModels;
+
     /**
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
      * @param  array<int, string>  $headings
