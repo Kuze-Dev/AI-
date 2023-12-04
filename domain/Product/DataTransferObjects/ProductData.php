@@ -97,6 +97,8 @@ class ProductData
             media_collection: [
                 ['collection' => 'image', 'materials' => $data['images']],
             ],
+            allow_guest_purchase: $data['allow_guest_purchase'] ?? false,
+            description: $data['description'] ?? '',
             product_options: array_map(
                 fn ($option) => (ProductOptionData::fromArray($option)),
                 $data['product_options'] ?? []

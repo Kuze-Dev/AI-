@@ -94,14 +94,14 @@ class ImportProductAction
                 'Import row(s) of product in CREATE ',
                 [
                     'name' => $data['name'],
-                    'product_id' => $data['product_sku'] ?? $data['sku'],
+                    'product_id' => $data['product_sku'],
                     'sku' => $data['sku'],
                 ]
             );
 
             return app(CreateProductAction::class)->execute(ProductData::fromCsv([
                 ...$data,
-                'sku' => $data['product_sku'] ?? $data['sku'],
+                'sku' => $data['product_sku'],
             ]));
         }
 

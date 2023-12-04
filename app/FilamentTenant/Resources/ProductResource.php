@@ -487,32 +487,32 @@ class ProductResource extends Resource
                                     Forms\Components\ColorPicker::make('icon_value')
                                         ->label(trans('Icon Value (HEX)'))
                                         ->hidden(fn (Closure $get) => ! ($get('icon_type') === 'color_palette' && $get('../../is_custom'))),
-                                    Forms\Components\FileUpload::make('images')
-                                        ->label(trans('Images (Preview Slides)'))
-                                        ->image()
-                                        ->mediaLibraryCollection('media')
-                                        ->multiple()
-                                        ->hidden(
-                                            fn (Closure $get) => isset($get('../../../*')[1])
-                                                && isset($get('../../../*')[1]['id'])
-                                                && $get('../../../*')[1]['id'] === $get('../../id')
-                                        )
-                                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                                            $mediaClass = config('media-library.media_model', Media::class);
+                                    // Forms\Components\FileUpload::make('images')
+                                    //     ->label(trans('Images (Preview Slides)'))
+                                    //     ->image()
+                                    //     ->mediaLibraryCollection('media')
+                                    //     ->multiple()
+                                    //     ->hidden(
+                                    //         fn (Closure $get) => isset($get('../../../*')[1])
+                                    //             && isset($get('../../../*')[1]['id'])
+                                    //             && $get('../../../*')[1]['id'] === $get('../../id')
+                                    //     )
+                                    //     ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                    //         $mediaClass = config('media-library.media_model', Media::class);
 
-                                            /** @var ?Media $media */
-                                            $media = $mediaClass::findByUuid($file);
+                                    //         /** @var ?Media $media */
+                                    //         $media = $mediaClass::findByUuid($file);
 
-                                            if ($component->getVisibility() === 'private') {
-                                                try {
-                                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                                } catch (Throwable $exception) {
-                                                    // This driver does not support creating temporary URLs.
-                                                }
-                                            }
+                                    //         if ($component->getVisibility() === 'private') {
+                                    //             try {
+                                    //                 return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                    //             } catch (Throwable $exception) {
+                                    //                 // This driver does not support creating temporary URLs.
+                                    //             }
+                                    //         }
 
-                                            return $media?->getUrl();
-                                        }),
+                                    //         return $media?->getUrl();
+                                    //     }),
 
                                 ])
                                 ->minItems(1)

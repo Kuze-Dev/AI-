@@ -22,13 +22,14 @@ class ImportProductBatchUpdateAction
     public static function proceed(): ImportAction
     {
         return ImportAction::make('Batch Update Import')
+            ->uniqueBy('sku')
             ->translateLabel()
             ->processRowsUsing(fn (array $row) => self::processBatchUpdate($row))
             ->withValidation(
                 rules: [
-                    'product_id' => 'required|integer|max:100',
+                    'product_id' => 'required|integer',
                     'is_variant' => ['required', new Enum(Decision::class)],
-                    'variant_id' => 'nullable|integer|max:100',
+                    'variant_id' => 'nullable|integer',
                     'name' => 'nullable|string|max:100',
                     'variant_combination' => 'string|nullable',
                     'sku' => 'required|string|max:100',
