@@ -162,6 +162,11 @@ class ServiceBill extends Model implements PayableInterface
         return $this->hasMany(ServiceTransaction::class);
     }
 
+    public function maskedReference(): string
+    {
+        return '********'.substr($this->reference, -4);
+    }
+
     /** @return Attribute<bool, never> */
     protected function isPaid(): Attribute
     {
