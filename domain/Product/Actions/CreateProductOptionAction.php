@@ -46,10 +46,10 @@ class CreateProductOptionAction
                         'data' => ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value],
                     ]);
 
-                    $this->uploadMediaMaterials(
-                        $newOptionValueModel,
-                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
-                    );
+                    // $this->uploadMediaMaterials(
+                    //     $newOptionValueModel,
+                    //     [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    // );
 
                     $productOptionValue = $productOptionValue
                         ->withId($newOptionValueModel->id, $productOptionValue);
@@ -92,23 +92,23 @@ class CreateProductOptionAction
         })->toArray();
     }
 
-    protected function uploadMediaMaterials(ProductOptionValue $productOptionValue, array $mediaCollection): void
-    {
-        collect($mediaCollection)->each(function ($media, $key) use ($productOptionValue) {
-            /** @var array<int, array> $mediaMaterials */
-            $mediaMaterials = $media['materials'];
+    // protected function uploadMediaMaterials(ProductOptionValue $productOptionValue, array $mediaCollection): void
+    // {
+    //     collect($mediaCollection)->each(function ($media, $key) use ($productOptionValue) {
+    //         /** @var array<int, array> $mediaMaterials */
+    //         $mediaMaterials = $media['materials'];
 
-            $mediaData = collect($mediaMaterials)->map(function ($material) {
-                /** @var \Illuminate\Http\UploadedFile|string $material */
-                return new MediaData(media: $material);
-            })->toArray();
+    //         $mediaData = collect($mediaMaterials)->map(function ($material) {
+    //             /** @var \Illuminate\Http\UploadedFile|string $material */
+    //             return new MediaData(media: $material);
+    //         })->toArray();
 
-            $syncMediaCollection = new SyncMediaCollectionAction();
+    //         $syncMediaCollection = new SyncMediaCollectionAction();
 
-            $syncMediaCollection->execute($productOptionValue, new MediaCollectionData(
-                collection: $media['collection'],
-                media: $mediaData,
-            ));
-        });
-    }
+    //         $syncMediaCollection->execute($productOptionValue, new MediaCollectionData(
+    //             collection: $media['collection'],
+    //             media: $mediaData,
+    //         ));
+    //     });
+    // }
 }

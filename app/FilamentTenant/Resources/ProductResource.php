@@ -16,6 +16,7 @@ use App\FilamentTenant\Support\ProductVariant;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Product\Actions\DeleteProductAction;
+use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Models\Product;
@@ -35,6 +36,7 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\Excel\Actions\ExportBulkAction;
 use Throwable;
 
 class ProductResource extends Resource
@@ -360,6 +362,63 @@ class ProductResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->translateLabel(),
+                ExportBulkAction::make()
+                    ->queue()
+                    ->query(fn (Builder $query) => $query->with('productVariants')->latest())
+                    ->mapUsing(
+                        [
+                            'product_id', 'is_variant', 'variant_id', 'name', 'variant_combination', 'sku',
+                            'retail_price', 'selling_price', 'stock', 'status', 'is_digital_product',
+                            'is_featured', 'is_special_offer', 'allow_customer_remarks', 'allow_stocks',
+                            'allow_guest_purchase', 'weight', 'length', 'width', 'height', 'minimum_order_quantity',
+                        ],
+                        function (Product $product) {
+                            $productData = [
+                                [
+                                    $product->id,
+                                    Decision::NO->value,
+                                    '',
+                                    $product->name,
+                                    '',
+                                    $product->sku,
+                                    $product->retail_price,
+                                    $product->selling_price,
+                                    $product->stock,
+                                    $product->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+                                    $product->is_digital_product ? Decision::YES->value : Decision::NO->value,
+                                    $product->is_featured ? Decision::YES->value : Decision::NO->value,
+                                    $product->is_special_offer ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_customer_remarks ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_stocks ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_guest_purchase ? Decision::YES->value : Decision::NO->value,
+                                    $product->weight,
+                                    $product->dimension['length'] ?? '',
+                                    $product->dimension['width'] ?? '',
+                                    $product->dimension['height'] ?? '',
+                                    $product->minimum_order_quantity,
+                                ],
+                            ];
+                            foreach ($product->productVariants as $variant) {
+                                $productData[] =
+                                    [
+                                        $variant->product_id,
+                                        Decision::YES->value,
+                                        $variant->id,
+                                        '',
+                                        $variant->combination,
+                                        $variant->sku,
+                                        $variant->retail_price,
+                                        $variant->selling_price,
+                                        $variant->stock,
+                                        $variant->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+
+                                    ];
+                            }
+
+                            return $productData;
+                        }
+                    ),
+
             ])
             ->defaultSort('updated_at', 'desc');
     }
@@ -618,15 +677,15 @@ class ProductResource extends Resource
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->required(),
                                 ])->columns(2),
-                            Forms\Components\Section::make('Status')
-                                ->translateLabel()
-                                ->schema([
-                                    Forms\Components\Toggle::make('status')
-                                        ->label(
-                                            fn ($state) => $state ? trans(STATUS::ACTIVE->value) : trans(STATUS::INACTIVE->value)
-                                        )
-                                        ->helperText('This product variant will be hidden from all sales channels.'),
-                                ]),
+                            // Forms\Components\Section::make('Status')
+                            //     ->translateLabel()
+                            //     ->schema([
+                            //         Forms\Components\Toggle::make('status')
+                            //             ->label(
+                            //                 fn ($state) => $state ? trans(STATUS::ACTIVE->value) : trans(STATUS::INACTIVE->value)
+                            //             )
+                            //             ->helperText('This product variant will be hidden from all sales channels.'),
+                            //     ]),
                         ]),
                 ]),
         ])->hiddenOn('create');

@@ -107,6 +107,8 @@ class ImportProductAction
 
         // Merge the product options and variants with the existing product
         $data['product_options'] = self::mergingProductOptions($foundProduct, $data['product_options']);
+
+        Log::info('MERGED PROD OPTIONS : ', $data['product_options']);
         $data['product_variants'] = self::mergingProductVariants($foundProduct, $data);
 
         // Check for possible sku duplication
@@ -195,9 +197,10 @@ class ImportProductAction
                     'slug' => $item->slug,
                     'is_custom' => $item->is_custom,
                     'productOptionValues' => array_map(function ($optionValue) {
-                        $optionValueModel = ProductOptionValue::with('media')
-                            ->where('id', $optionValue['id'])
-                            ->first();
+                        $optionValueModel = ProductOptionValue::
+                            // with('media')
+                            where('id', $optionValue['id'])
+                                ->first();
 
                         if (! $optionValueModel) {
                             return [];
@@ -206,7 +209,7 @@ class ImportProductAction
                         return [
                             ...$optionValue,
                             ...$optionValue['data'],
-                            'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
+                            // 'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
                         ];
                     }, $item->productOptionValues->toArray()),
                 ];
@@ -234,9 +237,10 @@ class ImportProductAction
                         })->toArray();
 
                     $mappedExistingOptions = array_map(function ($optionValue) {
-                        $optionValueModel = ProductOptionValue::with('media')
-                            ->where('id', $optionValue['id'])
-                            ->first();
+                        $optionValueModel = ProductOptionValue::
+                            // with('media')
+                            where('id', $optionValue['id'])
+                                ->first();
 
                         if (! $optionValueModel) {
                             return [];
@@ -245,7 +249,7 @@ class ImportProductAction
                         return [
                             ...$optionValue,
                             ...$optionValue['data'],
-                            'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
+                            // 'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
                         ];
                     }, $existingOptions[$index]['productOptionValues']);
 
@@ -262,6 +266,7 @@ class ImportProductAction
             }
 
             if (! $hasFound) {
+                // dd('DITO DAPAT DIBA');
                 $existingOptions = array_merge($csvRowOptions, $existingOptions);
             }
         }
@@ -393,9 +398,9 @@ class ImportProductAction
                         'id' => uniqid(),
                         'name' => $row["product_option_{$i}_value_{$j}"],
                         'slug' => $row["product_option_{$i}_value_{$j}"],
-                        'icon_type' => $i === 1 ? $row["product_option_{$i}_value_{$j}_icon_type"] : 'text',
-                        'icon_value' => $i === 1 ? $row["product_option_{$i}_value_{$j}_icon_value"] : '',
-                        'images' => $i === 1 ? (isset($row["product_option_{$i}_value_{$j}_image_link"]) ? [$row["product_option_{$i}_value_{$j}_image_link"]] : null) : [],
+                        'icon_type' => $i === 1 ? ($row["product_option_{$i}_value_{$j}_icon_type"] ?? 'text') : 'text',
+                        'icon_value' => $i === 1 ? ($row["product_option_{$i}_value_{$j}_icon_value"] ?? '') : '',
+                        // 'images' => $i === 1 ? (isset($row["product_option_{$i}_value_{$j}_image_link"]) ? [$row["product_option_{$i}_value_{$j}_image_link"]] : null) : [],
                         'product_option_id' => $productOption['id'],
                     ]);
 
