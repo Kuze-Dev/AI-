@@ -44,6 +44,7 @@ use Support\MetaData\HasMetaData;
  * @property bool $is_special_offer
  * @property bool $allow_customer_remarks
  * @property bool $allow_stocks
+ * @property bool $allow_guest_purchase
  * @property int $minimum_order_quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -68,6 +69,7 @@ use Support\MetaData\HasMetaData;
  * @method static ProductBuilder|Product query()
  * @method static ProductBuilder|Product whereAllowCustomerRemarks($value)
  * @method static ProductBuilder|Product whereAllowStocks($value)
+ * @method static ProductBuilder|Product whereAllowGuestPurchase($value)
  * @method static ProductBuilder|Product whereCreatedAt($value)
  * @method static ProductBuilder|Product whereDescription($value)
  * @method static ProductBuilder|Product whereDimension($value)
