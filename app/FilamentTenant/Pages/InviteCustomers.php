@@ -182,7 +182,6 @@ class InviteCustomers extends Page implements HasTable
                 ])
                 ->processRowsUsing(
                     function (array $row): Customer {
-                        // dd($row);
                         $data = [
                             'email' => $row['email'],
                             'first_name' => $row['first_name'] ?? '',
