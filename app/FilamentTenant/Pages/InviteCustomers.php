@@ -14,9 +14,11 @@ use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
+use Domain\Customer\Exceptions\NoSenderEmailException;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
@@ -118,20 +120,27 @@ class InviteCustomers extends Page implements HasTable
             BulkAction::make('invite')
                 ->translateLabel()
                 ->action(function (Collection $records, BulkAction $action) {
+                    try {
+                        $success = null;
+                        /** @var \Domain\Customer\Models\Customer $customer */
+                        foreach ($records as $customer) {
+                            $success = app(SendRegisterInvitationAction::class)->execute($customer);
+                        }
+                        if ($success) {
+                            $action
+                                ->successNotificationTitle(trans('Invitation Email sent.'))
+                                ->success();
+                        } else {
+                            $action->failureNotificationTitle(trans('Failed to send  invitation. Invite inactive and unregistered users only'))
+                                ->failure();
+                        }
+                    } catch (NoSenderEmailException $s) {
+                        return Notification::make()
+                            ->danger()
+                            ->title(trans($s->getMessage()))
+                            ->send();
+                    }
 
-                    $success = null;
-                    /** @var \Domain\Customer\Models\Customer $customer */
-                    foreach ($records as $customer) {
-                        $success = app(SendRegisterInvitationAction::class)->execute($customer);
-                    }
-                    if ($success) {
-                        $action
-                            ->successNotificationTitle(trans('Invitation Email sent.'))
-                            ->success();
-                    } else {
-                        $action->failureNotificationTitle(trans('Failed to send  invitation. Invite inactive and unregistered users only'))
-                            ->failure();
-                    }
                 })
                 ->deselectRecordsAfterCompletion()
                 ->icon('heroicon-o-speakerphone'),
