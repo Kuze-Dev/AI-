@@ -240,6 +240,7 @@ final class CustomerData
             email: $data['email'],
             password: $data['password'],
             image: $data['profile_image'] ?? null,
+            tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::REGISTERED,
         );
     }

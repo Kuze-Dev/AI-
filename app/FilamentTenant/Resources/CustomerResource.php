@@ -111,6 +111,7 @@ class CustomerResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->label(trans('Mobile Number'))
                         ->nullable()
+                        ->numeric()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('birth_date')
                         ->translateLabel()

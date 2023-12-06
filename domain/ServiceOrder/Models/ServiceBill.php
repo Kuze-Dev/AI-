@@ -167,6 +167,29 @@ class ServiceBill extends Model implements PayableInterface
         return '********'.substr($this->reference, -4);
     }
 
+    public function latestTransaction(): ?ServiceTransaction
+    {
+        return $this->serviceTransactions()->latest()->first();
+    }
+
+    public function latestTransactionPaid(): ?ServiceTransaction
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction */
+        $serviceTransaction = $this->latestTransaction();
+
+        return filled($serviceTransaction) && $serviceTransaction->status === ServiceTransactionStatus::PAID
+            ? $serviceTransaction
+            : null;
+    }
+
+    public function paymentMethod(): ?PaymentMethod
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction */
+        $serviceTransaction = $this->latestTransactionPaid();
+
+        return filled($serviceTransaction) ? $serviceTransaction->payment_method : null;
+    }
+
     /** @return Attribute<bool, never> */
     protected function isPaid(): Attribute
     {
