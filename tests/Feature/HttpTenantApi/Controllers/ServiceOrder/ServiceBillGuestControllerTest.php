@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Features\Service\ServiceBase;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
@@ -27,10 +29,10 @@ it('can show', function () {
         ->createOne();
 
     $serviceBill = ServiceBillFactory::new([
-        "service_order_id" => $serviceOrder->id,
+        'service_order_id' => $serviceOrder->id,
     ])->createOne();
 
-    postJson('api/service-bill-guest', ["reference" => $serviceBill->reference])
+    postJson('api/service-bill-guest', ['reference' => $serviceBill->reference])
         ->assertValid()
         ->assertSuccessful();
 });
