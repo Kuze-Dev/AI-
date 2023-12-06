@@ -9,6 +9,7 @@ use App\Features\ECommerce\ColorPallete;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
+use App\FilamentTenant\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\FilamentTenant\Resources\ReviewResource\RelationManagers\ReviewRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\ProductOption as ProductOptionSupport;
@@ -429,6 +430,7 @@ class ProductResource extends Resource
             ReviewRelationManager::class,
             ActivitiesRelationManager::class,
             TiersRelationManager::class,
+            VariantsRelationManager::class,
         ];
     }
 
