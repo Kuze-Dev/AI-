@@ -48,7 +48,7 @@ class ProductOption extends Field
         });
     }
 
-    public function getChildComponentContainers(bool $withHidden = false, string $statePath = null): array
+    public function getChildComponentContainers(bool $withHidden = false, ?string $statePath = null): array
     {
         return [];
     }

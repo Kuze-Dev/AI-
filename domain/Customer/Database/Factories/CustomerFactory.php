@@ -68,7 +68,7 @@ class CustomerFactory extends Factory
         return $this->state(['deleted_at' => now()]);
     }
 
-    public function verified(Carbon $datetime = null): self
+    public function verified(?Carbon $datetime = null): self
     {
         return $this->state(['email_verified_at' => $datetime ?? now()]);
     }

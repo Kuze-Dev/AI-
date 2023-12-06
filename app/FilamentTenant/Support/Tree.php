@@ -99,7 +99,7 @@ class Tree extends Field
         $this->registerActions([TreeFormAction::make()]);
     }
 
-    public function getChildComponentContainers(bool $withHidden = false, string $statePath = null): array
+    public function getChildComponentContainers(bool $withHidden = false, ?string $statePath = null): array
     {
         return [];
     }

@@ -10,5 +10,5 @@ abstract class BaseProvider
     {
     }
 
-    abstract public function verify(string $token, string $ip = null): bool;
+    abstract public function verify(string $token, ?string $ip = null): bool;
 }
