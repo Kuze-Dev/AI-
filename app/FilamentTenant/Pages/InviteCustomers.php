@@ -220,7 +220,7 @@ class InviteCustomers extends Page implements HasTable
                         'mobile' => 'nullable|min:3|max:100',
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'status' => ['nullable', Rule::enum(Status::class)],
-                        'birth_date' => ['nullable', 'date_format:Y/m/d'],
+                        'birth_date' => ['nullable', 'date_format:Y/m/d', 'before:today'],
                         'tier' => [
                             'nullable',
                             Rule::exists(Tier::class, 'name'),
