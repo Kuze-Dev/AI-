@@ -156,7 +156,7 @@ class ImportProductBatchUpdateAction
                         'product_option_id' => $optionValueToArray['product_option_id'],
                         'icon_type' => $optionValueToArray['data']['icon_type'] ?? 'text',
                         'icon_value' => $optionValueToArray['data']['icon_value'] ?? null,
-                        'images' => array_map(fn ($image) => $image['uuid'], $optionValueToArray['media']) ?? null,
+                        'images' => array_map(fn ($image) => $image['uuid'], $optionValueToArray['media']),
                     ];
                 })->toArray(),
             ];
