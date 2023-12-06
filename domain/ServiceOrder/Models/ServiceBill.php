@@ -169,7 +169,6 @@ class ServiceBill extends Model implements PayableInterface
         return '********'.substr($this->reference, -4);
     }
 
-    /** @return \Domain\ServiceOrder\Models\ServiceTransaction|null */
     public function latestTransaction(): ?ServiceTransaction
     {
         return $this->serviceTransactions()->latest()->first();
