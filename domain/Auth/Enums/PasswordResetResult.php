@@ -30,7 +30,7 @@ enum PasswordResetResult: string
         };
     }
 
-    public function throw(string $redirectTo = null): void
+    public function throw(?string $redirectTo = null): void
     {
         if ($this->failed()) {
             $exception = ValidationException::withMessages(['email' => $this->getMessage()]);

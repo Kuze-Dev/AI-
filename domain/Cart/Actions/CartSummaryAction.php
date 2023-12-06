@@ -286,7 +286,7 @@ class CartSummaryAction
 
     public function getTax(
         ?int $countryId,
-        int $stateId = null
+        ?int $stateId = null
     ): array {
         if (is_null($countryId)) {
             return [

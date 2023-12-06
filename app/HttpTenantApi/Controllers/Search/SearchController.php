@@ -43,7 +43,7 @@ class SearchController
     }
 
     /** @return JsonApiResourceCollection <int, Page> */
-    protected function getPageResults(string $searchQuery, array $filter = null): JsonApiResourceCollection
+    protected function getPageResults(string $searchQuery, ?array $filter = null): JsonApiResourceCollection
     {
         return PageResource::collection(
             Page::query()
@@ -53,7 +53,7 @@ class SearchController
         );
     }
 
-    protected function getContentEntryResults(string $searchQuery, array $filter = null): JsonApiResourceCollection
+    protected function getContentEntryResults(string $searchQuery, ?array $filter = null): JsonApiResourceCollection
     {
         return ContentEntryResource::collection(
             ContentEntry::query()

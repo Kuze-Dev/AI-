@@ -56,7 +56,7 @@ class SchemaFormBuilder extends Component
         $this->schemaData($schemaData);
     }
 
-    public static function make(string $name, SchemaData|Closure $schemaData = null): static
+    public static function make(string $name, SchemaData|Closure|null $schemaData = null): static
     {
         $static = app(static::class, [
             'name' => $name,
@@ -75,7 +75,7 @@ class SchemaFormBuilder extends Component
         $this->columnSpan('full');
     }
 
-    public function schemaData(SchemaData|Closure $schemaData = null): self
+    public function schemaData(SchemaData|Closure|null $schemaData = null): self
     {
         $this->schemaData = $schemaData;
 
