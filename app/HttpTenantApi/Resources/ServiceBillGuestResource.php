@@ -11,14 +11,13 @@ use TiMacDonald\JsonApi\JsonApiResource;
 /**
  * @mixin ServiceBill
  */
-class ServiceBillResource extends JsonApiResource
+class ServiceBillGuestResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-
         return [
             'id' => $this->id,
-            'reference' => $this->reference,
+            'reference' => $this->maskedReference(),
             'status' => $this->status,
             'due_date' => $this->due_date,
             'bill_date' => $this->bill_date,
@@ -28,7 +27,6 @@ class ServiceBillResource extends JsonApiResource
             'tax_total' => $this->tax_total,
             'additional_charges' => $this->additional_charges,
             'total_amount' => $this->total_amount,
-            'payment_method' => $this->paymentMethod()?->title,
         ];
     }
 
