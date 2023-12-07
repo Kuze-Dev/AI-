@@ -67,10 +67,10 @@ class UpdateProductOptionAction
                     $optionValueModel->data = ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value];
                     $optionValueModel->save();
 
-                    $this->uploadMediaMaterials(
-                        $optionValueModel,
-                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
-                    );
+                // $this->uploadMediaMaterials(
+                //     $optionValueModel,
+                //     [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                // );
                 } else {
                     $newOptionValueModel = ProductOptionValue::create([
                         'name' => $productOptionValue->name,
@@ -78,10 +78,10 @@ class UpdateProductOptionAction
                         'data' => ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value],
                     ]);
 
-                    $this->uploadMediaMaterials(
-                        $newOptionValueModel,
-                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
-                    );
+                    // $this->uploadMediaMaterials(
+                    //     $newOptionValueModel,
+                    //     [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    // );
 
                     $productOptionValue = $productOptionValue
                         ->withId($newOptionValueModel->id, $productOptionValue);
@@ -166,23 +166,23 @@ class UpdateProductOptionAction
         })->toArray();
     }
 
-    protected function uploadMediaMaterials(ProductOptionValue $productOptionValue, array $mediaCollection): void
-    {
-        collect($mediaCollection)->each(function ($media, $key) use ($productOptionValue) {
-            /** @var array<int, array> $mediaMaterials */
-            $mediaMaterials = $media['materials'];
+    // protected function uploadMediaMaterials(ProductOptionValue $productOptionValue, array $mediaCollection): void
+    // {
+    //     collect($mediaCollection)->each(function ($media, $key) use ($productOptionValue) {
+    //         /** @var array<int, array> $mediaMaterials */
+    //         $mediaMaterials = $media['materials'];
 
-            $mediaData = collect($mediaMaterials)->map(function ($material) {
-                /** @var \Illuminate\Http\UploadedFile|string $material */
-                return new MediaData(media: $material);
-            })->toArray();
+    //         $mediaData = collect($mediaMaterials)->map(function ($material) {
+    //             /** @var \Illuminate\Http\UploadedFile|string $material */
+    //             return new MediaData(media: $material);
+    //         })->toArray();
 
-            $syncMediaCollection = new SyncMediaCollectionAction();
+    //         $syncMediaCollection = new SyncMediaCollectionAction();
 
-            $syncMediaCollection->execute($productOptionValue, new MediaCollectionData(
-                collection: $media['collection'],
-                media: $mediaData,
-            ));
-        });
-    }
+    //         $syncMediaCollection->execute($productOptionValue, new MediaCollectionData(
+    //             collection: $media['collection'],
+    //             media: $mediaData,
+    //         ));
+    //     });
+    // }
 }
