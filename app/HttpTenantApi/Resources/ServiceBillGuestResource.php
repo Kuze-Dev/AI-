@@ -17,7 +17,7 @@ class ServiceBillGuestResource extends JsonApiResource
     {
         return [
             'id' => $this->id,
-            'reference' => $this->maskedReference(),
+            'reference' => '********'.substr($this->reference, -4),
             'status' => $this->status,
             'due_date' => $this->due_date,
             'bill_date' => $this->bill_date,

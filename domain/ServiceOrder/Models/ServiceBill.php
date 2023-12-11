@@ -179,11 +179,6 @@ class ServiceBill extends Model implements HasMedia, PayableInterface
         return $this->hasMany(ServiceTransaction::class);
     }
 
-    public function maskedReference(): string
-    {
-        return '********'.substr($this->reference, -4);
-    }
-
     public function latestTransaction(): ?ServiceTransaction
     {
         return $this->serviceTransactions()->latest()->first();
