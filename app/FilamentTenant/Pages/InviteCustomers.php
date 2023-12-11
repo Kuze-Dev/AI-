@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Pages;
 use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use Artificertech\FilamentMultiContext\Concerns\ContextualPage;
+use Carbon\Carbon;
 use Domain\Customer\Actions\CreateCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationAction;
@@ -14,9 +15,11 @@ use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
+use Domain\Customer\Exceptions\NoSenderEmailException;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\BadgeColumn;
@@ -32,8 +35,6 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use Support\Common\Rules\DateRule;
 
 class InviteCustomers extends Page implements HasTable
 {
@@ -118,20 +119,27 @@ class InviteCustomers extends Page implements HasTable
             BulkAction::make('invite')
                 ->translateLabel()
                 ->action(function (Collection $records, BulkAction $action) {
+                    try {
+                        $success = null;
+                        /** @var \Domain\Customer\Models\Customer $customer */
+                        foreach ($records as $customer) {
+                            $success = app(SendRegisterInvitationAction::class)->execute($customer);
+                        }
+                        if ($success) {
+                            $action
+                                ->successNotificationTitle(trans('Invitation Email sent.'))
+                                ->success();
+                        } else {
+                            $action->failureNotificationTitle(trans('Failed to send  invitation. Invite inactive and unregistered users only'))
+                                ->failure();
+                        }
+                    } catch (NoSenderEmailException $s) {
+                        return Notification::make()
+                            ->danger()
+                            ->title(trans($s->getMessage()))
+                            ->send();
+                    }
 
-                    $success = null;
-                    /** @var \Domain\Customer\Models\Customer $customer */
-                    foreach ($records as $customer) {
-                        $success = app(SendRegisterInvitationAction::class)->execute($customer);
-                    }
-                    if ($success) {
-                        $action
-                            ->successNotificationTitle(trans('Invitation Email sent.'))
-                            ->success();
-                    } else {
-                        $action->failureNotificationTitle(trans('Failed to send  invitation. Invite inactive and unregistered users only'))
-                            ->failure();
-                    }
                 })
                 ->deselectRecordsAfterCompletion()
                 ->icon('heroicon-o-speakerphone'),
@@ -190,7 +198,7 @@ class InviteCustomers extends Page implements HasTable
                             'mobile' => $row['mobile'] ? (string) $row['mobile'] : null,
                             'gender' => $row['gender'] ?? null,
                             'status' => $row['status'] ?? null,
-                            'birth_date' => is_null($row['birth_date']) ? null : Date::excelToDateTimeObject($row['birth_date']),
+                            'birth_date' => is_null($row['birth_date']) ? null : Carbon::createFromFormat('Y/m/d', $row['birth_date']),
                             'tier_id' => isset($row['tier'])
                                 ? (Tier::whereName($row['tier'])->first()?->getKey())
                                 : null,
@@ -221,7 +229,7 @@ class InviteCustomers extends Page implements HasTable
                         'mobile' => 'nullable|min:3|max:100',
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'status' => ['nullable', Rule::enum(Status::class)],
-                        'birth_date' => ['nullable', new DateRule()],
+                        'birth_date' => ['nullable', 'date_format:Y/m/d', 'before:today'],
                         'tier' => [
                             'nullable',
                             Rule::exists(Tier::class, 'name'),
