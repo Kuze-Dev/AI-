@@ -215,7 +215,8 @@ class CustomerResource extends Resource
                             }
                         }),
                 ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->disabled(fn ($record) => $record?->trashed()),
             ]);
     }
 
