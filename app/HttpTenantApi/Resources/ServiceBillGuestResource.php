@@ -27,6 +27,7 @@ class ServiceBillGuestResource extends JsonApiResource
             'tax_total' => $this->tax_total,
             'additional_charges' => $this->additional_charges,
             'total_amount' => $this->total_amount,
+            'payment_method' => $this->paymentMethod()?->slug,
         ];
     }
 

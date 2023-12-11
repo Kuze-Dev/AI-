@@ -8,6 +8,7 @@ use Akaunting\Money\Money;
 use App\Casts\MoneyCast;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Interfaces\PayableInterface;
+use Domain\Payments\Models\Payment;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
@@ -17,6 +18,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * Domain\ServiceOrder\Models\ServiceBill
@@ -69,9 +72,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Eloquent
  */
-class ServiceBill extends Model implements PayableInterface
+class ServiceBill extends Model implements HasMedia, PayableInterface
 {
     use HasPayments;
+    use InteractsWithMedia;
     use SoftDeletes;
 
     protected $fillable = [
@@ -115,6 +119,17 @@ class ServiceBill extends Model implements PayableInterface
     public function newEloquentBuilder($query): ServiceBillQueryBuilder
     {
         return new ServiceBillQueryBuilder($query);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $registerMediaConversions = function () {
+            $this->addMediaConversion('preview');
+        };
+
+        $this->addMediaCollection('service_bill_bank_proof_image')
+            ->onlyKeepLatest(5)
+            ->registerMediaConversions($registerMediaConversions);
     }
 
     /** @return Attribute<Money, never> */
@@ -184,10 +199,15 @@ class ServiceBill extends Model implements PayableInterface
             : null;
     }
 
+    public function latestPayment(): ?Payment
+    {
+        return $this->payments()->latest()->first();
+    }
+
     public function paymentMethod(): ?PaymentMethod
     {
         /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction */
-        $serviceTransaction = $this->latestTransactionPaid();
+        $serviceTransaction = $this->latestTransaction();
 
         return filled($serviceTransaction) ? $serviceTransaction->payment_method : null;
     }
