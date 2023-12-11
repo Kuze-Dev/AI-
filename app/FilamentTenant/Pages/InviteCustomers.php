@@ -72,6 +72,7 @@ class InviteCustomers extends Page implements HasTable
                 ->wrap(),
             TextColumn::make('email')
                 ->translateLabel()
+                ->searchable()
                 ->sortable(),
             IconColumn::make('email_verified_at')
                 ->label(trans('Verified'))
