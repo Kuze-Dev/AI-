@@ -32,7 +32,7 @@ class ImportProductAction
                     'name' => 'required|string|max:100',
                     'category' => 'required|string|max:100',
                     'brand' => 'required|string|max:100',
-                    'sku' => 'required|string|max:100',
+                    'sku' => 'required|string|unique:product_variants|max:100',
                     'stock' => ['required', 'numeric', new MinimumValueRule(0)],
                     'retail_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
                     'selling_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
@@ -57,7 +57,7 @@ class ImportProductAction
 
         // Prepare the data for the product
         $data = [
-            'images' => $row['image_link'],
+            'images' => [$row['image_link']],
             'name' => $row['name'],
             'categories' => $row['category'],
             'brand' => $row['brand'],
@@ -85,7 +85,7 @@ class ImportProductAction
 
         // Check if the product already exists in the database
         $foundProduct = Product::where('name', $data['name'])
-            ->with('productOptions', 'productVariants')
+            ->with('productOptions', 'productVariants', 'media')
             ->first();
 
         // If the product does not exist, create a new one
@@ -108,7 +108,6 @@ class ImportProductAction
         // Merge the product options and variants with the existing product
         $data['product_options'] = self::mergingProductOptions($foundProduct, $data['product_options']);
 
-        Log::info('MERGED PROD OPTIONS : ', $data['product_options']);
         $data['product_variants'] = self::mergingProductVariants($foundProduct, $data);
 
         // Check for possible sku duplication
@@ -142,6 +141,20 @@ class ImportProductAction
                 'sku' => $data['sku'],
             ]
         );
+
+        // Process image upload
+        $linkSplittedToArray = explode('/', $data['images'][0]);
+        $csvImageFilename = end($linkSplittedToArray);
+        $productMedia = $foundProduct->getMedia('image');
+
+        if (
+            in_array($csvImageFilename, $productMedia->pluck('file_name')->toArray()) ||
+            in_array($csvImageFilename, $productMedia->pluck('name')->toArray())
+        ) {
+            $data['images'] = $productMedia->pluck('uuid')->toArray();
+        } else {
+            $data['images'] = array_merge($data['images'], $productMedia->pluck('uuid')->toArray());
+        }
 
         // Update the existing product
         return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsv([
@@ -206,11 +219,14 @@ class ImportProductAction
                             return [];
                         }
 
-                        return [
+                        $toReturn = [
                             ...$optionValue,
                             ...$optionValue['data'],
                             // 'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
                         ];
+                        unset($toReturn['data']);
+
+                        return $toReturn;
                     }, $item->productOptionValues->toArray()),
                 ];
             }
@@ -227,16 +243,7 @@ class ImportProductAction
                 ) {
                     $csvRowOptionValues = $csvRowOption['productOptionValues'];
 
-                    /** @var array $csvRowOptionValues */
-                    $collectedCsvRowOptionValues = collect($csvRowOptionValues)
-                        ->map(function ($optionValue) use ($existingOption) {
-                            return [
-                                ...$optionValue,
-                                'product_option_id' => $existingOption['id'],
-                            ];
-                        })->toArray();
-
-                    $mappedExistingOptions = array_map(function ($optionValue) {
+                    $mappedExistingOptionValues = array_map(function ($optionValue) {
                         $optionValueModel = ProductOptionValue::
                             // with('media')
                             where('id', $optionValue['id'])
@@ -248,14 +255,29 @@ class ImportProductAction
 
                         return [
                             ...$optionValue,
-                            ...$optionValue['data'],
                             // 'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
                         ];
                     }, $existingOptions[$index]['productOptionValues']);
 
+                    /** @var array $csvRowOptionValues */
+                    $collectedCsvRowOptionValues = collect($csvRowOptionValues)
+                        ->filter(function ($csvOptionValue) use ($mappedExistingOptionValues) {
+                            $matchedElements = array_filter($mappedExistingOptionValues, function ($element) use ($csvOptionValue) {
+                                return trim(strtolower($csvOptionValue['name'])) === trim(strtolower($element['name']));
+                            });
+
+                            return ! $matchedElements;
+                        })
+                        ->map(function ($optionValue) use ($existingOption) {
+                            return [
+                                ...$optionValue,
+                                'product_option_id' => $existingOption['id'],
+                            ];
+                        })->toArray();
+
                     $existingOptions[$index]['productOptionValues'] =
                         array_merge(
-                            $mappedExistingOptions,
+                            $mappedExistingOptionValues,
                             $collectedCsvRowOptionValues,
                         );
 
@@ -275,37 +297,17 @@ class ImportProductAction
 
     protected static function mergingProductVariants(Product $foundProduct, array $data): array
     {
-        $productOptions = $data['product_options'];
         $productVariants = $data['product_variants'];
 
-        // If first and second product option have 2 or more option values, generate cross combination
-        if (
-            isset($productOptions[1])
-            && count($productOptions[0]) >= 2
-            && count($productOptions[1]) >= 2
-        ) {
-            return self::generateCombinations($data, $productOptions);
-        }
-
         $existingVariants = $foundProduct->productVariants->toArray();
-        // Iterate through $inputVariants and $existingVariants
-
-        foreach ($productVariants as &$inputVariant) {
-            foreach ($existingVariants as $existingVariant) {
-                foreach ($inputVariant['combination'] as &$inputCombination) {
-                    // Check if the "option" matches
-                    foreach ($existingVariant['combination'] as $existingCombination) {
-
-                        if ($inputCombination['option'] == $existingCombination['option']) {
-                            // Update the "option_id" from $existingVariants
-                            $inputCombination['option_id'] = $existingCombination['option_id'];
-                        }
-                    }
-                }
-            }
-        }
 
         return array_merge($productVariants, $existingVariants);
+    }
+
+    protected static function newGenerateCombination(array $row, array $inputArray): array
+    {
+
+        return [];
     }
 
     protected static function generateCombinations(array $row, array $inputArray): array
@@ -322,7 +324,7 @@ class ImportProductAction
 
         $option1Values->each(function ($optionValue1, $key1) use ($option2Values, $row, $inputArray, &$outputArray) {
             if ($option2Values->isNotEmpty()) {
-                $option2Values->each(function ($optionValue2, $key2) use ($optionValue1, $key1, $row, $inputArray, &$outputArray) {
+                $option2Values->each(function ($optionValue2, $key2) use ($optionValue1, $row, $inputArray, &$outputArray) {
                     $combination = [
                         [
                             'option' => $inputArray[0]['name'],
@@ -344,7 +346,8 @@ class ImportProductAction
                         'selling_price' => $row['selling_price'],
                         'retail_price' => $row['retail_price'],
                         'stock' => $row['stock'],
-                        'sku' => $row['sku'].$key1.$key2,
+                        'sku' => $row['sku'],
+                        // 'sku' => $row['sku'].$key1.$key2,
                         'status' => true,
                     ];
                 });
@@ -365,6 +368,7 @@ class ImportProductAction
                     'selling_price' => $row['selling_price'],
                     'retail_price' => $row['retail_price'],
                     'stock' => $row['stock'],
+                    // 'sku' => $row['sku'].$keyOne,
                     'sku' => $row['sku'].$keyOne,
                     'status' => true,
                 ];
