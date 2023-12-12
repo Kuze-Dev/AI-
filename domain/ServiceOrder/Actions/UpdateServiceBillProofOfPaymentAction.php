@@ -25,6 +25,10 @@ class UpdateServiceBillProofOfPaymentAction
         $serviceBill = ServiceBill::whereReference($serviceBillBankTransferData->reference_id)->firstOrFail();
         $payment = $serviceBill->latestPayment();
 
+        if (!$payment) {
+            throw new BadRequestHttpException('Payment not found!');
+        }
+
         if (
             $payment->gateway != 'bank-transfer'
         ) {

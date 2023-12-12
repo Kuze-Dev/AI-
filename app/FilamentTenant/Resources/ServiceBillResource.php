@@ -85,7 +85,7 @@ class ServiceBillResource extends Resource
                     ->label('Status')
                     ->translateLabel()
                     ->formatStateUsing(
-                        fn (string $state): string => ucfirst($state)
+                        fn (string $state): string => ucfirst(str_replace('_', ' ', strtolower($state)))
                     )
                     ->color(
                         fn (ServiceBill $record): string => $record->getStatusColor()
