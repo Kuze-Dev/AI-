@@ -238,6 +238,7 @@ class CustomerResource extends Resource
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
                     ->translateLabel()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))

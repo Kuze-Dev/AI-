@@ -25,6 +25,7 @@ class ProductData
         public readonly bool $allow_stocks = true,
         public readonly array $taxonomy_terms = [],
         public readonly bool $allow_guest_purchase = false,
+        public readonly bool $skip_media_sync = false,
         public readonly ?float $weight = null,
         public ?array $product_options = [],
         public ?array $product_variants = [],
@@ -76,6 +77,7 @@ class ProductData
                 'selling_price' => (float) $variant['selling_price'],
                 'retail_price' => (float) $variant['retail_price'],
             ])), $data['product_variants'] ?? []),
+            skip_media_sync: $data['skip_media_sync'] ?? false,
         );
     }
 
@@ -108,6 +110,7 @@ class ProductData
                 'selling_price' => (float) $variant['selling_price'],
                 'retail_price' => (float) $variant['retail_price'],
             ])), $data['product_variants'] ?? []),
+            skip_media_sync: $data['skip_media_sync'] ?? false,
         );
     }
 
@@ -133,6 +136,7 @@ class ProductData
                 'selling_price' => (float) $variant['selling_price'],
                 'retail_price' => (float) $variant['retail_price'],
             ])), $data['product_variants'] ?? []),
+            skip_media_sync: $data['skip_media_sync'] ?? false,
         );
     }
 }
