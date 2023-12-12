@@ -142,18 +142,8 @@ class ImportProductAction
             ]
         );
 
-        // Process image upload
-        $linkSplittedToArray = explode('/', $data['images'][0]);
-        $csvImageFilename = end($linkSplittedToArray);
-        $productMedia = $foundProduct->getMedia('image');
-
-        if (
-            in_array($csvImageFilename, $productMedia->pluck('file_name')->toArray()) ||
-            in_array($csvImageFilename, $productMedia->pluck('name')->toArray())
-        ) {
-            $data['images'] = $productMedia->pluck('uuid')->toArray();
-        } else {
-            $data['images'] = array_merge($data['images'], $productMedia->pluck('uuid')->toArray());
+        if ($foundProduct->getMedia('image')->toArray()) {
+            $data['skip_media_sync'] = true;
         }
 
         // Update the existing product

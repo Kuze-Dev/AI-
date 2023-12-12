@@ -134,7 +134,7 @@ final class CustomerData
         );
     }
 
-    public static function fromArrayEditByAdmin(Customer $customer, array $data, ?Tier $tier = null): self
+    public static function fromArrayEditByAdmin(Customer $customer, array $data, Tier $tier = null): self
     {
 
         $tierApprovalStatus = ! isset($data['tier_approval_status']) ? null : TierApprovalStatus::from($data['tier_approval_status']);
@@ -188,9 +188,9 @@ final class CustomerData
     }
 
     private static function getStatus(
-        ?Tier $tier = null,
-        ?TierApprovalStatus $tierApprovalStatus = null,
-        ?Customer $customer = null
+        Tier $tier = null,
+        TierApprovalStatus $tierApprovalStatus = null,
+        Customer $customer = null
     ): RegisterStatus {
 
         if (! tenancy()->tenant?->features()->active(TierBase::class)) {

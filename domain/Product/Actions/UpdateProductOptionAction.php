@@ -105,7 +105,7 @@ class UpdateProductOptionAction
         $this->sanitizeOptions($productData, $product->id);
     }
 
-    protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, ?int $productId = null): void
+    protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, int $productId = null): void
     {
         $arrayForMapping = [];
 
