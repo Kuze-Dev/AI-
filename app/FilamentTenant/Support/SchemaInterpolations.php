@@ -20,7 +20,7 @@ class SchemaInterpolations extends Component
         $this->schemaData($schemaData);
     }
 
-    public static function make(string $name, Closure $schemaData = null): static
+    public static function make(string $name, ?Closure $schemaData = null): static
     {
         $static = app(static::class, [
             'name' => $name,
@@ -32,7 +32,7 @@ class SchemaInterpolations extends Component
         return $static;
     }
 
-    public function schemaData(SchemaData|Closure $schemaData = null): self
+    public function schemaData(SchemaData|Closure|null $schemaData = null): self
     {
         $this->schemaData = $schemaData;
 

@@ -15,7 +15,7 @@ class Taxation
     {
     }
 
-    public function getTaxZone(Country|int $country, State|int $state = null): ?TaxZone
+    public function getTaxZone(Country|int $country, State|int|null $state = null): ?TaxZone
     {
         if ($state && $taxZone = $this->getTaxZoneByState($country, $state)) {
             return $taxZone;

@@ -31,7 +31,7 @@ class TenantFactory extends Factory
     }
 
     /** @param  string|array<string>  $domains */
-    public function withDomains(string|array $domains = null): self
+    public function withDomains(string|array|null $domains = null): self
     {
         return $this->afterCreating(function (Tenant $tenant) use ($domains) {
             foreach (Arr::wrap($domains ?? [fake()->domainName()]) as $domain) {

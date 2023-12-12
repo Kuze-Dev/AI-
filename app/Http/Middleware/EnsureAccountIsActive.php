@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureAccountIsActive
 {
-    public function handle(Request $request, Closure $next, string $redirectTo = null): Response
+    public function handle(Request $request, Closure $next, ?string $redirectTo = null): Response
     {
         $user = $request->user();
 

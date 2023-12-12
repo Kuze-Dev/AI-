@@ -40,7 +40,7 @@ class SyncTermTreeAction
     }
 
     /** @param  array<TaxonomyTermData>  $taxonomyTermDataSet */
-    protected function syncTerms(array $taxonomyTermDataSet, TaxonomyTerm $parentTerm = null): void
+    protected function syncTerms(array $taxonomyTermDataSet, ?TaxonomyTerm $parentTerm = null): void
     {
         $termIds = [];
 
@@ -51,7 +51,7 @@ class SyncTermTreeAction
         TaxonomyTerm::setNewOrder($termIds);
     }
 
-    protected function createOrUpdateTerm(TaxonomyTermData $termData, TaxonomyTerm $parentTerm = null): TaxonomyTerm
+    protected function createOrUpdateTerm(TaxonomyTermData $termData, ?TaxonomyTerm $parentTerm = null): TaxonomyTerm
     {
         /** @var TaxonomyTerm $term */
         $term = $this->taxonomy->taxonomyTerms()->where('id', $termData->id)->firstOrNew();
