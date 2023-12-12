@@ -28,7 +28,7 @@ class ImportProductAction
             ->withValidation(
                 rules: [
                     'product_id' => 'required|string|max:100',
-                    'image_link' => 'nullable|string',
+                    'image_link' => 'nullable|url:http,https',
                     'name' => 'required|string|max:100',
                     'category' => 'required|string|max:100',
                     'brand' => 'required|string|max:100',

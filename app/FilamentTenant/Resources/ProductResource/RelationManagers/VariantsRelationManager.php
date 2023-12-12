@@ -101,6 +101,15 @@ class VariantsRelationManager extends RelationManager
                                     ->dehydrateStateUsing(fn ($state) => (float) $state)
                                     ->required(),
                             ])->columns(2),
+                        \Filament\Forms\Components\Section::make('Status')
+                            ->translateLabel()
+                            ->schema([
+                                \Filament\Forms\Components\Toggle::make('status')
+                                    ->label(
+                                        fn ($state) => $state ? ucfirst(trans(STATUS::ACTIVE->value)) : ucfirst(trans(STATUS::INACTIVE->value))
+                                    )
+                                    ->helperText('This product variant will be hidden from all sales channels.'),
+                            ])->columns(2),
                     ]),
             ])->columns(1);
     }
