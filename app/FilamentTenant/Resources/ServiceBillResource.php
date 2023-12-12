@@ -19,6 +19,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 class ServiceBillResource extends Resource
@@ -97,6 +98,7 @@ class ServiceBillResource extends Resource
                             : $record->bill_date
                     )
                     ->label('Bill Date')
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->translateLabel()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_date')
@@ -105,6 +107,7 @@ class ServiceBillResource extends Resource
                             ? 'N/A'
                             : $record->due_date
                     )
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->label('Due at')
                     ->translateLabel()
                     ->sortable(),
