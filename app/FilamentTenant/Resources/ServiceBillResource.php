@@ -19,7 +19,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 class ServiceBillResource extends Resource
@@ -184,11 +183,7 @@ class ServiceBillResource extends Resource
             $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
         }
 
-        /** @var string */
-        $timeZone = Auth::user()?->timezone;
-
         $formattedState = Carbon::parse($referenceDate)
-            ->setTimezone($timeZone)
             ->format('F d, Y');
 
         return 'Upcoming Bill: '.$formattedState;
