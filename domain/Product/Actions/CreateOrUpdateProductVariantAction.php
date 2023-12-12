@@ -36,9 +36,12 @@ class CreateOrUpdateProductVariantAction
 
     protected function createProductVariant(int $productId, ProductVariantData $productVariant): void
     {
-        ProductVariant::create(
-            array_merge(['product_id' => $productId], $this->prepareVariantData($productVariant))
-        );
+        $existingVariantViaSku = ProductVariant::whereSku($productVariant->sku)->first();
+        if (! $existingVariantViaSku) {
+            ProductVariant::create(
+                array_merge(['product_id' => $productId], $this->prepareVariantData($productVariant))
+            );
+        }
     }
 
     protected function sanitizeVariants(int $productId, array $productVariants): void
