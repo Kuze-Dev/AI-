@@ -299,18 +299,18 @@ class ViewServiceBill extends ViewRecord
                         ->title(trans('Proof of payment updated successfully'))
                         ->success()
                         ->send();
-                    try{
+                    try {
                         event(new AdminServiceBillBankPaymentEvent(
                             $record,
                             $paymentRemarks,
                         ));
-                    }catch(ModelNotFoundException $e){
+                    } catch (ModelNotFoundException $e) {
                         Notification::make()
-                        ->title(trans($e->getMessage()))
-                        ->danger()
-                        ->send();
+                            ->title(trans($e->getMessage()))
+                            ->danger()
+                            ->send();
                     }
-               
+
                 });
             })
             ->modalHeading(trans('Proof of Payment'))

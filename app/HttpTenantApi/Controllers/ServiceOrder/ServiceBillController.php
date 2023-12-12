@@ -11,7 +11,6 @@ use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Requests\UpdateServiceBillProofOfPaymentRequest;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -47,6 +46,7 @@ class ServiceBillController
                 'message' => trans('Uploaded Successfully'),
                 'data' => $data,
             ]);
+
         } catch (BadRequestHttpException $e) {
             return response(
                 ['message' => trans($e->getMessage())],

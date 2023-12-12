@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Listeners;
 
-use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Events\AdminServiceBillBankPaymentEvent;
-use Domain\ServiceOrder\Models\ServiceTransaction;
 use Domain\ServiceOrder\Notifications\ServiceBillBankPaymentNotification;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Notification;
@@ -26,11 +24,10 @@ class AdminServiceBillBankPaymentListener
         $serviceTransaction = $serviceBill->latestTransaction();
         $serviceOrder = $serviceBill->serviceOrder;
         $customer = $serviceOrder?->customer;
-        
-        if(!$serviceOrder || !$serviceTransaction){
+
+        if (! $serviceOrder || ! $serviceTransaction) {
             throw new ModelNotFoundException();
         }
-        
 
         if ($serviceOrder->is_subscription) {
             $serviceOrder->update([
