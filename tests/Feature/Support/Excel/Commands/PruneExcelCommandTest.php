@@ -11,7 +11,6 @@ use function Pest\Laravel\travelTo;
 
 beforeEach(function () {
     config([
-        'support.excel.import_expires_in_minute' => 5,
         'support.excel.export_expires_in_minute' => 5,
     ]);
 

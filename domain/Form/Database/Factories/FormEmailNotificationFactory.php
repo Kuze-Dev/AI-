@@ -36,7 +36,7 @@ class FormEmailNotificationFactory extends Factory
         );
     }
 
-    protected function emails(int $count = null): array
+    protected function emails(?int $count = null): array
     {
         return array_map(
             fn () => $this->faker->safeEmail(),

@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 class PageBuilder extends Builder
 {
     /** @return self<\Domain\Page\Models\Page> */
-    public function wherePublishedAtRange(Carbon $publishedAtStart = null, Carbon $publishedAtEnd = null): self
+    public function wherePublishedAtRange(?Carbon $publishedAtStart = null, ?Carbon $publishedAtEnd = null): self
     {
         return $this
             ->when(
@@ -29,7 +29,7 @@ class PageBuilder extends Builder
     }
 
     /** @return self<\Domain\Page\Models\Page> */
-    public function wherePublishedAtYearMonth(int $year, int $month = null): self
+    public function wherePublishedAtYearMonth(int $year, ?int $month = null): self
     {
         $selectedDate = tap(
             Carbon::now()->year($year),

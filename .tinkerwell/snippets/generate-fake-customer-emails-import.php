@@ -1,7 +1,8 @@
 <?php
 
 $emails = '';
-foreach(range(1, 21_000) as $i) {
+
+foreach (range(1, 21_000) as $i) {
     $emails .= fake()->unique()->companyEmail()."\n";
 }
 

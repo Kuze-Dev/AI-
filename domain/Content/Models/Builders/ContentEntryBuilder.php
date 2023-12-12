@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 class ContentEntryBuilder extends Builder
 {
     /** @return self<\Domain\Content\Models\ContentEntry> */
-    public function wherePublishStatus(PublishBehavior $publishBehavior = null, string $timezone = null): self
+    public function wherePublishStatus(?PublishBehavior $publishBehavior = null, ?string $timezone = null): self
     {
         return $this->where(
             fn ($query) => $query
@@ -32,7 +32,7 @@ class ContentEntryBuilder extends Builder
     }
 
     /** @return self<\Domain\Content\Models\ContentEntry> */
-    public function wherePublishedAtRange(Carbon $publishedAtStart = null, Carbon $publishedAtEnd = null): self
+    public function wherePublishedAtRange(?Carbon $publishedAtStart = null, ?Carbon $publishedAtEnd = null): self
     {
         return $this
             ->when(
@@ -46,7 +46,7 @@ class ContentEntryBuilder extends Builder
     }
 
     /** @return self<\Domain\Content\Models\ContentEntry> */
-    public function wherePublishedAtYearMonth(int $year, int $month = null): self
+    public function wherePublishedAtYearMonth(int $year, ?int $month = null): self
     {
         $selectedDate = tap(
             Carbon::now()->year($year),
