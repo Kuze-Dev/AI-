@@ -522,7 +522,32 @@ class ProductResource extends Resource
                                     Forms\Components\Group::make()
                                         ->schema(
                                             [
-                                                Forms\Components\TextInput::make('name')
+                                                Forms\Components\TextInput::make('name')->rules([
+                                                    function (Closure $get, $state) {
+                                                        return function (string $attribute, $value, Closure $fail) use ($get) {
+                                                            $optionsData = $get('../../../*');
+
+                                                            $largeStrings = [];
+                                                            $stack = [$optionsData];
+
+                                                            while (! empty($stack)) {
+                                                                $current = array_shift($stack);
+
+                                                                foreach ($current as $key => $item) {
+                                                                    if (is_array($item)) {
+                                                                        $stack[] = $item;
+                                                                    } elseif ($key === 'name' && $item === $value) {
+                                                                        $largeStrings[] = $item;
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            if (count($largeStrings) > 1) {
+                                                                $fail('The :attribute has duplicate.');
+                                                            }
+                                                        };
+                                                    },
+                                                ])
                                                     ->translateLabel()
                                                     ->maxLength(100)
                                                     ->lazy()
