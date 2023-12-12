@@ -27,7 +27,7 @@ class ImportProductAction
             ->processRowsUsing(fn (array $row): Product => self::processProductUpload($row))
             ->withValidation(
                 rules: [
-                    'product_id' => 'required|string|max:100',
+                    'product_id' => 'required|int|string|max:100',
                     'image_link' => 'nullable|url:http,https',
                     'name' => 'required|string|max:100',
                     'category' => 'required|string|max:100',
@@ -61,7 +61,7 @@ class ImportProductAction
             'name' => $row['name'],
             'categories' => $row['category'],
             'brand' => $row['brand'],
-            'product_sku' => $row['product_id'] ?? $row['sku'],
+            'product_sku' => (string) $row['product_id'],
             'sku' => $row['sku'],
             'stock' => $row['stock'],
             'retail_price' => $row['retail_price'],
@@ -137,7 +137,7 @@ class ImportProductAction
             'Import row(s) of product for UPDATE ',
             [
                 'name' => $data['name'],
-                'product_id' => $data['product_sku'] ?? $data['sku'],
+                'product_id' => $data['product_sku'],
                 'sku' => $data['sku'],
             ]
         );
@@ -159,7 +159,7 @@ class ImportProductAction
         // Update the existing product
         return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsv([
             ...$data,
-            'sku' => $data['product_sku'] ?? $data['sku'],
+            'sku' => $data['product_sku'],
         ]));
     }
 
