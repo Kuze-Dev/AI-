@@ -13,6 +13,8 @@ use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\TextLabel;
 use Closure;
 use Domain\Admin\Models\Admin;
+use Domain\Payments\Enums\PaymentRemark;
+use Domain\Payments\Enums\PaymentStatus;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Events\AdminServiceBillBankPaymentEvent;
 use Domain\ServiceOrder\Models\ServiceBill;
@@ -27,6 +29,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
@@ -269,22 +272,30 @@ class ViewServiceBill extends ViewRecord
                     /** @var \Domain\Payments\Models\Payment $payment */
                     $payment = $record->latestPayment();
 
+                    if (is_null($paymentRemarks)) {
+                        Notification::make()
+                            ->title(trans('No status found!'))
+                            ->warning()
+                            ->send();
+
+                        return;
+                    }
+
                     $result = $payment->update([
                         'remarks' => $paymentRemarks,
                         'admin_message' => $message,
                     ]);
 
-                    if ($result) {
-                        $payment->update([
-                            'status' => 'paid',
-                        ]);
+                    if (! $result) {
+                        Notification::make()
+                            ->title(trans('Invalid Data!'))
+                            ->danger()
+                            ->send();
 
-                        $record->update([
-                            'status' => ServiceBillStatus::PAID,
-                        ]);
+                        return;
+                    }
 
-                        $set('status', ucfirst(ServiceBillStatus::PAID->value));
-                    } else {
+                    if ($paymentRemarks === PaymentRemark::DECLINED->value) {
                         $payment->update([
                             'status' => 'pending',
                         ]);
@@ -295,20 +306,33 @@ class ViewServiceBill extends ViewRecord
 
                         $set('status', ucfirst(ServiceBillStatus::PENDING->value));
                     }
-                    Notification::make()
-                        ->title(trans('Proof of payment updated successfully'))
-                        ->success()
-                        ->send();
-                    try {
-                        event(new AdminServiceBillBankPaymentEvent(
-                            $record,
-                            $paymentRemarks,
-                        ));
-                    } catch (ModelNotFoundException $e) {
+
+                    if ($paymentRemarks === PaymentRemark::APPROVED->value) {
+                        $payment->update([
+                            'status' => PaymentStatus::PAID,
+                        ]);
+
+                        $record->update([
+                            'status' => ServiceBillStatus::PAID,
+                        ]);
+
+                        $set('status', ucfirst(ServiceBillStatus::PAID->value));
+
                         Notification::make()
-                            ->title(trans($e->getMessage()))
-                            ->danger()
+                            ->title(trans('Proof of payment updated successfully'))
+                            ->success()
                             ->send();
+                        try {
+                            event(new AdminServiceBillBankPaymentEvent(
+                                $record,
+                                $paymentRemarks,
+                            ));
+                        } catch (ModelNotFoundException $e) {
+                            Notification::make()
+                                ->title(trans($e->getMessage()))
+                                ->danger()
+                                ->send();
+                        }
                     }
 
                 });
@@ -355,10 +379,13 @@ class ViewServiceBill extends ViewRecord
                     })->disabled(),
                 Forms\Components\Select::make('payment_remarks')
                     ->label('Status')
-                    ->options([
-                        'approved' => 'Approved',
-                        'declined' => 'Declined',
-                    ]),
+                    ->required()
+                    ->options(
+                        collect(PaymentRemark::cases())
+                            ->mapWithKeys(fn (PaymentRemark $target) => [$target->value => Str::headline($target->value)])
+                            ->toArray()
+                    )
+                    ->enum(PaymentRemark::class),
                 Forms\Components\Textarea::make('message')
                     ->maxLength(255)
                     ->label(trans('Admin Message'))
