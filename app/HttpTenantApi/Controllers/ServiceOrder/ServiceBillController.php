@@ -19,7 +19,6 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('service-order/service-bills', only: ['show', 'update']),
-    Middleware(['auth:sanctum'])
 ]
 class ServiceBillController
 {
