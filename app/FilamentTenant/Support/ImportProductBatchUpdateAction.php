@@ -27,7 +27,7 @@ class ImportProductBatchUpdateAction
             ->processRowsUsing(fn (array $row) => self::processBatchUpdate($row))
             ->withValidation(
                 rules: [
-                    'product_id' => 'required|integer',
+                    'product_id' => 'required|numeric',
                     'is_variant' => ['required', new Enum(Decision::class)],
                     'variant_id' => 'nullable|integer',
                     'name' => 'nullable|string|max:100',

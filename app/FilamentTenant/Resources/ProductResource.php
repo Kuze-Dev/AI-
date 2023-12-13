@@ -474,7 +474,7 @@ class ProductResource extends Resource
                                         'id' => $optionValue->id,
                                         'slug' => $optionValue->slug,
                                         'name' => $optionValue->name,
-                                        'icon_type' => $optionValue->data['icon_type'] ?? 'colored',
+                                        'icon_type' => $optionValue->data['icon_type'] ?? 'color_palette',
                                         'icon_value' => $optionValue->data['icon_value'] ?? '',
                                         'images' => $optionValueImages,
                                         'product_option_id' => $optionValue->product_option_id,
@@ -493,6 +493,21 @@ class ProductResource extends Resource
                         })
                         ->schema([
                             Forms\Components\TextInput::make('name')
+                                ->rules([
+                                    function (Closure $get) {
+                                        return function (string $attribute, $value, Closure $fail) use ($get) {
+                                            $optionsData = $get('../*');
+
+                                            $count = count(array_filter($optionsData, function ($item) use ($value) {
+                                                return strtolower($item['name']) === strtolower($value);
+                                            }));
+
+                                            if ($count > 1) {
+                                                $fail('The :attribute has duplicate.');
+                                            }
+                                        };
+                                    },
+                                ])
                                 ->translateLabel()
                                 ->maxLength(100)
                                 ->required(),
@@ -523,7 +538,7 @@ class ProductResource extends Resource
                                         ->schema(
                                             [
                                                 Forms\Components\TextInput::make('name')->rules([
-                                                    function (Closure $get, $state) {
+                                                    function (Closure $get) {
                                                         return function (string $attribute, $value, Closure $fail) use ($get) {
                                                             $optionsData = $get('../../../*');
 
@@ -536,14 +551,14 @@ class ProductResource extends Resource
                                                                 foreach ($current as $key => $item) {
                                                                     if (is_array($item)) {
                                                                         $stack[] = $item;
-                                                                    } elseif ($key === 'name' && $item === $value) {
+                                                                    } elseif ($key === 'name' && strtolower($item) === strtolower($value)) {
                                                                         $largeStrings[] = $item;
                                                                     }
                                                                 }
                                                             }
 
                                                             if (count($largeStrings) > 1) {
-                                                                $fail('The :attribute has duplicate.');
+                                                                $fail('The :attribute has duplicates.');
                                                             }
                                                         };
                                                     },
