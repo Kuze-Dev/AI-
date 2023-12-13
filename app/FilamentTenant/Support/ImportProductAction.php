@@ -88,7 +88,7 @@ class ImportProductAction
         $foundProduct = Product::where('name', $data['name'])
             ->with('productOptions', 'productVariants', 'media')
             ->first();
-            
+
         // If the product does not exist, create a new one
         if (! $foundProduct instanceof Product) {
             Log::info(
