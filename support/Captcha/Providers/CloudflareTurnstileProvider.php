@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class CloudflareTurnstileProvider extends BaseProvider
 {
-    public function verify(string $token, string $ip = null): bool
+    public function verify(string $token, ?string $ip = null): bool
     {
         $response = Http::asJson()
             ->post(

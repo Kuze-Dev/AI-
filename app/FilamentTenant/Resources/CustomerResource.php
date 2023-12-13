@@ -111,6 +111,7 @@ class CustomerResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->label(trans('Mobile Number'))
                         ->nullable()
+                        ->numeric()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('birth_date')
                         ->translateLabel()
@@ -214,7 +215,8 @@ class CustomerResource extends Resource
                             }
                         }),
                 ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->disabled(fn ($record) => $record?->trashed()),
             ]);
     }
 
@@ -236,6 +238,7 @@ class CustomerResource extends Resource
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
                     ->translateLabel()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))

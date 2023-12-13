@@ -9,6 +9,7 @@ use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
+use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -22,15 +23,16 @@ class ImportProductAction
     public static function proceed(): ImportAction
     {
         return ImportAction::make()
+            ->uniqueBy('sku')
             ->processRowsUsing(fn (array $row): Product => self::processProductUpload($row))
             ->withValidation(
                 rules: [
-                    'product_id' => 'required|string|max:100',
-                    'image_link' => 'nullable|string',
+                    'product_id' => 'required|alpha_num|max:100',
+                    'image_link' => 'nullable|url:http,https',
                     'name' => 'required|string|max:100',
                     'category' => 'required|string|max:100',
                     'brand' => 'required|string|max:100',
-                    'sku' => 'required|string|max:100',
+                    'sku' => 'required|string|unique:product_variants|max:100',
                     'stock' => ['required', 'numeric', new MinimumValueRule(0)],
                     'retail_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
                     'selling_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
@@ -55,11 +57,11 @@ class ImportProductAction
 
         // Prepare the data for the product
         $data = [
-            'images' => $row['image_link'],
+            'images' => [$row['image_link']],
             'name' => $row['name'],
             'categories' => $row['category'],
             'brand' => $row['brand'],
-            'product_sku' => $row['product_id'] ?? $row['sku'],
+            'product_sku' => (string) $row['product_id'],
             'sku' => $row['sku'],
             'stock' => $row['stock'],
             'retail_price' => $row['retail_price'],
@@ -83,19 +85,29 @@ class ImportProductAction
 
         // Check if the product already exists in the database
         $foundProduct = Product::where('name', $data['name'])
-            ->with('productOptions', 'productVariants')
+            ->with('productOptions', 'productVariants', 'media')
             ->first();
 
         // If the product does not exist, create a new one
         if (! $foundProduct instanceof Product) {
+            Log::info(
+                'Import row(s) of product in CREATE ',
+                [
+                    'name' => $data['name'],
+                    'product_id' => $data['product_sku'],
+                    'sku' => $data['sku'],
+                ]
+            );
+
             return app(CreateProductAction::class)->execute(ProductData::fromCsv([
                 ...$data,
-                'sku' => $data['product_sku'] ?? $data['sku'],
+                'sku' => $data['product_sku'],
             ]));
         }
 
         // Merge the product options and variants with the existing product
         $data['product_options'] = self::mergingProductOptions($foundProduct, $data['product_options']);
+
         $data['product_variants'] = self::mergingProductVariants($foundProduct, $data);
 
         // Check for possible sku duplication
@@ -122,23 +134,39 @@ class ImportProductAction
         }
 
         Log::info(
-            'Import row(s) of product ',
+            'Import row(s) of product for UPDATE ',
             [
                 'name' => $data['name'],
-                'product_id' => $data['product_sku'] ?? $data['sku'],
+                'product_id' => $data['product_sku'],
                 'sku' => $data['sku'],
             ]
         );
 
+        if ($foundProduct->getMedia('image')->toArray()) {
+            $data['skip_media_sync'] = true;
+        }
+
         // Update the existing product
         return app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsv([
             ...$data,
-            'sku' => $data['product_sku'] ?? $data['sku'],
+            'sku' => $data['product_sku'],
         ]));
     }
 
     protected static function validateIncomingProductOptions(array $row): void
     {
+        for ($i = 1; $i <= 10; $i++) {
+            if (
+                isset($row["product_option_2_value_{$i}_image_link"])
+                || isset($row["product_option_2_value_{$i}_icon_type"])
+                || isset($row["product_option_2_value_{$i}_icon_value"])
+            ) {
+                throw ValidationException::withMessages([
+                    'product_option_2_name' => trans("{$row['name']}'s option 2 must not have details related to icon and image customization"),
+                ]);
+            }
+        }
+
         $productOptions = ProductOption::select('id', 'name')
             ->where('product_id', function ($query) use ($row) {
                 $query->select('id')
@@ -170,7 +198,26 @@ class ImportProductAction
                     'id' => $item->id,
                     'name' => $item->name,
                     'slug' => $item->slug,
-                    'productOptionValues' => $item->productOptionValues->toArray(),
+                    'is_custom' => $item->is_custom,
+                    'productOptionValues' => array_map(function ($optionValue) {
+                        $optionValueModel = ProductOptionValue::
+                            // with('media')
+                            where('id', $optionValue['id'])
+                                ->first();
+
+                        if (! $optionValueModel) {
+                            return [];
+                        }
+
+                        $toReturn = [
+                            ...$optionValue,
+                            ...$optionValue['data'],
+                            // 'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
+                        ];
+                        unset($toReturn['data']);
+
+                        return $toReturn;
+                    }, $item->productOptionValues->toArray()),
                 ];
             }
         )->toArray();
@@ -186,8 +233,31 @@ class ImportProductAction
                 ) {
                     $csvRowOptionValues = $csvRowOption['productOptionValues'];
 
+                    $mappedExistingOptionValues = array_map(function ($optionValue) {
+                        $optionValueModel = ProductOptionValue::
+                            // with('media')
+                            where('id', $optionValue['id'])
+                                ->first();
+
+                        if (! $optionValueModel) {
+                            return [];
+                        }
+
+                        return [
+                            ...$optionValue,
+                            // 'images' => $optionValueModel->getMedia('media')->pluck('uuid')->toArray(),
+                        ];
+                    }, $existingOptions[$index]['productOptionValues']);
+
                     /** @var array $csvRowOptionValues */
                     $collectedCsvRowOptionValues = collect($csvRowOptionValues)
+                        ->filter(function ($csvOptionValue) use ($mappedExistingOptionValues) {
+                            $matchedElements = array_filter($mappedExistingOptionValues, function ($element) use ($csvOptionValue) {
+                                return trim(strtolower($csvOptionValue['name'])) === trim(strtolower($element['name']));
+                            });
+
+                            return ! $matchedElements;
+                        })
                         ->map(function ($optionValue) use ($existingOption) {
                             return [
                                 ...$optionValue,
@@ -197,7 +267,7 @@ class ImportProductAction
 
                     $existingOptions[$index]['productOptionValues'] =
                         array_merge(
-                            $existingOptions[$index]['productOptionValues'],
+                            $mappedExistingOptionValues,
                             $collectedCsvRowOptionValues,
                         );
 
@@ -217,37 +287,17 @@ class ImportProductAction
 
     protected static function mergingProductVariants(Product $foundProduct, array $data): array
     {
-        $productOptions = $data['product_options'];
         $productVariants = $data['product_variants'];
 
-        // If first and second product option have 2 or more option values, generate cross combination
-        if (
-            isset($productOptions[1])
-            && count($productOptions[0]) >= 2
-            && count($productOptions[1]) >= 2
-        ) {
-            return self::generateCombinations($data, $productOptions);
-        }
-
         $existingVariants = $foundProduct->productVariants->toArray();
-        // Iterate through $inputVariants and $existingVariants
-
-        foreach ($productVariants as &$inputVariant) {
-            foreach ($existingVariants as $existingVariant) {
-                foreach ($inputVariant['combination'] as &$inputCombination) {
-                    // Check if the "option" matches
-                    foreach ($existingVariant['combination'] as $existingCombination) {
-
-                        if ($inputCombination['option'] == $existingCombination['option']) {
-                            // Update the "option_id" from $existingVariants
-                            $inputCombination['option_id'] = $existingCombination['option_id'];
-                        }
-                    }
-                }
-            }
-        }
 
         return array_merge($productVariants, $existingVariants);
+    }
+
+    protected static function newGenerateCombination(array $row, array $inputArray): array
+    {
+
+        return [];
     }
 
     protected static function generateCombinations(array $row, array $inputArray): array
@@ -264,7 +314,7 @@ class ImportProductAction
 
         $option1Values->each(function ($optionValue1, $key1) use ($option2Values, $row, $inputArray, &$outputArray) {
             if ($option2Values->isNotEmpty()) {
-                $option2Values->each(function ($optionValue2, $key2) use ($optionValue1, $key1, $row, $inputArray, &$outputArray) {
+                $option2Values->each(function ($optionValue2, $key2) use ($optionValue1, $row, $inputArray, &$outputArray) {
                     $combination = [
                         [
                             'option' => $inputArray[0]['name'],
@@ -286,7 +336,8 @@ class ImportProductAction
                         'selling_price' => $row['selling_price'],
                         'retail_price' => $row['retail_price'],
                         'stock' => $row['stock'],
-                        'sku' => $row['sku'].$key1.$key2,
+                        'sku' => $row['sku'],
+                        // 'sku' => $row['sku'].$key1.$key2,
                         'status' => true,
                     ];
                 });
@@ -307,6 +358,7 @@ class ImportProductAction
                     'selling_price' => $row['selling_price'],
                     'retail_price' => $row['retail_price'],
                     'stock' => $row['stock'],
+                    // 'sku' => $row['sku'].$keyOne,
                     'sku' => $row['sku'].$keyOne,
                     'status' => true,
                 ];
@@ -327,6 +379,9 @@ class ImportProductAction
                     'id' => uniqid(),
                     'name' => $row["product_option_{$i}_name"],
                     'slug' => $row["product_option_{$i}_name"],
+                    'is_custom' => isset($row["product_option_{$i}_is_custom"])
+                        && $row["product_option_{$i}_is_custom"]
+                        == 'yes' ? true : false,
                     'productOptionValues' => [],
                 ];
 
@@ -336,6 +391,9 @@ class ImportProductAction
                         'id' => uniqid(),
                         'name' => $row["product_option_{$i}_value_{$j}"],
                         'slug' => $row["product_option_{$i}_value_{$j}"],
+                        'icon_type' => $i === 1 ? ($row["product_option_{$i}_value_{$j}_icon_type"] ?? 'text') : 'text',
+                        'icon_value' => $i === 1 ? ($row["product_option_{$i}_value_{$j}_icon_value"] ?? '') : '',
+                        // 'images' => $i === 1 ? (isset($row["product_option_{$i}_value_{$j}_image_link"]) ? [$row["product_option_{$i}_value_{$j}_image_link"]] : null) : [],
                         'product_option_id' => $productOption['id'],
                     ]);
 

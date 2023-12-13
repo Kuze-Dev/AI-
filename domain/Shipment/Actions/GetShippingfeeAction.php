@@ -19,7 +19,7 @@ class GetShippingfeeAction
         ParcelData $parcelData,
         ShippingMethod $shippingMethod,
         ShippingAddressData $address,
-        int|string $serviceID = null
+        int|string|null $serviceID = null
     ): float {
 
         return $this->getShippingRateAction->execute(

@@ -53,7 +53,7 @@ trait LogsFormActivity
         return count($this->formChanges()) > 0;
     }
 
-    protected function logFormActivity(string $event, string $description = null): ?Activity
+    protected function logFormActivity(string $event, ?string $description = null): ?Activity
     {
         $activityLogger = app(ActivityLogger::class)
             ->useLog($this->getLogName())

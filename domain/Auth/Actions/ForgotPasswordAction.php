@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Password;
 
 class ForgotPasswordAction
 {
-    public function execute(string $email, string $broker = null): PasswordResetResult
+    public function execute(string $email, ?string $broker = null): PasswordResetResult
     {
         $result = Password::broker($broker)
             ->sendResetLink(

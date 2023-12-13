@@ -34,7 +34,7 @@ class CustomerRequestFactory extends RequestFactory
             'register_status' => RegisterStatus::REGISTERED->value,
             'password' => 'secret',
             'password_confirmation' => 'secret',
-            'mobile' => $this->faker->phoneNumber(),
+            'mobile' => $this->faker->numerify('###########'),
             'birth_date' => now()->subYears($this->faker->randomDigitNotNull())->format('Y-m-d'),
         ];
     }

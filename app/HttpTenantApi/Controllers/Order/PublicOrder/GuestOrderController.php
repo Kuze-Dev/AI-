@@ -26,13 +26,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
-use Spatie\RouteAttributes\Attributes\Resource;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 
 #[
-    Resource('guest/orders', apiResource: true, except: 'destroy', names: 'guest.orders'),
+    ApiResource('guest/orders', only: ['store', 'show', 'update'], names: 'guest.orders'),
     Middleware(['feature.tenant:'.AllowGuestOrder::class])
 ]
 class GuestOrderController extends Controller

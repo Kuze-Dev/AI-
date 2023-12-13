@@ -16,6 +16,7 @@ use App\FilamentTenant\Support\ProductVariant;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Product\Actions\DeleteProductAction;
+use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Models\Product;
@@ -35,6 +36,7 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\Excel\Actions\ExportBulkAction;
 use Throwable;
 
 class ProductResource extends Resource
@@ -360,6 +362,63 @@ class ProductResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->translateLabel(),
+                ExportBulkAction::make()
+                    ->queue()
+                    ->query(fn (Builder $query) => $query->with('productVariants')->latest())
+                    ->mapUsing(
+                        [
+                            'product_id', 'is_variant', 'variant_id', 'name', 'variant_combination', 'sku',
+                            'retail_price', 'selling_price', 'stock', 'status', 'is_digital_product',
+                            'is_featured', 'is_special_offer', 'allow_customer_remarks', 'allow_stocks',
+                            'allow_guest_purchase', 'weight', 'length', 'width', 'height', 'minimum_order_quantity',
+                        ],
+                        function (Product $product) {
+                            $productData = [
+                                [
+                                    $product->id,
+                                    Decision::NO->value,
+                                    '',
+                                    $product->name,
+                                    '',
+                                    $product->sku,
+                                    $product->retail_price,
+                                    $product->selling_price,
+                                    $product->stock,
+                                    $product->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+                                    $product->is_digital_product ? Decision::YES->value : Decision::NO->value,
+                                    $product->is_featured ? Decision::YES->value : Decision::NO->value,
+                                    $product->is_special_offer ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_customer_remarks ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_stocks ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_guest_purchase ? Decision::YES->value : Decision::NO->value,
+                                    $product->weight,
+                                    $product->dimension['length'] ?? '',
+                                    $product->dimension['width'] ?? '',
+                                    $product->dimension['height'] ?? '',
+                                    $product->minimum_order_quantity,
+                                ],
+                            ];
+                            foreach ($product->productVariants as $variant) {
+                                $productData[] =
+                                    [
+                                        $variant->product_id,
+                                        Decision::YES->value,
+                                        $variant->id,
+                                        '',
+                                        $variant->combination,
+                                        $variant->sku,
+                                        $variant->retail_price,
+                                        $variant->selling_price,
+                                        $variant->stock,
+                                        $variant->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+
+                                    ];
+                            }
+
+                            return $productData;
+                        }
+                    ),
+
             ])
             ->defaultSort('updated_at', 'desc');
     }
@@ -463,7 +522,32 @@ class ProductResource extends Resource
                                     Forms\Components\Group::make()
                                         ->schema(
                                             [
-                                                Forms\Components\TextInput::make('name')
+                                                Forms\Components\TextInput::make('name')->rules([
+                                                    function (Closure $get, $state) {
+                                                        return function (string $attribute, $value, Closure $fail) use ($get) {
+                                                            $optionsData = $get('../../../*');
+
+                                                            $largeStrings = [];
+                                                            $stack = [$optionsData];
+
+                                                            while (! empty($stack)) {
+                                                                $current = array_shift($stack);
+
+                                                                foreach ($current as $key => $item) {
+                                                                    if (is_array($item)) {
+                                                                        $stack[] = $item;
+                                                                    } elseif ($key === 'name' && $item === $value) {
+                                                                        $largeStrings[] = $item;
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            if (count($largeStrings) > 1) {
+                                                                $fail('The :attribute has duplicate.');
+                                                            }
+                                                        };
+                                                    },
+                                                ])
                                                     ->translateLabel()
                                                     ->maxLength(100)
                                                     ->lazy()
@@ -487,32 +571,32 @@ class ProductResource extends Resource
                                     Forms\Components\ColorPicker::make('icon_value')
                                         ->label(trans('Icon Value (HEX)'))
                                         ->hidden(fn (Closure $get) => ! ($get('icon_type') === 'color_palette' && $get('../../is_custom'))),
-                                    Forms\Components\FileUpload::make('images')
-                                        ->label(trans('Images (Preview Slides)'))
-                                        ->image()
-                                        ->mediaLibraryCollection('media')
-                                        ->multiple()
-                                        ->hidden(
-                                            fn (Closure $get) => isset($get('../../../*')[1])
-                                                && isset($get('../../../*')[1]['id'])
-                                                && $get('../../../*')[1]['id'] === $get('../../id')
-                                        )
-                                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                                            $mediaClass = config('media-library.media_model', Media::class);
+                                    // Forms\Components\FileUpload::make('images')
+                                    //     ->label(trans('Images (Preview Slides)'))
+                                    //     ->image()
+                                    //     ->mediaLibraryCollection('media')
+                                    //     ->multiple()
+                                    //     ->hidden(
+                                    //         fn (Closure $get) => isset($get('../../../*')[1])
+                                    //             && isset($get('../../../*')[1]['id'])
+                                    //             && $get('../../../*')[1]['id'] === $get('../../id')
+                                    //     )
+                                    //     ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                                    //         $mediaClass = config('media-library.media_model', Media::class);
 
-                                            /** @var ?Media $media */
-                                            $media = $mediaClass::findByUuid($file);
+                                    //         /** @var ?Media $media */
+                                    //         $media = $mediaClass::findByUuid($file);
 
-                                            if ($component->getVisibility() === 'private') {
-                                                try {
-                                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                                } catch (Throwable $exception) {
-                                                    // This driver does not support creating temporary URLs.
-                                                }
-                                            }
+                                    //         if ($component->getVisibility() === 'private') {
+                                    //             try {
+                                    //                 return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                    //             } catch (Throwable $exception) {
+                                    //                 // This driver does not support creating temporary URLs.
+                                    //             }
+                                    //         }
 
-                                            return $media?->getUrl();
-                                        }),
+                                    //         return $media?->getUrl();
+                                    //     }),
 
                                 ])
                                 ->minItems(1)
@@ -618,15 +702,15 @@ class ProductResource extends Resource
                                         ->dehydrateStateUsing(fn ($state) => (float) $state)
                                         ->required(),
                                 ])->columns(2),
-                            Forms\Components\Section::make('Status')
-                                ->translateLabel()
-                                ->schema([
-                                    Forms\Components\Toggle::make('status')
-                                        ->label(
-                                            fn ($state) => $state ? trans(STATUS::ACTIVE->value) : trans(STATUS::INACTIVE->value)
-                                        )
-                                        ->helperText('This product variant will be hidden from all sales channels.'),
-                                ]),
+                            // Forms\Components\Section::make('Status')
+                            //     ->translateLabel()
+                            //     ->schema([
+                            //         Forms\Components\Toggle::make('status')
+                            //             ->label(
+                            //                 fn ($state) => $state ? trans(STATUS::ACTIVE->value) : trans(STATUS::INACTIVE->value)
+                            //             )
+                            //             ->helperText('This product variant will be hidden from all sales channels.'),
+                            //     ]),
                         ]),
                 ]),
         ])->hiddenOn('create');
