@@ -12,6 +12,7 @@ use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -207,6 +208,14 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     public function productOptions(): HasMany
     {
         return $this->hasMany(ProductOption::class);
+    }
+
+    /**
+     * Get all of the option values of product option.
+     */
+    public function productOptionValues(): HasManyThrough
+    {
+        return $this->hasManyThrough(ProductOptionValue::class, ProductOption::class);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
