@@ -157,7 +157,7 @@ class UpdateProductOptionAction
         }
     }
 
-    protected function searchAndChangeValueByName(string|int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
+    protected function searchAndChangeValueByName(string $needle, array $haystack, int $newValue, string $field = 'option_id'): array
     {
         return collect($haystack)->map(function ($variant) use ($needle, $newValue, $field) {
             /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
