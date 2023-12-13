@@ -45,8 +45,6 @@ class CheckoutServiceOrderAction
 
         $this->serviceOrder = $this->prepareServiceOrder();
 
-        $this->validateUser();
-
         return $this->proceedPayment();
     }
 
