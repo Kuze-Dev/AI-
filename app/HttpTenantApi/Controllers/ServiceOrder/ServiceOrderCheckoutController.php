@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 #[
     ApiResource('service-transaction', only: ['store']),
-    Middleware(['auth:sanctum'])
 ]
 class ServiceOrderCheckoutController
 {
