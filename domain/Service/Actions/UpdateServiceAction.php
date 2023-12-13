@@ -38,6 +38,7 @@ class UpdateServiceAction
             'status' => $serviceData->status,
             'needs_approval' => $serviceData->needs_approval,
             'is_auto_generated_bill' => $serviceData->is_auto_generated_bill,
+            'is_partial_payment' => $serviceData->is_partial_payment,
         ]);
 
         $service->taxonomyTerms()->sync([$serviceData->taxonomy_term_id]);

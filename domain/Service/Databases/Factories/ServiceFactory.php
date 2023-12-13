@@ -37,6 +37,7 @@ class ServiceFactory extends Factory
             'status' => $this->faker->boolean(),
             'needs_approval' => $this->faker->boolean(),
             'is_auto_generated_bill' => $this->faker->boolean(),
+            'is_partial_payment' => $this->faker->boolean(),
         ];
     }
 
@@ -86,6 +87,13 @@ class ServiceFactory extends Factory
     {
         return $this->state([
             'is_auto_generated_bill' => $autoGenerateBill,
+        ]);
+    }
+
+    public function isPartialPayment(bool $isPartialPayment = true): self
+    {
+        return $this->state([
+            'is_partial_payment' => $isPartialPayment,
         ]);
     }
 

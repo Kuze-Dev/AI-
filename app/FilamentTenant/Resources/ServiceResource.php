@@ -341,6 +341,8 @@ class ServiceResource extends Resource
                     ->reactive(),
                 Forms\Components\Toggle::make('needs_approval')
                     ->label(trans('Needs Approval')),
+                Forms\Components\Toggle::make('is_partial_payment')
+                    ->label(trans('Partial Payment')),
             ])
             ->registerListeners([
                 'status::update' => [
