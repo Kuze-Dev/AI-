@@ -13,7 +13,6 @@ use Domain\ServiceOrder\Requests\ServiceTransactionStoreRequest;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\RouteAttributes\Attributes\ApiResource;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Symfony\Component\HttpFoundation\Response;
 
 #[
