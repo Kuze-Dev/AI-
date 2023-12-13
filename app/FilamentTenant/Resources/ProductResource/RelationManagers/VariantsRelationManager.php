@@ -6,13 +6,13 @@ namespace App\FilamentTenant\Resources\ProductResource\RelationManagers;
 
 // use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
 // use Domain\Product\Rules\UniqueProductSkuRule;
+use Closure;
+use Domain\Product\Enums\Status;
+use Domain\Product\Models\ProductVariant;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Closure;
-use Domain\Product\Enums\Status;
-use Domain\Product\Models\ProductVariant;
 
 class VariantsRelationManager extends RelationManager
 {
@@ -32,9 +32,9 @@ class VariantsRelationManager extends RelationManager
                                 foreach ($state['combination'] as $key => $combination) {
                                     $schemaArray[$key] =
                                         \Filament\Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                        ->formatStateUsing(fn () => ucfirst($combination['option_value']))
-                                        ->label(trans(ucfirst($combination['option'])))
-                                        ->disabled();
+                                            ->formatStateUsing(fn () => ucfirst($combination['option_value']))
+                                            ->label(trans(ucfirst($combination['option'])))
+                                            ->disabled();
                                 }
 
                                 return $schemaArray;
@@ -122,17 +122,8 @@ class VariantsRelationManager extends RelationManager
                     ->translateLabel()
                     ->searchable()
                     ->sortable(),
-                // Tables\Columns\TextColumn::make('combination')
-                //     ->label(trans('Variation'))
-                //     ->formatStateUsing(function ($state) {
-                //         dd($state);
-                //         // foreach ($state as $key => $itemOne) {
-                //         //     dd($itemOne['option_value']);
-                //         //     // return ucfirst($itemOne['option_value']) . " / ";
-                //         // }
-                //         // {{ ucfirst($itemOne['option_value']) }} /
-
-                //     }),
+                Tables\Columns\TextColumn::make('stringCombination')
+                    ->label(trans('Variation')),
                 Tables\Columns\TextColumn::make('retail_price')
                     ->translateLabel()
                     ->searchable()
