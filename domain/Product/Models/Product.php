@@ -212,6 +212,8 @@ class Product extends Model implements HasMedia, HasMetaDataContract
 
     /**
      * Get all of the option values of product option.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Domain\Product\Models\ProductOptionValue>
      */
     public function productOptionValues(): HasManyThrough
     {

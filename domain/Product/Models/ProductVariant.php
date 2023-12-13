@@ -65,6 +65,8 @@ class ProductVariant extends Model
 
     /**
      * Get the stringify combination (array)
+     *
+     * @return Attribute<string, static>
      */
     protected function stringCombination(): Attribute
     {

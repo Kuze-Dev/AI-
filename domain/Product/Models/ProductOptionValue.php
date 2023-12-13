@@ -66,16 +66,20 @@ class ProductOptionValue extends Model implements HasMedia
 
     /**
      * Get the product option name
+     *
+     * @return Attribute<string, static>
      */
     protected function productOptionName(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->productOption->name,
+            get: fn ($value) => $this->productOption ? $this->productOption->name : '',
         );
     }
 
     /**
      * Get the icon details
+     *
+     * @return Attribute<string, static>
      */
     protected function iconDetails(): Attribute
     {
