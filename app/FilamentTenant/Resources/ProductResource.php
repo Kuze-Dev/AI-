@@ -474,7 +474,7 @@ class ProductResource extends Resource
                                         'id' => $optionValue->id,
                                         'slug' => $optionValue->slug,
                                         'name' => $optionValue->name,
-                                        'icon_type' => $optionValue->data['icon_type'] ?? 'colored',
+                                        'icon_type' => $optionValue->data['icon_type'] ?? 'color_palette',
                                         'icon_value' => $optionValue->data['icon_value'] ?? '',
                                         'images' => $optionValueImages,
                                         'product_option_id' => $optionValue->product_option_id,
