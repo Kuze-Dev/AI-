@@ -22,7 +22,8 @@ class ImportProductAction
 {
     public static function proceed(): ImportAction
     {
-        return ImportAction::make()
+        return ImportAction::make('Product Import')
+            ->translateLabel()
             ->uniqueBy('sku')
             ->processRowsUsing(fn (array $row): Product => self::processProductUpload($row))
             ->withValidation(
@@ -47,7 +48,7 @@ class ImportProductAction
     public static function processProductUpload(array $row): Product
     {
         // Validate that the product has a maximum of 2 options
-        self::validateIncomingProductOptions($row);
+        self::validateIncomingProductOptions($row); // pwede comment
 
         // Map product options and its values
         $productOptions = self::mapProductOptions($row);
@@ -75,7 +76,7 @@ class ImportProductAction
         ];
 
         // Collect taxonomy term IDs for the product
-        $data['taxonomy_terms'] = self::collectTaxonomyTermIds($data);
+        $data['taxonomy_terms'] = self::collectTaxonomyTermIds($data); // pwede comment
 
         // Remove unnecessary data from the $row and $data arrays
         unset($row, $data['categories'], $data['brand']);
@@ -87,7 +88,7 @@ class ImportProductAction
         $foundProduct = Product::where('name', $data['name'])
             ->with('productOptions', 'productVariants', 'media')
             ->first();
-
+            
         // If the product does not exist, create a new one
         if (! $foundProduct instanceof Product) {
             Log::info(
