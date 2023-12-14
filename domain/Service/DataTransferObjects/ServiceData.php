@@ -23,6 +23,7 @@ class ServiceData
         public readonly bool $needs_approval = false,
         public readonly bool $is_auto_generated_bill = false,
         public readonly bool $is_partial_payment = false,
+        public readonly bool $is_installment = false,
         public readonly ?array $meta_data = [],
         public readonly ?array $media_collection = [],
     ) {
@@ -48,7 +49,8 @@ class ServiceData
             status: $data['status'],
             needs_approval: $data['needs_approval'],
             is_auto_generated_bill: $data['is_auto_generated_bill'] ?? false,
-            is_partial_payment: $data['is_partial_payment'] ?? false,
+            is_partial_payment: $data['is_partial_payment'],
+            is_installment: $data['is_installment'],
             meta_data: $data['meta_data'],
             media_collection: ['collection' => 'media', 'materials' => $data['media']],
         );

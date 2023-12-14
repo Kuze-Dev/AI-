@@ -37,6 +37,7 @@ class ServiceController
                     'needs_approval',
                     'is_auto_generated_bill',
                     'is_partial_payment',
+                    'is_installment',
                     AllowedFilter::callback(
                         'taxonomies',
                         function (Builder $query, array $value) {

@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::table('services', function (Blueprint $table) {
             $table->boolean('is_partial_payment')->default(false)->after('is_auto_generated_bill');
+            $table->boolean('is_installment')->default(false)->after('is_partial_payment');
         });
     }
 
@@ -25,6 +26,7 @@ return new class extends Migration
     {
         Schema::table('services', function (Blueprint $table) {
             $table->dropColumn('is_partial_payment');
+            $table->dropColumn('is_installment');
         });
     }
 };

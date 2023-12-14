@@ -100,6 +100,7 @@ it('can edit service', function () {
             'needs_approval' => ! $service->needs_approval,
             'is_auto_generated_bill' => ! $service->is_auto_generated_bill,
             'is_partial_payment' => ! $service->is_partial_payment,
+            'is_installment' => ! $service->is_installment,
             'taxonomy_term_id' => $taxonomyTerm->id,
             'media.0' => $image,
             'meta_data' => $metaData,
