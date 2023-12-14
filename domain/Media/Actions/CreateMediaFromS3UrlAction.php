@@ -25,7 +25,7 @@ class CreateMediaFromS3UrlAction
                     $mediaExcepts[] = $media;
                 }
             } else {
-                if (Str::contains($imageUrl, env('AWS_ENDPOINT'))) {
+                if (Str::contains($imageUrl, config('filesystems.disks.s3.endpoint'))) {
                     $name = $this->getMediaName($imageUrl);
                     $objectPath = $this->getBucketUrl($imageUrl);
 
