@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Product\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -61,6 +62,29 @@ class ProductVariant extends Model
         'combination' => 'array',
         'status' => 'boolean',
     ];
+
+    /**
+     * Get the stringify combination (array)
+     *
+     * @return Attribute<string, static>
+     */
+    protected function stringCombination(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                $combinationString = '';
+
+                foreach ($this->combination as $option) {
+                    $combinationString .= $option['option'].': '.$option['option_value'].' | ';
+                }
+
+                // Remove the trailing comma and space
+                $combinationString = rtrim($combinationString, ' | ');
+
+                return $combinationString;
+            }
+        );
+    }
 
     /**
      * Declare relationship of

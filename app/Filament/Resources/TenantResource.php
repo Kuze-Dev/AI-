@@ -120,7 +120,7 @@ class TenantResource extends Resource
                                     'label' => trans('eCommerce'),
                                     'extras' => [
                                         Features\ECommerce\ColorPallete::class => 'Collor Pallete (Color Selector)',
-
+                                        Features\ECommerce\ProductBatchUpdate::class => 'Product Batch Update',
                                         Features\ECommerce\AllowGuestOrder::class => 'Allow Guest Orders',
                                         Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
                                     ],

@@ -12,7 +12,7 @@ use App\FilamentTenant\Support\Contracts\HasProductOptions as HasProductOptionsC
 use App\FilamentTenant\Support\Contracts\HasProductVariants as HasProductVariantsContracts;
 use App\FilamentTenant\Support\ProductOptionFormAction;
 use App\FilamentTenant\Support\ProductVariantFormAction;
-use Domain\Product\Actions\UpdateProductAction;
+use Domain\Product\Actions\UpdateProductActionV2;
 use Domain\Product\DataTransferObjects\ProductData;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
@@ -54,7 +54,7 @@ class EditProduct extends EditRecord implements HasProductOptionsContracts, HasP
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateProductAction::class)->execute($record, ProductData::fromArray($data)));
+        return DB::transaction(fn () => app(UpdateProductActionV2::class)->execute($record, ProductData::fromArray($data)));
     }
 
     protected function afterSave(): void
