@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\FilamentTenant\Resources\ServiceBillResource\Pages\ListServiceBill;
 use App\FilamentTenant\Resources\ServiceBillResource\Pages\ViewServiceBill;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Carbon\Carbon;
+use Closure;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Filament\Facades\Filament;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 class ServiceBillResource extends Resource
 {
@@ -27,6 +29,29 @@ class ServiceBillResource extends Resource
     protected static ?string $model = ServiceBill::class;
 
     protected static bool $shouldRegisterNavigation = false;
+
+    protected static ?string $slug = 'service-bills';
+
+    public static function getRouteBaseName(): string
+    {
+        return Filament::currentContext().'.resources.service-orders.service-bills';
+    }
+
+    public static function getRoutes(): Closure
+    {
+        return function () {
+            $slug = static::getSlug();
+
+            Route::name("service-orders.{$slug}.")
+                ->prefix('service-orders/{ownerRecord}')
+                ->middleware(static::getMiddlewares())
+                ->group(function () {
+                    foreach (static::getPages() as $name => $page) {
+                        Route::get($page['route'], $page['class'])->name($name);
+                    }
+                });
+        };
+    }
 
     public static function form(Form $form): Form
     {
@@ -73,6 +98,7 @@ class ServiceBillResource extends Resource
                             : $record->bill_date
                     )
                     ->label('Bill Date')
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->translateLabel()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_date')
@@ -81,6 +107,7 @@ class ServiceBillResource extends Resource
                             ? 'N/A'
                             : $record->due_date
                     )
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->label('Due at')
                     ->translateLabel()
                     ->sortable(),
@@ -114,8 +141,7 @@ class ServiceBillResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListServiceBill::route('/'),
-            'view' => ViewServiceBill::route('/{record}'),
+            'view' => ViewServiceBill::route('service-bills/{record}'),
         ];
     }
 
@@ -160,11 +186,7 @@ class ServiceBillResource extends Resource
             $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
         }
 
-        /** @var string */
-        $timeZone = Auth::user()?->timezone;
-
         $formattedState = Carbon::parse($referenceDate)
-            ->setTimezone($timeZone)
             ->format('F d, Y');
 
         return 'Upcoming Bill: '.$formattedState;

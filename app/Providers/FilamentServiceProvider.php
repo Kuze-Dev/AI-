@@ -19,7 +19,9 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions as PageActions;
+use Filament\Pages\Page;
 use Filament\Support\Actions as SupportActions;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +31,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Saade\FilamentLaravelLog\Pages\ViewLog;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -109,6 +112,13 @@ class FilamentServiceProvider extends ServiceProvider
         $this->registerMacros();
 
         $this->configureComponents();
+
+        Page::$reportValidationErrorUsing = function (ValidationException $exception) {
+            Notification::make()
+                ->title($exception->getMessage())
+                ->danger()
+                ->send();
+        };
     }
 
     protected function registerRoutes(): void
@@ -159,10 +169,10 @@ class FilamentServiceProvider extends ServiceProvider
             'withActivityLog',
             function (
                 string $logName = 'admin',
-                Closure|string $event = null,
-                Closure|string $description = null,
-                Closure|array $properties = null,
-                Model|int|string $causedBy = null,
+                Closure|string|null $event = null,
+                Closure|string|null $description = null,
+                Closure|array|null $properties = null,
+                Model|int|string|null $causedBy = null,
             ): SupportActions\Action {
                 /** @var SupportActions\Action $this */
                 return $this->after(function (SupportActions\Action $action) use ($logName, $event, $description, $properties, $causedBy) {
@@ -216,7 +226,7 @@ class FilamentServiceProvider extends ServiceProvider
 
         Forms\Components\Select::macro(
             'optionsFromModel',
-            function (string|Closure $model, string|Closure $titleColumnName, Closure $callback = null): Forms\Components\Select {
+            function (string|Closure $model, string|Closure $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
                 /** @var Forms\Components\Select $this */
                 if (blank($this->getSearchColumns())) {
                     $this->searchable([$this->evaluate($titleColumnName)]);

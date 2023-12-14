@@ -7,15 +7,11 @@ namespace Domain\ServiceOrder\Listeners;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Exceptions\PaymentException;
 use Domain\Payments\Models\Payment;
-use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
-use Domain\ServiceOrder\DataTransferObjects\GetServiceBillingAndDueData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentData;
+use Domain\ServiceOrder\Actions\ServiceOrderPaymentUpdatedPipelineAction;
+use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentUpdatedPipelineData;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
-use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
-use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
-use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceTransaction;
@@ -29,7 +25,7 @@ class ServiceOrderPaymentUpdatedListener
         private ServiceBill $serviceBill,
         private ServiceOrder $serviceOrder,
         private ServiceTransaction $serviceTransaction,
-        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
+        private ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction
     ) {
     }
 
@@ -78,95 +74,31 @@ class ServiceOrderPaymentUpdatedListener
         return $serviceTransaction;
     }
 
-    private function onServiceBillPaid(): ServiceOrderPaymentData
-    {
-        return new ServiceOrderPaymentData(
-            service_transaction_status: ServiceTransactionStatus::PAID,
-            service_bill_status: ServiceBillStatus::PAID
-        );
-    }
-
-    private function onServiceBillRefunded(): ServiceOrderPaymentData
-    {
-        return new ServiceOrderPaymentData(
-            service_transaction_status: ServiceTransactionStatus::REFUNDED,
-            service_bill_status: ServiceBillStatus::PENDING
-        );
-    }
-
-    private function onServiceBillCancelled(): ServiceOrderPaymentData
-    {
-        return new ServiceOrderPaymentData(
-            service_transaction_status: ServiceTransactionStatus::CANCELLED,
-            service_bill_status: ServiceBillStatus::PENDING
-        );
-    }
-
-    private function createServiceBill(): void
-    {
-        $shouldCreateNewServiceBill = $this->serviceOrder->is_subscription &&
-        ! $this->serviceOrder->is_auto_generated_bill;
-
-        if (! $shouldCreateNewServiceBill) {
-            return;
-        }
-
-        /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
-        $createServiceBillJob = CreateServiceBillJob::dispatchIf(
-            $shouldCreateNewServiceBill,
-            $this->serviceOrder,
-            $this->getServiceBillingAndDueDateAction
-                ->execute(
-                    new GetServiceBillingAndDueData(
-                        service_order: $this->serviceOrder,
-                        service_bill: $this->serviceBill,
-                        service_transaction: $this->serviceTransaction
-                    )
-                )
-        );
-
-        $createServiceBillJob->chain([
-            new NotifyCustomerLatestServiceBillJob($this->serviceOrder),
-        ]);
-    }
-
-    private function updateServiceOrderStatus(): void
-    {
-        $this->serviceOrder->update([
-            'status' => $this->serviceOrder->is_subscription
-                ? ServiceOrderStatus::ACTIVE
-                : ServiceOrderStatus::INPROGRESS,
-        ]);
-
-        NotifyCustomerServiceOrderStatusJob::dispatch($this->serviceOrder);
-    }
-
     private function handleServiceBillStatusUpdate(): void
     {
-        /** @var \Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentData $serviceOrderPaymentData */
-        $serviceOrderPaymentData = match ($this->payment->status) {
-            'paid' => $this->onServiceBillPaid(),
-            'refunded', => $this->onServiceBillRefunded(),
-            'cancelled', => $this->onServiceBillCancelled(),
+        /** @var \Domain\ServiceOrder\Enums\ServiceTransactionStatus $serviceTransactionStatus */
+        $serviceTransactionStatus = match ($this->payment->status) {
+            'paid' => ServiceTransactionStatus::PAID,
+            'refunded', => ServiceTransactionStatus::REFUNDED,
+            'cancelled', => ServiceTransactionStatus::CANCELLED,
             default => throw new PaymentException()
         };
 
-        $this->serviceTransaction->update(['status' => $serviceOrderPaymentData->service_transaction_status]);
+        $this->serviceTransaction->update(['status' => $serviceTransactionStatus]);
 
-        $this->serviceBill->update(['status' => $serviceOrderPaymentData->service_bill_status]);
-
-        $isPaid = $this->serviceBill->is_paid && $this->serviceTransaction->is_paid;
-
-        if (! $isPaid) {
-            return;
+        if ($this->serviceTransaction->is_paid) {
+            $this->serviceBill->update(['status' => ServiceBillStatus::PAID]);
         }
 
-        if ($this->serviceOrder->status == ServiceOrderStatus::CLOSED) {
-            return;
-        }
-
-        $this->createServiceBill();
-
-        $this->updateServiceOrderStatus();
+        $this->serviceOrderPaymentUpdatedPipelineAction
+            ->execute(
+                new ServiceOrderPaymentUpdatedPipelineData(
+                    service_order: $this->serviceOrder,
+                    service_bill: $this->serviceBill,
+                    service_transaction: $this->serviceTransaction,
+                    is_payment_paid: $this->serviceBill->is_paid && $this->serviceTransaction->is_paid,
+                    is_service_order_status_closed: $this->serviceOrder->status == ServiceOrderStatus::CLOSED
+                )
+            );
     }
 }

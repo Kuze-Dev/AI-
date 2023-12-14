@@ -51,6 +51,10 @@ class ViewOrderDetails extends ViewRecord
                 ->schema([
                     Forms\Components\Group::make()
                         ->schema([
+                            Support\Carousel::make('order_line_carousel')
+                                ->value(function () use ($orderLine) {
+                                    return $orderLine?->getMedia('order_line_images')->toArray() ?? [];
+                                }),
                             Forms\Components\Group::make()
                                 ->schema([
                                     Forms\Components\FileUpload::make('image_'.$sectionIndex)

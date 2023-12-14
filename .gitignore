@@ -32,3 +32,10 @@ error.log
 output.txt
 Thumbs.db
 .env.ecommerce-branch
+
+# TODO: ignore all public/vendor folder
+/public/vendor/horizon
+/public/vendor/queue-monitor
+
+# tinkerwell generated
+/.phpactor.json

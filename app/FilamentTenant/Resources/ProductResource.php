@@ -6,20 +6,18 @@ namespace App\FilamentTenant\Resources;
 
 use App\Features\ECommerce\AllowGuestOrder;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
+use App\FilamentTenant\Resources\ProductResource\RelationManagers\OptionsRelationManager;
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
+use App\FilamentTenant\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\FilamentTenant\Resources\ReviewResource\RelationManagers\ReviewRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
-use App\FilamentTenant\Support\ProductOption as ProductOptionSupport;
-use App\FilamentTenant\Support\ProductVariant;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Product\Actions\DeleteProductAction;
+use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Models\Product;
-use Domain\Product\Models\ProductOption;
-use Domain\Product\Rules\UniqueProductSkuRule;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
@@ -33,6 +31,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\Excel\Actions\ExportBulkAction;
 
 class ProductResource extends Resource
 {
@@ -108,7 +107,7 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->rules([
-                                    new MinimumValueRule(0.1),
+                                    new MinimumValueRule(0.01),
                                 ])
                                 ->dehydrateStateUsing(fn ($state) => (float) $state),
 
@@ -148,7 +147,7 @@ class ProductResource extends Resource
                         ]),
 
                     /** Form for variant section */
-                    self::getVariantForm(),
+                    // self::getVariantForm(),
 
                     Forms\Components\Section::make('Inventory')
                         ->translateLabel()
@@ -231,6 +230,7 @@ class ProductResource extends Resource
                                 ->label(
                                     fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
                                 )
+                                ->reactive()
                                 ->helperText('This product will be hidden from all sales channels.'),
                             Forms\Components\Toggle::make('allow_guest_purchase')
                                 ->helperText('Item can be purchased by guests.')
@@ -356,6 +356,63 @@ class ProductResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->translateLabel(),
+                ExportBulkAction::make()
+                    ->queue()
+                    ->query(fn (Builder $query) => $query->with('productVariants')->latest())
+                    ->mapUsing(
+                        [
+                            'product_id', 'is_variant', 'variant_id', 'name', 'variant_combination', 'sku',
+                            'retail_price', 'selling_price', 'stock', 'status', 'is_digital_product',
+                            'is_featured', 'is_special_offer', 'allow_customer_remarks', 'allow_stocks',
+                            'allow_guest_purchase', 'weight', 'length', 'width', 'height', 'minimum_order_quantity',
+                        ],
+                        function (Product $product) {
+                            $productData = [
+                                [
+                                    $product->id,
+                                    Decision::NO->value,
+                                    '',
+                                    $product->name,
+                                    '',
+                                    $product->sku,
+                                    $product->retail_price,
+                                    $product->selling_price,
+                                    $product->stock,
+                                    $product->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+                                    $product->is_digital_product ? Decision::YES->value : Decision::NO->value,
+                                    $product->is_featured ? Decision::YES->value : Decision::NO->value,
+                                    $product->is_special_offer ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_customer_remarks ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_stocks ? Decision::YES->value : Decision::NO->value,
+                                    $product->allow_guest_purchase ? Decision::YES->value : Decision::NO->value,
+                                    $product->weight,
+                                    $product->dimension['length'] ?? '',
+                                    $product->dimension['width'] ?? '',
+                                    $product->dimension['height'] ?? '',
+                                    $product->minimum_order_quantity,
+                                ],
+                            ];
+                            foreach ($product->productVariants as $variant) {
+                                $productData[] =
+                                    [
+                                        $variant->product_id,
+                                        Decision::YES->value,
+                                        $variant->id,
+                                        '',
+                                        $variant->combination,
+                                        $variant->sku,
+                                        $variant->retail_price,
+                                        $variant->selling_price,
+                                        $variant->stock,
+                                        $variant->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+
+                                    ];
+                            }
+
+                            return $productData;
+                        }
+                    ),
+
             ])
             ->defaultSort('updated_at', 'desc');
     }
@@ -366,6 +423,8 @@ class ProductResource extends Resource
             ReviewRelationManager::class,
             ActivitiesRelationManager::class,
             TiersRelationManager::class,
+            VariantsRelationManager::class,
+            OptionsRelationManager::class,
         ];
     }
 
@@ -376,170 +435,5 @@ class ProductResource extends Resource
             'create' => ProductResource\Pages\CreateProduct::route('/create'),
             'edit' => ProductResource\Pages\EditProduct::route('/{record}/edit'),
         ];
-    }
-
-    protected static function getVariantForm(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make(trans('Variant'))->schema([
-            /** For Manage Variant */
-            ProductOptionSupport::make('product_options')
-                ->translateLabel()
-                ->itemLabel(fn (array $state) => $state['name'] ?? null)
-                ->schema([
-                    Forms\Components\Repeater::make('options')
-                        ->translateLabel()
-                        ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Product $record, ?array $state, EditProduct $livewire) {
-                            if (! $record) {
-                                return $state;
-                            }
-
-                            $productOptions = $livewire->data['product_options'];
-                            if (($productOptions) !== null) {
-                                $component->state($productOptions['options']);
-
-                                return;
-                            }
-
-                            $record->productOptions->load('productOptionValues');
-                            $mappedOptions = $record->productOptions->map(function (ProductOption $productOption) {
-                                return [
-                                    'id' => $productOption->id,
-                                    'name' => $productOption->name,
-                                    'slug' => $productOption->slug,
-                                    'productOptionValues' => $productOption->productOptionValues,
-                                ];
-                            });
-                            $component->state($mappedOptions->toArray());
-                        })
-                        ->schema([
-                            Forms\Components\TextInput::make('name')
-                                ->translateLabel()
-                                ->maxLength(100)
-                                ->required(),
-                            Forms\Components\Repeater::make('productOptionValues')
-                                ->translateLabel()
-                                ->schema([
-                                    Forms\Components\TextInput::make('name')
-                                        ->translateLabel()
-                                        ->maxLength(100)
-                                        ->label('')
-                                        ->lazy()
-                                        ->required(),
-                                ])
-                                ->minItems(1)
-                                ->disableItemMovement(),
-                        ])
-                        ->disableItemMovement()
-                        ->maxItems(2)
-                        ->collapsible(),
-                ]),
-            ProductVariant::make('product_variants')
-                ->translateLabel()
-                ->itemLabel(fn (array $state) => $state['name'] ?? null)
-                ->formatStateUsing(
-                    function (?Product $record) {
-                        if (! $record) {
-                            return [];
-                        }
-
-                        $newArray = [];
-                        foreach ($record->productVariants->toArray() as $key => $value) {
-                            $newKey = 'record-'.$value['id'];
-                            $newArray[$newKey] = $value;
-                        }
-
-                        return $newArray;
-                    }
-                )
-                ->schema([
-                    Forms\Components\Group::make()
-                        ->schema([
-                            Forms\Components\Group::make()
-                                ->schema(function ($state) {
-                                    $schemaArray = [];
-                                    foreach ($state['combination'] as $key => $combination) {
-                                        $schemaArray[$key] =
-                                            Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                                ->formatStateUsing(fn () => ucfirst($combination['option_value']))
-                                                ->label(trans(ucfirst($combination['option'])))
-                                                ->disabled();
-                                    }
-
-                                    return $schemaArray;
-                                })->columns(2),
-                            Forms\Components\Section::make('Inventory')
-                                ->translateLabel()
-                                ->schema([
-                                    Forms\Components\TextInput::make('sku')
-                                        ->maxLength(100)
-                                        // ->rule(function(EditProduct $livewire) {
-                                        //     dump(func_get_args());
-                                        // })
-                                        ->rule(fn (EditProduct $livewire) => new UniqueProductSkuRule($livewire))
-                                        ->required(),
-                                    Forms\Components\TextInput::make('stock')
-                                        ->translateLabel()
-                                        ->numeric()
-                                        ->minValue(0)
-                                        ->dehydrateStateUsing(fn ($state) => (int) $state),
-                                ])->columns(2),
-                            Forms\Components\Section::make('Pricing')
-                                ->translateLabel()
-                                ->schema([
-                                    Forms\Components\TextInput::make('retail_price')
-                                        ->translateLabel()
-                                        // Put custom rule to validate minimum value
-                                        ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                            prefix: '$',
-                                            thousandsSeparator: ',',
-                                            decimalPlaces: 2,
-                                            isSigned: false
-                                        ))
-                                        ->rules([
-                                            function () {
-                                                return function (string $attribute, mixed $value, Closure $fail) {
-                                                    if ($value <= 0) {
-                                                        $fail("{$attribute} must be above zero.");
-                                                    }
-                                                };
-                                            },
-                                        ])
-                                        ->dehydrateStateUsing(fn ($state) => (float) $state)
-                                        ->required(),
-
-                                    Forms\Components\TextInput::make('selling_price')
-                                        ->translateLabel()
-                                        // Put custom rule to validate minimum value
-                                        ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                            prefix: '$',
-                                            thousandsSeparator: ',',
-                                            decimalPlaces: 2,
-                                            isSigned: false
-                                        ))
-                                        ->rules([
-                                            function () {
-                                                return function (string $attribute, mixed $value, Closure $fail) {
-                                                    if ($value <= 0) {
-                                                        $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                                        $fail("{$attributeName} must be above zero.");
-                                                    }
-                                                };
-                                            },
-                                        ])
-                                        ->dehydrateStateUsing(fn ($state) => (float) $state)
-                                        ->required(),
-                                ])->columns(2),
-                            Forms\Components\Section::make('Status')
-                                ->translateLabel()
-                                ->schema([
-                                    Forms\Components\Toggle::make('status')
-                                        ->label(
-                                            fn ($state) => $state ? trans(STATUS::ACTIVE->value) : trans(STATUS::INACTIVE->value)
-                                        )
-                                        ->helperText('This product variant will be hidden from all sales channels.'),
-                                ]),
-                        ]),
-                ]),
-        ])->hiddenOn('create');
     }
 }

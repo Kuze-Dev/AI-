@@ -24,7 +24,8 @@ class ProductData
         public readonly bool $allow_customer_remarks = false,
         public readonly bool $allow_stocks = true,
         public readonly array $taxonomy_terms = [],
-        public readonly ?bool $allow_guest_purchase = null,
+        public readonly bool $allow_guest_purchase = false,
+        public readonly bool $skip_media_sync = false,
         public readonly ?float $weight = null,
         public ?array $product_options = [],
         public ?array $product_variants = [],
@@ -60,7 +61,7 @@ class ProductData
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
             allow_stocks: $data['allow_stocks'],
-            allow_guest_purchase: isset($data['allow_guest_purchase']) ? $data['allow_guest_purchase'] : null,
+            allow_guest_purchase: $data['allow_guest_purchase'] ?? false,
             images: $data['images'],
             videos: $data['videos'],
             media_collection: [
@@ -76,6 +77,7 @@ class ProductData
                 'selling_price' => (float) $variant['selling_price'],
                 'retail_price' => (float) $variant['retail_price'],
             ])), $data['product_variants'] ?? []),
+            skip_media_sync: $data['skip_media_sync'] ?? false,
         );
     }
 
@@ -97,6 +99,8 @@ class ProductData
             media_collection: [
                 ['collection' => 'image', 'materials' => $data['images']],
             ],
+            allow_guest_purchase: $data['allow_guest_purchase'] ?? false,
+            description: $data['description'] ?? '',
             product_options: array_map(
                 fn ($option) => (ProductOptionData::fromArray($option)),
                 $data['product_options'] ?? []
@@ -106,6 +110,33 @@ class ProductData
                 'selling_price' => (float) $variant['selling_price'],
                 'retail_price' => (float) $variant['retail_price'],
             ])), $data['product_variants'] ?? []),
+            skip_media_sync: $data['skip_media_sync'] ?? false,
+        );
+    }
+
+    public static function fromCsvBulkUpdate(array $data): self
+    {
+        return new self(
+            name: $data['name'],
+            meta_data: MetaDataData::fromArray($data['meta_data']),
+            sku: $data['sku'],
+            retail_price: $data['retail_price'],
+            selling_price: $data['selling_price'],
+            length: $data['length'],
+            width: $data['width'],
+            height: $data['height'],
+            weight: $data['weight'],
+            stock: $data['stock'] ?? null,
+            product_options: array_map(
+                fn ($option) => (ProductOptionData::fromArray($option)),
+                $data['product_options'] ?? []
+            ),
+            product_variants: array_map(fn ($variant) => (ProductVariantData::fromArray([
+                ...$variant,
+                'selling_price' => (float) $variant['selling_price'],
+                'retail_price' => (float) $variant['retail_price'],
+            ])), $data['product_variants'] ?? []),
+            skip_media_sync: $data['skip_media_sync'] ?? false,
         );
     }
 }

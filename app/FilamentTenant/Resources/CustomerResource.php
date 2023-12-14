@@ -111,6 +111,7 @@ class CustomerResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->label(trans('Mobile Number'))
                         ->nullable()
+                        ->numeric()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('birth_date')
                         ->translateLabel()
@@ -208,13 +209,14 @@ class CustomerResource extends Resource
                         ->label(trans('Is Verified: '))
                         ->content(function ($record) {
                             if ($record?->hasVerifiedEmail()) {
-                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-green-500 text-white">Verified</span>');
+                                return new HtmlString('<span class="px-2 py-1 text-white bg-green-500 rounded-full">Verified</span>');
                             } else {
-                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-red-500 text-white">Unverified</span>');
+                                return new HtmlString('<span class="px-2 py-1 text-white bg-red-500 rounded-full">Unverified</span>');
                             }
                         }),
                 ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->disabled(fn ($record) => $record?->trashed()),
             ]);
     }
 
@@ -236,6 +238,7 @@ class CustomerResource extends Resource
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
                     ->translateLabel()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
@@ -306,6 +309,7 @@ class CustomerResource extends Resource
                     ->default(RegisterStatus::REGISTERED->value)
                     ->options([
                         'Registered' => ucfirst(RegisterStatus::REGISTERED->value),
+                        'Unregistered' => ucfirst(RegisterStatus::UNREGISTERED->value),
                     ]),
             ])
             ->actions([

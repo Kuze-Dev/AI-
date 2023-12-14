@@ -12,9 +12,11 @@ use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
@@ -43,6 +45,7 @@ use Support\MetaData\HasMetaData;
  * @property bool $is_special_offer
  * @property bool $allow_customer_remarks
  * @property bool $allow_stocks
+ * @property bool $allow_guest_purchase
  * @property int $minimum_order_quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -67,6 +70,7 @@ use Support\MetaData\HasMetaData;
  * @method static ProductBuilder|Product query()
  * @method static ProductBuilder|Product whereAllowCustomerRemarks($value)
  * @method static ProductBuilder|Product whereAllowStocks($value)
+ * @method static ProductBuilder|Product whereAllowGuestPurchase($value)
  * @method static ProductBuilder|Product whereCreatedAt($value)
  * @method static ProductBuilder|Product whereDescription($value)
  * @method static ProductBuilder|Product whereDimension($value)
@@ -206,6 +210,16 @@ class Product extends Model implements HasMedia, HasMetaDataContract
         return $this->hasMany(ProductOption::class);
     }
 
+    /**
+     * Get all of the option values of product option.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Domain\Product\Models\ProductOptionValue>
+     */
+    public function productOptionValues(): HasManyThrough
+    {
+        return $this->hasManyThrough(ProductOptionValue::class, ProductOption::class);
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
     public function favorites(): HasMany
     {
@@ -250,7 +264,11 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
-            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
+            ->registerMediaConversions(function () {
+                $this->addMediaConversion('original');
+                $this->addMediaConversion('preview')
+                    ->fit(Manipulations::FIT_CROP, 300, 300);
+            });
 
         $this->addMediaCollection('video')
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));

@@ -41,7 +41,7 @@ class SyncNodeTreeAction
     }
 
     /** @param  array<NodeData>  $nodeDataSet */
-    protected function syncNodes(array $nodeDataSet, Node $parentNode = null): void
+    protected function syncNodes(array $nodeDataSet, ?Node $parentNode = null): void
     {
         $nodeIds = [];
 
@@ -52,7 +52,7 @@ class SyncNodeTreeAction
         Node::setNewOrder($nodeIds);
     }
 
-    protected function createOrUpdateNode(NodeData $nodeData, Node $parentNode = null): Node
+    protected function createOrUpdateNode(NodeData $nodeData, ?Node $parentNode = null): Node
     {
         /** @var Node $node */
         $node = $this->menu->nodes()->where('id', $nodeData->id)->firstOrNew();

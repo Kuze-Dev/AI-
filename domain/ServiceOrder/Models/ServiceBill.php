@@ -6,9 +6,11 @@ namespace Domain\ServiceOrder\Models;
 
 use Akaunting\Money\Money;
 use App\Casts\MoneyCast;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Interfaces\PayableInterface;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Queries\ServiceBillQueryBuilder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -160,6 +162,29 @@ class ServiceBill extends Model implements PayableInterface
     public function serviceTransactions(): HasMany
     {
         return $this->hasMany(ServiceTransaction::class);
+    }
+
+    public function latestTransaction(): ?ServiceTransaction
+    {
+        return $this->serviceTransactions()->latest()->first();
+    }
+
+    public function latestTransactionPaid(): ?ServiceTransaction
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction */
+        $serviceTransaction = $this->latestTransaction();
+
+        return filled($serviceTransaction) && $serviceTransaction->status === ServiceTransactionStatus::PAID
+            ? $serviceTransaction
+            : null;
+    }
+
+    public function paymentMethod(): ?PaymentMethod
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction */
+        $serviceTransaction = $this->latestTransactionPaid();
+
+        return filled($serviceTransaction) ? $serviceTransaction->payment_method : null;
     }
 
     /** @return Attribute<bool, never> */

@@ -7,6 +7,7 @@ namespace Domain\ServiceOrder\Notifications;
 use App\Settings\ServiceSettings;
 use App\Settings\SiteSettings;
 use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -18,6 +19,8 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
     private ServiceBill $serviceBill;
 
+    private ?ServiceOrder $serviceOrder;
+
     private string $logo;
 
     private string $title;
@@ -28,6 +31,8 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
     private string $url;
 
+    private string $payment_method = 'bank-transfer';
+
     private array $replyTo;
 
     private ?string $footer = null;
@@ -35,6 +40,10 @@ class ServiceBillNotification extends Notification implements ShouldQueue
     public function __construct(ServiceBill $serviceBill)
     {
         $this->serviceBill = $serviceBill;
+
+        $this->serviceOrder = $serviceBill->serviceOrder;
+
+        $this->payment_method = $serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
 
@@ -44,7 +53,9 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
-        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.'/'.$serviceBill->reference;
+        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.
+                     '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$serviceBill->reference.
+                     '&payment_method='.$this->payment_method;
 
         $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];
 

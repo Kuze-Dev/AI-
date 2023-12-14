@@ -13,12 +13,10 @@ use Domain\ServiceOrder\Requests\ServiceTransactionStoreRequest;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\RouteAttributes\Attributes\ApiResource;
-use Spatie\RouteAttributes\Attributes\Middleware;
 use Symfony\Component\HttpFoundation\Response;
 
 #[
     ApiResource('service-transaction', only: ['store']),
-    Middleware(['auth:sanctum'])
 ]
 class ServiceOrderCheckoutController
 {
@@ -48,9 +46,9 @@ class ServiceOrderCheckoutController
                 ['message' => trans('Unable to proceed, service order\'s status is still on pending')],
                 Response::HTTP_NOT_FOUND
             );
-        } catch (PaymentException) {
+        } catch (PaymentException $p) {
             return response(
-                ['message' => trans('Payment Unauthorized')],
+                ['message' => trans($p->getMessage())],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         } catch (ServiceBillAlreadyPaidException) {
