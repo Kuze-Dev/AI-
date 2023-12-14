@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources\ProductResource\Pages;
 use App\FilamentTenant\Resources\ProductResource;
 use App\FilamentTenant\Support\ImportProductAction;
 use App\FilamentTenant\Support\ImportProductBatchUpdateAction;
+use App\FilamentTenant\Support\ImportProductVariantAction;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
@@ -22,7 +23,8 @@ class ListProducts extends ListRecords
     protected function getActions(): array
     {
         return [
-            ImportProductAction::proceed(),
+            // ImportProductAction::proceed(),
+            ImportProductVariantAction::proceed(),
             ImportProductBatchUpdateAction::proceed(),
             ExportAction::make()
                 ->model(Product::class)
