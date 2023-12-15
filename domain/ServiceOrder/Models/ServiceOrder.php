@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Models;
 
+use Akaunting\Money\Money;
 use App\Casts\MoneyCast;
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Interfaces\PayableInterface;
+use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
@@ -123,8 +126,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *
  * @mixin \Eloquent
  */
-class ServiceOrder extends Model
+class ServiceOrder extends Model implements PayableInterface
 {
+    use HasPayments;
     use LogsActivity;
     use SoftDeletes;
 
@@ -183,6 +187,11 @@ class ServiceOrder extends Model
     public function getRouteKeyName(): string
     {
         return 'reference';
+    }
+
+    public function getReferenceNumber(): string
+    {
+        return $this->reference;
     }
 
     public function newEloquentBuilder($query): ServiceOrderQueryBuilder
@@ -245,6 +254,27 @@ class ServiceOrder extends Model
         return $this->serviceBills()
             ->latest()
             ->first();
+    }
+
+    public function totalBalance(): Money
+    {
+        return money($this->serviceBills()
+            ->where('status', 'pending')
+            ->sum('total_amount'));
+    }
+
+    public function totalBalanceTax(): Money
+    {
+        return money($this->serviceBills()
+            ->where('status', 'pending')
+            ->sum('tax_total'));
+    }
+
+    public function totalBalanceSubtotal(): Money
+    {
+        return money($this->serviceBills()
+            ->where('status', 'pending')
+            ->sum('sub_total'));
     }
 
     public function latestPaidServiceBill(): ?ServiceBill

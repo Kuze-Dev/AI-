@@ -24,6 +24,7 @@ use Domain\ServiceOrder\Events\AdminServiceBillBankPaymentEvent;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
 use Domain\ServiceOrder\Listeners\AdminServiceBillBankPaymentListener;
 use Domain\ServiceOrder\Listeners\AdminServiceOrderStatusUpdatedListener;
+use Domain\ServiceOrder\Listeners\ServiceOrderPartialPaymentUpdatedListener;
 use Domain\ServiceOrder\Listeners\ServiceOrderPaymentUpdatedListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -49,6 +50,7 @@ class EventServiceProvider extends ServiceProvider
         PaymentProcessEvent::class => [
             OrderPaymentUpdatedListener::class,
             ServiceOrderPaymentUpdatedListener::class,
+            ServiceOrderPartialPaymentUpdatedListener::class,
         ],
         OrderPlacedEvent::class => [
             OrderPlacedListener::class,

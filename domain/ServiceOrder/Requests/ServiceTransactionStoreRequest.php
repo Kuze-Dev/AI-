@@ -31,6 +31,10 @@ class ServiceTransactionStoreRequest extends FormRequest
             'payment_method' => [
                 'string',
             ],
+            'amount_to_pay' => [
+                'numeric',
+                'nullable',
+            ],
             'reference_id' => [
                 'string',
                 'min:12',
