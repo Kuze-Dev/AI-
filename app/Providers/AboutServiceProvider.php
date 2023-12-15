@@ -20,6 +20,7 @@ class AboutServiceProvider extends ServiceProvider
             'Livewire temporary_file_upload' => config('livewire.temporary_file_upload.disk') ?? 'null',
             'Excel Import temporary_files (package)' => config('filament-import.temporary_files.disk') ?? 'null',
             'Excel Export temporary_files (support)' => config('support.excel.temporary_files.disk') ?? 'null',
+            'Excel temporary_files (maatwebsite/excel)' => config('excel.temporary_files.remote_disk') ?? 'null',
         ]);
 
         AboutCommand::add('Livewire', fn () => [
