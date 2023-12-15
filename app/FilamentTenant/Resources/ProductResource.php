@@ -420,11 +420,11 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ReviewRelationManager::class,
-            ActivitiesRelationManager::class,
-            TiersRelationManager::class,
             VariantsRelationManager::class,
             OptionsRelationManager::class,
+            TiersRelationManager::class,
+            ReviewRelationManager::class,
+            ActivitiesRelationManager::class,
         ];
     }
 
