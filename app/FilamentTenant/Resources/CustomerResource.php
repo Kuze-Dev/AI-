@@ -17,6 +17,7 @@ use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
+use Domain\Customer\Export\Exports;
 use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tier\Enums\TierApprovalStatus;
@@ -38,7 +39,8 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Support\Excel\Actions\ExportBulkAction;
+
+//use Support\Excel\Actions\ExportBulkAction;
 
 class CustomerResource extends Resource
 {
@@ -386,27 +388,7 @@ class CustomerResource extends Resource
                     ->authorize('forceDelete'),
                 Tables\Actions\RestoreBulkAction::make()
                     ->authorize('restore'),
-                ExportBulkAction::make()
-                    ->queue()
-                    ->query(
-                        fn (Builder $query) => $query
-                            ->with('tier')
-                            ->latest()
-                    )
-                    ->mapUsing(
-                        ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
-                        fn (Customer $customer): array => [
-                            $customer->cuid,
-                            $customer->email,
-                            $customer->first_name,
-                            $customer->last_name,
-                            $customer->mobile,
-                            $customer->status?->value,
-                            $customer->birth_date?->format(config('tables.date_format')),
-                            $customer->tier?->name,
-                            $customer->created_at?->format(config('tables.date_time_format')),
-                        ]
-                    ),
+                Exports::tableBulk(),
             ])
             ->defaultSort('updated_at', 'desc');
     }
