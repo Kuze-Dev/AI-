@@ -23,10 +23,13 @@ class ImportProductVariantAction
             ->withValidation(
                 rules: [
                     'product_slug' => 'required|string|max:100',
-                    'sku' => 'required|string|unique:product_variants|max:100',
+                    'sku' => 'required|string|max:100',
                     'stock' => ['required', 'numeric', new MinimumValueRule(0)],
                     'retail_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
                     'selling_price' => ['required', 'numeric', new MinimumValueRule(0.1)],
+                    'product_option_1_name' => 'required|string|max:100',
+                    'product_option_1_value_1' => 'required|string|max:100',
+                    'product_option_1_is_custom' => 'required|string|max:100',
                 ],
             );
     }
@@ -35,31 +38,54 @@ class ImportProductVariantAction
     {
         $product = Product::select('id')->whereSlug($row['product_slug'])->first();
 
-        if (! $product instanceof Product) {
+        if (!$product instanceof Product) {
             throw ValidationException::withMessages([
                 'product_slug' => trans("{$row['sku']}'s product slug doesn\'t have any matches in database."),
             ]);
         }
 
+        $foundProductVariant = ProductVariant::whereSku($row['sku'])->first();
+
+        if ($foundProductVariant instanceof ProductVariant) {
+            \Log::info('Product Variant SKU exists! : ', [$row['sku']]);
+
+            return $foundProductVariant;
+        }
+
+
         $combination = [];
         for ($i = 1; $i <= 2; $i++) {
+            $iconType = 'text';
+            $iconValue = '';
+
+            if (!isset($row["product_option_{$i}_name"]) || !$row["product_option_{$i}_name"]) {
+                continue;
+            }
+
             $foundProductOption = ProductOption::select('id', 'name')
                 ->where('name', $row["product_option_{$i}_name"])
                 ->where('product_id', $product->id)->first();
 
+            if (isset($row["product_option_{$i}_value_1_icon_type"]) && $row["product_option_{$i}_value_1_icon_type"]) {
+                $iconType = strtolower(str_replace(' ', '_', $row["product_option_{$i}_value_1_icon_type"]));
+            }
+
+            if (isset($row["product_option_{$i}_value_1_icon_value"]) && $row["product_option_{$i}_value_1_icon_value"]) {
+                $iconValue = $row["product_option_{$i}_value_1_icon_value"];
+            }
             if ($foundProductOption instanceof ProductOption) {
                 $foundProductOptionValue = ProductOptionValue::select('id', 'name')
                     ->where('product_option_id', $foundProductOption->id)
                     ->where('name', $row["product_option_{$i}_value_1"])
                     ->first();
 
-                if (! $foundProductOptionValue instanceof ProductOptionValue) {
+                if (!$foundProductOptionValue instanceof ProductOptionValue) {
                     $productOptionValue = ProductOptionValue::create([
                         'name' => $row["product_option_{$i}_value_1"],
                         'product_option_id' => $foundProductOption->id,
                         'data' => [
-                            'icon_type' => $i === 1 ? (strtolower(str_replace(' ', '_', $row["product_option_{$i}_value_1_icon_type"]))) : 'text',
-                            'icon_value' => $i == 1 ? $row["product_option_{$i}_value_1_icon_value"] : '',
+                            'icon_type' => $i === 1 ? $iconType : 'text',
+                            'icon_value' => $i == 1 ? $iconValue : '',
 
                         ],
                     ]);
@@ -78,7 +104,6 @@ class ImportProductVariantAction
                         'option_value_id' => $foundProductOptionValue->id,
                     ];
                 }
-
             } else {
                 $productOption = ProductOption::create([
                     'name' => $row["product_option_{$i}_name"],
@@ -90,8 +115,8 @@ class ImportProductVariantAction
                     'name' => $row["product_option_{$i}_value_1"],
                     'product_option_id' => $productOption->id,
                     'data' => [
-                        'icon_type' => $i === 1 ? (strtolower(str_replace(' ', '_', $row["product_option_{$i}_value_1_icon_type"]))) : 'text',
-                        'icon_value' => $i == 1 ? $row["product_option_{$i}_value_1_icon_value"] : '',
+                        'icon_type' => $i === 1 ? $iconType : 'text',
+                        'icon_value' => $i == 1 ? $iconValue : '',
                     ],
                 ]);
 
