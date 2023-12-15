@@ -38,7 +38,7 @@ class ImportProductVariantAction
     {
         $product = Product::select('id')->whereSlug($row['product_slug'])->first();
 
-        if (!$product instanceof Product) {
+        if (! $product instanceof Product) {
             throw ValidationException::withMessages([
                 'product_slug' => trans("{$row['sku']}'s product slug doesn\'t have any matches in database."),
             ]);
@@ -52,13 +52,12 @@ class ImportProductVariantAction
             return $foundProductVariant;
         }
 
-
         $combination = [];
         for ($i = 1; $i <= 2; $i++) {
             $iconType = 'text';
             $iconValue = '';
 
-            if (!isset($row["product_option_{$i}_name"]) || !$row["product_option_{$i}_name"]) {
+            if (! isset($row["product_option_{$i}_name"]) || ! $row["product_option_{$i}_name"]) {
                 continue;
             }
 
@@ -79,7 +78,7 @@ class ImportProductVariantAction
                     ->where('name', $row["product_option_{$i}_value_1"])
                     ->first();
 
-                if (!$foundProductOptionValue instanceof ProductOptionValue) {
+                if (! $foundProductOptionValue instanceof ProductOptionValue) {
                     $productOptionValue = ProductOptionValue::create([
                         'name' => $row["product_option_{$i}_value_1"],
                         'product_option_id' => $foundProductOption->id,
