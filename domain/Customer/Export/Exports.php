@@ -46,6 +46,9 @@ final class Exports
                     $customer->created_at?->format(config('tables.date_time_format')),
                 ]
             )
+            ->tags([
+                'tenant:'.(tenant('id') ?? 'central'),
+            ])
             ->withActivityLog(
                 event: 'exported',
                 description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
@@ -79,6 +82,9 @@ final class Exports
                     $customer->created_at?->format(config('tables.date_time_format')),
                 ]
             )
+            ->tags([
+                'tenant:'.(tenant('id') ?? 'central'),
+            ])
             ->withActivityLog(
                 event: 'bulk-exported',
                 description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),

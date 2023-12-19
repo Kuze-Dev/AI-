@@ -19,6 +19,7 @@
         "halcyon-agile/filament-export": "dev-main",
         "halcyon-agile/filament-import": "^1.0",
         "ibrahimbougaoua/filament-menu-scroll-fix": "<1.0.2",
+        "indeev/laravel-schedule-calendar": "^1.2",
         "laravel/framework": "^10.15",
         "laravel/horizon": "^5.21.4",
         "laravel/pennant": "^1.3",

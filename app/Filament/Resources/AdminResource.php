@@ -263,6 +263,14 @@ class AdminResource extends Resource
                             $admin->getRoleNames()->implode(', '),
                             $admin->created_at?->format(config('tables.date_time_format')),
                         ]
+                    )
+                    ->tags([
+                        'tenant:'.(tenant('id') ?? 'central'),
+                    ])
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
                     ),
             ])
             ->defaultSort('created_at', 'desc');

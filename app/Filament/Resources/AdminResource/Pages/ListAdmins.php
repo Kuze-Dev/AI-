@@ -92,6 +92,13 @@ class ListAdmins extends ListRecords
                         $admin->getRoleNames()->implode(', '),
                         $admin->created_at?->format(config('tables.date_time_format')),
                     ]
+                )
+                ->tags([
+                    'tenant:'.(tenant('id') ?? 'central'),
+                ])
+                ->withActivityLog(
+                    event: 'exported',
+                    description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
                 ),
             Actions\CreateAction::make(),
         ];
