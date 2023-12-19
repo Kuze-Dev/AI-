@@ -22,7 +22,8 @@ class ImportProductAction
 {
     public static function proceed(): ImportAction
     {
-        return ImportAction::make()
+        return ImportAction::make('Product Import')
+            ->translateLabel()
             ->uniqueBy('sku')
             ->processRowsUsing(fn (array $row): Product => self::processProductUpload($row))
             ->withValidation(
@@ -47,7 +48,7 @@ class ImportProductAction
     public static function processProductUpload(array $row): Product
     {
         // Validate that the product has a maximum of 2 options
-        self::validateIncomingProductOptions($row);
+        self::validateIncomingProductOptions($row); // pwede comment
 
         // Map product options and its values
         $productOptions = self::mapProductOptions($row);
@@ -75,7 +76,7 @@ class ImportProductAction
         ];
 
         // Collect taxonomy term IDs for the product
-        $data['taxonomy_terms'] = self::collectTaxonomyTermIds($data);
+        $data['taxonomy_terms'] = self::collectTaxonomyTermIds($data); // pwede comment
 
         // Remove unnecessary data from the $row and $data arrays
         unset($row, $data['categories'], $data['brand']);
@@ -380,8 +381,8 @@ class ImportProductAction
                     'name' => $row["product_option_{$i}_name"],
                     'slug' => $row["product_option_{$i}_name"],
                     'is_custom' => isset($row["product_option_{$i}_is_custom"])
-                        && $row["product_option_{$i}_is_custom"]
-                        == 'yes' ? true : false,
+                        && strtolower($row["product_option_{$i}_is_custom"])
+                        === 'yes' ? true : false,
                     'productOptionValues' => [],
                 ];
 
@@ -391,7 +392,7 @@ class ImportProductAction
                         'id' => uniqid(),
                         'name' => $row["product_option_{$i}_value_{$j}"],
                         'slug' => $row["product_option_{$i}_value_{$j}"],
-                        'icon_type' => $i === 1 ? ($row["product_option_{$i}_value_{$j}_icon_type"] ?? 'text') : 'text',
+                        'icon_type' => $i === 1 ? (strtolower(str_replace(' ', '_', $row["product_option_{$i}_value_{$j}_icon_type"]))) : 'text',
                         'icon_value' => $i === 1 ? ($row["product_option_{$i}_value_{$j}_icon_value"] ?? '') : '',
                         // 'images' => $i === 1 ? (isset($row["product_option_{$i}_value_{$j}_image_link"]) ? [$row["product_option_{$i}_value_{$j}_image_link"]] : null) : [],
                         'product_option_id' => $productOption['id'],

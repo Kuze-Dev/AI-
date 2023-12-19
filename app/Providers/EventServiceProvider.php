@@ -20,7 +20,9 @@ use Domain\Order\Listeners\OrderPlacedListener;
 use Domain\Order\Listeners\OrderStatusUpdatedListener;
 use Domain\Order\Listeners\PublicOrder\GuestOrderPlacedListener;
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\ServiceOrder\Events\AdminServiceBillBankPaymentEvent;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
+use Domain\ServiceOrder\Listeners\AdminServiceBillBankPaymentListener;
 use Domain\ServiceOrder\Listeners\AdminServiceOrderStatusUpdatedListener;
 use Domain\ServiceOrder\Listeners\ServiceOrderPaymentUpdatedListener;
 use Illuminate\Auth\Events\Registered;
@@ -71,6 +73,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         AdminServiceOrderStatusUpdatedEvent::class => [
             AdminServiceOrderStatusUpdatedListener::class,
+        ],
+        AdminServiceBillBankPaymentEvent::class => [
+            AdminServiceBillBankPaymentListener::class,
         ],
     ];
 

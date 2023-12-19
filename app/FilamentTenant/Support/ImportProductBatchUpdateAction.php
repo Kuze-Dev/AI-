@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
+use App\Features\ECommerce\ProductBatchUpdate;
 use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\Actions\UpdateProductVariantFromCsvAction;
 use Domain\Product\DataTransferObjects\ProductData;
@@ -23,11 +24,12 @@ class ImportProductBatchUpdateAction
     {
         return ImportAction::make('Batch Update Import')
             ->uniqueBy('sku')
+            ->hidden(fn () => ! tenancy()->tenant?->features()->active(ProductBatchUpdate::class) ? true : false)
             ->translateLabel()
             ->processRowsUsing(fn (array $row) => self::processBatchUpdate($row))
             ->withValidation(
                 rules: [
-                    'product_id' => 'required|integer',
+                    'product_id' => 'required|numeric',
                     'is_variant' => ['required', new Enum(Decision::class)],
                     'variant_id' => 'nullable|integer',
                     'name' => 'nullable|string|max:100',

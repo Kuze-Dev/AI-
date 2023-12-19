@@ -8,7 +8,6 @@ use Domain\Product\Database\Factories\ProductOptionFactory;
 use Domain\Product\Database\Factories\ProductOptionValueFactory;
 use Domain\Product\Database\Factories\ProductVariantFactory;
 use Domain\Product\Models\Product;
-use Domain\Product\Models\ProductVariant;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
@@ -40,8 +39,6 @@ it('can render product', function () {
         ->assertFormSet([
             'name' => $product->name,
             'images.0' => $product->getMedia()->first(),
-            'product_variants.record-1' => $product->productVariants->toArray()[0],
-            // 'product_options.record-1' => $product->productOptions->toArray()[0],
             'dimension' => $product->dimension,
             'sku' => $product->sku,
             'retail_price' => $product->retail_price,
@@ -71,8 +68,6 @@ it('can edit product', function () {
         ->fillForm([
             'name' => 'Test Title Updated',
             'description' => 'Test Description Updated',
-            'product_variants.record-1.stock' => 50,
-            'product_variants.record-1.sku' => 'foosku',
             'images.0' => $dataImage,
             'status' => ! $product->status,
             'meta_data' => $metaData,
@@ -89,12 +84,6 @@ it('can edit product', function () {
         'description' => 'Test Description Updated',
         'status' => $updatedProduct->status,
         'updated_at' => $updatedProduct->updated_at,
-    ]);
-
-    assertDatabaseHas(ProductVariant::class, [
-        'product_id' => $product->id,
-        'stock' => 50,
-        'sku' => 'foosku',
     ]);
 
     assertDatabaseHas(

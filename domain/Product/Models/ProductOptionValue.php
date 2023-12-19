@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Product\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Image\Manipulations;
@@ -61,6 +62,38 @@ class ProductOptionValue extends Model implements HasMedia
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * Get the product option name
+     *
+     * @return Attribute<string, static>
+     */
+    protected function productOptionName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->productOption ? $this->productOption->name : '',
+        );
+    }
+
+    /**
+     * Get the icon details
+     *
+     * @return Attribute<string, static>
+     */
+    protected function iconDetails(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (is_null($this->data) || $this->data['icon_type'] == 'text') {
+                    return 'Type: Text | Value: N/A';
+                } else {
+                    $iconTypeTransformed = ucwords(str_replace('_', ' ', $this->data['icon_type']));
+
+                    return "Type: {$iconTypeTransformed} | Value: {$this->data['icon_value']}";
+                }
+            }
+        );
     }
 
     public function getSlugOptions(): SlugOptions

@@ -85,7 +85,7 @@ class ServiceBillResource extends Resource
                     ->label('Status')
                     ->translateLabel()
                     ->formatStateUsing(
-                        fn (string $state): string => ucfirst($state)
+                        fn (string $state): string => ucfirst(str_replace('_', ' ', strtolower($state)))
                     )
                     ->color(
                         fn (ServiceBill $record): string => $record->getStatusColor()
@@ -98,6 +98,7 @@ class ServiceBillResource extends Resource
                             : $record->bill_date
                     )
                     ->label('Bill Date')
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->translateLabel()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_date')
@@ -106,6 +107,7 @@ class ServiceBillResource extends Resource
                             ? 'N/A'
                             : $record->due_date
                     )
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->label('Due at')
                     ->translateLabel()
                     ->sortable(),
@@ -184,11 +186,7 @@ class ServiceBillResource extends Resource
             $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
         }
 
-        /** @var string */
-        $timeZone = Auth::user()?->timezone;
-
         $formattedState = Carbon::parse($referenceDate)
-            ->setTimezone($timeZone)
             ->format('F d, Y');
 
         return 'Upcoming Bill: '.$formattedState;
