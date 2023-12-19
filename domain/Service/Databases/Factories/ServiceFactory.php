@@ -98,12 +98,12 @@ class ServiceFactory extends Factory
         ]);
     }
 
-    public function isInstallment(bool $isInstallment = true): self
-    {
-        return $this->state([
-            'is_installment' => $isInstallment,
-        ]);
-    }
+    //    public function isInstallment(bool $isInstallment = true): self
+    //    {
+    //        return $this->state([
+    //            'is_installment' => $isInstallment,
+    //        ]);
+    //    }
 
     public function withDummyBlueprint(): self
     {

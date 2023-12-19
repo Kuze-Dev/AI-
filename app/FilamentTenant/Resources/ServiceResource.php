@@ -343,8 +343,8 @@ class ServiceResource extends Resource
                     ->label(trans('Needs Approval')),
                 Forms\Components\Toggle::make('is_partial_payment')
                     ->label(trans('Partial Payment')),
-                Forms\Components\Toggle::make('is_installment')
-                    ->label(trans('Installment')),
+                //                Forms\Components\Toggle::make('is_installment')
+                //                    ->label(trans('Installment')),
             ])
             ->registerListeners([
                 'status::update' => [
