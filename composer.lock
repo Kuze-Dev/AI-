@@ -76,72 +76,6 @@
             "time": "2023-03-16T14:39:27+00:00"
         },
         {
-            "name": "anourvalar/eloquent-serialize",
-            "version": "1.2.17",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/AnourValar/eloquent-serialize.git",
-                "reference": "1fcfdd5f41a0d2e7c8cf1d37e7227357bb827aef"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/AnourValar/eloquent-serialize/zipball/1fcfdd5f41a0d2e7c8cf1d37e7227357bb827aef",
-                "reference": "1fcfdd5f41a0d2e7c8cf1d37e7227357bb827aef",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "php": "^7.1|^8.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.26",
-                "laravel/legacy-factories": "^1.1",
-                "orchestra/testbench": "~3.6.0|~3.7.0|~3.8.0|^4.0|^5.0|^6.0|^7.0|^8.0",
-                "phpstan/phpstan": "^1.10",
-                "phpunit/phpunit": "^9.5",
-                "psalm/plugin-laravel": "^2.8",
-                "squizlabs/php_codesniffer": "^3.7"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "EloquentSerialize": "AnourValar\\EloquentSerialize\\Facades\\EloquentSerializeFacade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "AnourValar\\EloquentSerialize\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Laravel Query Builder (Eloquent) serialization",
-            "homepage": "https://github.com/AnourValar/eloquent-serialize",
-            "keywords": [
-                "anourvalar",
-                "builder",
-                "copy",
-                "eloquent",
-                "job",
-                "laravel",
-                "query",
-                "querybuilder",
-                "queue",
-                "serializable",
-                "serialization",
-                "serialize"
-            ],
-            "support": {
-                "issues": "https://github.com/AnourValar/eloquent-serialize/issues",
-                "source": "https://github.com/AnourValar/eloquent-serialize/tree/1.2.17"
-            },
-            "time": "2023-12-06T15:54:01+00:00"
-        },
-        {
             "name": "artificertech/filament-multi-context",
             "version": "V2.1.2",
             "source": {
@@ -347,16 +281,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.294.1",
+            "version": "3.294.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "63c720229a9c9cdedff6bac98d6e72be8cc241f1"
+                "reference": "e6a63e39fed0fd9fb553af42e99aaf8d7c104c88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/63c720229a9c9cdedff6bac98d6e72be8cc241f1",
-                "reference": "63c720229a9c9cdedff6bac98d6e72be8cc241f1",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/e6a63e39fed0fd9fb553af42e99aaf8d7c104c88",
+                "reference": "e6a63e39fed0fd9fb553af42e99aaf8d7c104c88",
                 "shasum": ""
             },
             "require": {
@@ -436,9 +370,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.294.1"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.294.2"
             },
-            "time": "2023-12-15T19:25:52+00:00"
+            "time": "2023-12-18T19:11:16+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -2731,12 +2665,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/halcyon-agile/filament-export.git",
-                "reference": "aea27e2568816c6e7f3851c3258ed74321e56ca4"
+                "reference": "ac18097b3653325d52c2796e97a1a1b046045ac6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/aea27e2568816c6e7f3851c3258ed74321e56ca4",
-                "reference": "aea27e2568816c6e7f3851c3258ed74321e56ca4",
+                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/ac18097b3653325d52c2796e97a1a1b046045ac6",
+                "reference": "ac18097b3653325d52c2796e97a1a1b046045ac6",
                 "shasum": ""
             },
             "require": {
@@ -2744,7 +2678,6 @@
                 "illuminate/contracts": "^10.0",
                 "maatwebsite/excel": "^3.1.50",
                 "php": "^8.2",
-                "pxlrbt/filament-excel": "^1.1.13",
                 "spatie/laravel-package-tools": "^1.16.1"
             },
             "require-dev": {
@@ -2797,7 +2730,7 @@
                 "issues": "https://github.com/halcyon-agile/filament-export/issues",
                 "source": "https://github.com/halcyon-agile/filament-export/tree/main"
             },
-            "time": "2023-12-15T00:08:10+00:00"
+            "time": "2023-12-19T07:43:43+00:00"
         },
         {
             "name": "halcyon-agile/filament-import",
@@ -6800,73 +6733,6 @@
             "time": "2023-10-14T21:56:36+00:00"
         },
         {
-            "name": "pxlrbt/filament-excel",
-            "version": "v1.1.13",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pxlrbt/filament-excel.git",
-                "reference": "771952cfb26a79fc3da0cf78c916188ccf893dcd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pxlrbt/filament-excel/zipball/771952cfb26a79fc3da0cf78c916188ccf893dcd",
-                "reference": "771952cfb26a79fc3da0cf78c916188ccf893dcd",
-                "shasum": ""
-            },
-            "require": {
-                "anourvalar/eloquent-serialize": "^1.2",
-                "filament/filament": "^2.13.24|^3.0",
-                "maatwebsite/excel": "^3.1",
-                "php": "^8.0"
-            },
-            "require-dev": {
-                "laravel/pint": "^1.10"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "pxlrbt\\FilamentExcel\\FilamentExcelServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "pxlrbt\\FilamentExcel\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Dennis Koch",
-                    "email": "info@pixelarbeit.de"
-                }
-            ],
-            "description": "Supercharged Excel exports for Filament Resources",
-            "keywords": [
-                "PHPExcel",
-                "actions",
-                "filament",
-                "laravel",
-                "laravel-filament",
-                "phpspreadsheet"
-            ],
-            "support": {
-                "issues": "https://github.com/pxlrbt/filament-excel/issues",
-                "source": "https://github.com/pxlrbt/filament-excel/tree/v1.1.13"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/pxlrbt",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-07-05T19:06:22+00:00"
-        },
-        {
             "name": "ralouphie/getallheaders",
             "version": "3.0.3",
             "source": {
@@ -8670,16 +8536,16 @@
         },
         {
             "name": "spatie/laravel-route-attributes",
-            "version": "1.20.0",
+            "version": "1.20.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-route-attributes.git",
-                "reference": "4769a0723613386ff38bc63ab9ab6f85e56634cb"
+                "reference": "57e62a71abd97e531b23cec9ef4e5444e9ba1ae1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-route-attributes/zipball/4769a0723613386ff38bc63ab9ab6f85e56634cb",
-                "reference": "4769a0723613386ff38bc63ab9ab6f85e56634cb",
+                "url": "https://api.github.com/repos/spatie/laravel-route-attributes/zipball/57e62a71abd97e531b23cec9ef4e5444e9ba1ae1",
+                "reference": "57e62a71abd97e531b23cec9ef4e5444e9ba1ae1",
                 "shasum": ""
             },
             "require": {
@@ -8725,7 +8591,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-route-attributes/issues",
-                "source": "https://github.com/spatie/laravel-route-attributes/tree/1.20.0"
+                "source": "https://github.com/spatie/laravel-route-attributes/tree/1.20.1"
             },
             "funding": [
                 {
@@ -8737,7 +8603,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-11-24T09:12:48+00:00"
+            "time": "2023-12-18T14:59:02+00:00"
         },
         {
             "name": "spatie/laravel-settings",

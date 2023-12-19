@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use HalcyonAgile\FilamentExport\Commands\PruneExcelCommand;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Support\Excel\Commands\PruneExcelCommand;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\travelTo;

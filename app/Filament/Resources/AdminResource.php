@@ -16,13 +16,13 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
-use Support\Excel\Actions\ExportBulkAction;
 
 class AdminResource extends Resource
 {
