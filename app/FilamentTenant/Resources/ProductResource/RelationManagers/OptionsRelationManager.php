@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ProductResource\RelationManagers;
 
 use App\Features\ECommerce\ColorPallete;
-use DB;
+use App\FilamentTenant\Support\CreateProductOptionValueAction;
+use App\FilamentTenant\Support\EditProductOptionValueAction;
+use App\FilamentTenant\Support\ManageProductOptionAction;
+use Closure;
+use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
+use Exception;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class OptionsRelationManager extends RelationManager
@@ -23,34 +28,39 @@ class OptionsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'Product Option Values';
 
+    public Model $ownerRecord;
+
     public static function form(Form $form): Form
     {
-        // Temporarily commented
         return $form->schema([
             \Filament\Forms\Components\TextInput::make('name')
                 ->translateLabel()
                 ->maxLength(100)
-                ->lazy()
                 ->columnSpan(2)
-                // ->columnSpan(
-                //     fn (Closure $get) => $get('../../is_custom') ? 1 : 2
-                // )
                 ->required(),
-            // \Filament\Forms\Components\Select::make('icon_type')
-            //     ->default('text')
-            //     ->required()
-            //     ->options(fn () => tenancy()->tenant?->features()->active(ColorPallete::class) ? [
-            //         'text' => 'Text',
-            //         'color_palette' => 'Color Palette',
-            //     ] : [
-            //         'text' => 'Text',
-            //     ]),
+            \Filament\Forms\Components\Group::make()
+                ->schema([
+                    \Filament\Forms\Components\Select::make('icon_type')
+                        ->default('text')
+                        ->required()
+                        ->options(fn () => tenancy()->tenant?->features()->active(ColorPallete::class) ? [
+                            'text' => 'Text',
+                            'color_palette' => 'Color Palette',
+                        ] : [
+                            'text' => 'Text',
+                        ])
+                        ->columnSpan(
+                            fn (Closure $get) => $get('icon_type') == 'color_palette' ? 1 : 2
+                        )
+                        ->hidden(fn (Closure $get) => ! $get('option_is_custom'))
+                        ->reactive(),
 
-            // \Filament\Forms\Components\ColorPicker::make('icon_value')
-            //     ->label(trans('Icon Value (HEX)')),
-            // ->hidden(fn (Closure $get) => !($get('icon_type') === 'color_palette' && $get('../../is_custom'))),
-            // ->hidden(fn (Closure $get) => !$get('../../is_custom'))
-            // ->reactive(),
+                    \Filament\Forms\Components\ColorPicker::make('icon_value')
+                        ->label(trans('Icon Value (HEX)'))
+                        ->hidden(fn (Closure $get) => ! ($get('icon_type') === 'color_palette' && $get('option_is_custom'))),
+                ])
+                ->columns(2)
+                ->columnSpan(2),
         ]);
     }
 
@@ -74,15 +84,23 @@ class OptionsRelationManager extends RelationManager
                     ->sortable(query: function (Builder $query, string $direction): Builder {
                         return $query->orderBy('product_option_values.name', $direction);
                     }),
-                Tables\Columns\TextColumn::make('iconDetails')
+                Tables\Columns\TextColumn::make('icon_details')
                     ->translateLabel(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                EditProductOptionValueAction::proceed(),
                 Tables\Actions\DeleteAction::make()
                     ->translateLabel()
                     ->action(function (ProductOptionValue $record, Tables\Actions\Action $action): void {
                         try {
+                            if (! $record->productOption instanceof ProductOption) {
+                                $action
+                                    ->failureNotificationTitle(trans('The option value is unlinked from an option.'))
+                                    ->failure();
+
+                                return;
+                            }
+
                             ProductVariant::where('product_id', $record->productOption->product_id)
                                 ->where(function (Builder $query) use ($record) {
                                     $query->whereJsonContains('combination', [['option_value_id' => $record->id]]);
@@ -106,9 +124,13 @@ class OptionsRelationManager extends RelationManager
                     ->action(function (Collection $records): void {
                         foreach ($records as $record) {
                             try {
+                                if (! isset($record->productOption)) {
+                                    return;
+                                }
+
                                 ProductVariant::where('product_id', $record->productOption->product_id)
                                     ->where(function (Builder $query) use ($record) {
-                                        $query->whereJsonContains('combination', [['option_value_id' => $record->id]]);
+                                        $query->whereJsonContains('combination', [['option_value_id' => $record->id ?? 0]]);
                                     })->delete();
 
                                 $record->delete();
@@ -124,6 +146,10 @@ class OptionsRelationManager extends RelationManager
                             }
                         }
                     }),
+            ])
+            ->headerActions([
+                ManageProductOptionAction::proceed(),
+                CreateProductOptionValueAction::proceed(),
             ])
             ->defaultSort('id', 'asc');
     }
