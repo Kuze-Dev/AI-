@@ -25,15 +25,10 @@ class CreateMediaFromS3UrlAction
                     $mediaExcepts[] = $media;
                 }
             } else {
-                if (Str::contains($imageUrl, env('AWS_ENDPOINT'))) {
-                    $name = $this->getMediaName($imageUrl);
-                    $objectPath = $this->getBucketUrl($imageUrl);
+                $name = $this->getMediaName($imageUrl);
 
-                    if (Storage::disk('s3')->exists($objectPath)) {
-                        $media = Media::where('name', $name)->first();
-                        $mediaExcepts[] = $media;
-                    }
-                }
+                $media = Media::where('name', $name)->first();
+                $mediaExcepts[] = $media;
             }
         }
 
@@ -52,18 +47,5 @@ class CreateMediaFromS3UrlAction
         }
 
         return $pathInfo['filename'];
-    }
-
-    private function getBucketUrl(string $mediaUrl): string
-    {
-        /** @phpstan-ignore-next-line */
-        $pathInfo = pathinfo(parse_url($mediaUrl, PHP_URL_PATH));
-        $dirname = $pathInfo['dirname'] ?? '';
-        $segments = explode('/', $dirname);
-        array_splice($segments, 1, 1);
-        $outputString = implode('/', $segments);
-        $objectPath = $outputString.'/'.$pathInfo['basename'];
-
-        return $objectPath;
     }
 }

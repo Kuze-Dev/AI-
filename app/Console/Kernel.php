@@ -8,14 +8,12 @@ use App\Console\Commands\CreateServiceBillCommand;
 use App\Console\Commands\InactivateServiceOrderCommand;
 use App\Console\Commands\NotifyCustomerServiceBillDueDateCommand;
 use Domain\Tenant\Models\Tenant;
+use HalcyonAgile\FilamentExport\Commands\PruneExportCommand;
 use HalcyonAgile\FilamentImport\Commands\PruneImportCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Laravel\Sanctum\Console\Commands\PruneExpired as SanctumPruneExpired;
-use Spatie\Health\Commands\DispatchQueueCheckJobsCommand;
-use Spatie\Health\Commands\ScheduleCheckHeartbeatCommand;
-use Support\Excel\Commands\PruneExcelCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -45,7 +43,7 @@ class Kernel extends ConsoleKernel
             ->daily()
             ->sentryMonitor();
 
-        $schedule->command(PruneExcelCommand::class)
+        $schedule->command(PruneExportCommand::class)
             ->daily();
         $schedule->command(PruneImportCommand::class)
             ->daily();

@@ -193,7 +193,6 @@ return [
         * Support Service Providers...
         */
         Support\Captcha\CaptchaServiceProvider::class,
-        Support\Excel\ExcelServiceProvider::class,
         Domain\Payments\PaymentServiceProvider::class,
 
     ])->toArray(),

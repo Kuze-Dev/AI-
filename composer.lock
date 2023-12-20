@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ef48189488d358bdfc6b07f58af29216",
+    "content-hash": "968dba710fb09574ad6fd732c8768ca1",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -281,16 +281,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.293.9",
+            "version": "3.294.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "1fa17dba47021586de511d10944637da8ea4cc43"
+                "reference": "e6a63e39fed0fd9fb553af42e99aaf8d7c104c88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/1fa17dba47021586de511d10944637da8ea4cc43",
-                "reference": "1fa17dba47021586de511d10944637da8ea4cc43",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/e6a63e39fed0fd9fb553af42e99aaf8d7c104c88",
+                "reference": "e6a63e39fed0fd9fb553af42e99aaf8d7c104c88",
                 "shasum": ""
             },
             "require": {
@@ -370,9 +370,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.293.9"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.294.2"
             },
-            "time": "2023-12-12T19:08:53+00:00"
+            "time": "2023-12-18T19:11:16+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -1307,16 +1307,16 @@
         },
         {
             "name": "dompdf/dompdf",
-            "version": "v2.0.3",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "e8d2d5e37e8b0b30f0732a011295ab80680d7e85"
+                "reference": "093f2d9739cec57428e39ddadedfd4f3ae862c0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/e8d2d5e37e8b0b30f0732a011295ab80680d7e85",
-                "reference": "e8d2d5e37e8b0b30f0732a011295ab80680d7e85",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/093f2d9739cec57428e39ddadedfd4f3ae862c0f",
+                "reference": "093f2d9739cec57428e39ddadedfd4f3ae862c0f",
                 "shasum": ""
             },
             "require": {
@@ -1363,9 +1363,9 @@
             "homepage": "https://github.com/dompdf/dompdf",
             "support": {
                 "issues": "https://github.com/dompdf/dompdf/issues",
-                "source": "https://github.com/dompdf/dompdf/tree/v2.0.3"
+                "source": "https://github.com/dompdf/dompdf/tree/v2.0.4"
             },
-            "time": "2023-02-07T12:51:48+00:00"
+            "time": "2023-12-12T20:19:39+00:00"
         },
         {
             "name": "dragonmantank/cron-expression",
@@ -2660,6 +2660,79 @@
             "time": "2023-12-03T19:50:20+00:00"
         },
         {
+            "name": "halcyon-agile/filament-export",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/halcyon-agile/filament-export.git",
+                "reference": "d3fffb1d7b89ad469fc1e2c0ab016f9ae0e1efbd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/d3fffb1d7b89ad469fc1e2c0ab016f9ae0e1efbd",
+                "reference": "d3fffb1d7b89ad469fc1e2c0ab016f9ae0e1efbd",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^2.17.55",
+                "illuminate/contracts": "^10.0",
+                "maatwebsite/excel": "^3.1.51",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16.1"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.7",
+                "laravel/pint": "^1.13.7",
+                "nunomaduro/collision": "^7.10",
+                "orchestra/testbench": "^8.18",
+                "pestphp/pest": "^2.28.1",
+                "pestphp/pest-plugin-arch": "^2.5",
+                "pestphp/pest-plugin-laravel": "^2.2",
+                "phpstan/extension-installer": "^1.3.1",
+                "phpstan/phpstan-deprecation-rules": "^1.1.4",
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "spatie/laravel-ray": "^1.33"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "HalcyonAgile\\FilamentExport\\FilamentExportServiceProvider",
+                        "HalcyonAgile\\FilamentExport\\ExportEventServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HalcyonAgile\\FilamentExport\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Halcyon Agile",
+                    "email": "lgarcia.halcyondigital@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is my package filament-export",
+            "homepage": "https://github.com/halcyon-agile/filament-export",
+            "keywords": [
+                "HalcyonAgile",
+                "filament-export",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/halcyon-agile/filament-export/issues",
+                "source": "https://github.com/halcyon-agile/filament-export/tree/main"
+            },
+            "time": "2023-12-19T11:43:41+00:00"
+        },
+        {
             "name": "halcyon-agile/filament-import",
             "version": "v1.0.0",
             "source": {
@@ -2851,6 +2924,65 @@
                 "source": "https://github.com/ibrahimBougaoua/filament-menu-scroll-fix/tree/v1.0.1"
             },
             "time": "2023-06-22T17:45:46+00:00"
+        },
+        {
+            "name": "indeev/laravel-schedule-calendar",
+            "version": "v1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inDeev/Laravel-Schedule-Calendar.git",
+                "reference": "ba13714870a7d5d992bde5f6383f96554e1c4e88"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/inDeev/Laravel-Schedule-Calendar/zipball/ba13714870a7d5d992bde5f6383f96554e1c4e88",
+                "reference": "ba13714870a7d5d992bde5f6383f96554e1c4e88",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.3 || ^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^v6.40.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Indeev\\LaravelScheduleCalendar\\LaravelScheduleCalendarServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Indeev\\LaravelScheduleCalendar\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Petr Kateřiňák",
+                    "email": "katerinak@indeev.eu",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel Schedule Calendar - a package providing developers with a concise and visual representation of scheduled tasks, enabling easy analysis of load distribution throughout the day or week for optimized task scheduling.",
+            "homepage": "https://github.com/indeev/laravel-schedule-calendar",
+            "keywords": [
+                "calendar",
+                "indeev",
+                "laravel",
+                "laravel-schedule-calendar",
+                "schedule"
+            ],
+            "support": {
+                "issues": "https://github.com/inDeev/Laravel-Schedule-Calendar/issues",
+                "source": "https://github.com/inDeev/Laravel-Schedule-Calendar/tree/v1.2"
+            },
+            "time": "2023-12-16T12:28:15+00:00"
         },
         {
             "name": "intervention/image",
@@ -3065,16 +3197,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.37.1",
+            "version": "v10.37.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "b41612c58e358655cda1239e18d8851ff8736e8f"
+                "reference": "996375dd61f8c6e4ac262b57ed485655d71fcbdc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/b41612c58e358655cda1239e18d8851ff8736e8f",
-                "reference": "b41612c58e358655cda1239e18d8851ff8736e8f",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/996375dd61f8c6e4ac262b57ed485655d71fcbdc",
+                "reference": "996375dd61f8c6e4ac262b57ed485655d71fcbdc",
                 "shasum": ""
             },
             "require": {
@@ -3263,7 +3395,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2023-12-12T19:03:09+00:00"
+            "time": "2023-12-13T20:10:58+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -3742,21 +3874,22 @@
         },
         {
             "name": "laravel/vapor-core",
-            "version": "v2.32.0",
+            "version": "v2.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/vapor-core.git",
-                "reference": "36886e915b46cbd738ec8e147be09325d00cbee3"
+                "reference": "03bc11599dd880d4e0e13caf000e265505363f4c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/vapor-core/zipball/36886e915b46cbd738ec8e147be09325d00cbee3",
-                "reference": "36886e915b46cbd738ec8e147be09325d00cbee3",
+                "url": "https://api.github.com/repos/laravel/vapor-core/zipball/03bc11599dd880d4e0e13caf000e265505363f4c",
+                "reference": "03bc11599dd880d4e0e13caf000e265505363f4c",
                 "shasum": ""
             },
             "require": {
                 "aws/aws-sdk-php": "^3.80",
                 "guzzlehttp/guzzle": "^6.3|^7.0",
+                "guzzlehttp/promises": "^1.4|^2.0",
                 "hollodotme/fast-cgi-client": "^3.0",
                 "illuminate/container": "^6.0|^7.0|^8.0|^9.0|^10.0",
                 "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0",
@@ -3783,7 +3916,10 @@
                 "laravel": {
                     "providers": [
                         "Laravel\\Vapor\\VaporServiceProvider"
-                    ]
+                    ],
+                    "aliases": {
+                        "Vapor": "Laravel\\Vapor\\Vapor"
+                    }
                 }
             },
             "autoload": {
@@ -3811,9 +3947,9 @@
                 "vapor"
             ],
             "support": {
-                "source": "https://github.com/laravel/vapor-core/tree/v2.32.0"
+                "source": "https://github.com/laravel/vapor-core/tree/v2.34.0"
             },
-            "time": "2023-07-24T18:45:25+00:00"
+            "time": "2023-12-19T08:34:28+00:00"
         },
         {
             "name": "league/commonmark",
@@ -4563,16 +4699,16 @@
         },
         {
             "name": "maatwebsite/excel",
-            "version": "3.1.50",
+            "version": "3.1.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SpartnerNL/Laravel-Excel.git",
-                "reference": "d79e66391aa306983bb7e234503f5605c3e33348"
+                "reference": "6d3c78ce6645abada32e03b40dc7f3c561878bc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/d79e66391aa306983bb7e234503f5605c3e33348",
-                "reference": "d79e66391aa306983bb7e234503f5605c3e33348",
+                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/6d3c78ce6645abada32e03b40dc7f3c561878bc3",
+                "reference": "6d3c78ce6645abada32e03b40dc7f3c561878bc3",
                 "shasum": ""
             },
             "require": {
@@ -4627,7 +4763,7 @@
             ],
             "support": {
                 "issues": "https://github.com/SpartnerNL/Laravel-Excel/issues",
-                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.50"
+                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.51"
             },
             "funding": [
                 {
@@ -4639,7 +4775,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-11-06T11:29:48+00:00"
+            "time": "2023-12-08T12:44:49+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -6070,16 +6206,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.24.4",
+            "version": "1.24.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "6bd0c26f3786cd9b7c359675cb789e35a8e07496"
+                "reference": "fedf211ff14ec8381c9bf5714e33a7a552dd1acc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/6bd0c26f3786cd9b7c359675cb789e35a8e07496",
-                "reference": "6bd0c26f3786cd9b7c359675cb789e35a8e07496",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/fedf211ff14ec8381c9bf5714e33a7a552dd1acc",
+                "reference": "fedf211ff14ec8381c9bf5714e33a7a552dd1acc",
                 "shasum": ""
             },
             "require": {
@@ -6111,9 +6247,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.4"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.5"
             },
-            "time": "2023-11-26T18:29:22+00:00"
+            "time": "2023-12-16T09:33:33+00:00"
         },
         {
             "name": "pragmarx/google2fa",
@@ -8463,16 +8599,16 @@
         },
         {
             "name": "spatie/laravel-route-attributes",
-            "version": "1.20.0",
+            "version": "1.20.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-route-attributes.git",
-                "reference": "4769a0723613386ff38bc63ab9ab6f85e56634cb"
+                "reference": "57e62a71abd97e531b23cec9ef4e5444e9ba1ae1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-route-attributes/zipball/4769a0723613386ff38bc63ab9ab6f85e56634cb",
-                "reference": "4769a0723613386ff38bc63ab9ab6f85e56634cb",
+                "url": "https://api.github.com/repos/spatie/laravel-route-attributes/zipball/57e62a71abd97e531b23cec9ef4e5444e9ba1ae1",
+                "reference": "57e62a71abd97e531b23cec9ef4e5444e9ba1ae1",
                 "shasum": ""
             },
             "require": {
@@ -8518,7 +8654,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-route-attributes/issues",
-                "source": "https://github.com/spatie/laravel-route-attributes/tree/1.20.0"
+                "source": "https://github.com/spatie/laravel-route-attributes/tree/1.20.1"
             },
             "funding": [
                 {
@@ -8530,7 +8666,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-11-24T09:12:48+00:00"
+            "time": "2023-12-18T14:59:02+00:00"
         },
         {
             "name": "spatie/laravel-settings",
@@ -12540,16 +12676,16 @@
         },
         {
             "name": "beyondcode/helo-laravel",
-            "version": "1.6.1",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/beyondcode/helo-laravel.git",
-                "reference": "c2b964bcffbe1c76c8701b90c0cdcedd64b338a7"
+                "reference": "b2c23ee8e0b188d8aa4ebbb5c8a548c82aa40a61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/beyondcode/helo-laravel/zipball/c2b964bcffbe1c76c8701b90c0cdcedd64b338a7",
-                "reference": "c2b964bcffbe1c76c8701b90c0cdcedd64b338a7",
+                "url": "https://api.github.com/repos/beyondcode/helo-laravel/zipball/b2c23ee8e0b188d8aa4ebbb5c8a548c82aa40a61",
+                "reference": "b2c23ee8e0b188d8aa4ebbb5c8a548c82aa40a61",
                 "shasum": ""
             },
             "require": {
@@ -12596,9 +12732,9 @@
             ],
             "support": {
                 "issues": "https://github.com/beyondcode/helo-laravel/issues",
-                "source": "https://github.com/beyondcode/helo-laravel/tree/1.6.1"
+                "source": "https://github.com/beyondcode/helo-laravel/tree/1.7.0"
             },
-            "time": "2023-03-29T21:30:43+00:00"
+            "time": "2023-12-15T10:22:04+00:00"
         },
         {
             "name": "brianium/paratest",
@@ -13915,16 +14051,16 @@
         },
         {
             "name": "pestphp/pest",
-            "version": "v2.28.0",
+            "version": "v2.28.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest.git",
-                "reference": "9a8f6e64149592b2555a2519237abb39e9e4f1fe"
+                "reference": "9ee41910201ef8fc5f5b6d1390e5ec4558222927"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest/zipball/9a8f6e64149592b2555a2519237abb39e9e4f1fe",
-                "reference": "9a8f6e64149592b2555a2519237abb39e9e4f1fe",
+                "url": "https://api.github.com/repos/pestphp/pest/zipball/9ee41910201ef8fc5f5b6d1390e5ec4558222927",
+                "reference": "9ee41910201ef8fc5f5b6d1390e5ec4558222927",
                 "shasum": ""
             },
             "require": {
@@ -13934,10 +14070,10 @@
                 "pestphp/pest-plugin": "^2.1.1",
                 "pestphp/pest-plugin-arch": "^2.5.0",
                 "php": "^8.1.0",
-                "phpunit/phpunit": "^10.5.2"
+                "phpunit/phpunit": "^10.5.3"
             },
             "conflict": {
-                "phpunit/phpunit": ">10.5.2",
+                "phpunit/phpunit": ">10.5.3",
                 "sebastian/exporter": "<5.1.0",
                 "webmozart/assert": "<1.11.0"
             },
@@ -14007,7 +14143,7 @@
             ],
             "support": {
                 "issues": "https://github.com/pestphp/pest/issues",
-                "source": "https://github.com/pestphp/pest/tree/v2.28.0"
+                "source": "https://github.com/pestphp/pest/tree/v2.28.1"
             },
             "funding": [
                 {
@@ -14019,7 +14155,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-05T19:06:22+00:00"
+            "time": "2023-12-15T11:42:34+00:00"
         },
         {
             "name": "pestphp/pest-plugin",
@@ -14731,16 +14867,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.49",
+            "version": "1.10.50",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "9367ba4c4f6ad53e9efb594d74a8941563caccf6"
+                "reference": "06a98513ac72c03e8366b5a0cb00750b487032e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9367ba4c4f6ad53e9efb594d74a8941563caccf6",
-                "reference": "9367ba4c4f6ad53e9efb594d74a8941563caccf6",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/06a98513ac72c03e8366b5a0cb00750b487032e4",
+                "reference": "06a98513ac72c03e8366b5a0cb00750b487032e4",
                 "shasum": ""
             },
             "require": {
@@ -14789,7 +14925,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-12-12T10:05:12+00:00"
+            "time": "2023-12-13T10:59:42+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -15162,16 +15298,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.2",
+            "version": "10.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "5aedff46afba98dddecaa12349ec044d9103d4fe"
+                "reference": "6fce887c71076a73f32fd3e0774a6833fc5c7f19"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/5aedff46afba98dddecaa12349ec044d9103d4fe",
-                "reference": "5aedff46afba98dddecaa12349ec044d9103d4fe",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6fce887c71076a73f32fd3e0774a6833fc5c7f19",
+                "reference": "6fce887c71076a73f32fd3e0774a6833fc5c7f19",
                 "shasum": ""
             },
             "require": {
@@ -15243,7 +15379,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.2"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.3"
             },
             "funding": [
                 {
@@ -15259,7 +15395,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-12-05T14:54:33+00:00"
+            "time": "2023-12-13T07:25:23+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -16495,16 +16631,16 @@
         },
         {
             "name": "spatie/laravel-ignition",
-            "version": "2.3.1",
+            "version": "2.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-ignition.git",
-                "reference": "bf21cd15aa47fa4ec5d73bbc932005c70261efc8"
+                "reference": "4800661a195e15783477d99f7f8f669a49793996"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/bf21cd15aa47fa4ec5d73bbc932005c70261efc8",
-                "reference": "bf21cd15aa47fa4ec5d73bbc932005c70261efc8",
+                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/4800661a195e15783477d99f7f8f669a49793996",
+                "reference": "4800661a195e15783477d99f7f8f669a49793996",
                 "shasum": ""
             },
             "require": {
@@ -16583,7 +16719,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-09T12:55:26+00:00"
+            "time": "2023-12-15T13:44:49+00:00"
         },
         {
             "name": "spatie/laravel-ray",
@@ -17284,6 +17420,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "halcyon-agile/filament-export": 20,
         "timacdonald/json-api": 10
     },
     "prefer-stable": true,
