@@ -38,7 +38,7 @@ class ServiceFactory extends Factory
             'needs_approval' => $this->faker->boolean(),
             'is_auto_generated_bill' => $this->faker->boolean(),
             'is_partial_payment' => $this->faker->boolean(),
-            'is_installment' => $this->faker->boolean(),
+            //            'is_installment' => $this->faker->boolean(),
         ];
     }
 
