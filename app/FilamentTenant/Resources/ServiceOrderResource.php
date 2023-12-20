@@ -28,6 +28,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -227,6 +228,48 @@ class ServiceOrderResource extends Resource
                                             return isset($state['service_id']);
                                         }
                                     ),
+
+                                Forms\Components\Group::make()
+                                    ->schema([
+                                        TextLabel::make('')
+                                            ->label(trans('Payment Plan'))
+                                            ->alignLeft()
+                                            ->size('xl')
+                                            ->weight('bold')
+                                            ->inline()
+                                            ->readOnly(),
+
+                                        Radio::make('payment_type')
+                                            ->label(trans(''))
+                                            ->options([
+                                                'pay_in_full' => 'Pay in full',
+                                                'pay_in_milestone' => 'Pay in milestone',
+                                            ])
+                                            ->reactive()
+                                            ->columnSpan(2)
+                                            ->columns(2),
+
+                                        Forms\Components\Select::make('value')
+                                            ->reactive()
+                                            ->options(function () {
+                                                return ['hello', 'hi'];
+                                            })
+                                            ->columnSpan(2)
+                                            ->columns(2),
+
+                                        Repeater::make('payment_plan')
+                                            ->label('')
+                                            ->createItemButtonLabel('Add milestone')
+                                            ->columnSpan(2)
+                                            ->defaultItems(0)
+                                            ->reactive()
+                                            ->schema([
+                                                TextInput::make('description')->required()->translateLabel(),
+                                                TextInput::make('percent')->required()->translateLabel(),
+                                            ])->columns(2)
+                                            ->visible(fn (Closure $get) => $get('payment_type') === 'pay_in_milestone'),
+                                    ])
+                                    ->columnSpan(2),
 
                                 TextLabel::make('')
                                     ->label(trans('Additional Charges'))
