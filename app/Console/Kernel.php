@@ -7,7 +7,6 @@ namespace App\Console;
 use App\Console\Commands\CreateServiceBillCommand;
 use App\Console\Commands\InactivateServiceOrderCommand;
 use App\Console\Commands\NotifyCustomerServiceBillDueDateCommand;
-use Domain\Tenant\Models\Tenant;
 use HalcyonAgile\FilamentExport\Commands\PruneExportCommand;
 use HalcyonAgile\FilamentImport\Commands\PruneImportCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
@@ -20,7 +19,7 @@ class Kernel extends ConsoleKernel
     /** Define the application's command schedule. */
     protected function schedule(Schedule $schedule): void
     {
-        $tenants = Tenant::pluck('id')->toArray();
+        $tenants = tenancy()->model()->cursor()->pluck('id')->toArray();
 
         $schedule->command(
             NotifyCustomerServiceBillDueDateCommand::class,
