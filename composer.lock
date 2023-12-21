@@ -2665,12 +2665,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/halcyon-agile/filament-export.git",
-                "reference": "c0bf1890da117a201f360919959596255fcdcf62"
+                "reference": "b68e4f2e80464b12fece488de73eae658c2e2ff8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/c0bf1890da117a201f360919959596255fcdcf62",
-                "reference": "c0bf1890da117a201f360919959596255fcdcf62",
+                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/b68e4f2e80464b12fece488de73eae658c2e2ff8",
+                "reference": "b68e4f2e80464b12fece488de73eae658c2e2ff8",
                 "shasum": ""
             },
             "require": {
@@ -2730,7 +2730,7 @@
                 "issues": "https://github.com/halcyon-agile/filament-export/issues",
                 "source": "https://github.com/halcyon-agile/filament-export/tree/main"
             },
-            "time": "2023-12-19T11:45:17+00:00"
+            "time": "2023-12-21T05:52:07+00:00"
         },
         {
             "name": "halcyon-agile/filament-import",
