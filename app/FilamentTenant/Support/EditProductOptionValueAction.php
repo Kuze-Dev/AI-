@@ -52,12 +52,22 @@ class EditProductOptionValueAction
                         ->failure();
 
                     $action->halt();
+                    return 'halted';
                 }
 
                 $record->update([
                     'name' => $data['name'],
                     'data' => ['icon_type' => $data['icon_type'] ?? 'text', 'icon_value' => $data['icon_value'] ?? ''],
                 ]);
+
+                if (! $record->productOption instanceof ProductOption) {
+                    $action->failureNotificationTitle(trans('The option value is unlinked from an option.'))
+                        ->failure();
+
+                    $action->halt();
+                    return 'halted';
+                }
+
 
                 // Sync product variants connected to this option value
                 $productVariants = ProductVariant::where('product_id', $record->productOption->product_id)
