@@ -178,10 +178,8 @@ class ProductOptionFormAction extends Action
         $mergedCombination = [];
         $result = [];
         $existingProductVariants = $record->productVariants->toArray();
-        // dd($record->productVariants->toArray(), $productVariants);
         // Merge new and existing combinations
         $mergedCombination = $this->mergeCombinations($record->productVariants->toArray(), $productVariants);
-        // dd($mergedCombination);
 
         $result = collect($mergedCombination)->map(function ($combination) use ($existingProductVariants, $record, $result) {
             $generatedSku = $this->generateUniqueSku($record, collect($result));
