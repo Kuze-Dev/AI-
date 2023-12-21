@@ -145,10 +145,6 @@ class ProductResource extends Resource
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
                                 ])->columns(3),
                         ]),
-
-                    /** Form for variant section */
-                    // self::getVariantForm(),
-
                     Forms\Components\Section::make('Inventory')
                         ->translateLabel()
                         ->schema([

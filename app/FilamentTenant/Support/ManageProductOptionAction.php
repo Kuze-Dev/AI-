@@ -14,7 +14,6 @@ use Filament\Tables\Contracts\HasRelationshipTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
 class ManageProductOptionAction
@@ -30,14 +29,14 @@ class ManageProductOptionAction
             ->form(
                 fn () => self::getFormElements()
             )
-            ->using(function (HasRelationshipTable $livewire, array $data): Model|string|BadRequestHttpException {
-                return self::processProductOption($livewire, $data);
+            ->using(function (HasRelationshipTable $livewire, array $data, Tables\Actions\Action $action): Model|string {
+                return self::processProductOption($livewire, $data, $action);
             });
     }
 
-    protected static function processProductOption(HasRelationshipTable $livewire, array $data): Model|string|BadRequestHttpException
+    protected static function processProductOption(HasRelationshipTable $livewire, array $data, Tables\Actions\Action $action): Model|string
     {
-        return DB::transaction(function () use ($livewire, $data) {
+        return DB::transaction(function () use ($livewire, $data, $action) {
             try {
                 DB::beginTransaction();
 
@@ -45,7 +44,19 @@ class ManageProductOptionAction
                     try {
                         $isThereNameAdjustment = false;
 
-                        $productOption = ProductOption::whereProductId($livewire->ownerRecord->id);
+                        if (! isset($livewire->ownerRecord)) {
+                            $action->failureNotificationTitle(trans('No owner record set.'))
+                                ->failure();
+
+                            $action->halt();
+
+                            return 'halted';
+                        }
+
+                        /** @var Product $livewireOwnerRecord */
+                        $livewireOwnerRecord = $livewire->ownerRecord;
+
+                        $productOption = ProductOption::whereProductId($livewireOwnerRecord->id);
 
                         if (isset($option['id'])) {
                             $foundOption = $productOption->whereId($option['id'])->first();
@@ -55,7 +66,7 @@ class ManageProductOptionAction
 
                         if (! $foundOption instanceof ProductOption) {
                             $foundOption = ProductOption::create([
-                                'product_id' => $livewire->ownerRecord->id,
+                                'product_id' => $livewireOwnerRecord->id,
                                 'name' => $option['name'],
                                 'is_custom' => $option['is_custom'],
                             ]);
@@ -100,7 +111,7 @@ class ManageProductOptionAction
 
                 DB::commit();
 
-                return $foundOption;
+                return $foundOption ?? 'Process finished.';
             } catch (Exception $e) {
                 DB::rollBack();
 
@@ -109,14 +120,15 @@ class ManageProductOptionAction
         });
     }
 
-    protected static function getFormElements()
+    protected static function getFormElements(): array
     {
         return [
             \Filament\Forms\Components\Repeater::make('options')
                 ->translateLabel()
                 ->reactive()
                 ->disableItemDeletion()
-                ->afterStateHydrated(function (\Filament\Forms\Components\Repeater $component, ?Product $record, ?array $state, HasRelationshipTable $livewire, Closure $get) {
+                ->afterStateHydrated(function (\Filament\Forms\Components\Repeater $component, ?Product $record, ?array $state, HasRelationshipTable $livewire) {
+                    /** @phpstan-ignore-next-line */
                     $productOptions = $livewire->ownerRecord->productOptions->toArray();
                     if (($productOptions) !== null) {
                         $component->state($productOptions);

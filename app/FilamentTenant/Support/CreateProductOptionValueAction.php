@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Support;
 
 use App\Features\ECommerce\ColorPallete;
 use Closure;
+use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
@@ -42,34 +43,49 @@ class CreateProductOptionValueAction
             $action->failureNotificationTitle(trans('Option value name has duplicate.'))
                 ->failure();
 
-            return $action->halt();
+            $action->halt();
+
+            return 'halted';
         }
 
-        return DB::transaction(function () use ($livewire, $data) {
+        return DB::transaction(function () use ($livewire, $data, $action) {
             try {
                 DB::beginTransaction();
 
-                if (!isset($data['icon_type'])) {
+                if (! isset($data['icon_type'])) {
                     $data['data'] = ['icon_type' => 'text', 'icon_value' => ''];
                 } else {
                     $data['data'] = ['icon_type' => $data['icon_type'], 'icon_value' => $data['icon_value'] ?? ''];
                 }
 
-                if (! $livewire instanceof HasRelationshipTable) {
-                    return 'Error: livewire has on instance of HasRelationshipTable';
+                /** @var ProductOptionValue $optionValueModel */
+                $optionValueModel = ProductOptionValue::create($data);
+
+                if (! isset($livewire->ownerRecord)) {
+                    $action->failureNotificationTitle(trans('No owner record set.'))
+                        ->failure();
+
+                    $action->halt();
+
+                    return 'halted';
                 }
-                
-                $optionValueModel = $livewire->getRelationship()->create($data);
+
+                /** @var Product $livewireOwnerRecord */
+                $livewireOwnerRecord = $livewire->ownerRecord;
 
                 // Add product variants
-                $pairOption = $livewire->ownerRecord->productOptions->where('id', '!=', $data['product_option_id'])->first();
+                /** @var ProductOption $pairOption */
+                $pairOption = $livewireOwnerRecord->productOptions->where('id', '!=', $data['product_option_id'])->first();
 
-                if ($pairOption && count($pairOption->productOptionValues->toArray())) {
+                /** @var ProductOption $optionModel */
+                $optionModel = $optionValueModel->productOption;
+
+                if ($pairOption instanceof ProductOption && count($pairOption->productOptionValues->toArray())) {
                     // Remove variants with combination having only one array element
-                    $productVariants = ProductVariant::where('product_id', $livewire->ownerRecord->id)
-                        ->where(function (Builder $query) use ($optionValueModel, $livewire) {
+                    $productVariants = ProductVariant::where('product_id', $livewireOwnerRecord->id)
+                        ->where(function (Builder $query) use ($optionValueModel, $pairOption) {
                             $query->whereJsonContains('combination', [['option_id' => (int) $optionValueModel->product_option_id]])
-                                ->orWhereJsonContains('combination', [['option_id' => (int) $livewire->ownerRecord->productOptions->where('id', '!=', $optionValueModel->product_option_id)->first()->id]]);
+                                ->orWhereJsonContains('combination', [['option_id' => (int) $pairOption->id]]);
                         })->get();
 
                     foreach ($productVariants as $productVariant) {
@@ -90,12 +106,12 @@ class CreateProductOptionValueAction
                     foreach ($pairOptionValues as $key => $pairOptionValue) {
                         try {
                             ProductVariant::create([
-                                'product_id' => $livewire->ownerRecord->id,
-                                'sku' => $livewire->ownerRecord->sku . $optionValueModel->id . $pairOptionValue->id,
+                                'product_id' => $livewireOwnerRecord->id,
+                                'sku' => $livewireOwnerRecord->sku.$optionValueModel->id.$pairOptionValue->id,
                                 'combination' => [
                                     [
-                                        'option' => $optionValueModel->productOption->name,
-                                        'option_id' => $optionValueModel->productOption->id,
+                                        'option' => $optionModel->name,
+                                        'option_id' => $optionModel->id,
                                         'option_value' => $optionValueModel->name,
                                         'option_value_id' => $optionValueModel->id,
                                     ],
@@ -106,10 +122,10 @@ class CreateProductOptionValueAction
                                         'option_value_id' => $pairOptionValue->id,
                                     ],
                                 ],
-                                'retail_price' => $livewire->ownerRecord->retail_price,
-                                'selling_price' => $livewire->ownerRecord->selling_price,
-                                'stock' => $livewire->ownerRecord->stock,
-                                'status' => $livewire->ownerRecord->status,
+                                'retail_price' => $livewireOwnerRecord->retail_price,
+                                'selling_price' => $livewireOwnerRecord->selling_price,
+                                'stock' => $livewireOwnerRecord->stock,
+                                'status' => $livewireOwnerRecord->status,
                             ]);
                         } catch (Throwable $e) {
                             return $e->getMessage();
@@ -117,20 +133,20 @@ class CreateProductOptionValueAction
                     }
                 } else {
                     ProductVariant::create([
-                        'product_id' => $livewire->ownerRecord->id,
-                        'sku' => $livewire->ownerRecord->sku . $optionValueModel->id,
+                        'product_id' => $livewireOwnerRecord->id,
+                        'sku' => $livewireOwnerRecord->sku.$optionValueModel->id,
                         'combination' => [
                             [
-                                'option' => $optionValueModel->productOption->name,
-                                'option_id' => $optionValueModel->productOption->id,
+                                'option' => $optionModel->name,
+                                'option_id' => $optionModel->id,
                                 'option_value' => $optionValueModel->name,
                                 'option_value_id' => $optionValueModel->id,
                             ],
                         ],
-                        'retail_price' => $livewire->ownerRecord->retail_price,
-                        'selling_price' => $livewire->ownerRecord->selling_price,
-                        'stock' => $livewire->ownerRecord->stock,
-                        'status' => $livewire->ownerRecord->status,
+                        'retail_price' => $livewireOwnerRecord->retail_price,
+                        'selling_price' => $livewireOwnerRecord->selling_price,
+                        'stock' => $livewireOwnerRecord->stock,
+                        'status' => $livewireOwnerRecord->status,
                     ]);
                 }
 
@@ -145,12 +161,16 @@ class CreateProductOptionValueAction
         });
     }
 
-    protected static function getFormElements()
+    protected static function getFormElements(): array
     {
         return [
             \Filament\Forms\Components\Select::make('product_option_id')
                 ->label(trans('Product Option'))
-                ->options(fn (HasRelationshipTable $livewire) => $livewire->ownerRecord->productOptions->pluck('name', 'id'))
+                ->options(
+                    fn (HasRelationshipTable $livewire) =>
+                    /** @phpstan-ignore-next-line */
+                    $livewire->ownerRecord->productOptions->pluck('name', 'id')
+                )
                 ->columnSpan(2)
                 ->required()
                 ->reactive(),
@@ -176,7 +196,7 @@ class CreateProductOptionValueAction
                         ->hidden(function (Closure $get) {
                             if ($get('product_option_id')) {
                                 $productOption = ProductOption::find((int) $get('product_option_id'));
-                                \Log::info($productOption);
+
                                 if ($productOption) {
                                     return $productOption->is_custom ? false : true;
                                 }
@@ -189,7 +209,7 @@ class CreateProductOptionValueAction
                     \Filament\Forms\Components\ColorPicker::make('icon_value')
                         ->label(trans('Icon Value (HEX)'))
                         ->hidden(function (Closure $get) {
-                            if (!($get('icon_type') === 'color_palette')) {
+                            if (! ($get('icon_type') === 'color_palette')) {
                                 return true;
                             }
 

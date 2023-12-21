@@ -12,7 +12,6 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
 class EditProductOptionValueAction
@@ -33,11 +32,11 @@ class EditProductOptionValueAction
                 return $data;
             })
             ->using(
-                fn (Model $record, array $data, Tables\Actions\Action $action): Model => self::processUpdate($record, $data, $action)
+                fn (ProductOptionValue $record, array $data, Tables\Actions\Action $action): Model|string => self::processUpdate($record, $data, $action)
             )->authorize('update');
     }
 
-    protected static function processUpdate(Model $record, array $data, Tables\Actions\Action $action): Model|string|BadRequestHttpException
+    protected static function processUpdate(ProductOptionValue $record, array $data, Tables\Actions\Action $action): Model|string
     {
         return DB::transaction(function () use ($record, $data, $action) {
             try {
@@ -45,7 +44,7 @@ class EditProductOptionValueAction
 
                 // Check if option value has duplicate
                 $productOptionValues = ProductOptionValue::select('id')
-                    ->whereProductOptionId($record->option_id)
+                    ->whereProductOptionId($record->option_id ?? 0)
                     ->whereName($data['name'])->get();
 
                 if (count($productOptionValues->toArray()) > 1) {
