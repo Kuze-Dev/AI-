@@ -13,12 +13,12 @@ use Domain\Role\Models\Role;
 use Exception;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use HalcyonAgile\FilamentExport\Actions\ExportAction;
 use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\ValidationRules\Rules\Delimited;
-use Support\Excel\Actions\ExportAction;
 
 class ListAdmins extends ListRecords
 {
@@ -92,6 +92,13 @@ class ListAdmins extends ListRecords
                         $admin->getRoleNames()->implode(', '),
                         $admin->created_at?->format(config('tables.date_time_format')),
                     ]
+                )
+                ->tags([
+                    'tenant:'.(tenant('id') ?? 'central'),
+                ])
+                ->withActivityLog(
+                    event: 'exported',
+                    description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
                 ),
             Actions\CreateAction::make(),
         ];

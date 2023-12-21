@@ -174,6 +174,7 @@ return [
         App\Providers\HealthCheckServiceProvider::class,
         App\Providers\TenancyServiceProvider::class,
         App\Providers\FilamentTenantServiceProvider::class,
+        App\Providers\AboutServiceProvider::class,
 
         /*
          * Domain Service Providers...
@@ -192,7 +193,6 @@ return [
         * Support Service Providers...
         */
         Support\Captcha\CaptchaServiceProvider::class,
-        Support\Excel\ExcelServiceProvider::class,
         Domain\Payments\PaymentServiceProvider::class,
 
     ])->toArray(),
