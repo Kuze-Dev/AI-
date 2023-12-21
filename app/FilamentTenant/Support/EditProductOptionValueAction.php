@@ -52,6 +52,7 @@ class EditProductOptionValueAction
                         ->failure();
 
                     $action->halt();
+
                     return 'halted';
                 }
 
@@ -65,9 +66,9 @@ class EditProductOptionValueAction
                         ->failure();
 
                     $action->halt();
+
                     return 'halted';
                 }
-
 
                 // Sync product variants connected to this option value
                 $productVariants = ProductVariant::where('product_id', $record->productOption->product_id)
