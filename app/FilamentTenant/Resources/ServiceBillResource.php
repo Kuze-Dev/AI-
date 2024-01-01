@@ -81,6 +81,19 @@ class ServiceBillResource extends Resource
                     ->label('Amount')
                     ->translateLabel()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('total_balance')
+                    ->formatStateUsing(
+                        function (ServiceBill $record): string {
+                            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+                            $serviceOrder = $record->serviceOrder;
+
+                            return $serviceOrder->currency_symbol.' '.
+                                number_format((float) $record->total_balance, 2, '.', ',');
+                        }
+                    )
+                    ->label('Balance')
+                    ->translateLabel()
+                    ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
                     ->translateLabel()

@@ -260,7 +260,7 @@ class ServiceOrder extends Model implements PayableInterface
     {
         return money($this->serviceBills()
             ->where('status', 'pending')
-            ->sum('total_amount'));
+            ->sum('total_balance'));
     }
 
     public function totalBalanceTax(): Money

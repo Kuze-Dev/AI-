@@ -8,11 +8,10 @@ use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Exceptions\PaymentException;
 use Domain\Payments\Models\Payment;
 use Domain\ServiceOrder\Actions\ServiceOrderPaymentUpdatedPipelineAction;
+use Domain\ServiceOrder\Actions\UpdateServiceBillBalancePartialPaymentAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentUpdatedPipelineData;
-use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
-use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceTransaction;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -72,34 +71,19 @@ class ServiceOrderPartialPaymentUpdatedListener
 
         $this->serviceTransaction->update(['status' => $serviceTransactionStatus]);
 
-        $bills = $this->serviceOrder->serviceBills()->whereStatus('pending')->get();
+        app(UpdateServiceBillBalancePartialPaymentAction::class)->execute($this->payment, $this->serviceOrder);
 
-        $totalPayment = $this->payment->amount;
+        $serviceBill = $this->serviceOrder->serviceBills()->first();
 
-        foreach($bills as $bill){
-            $billPayment = min($bill->total_amount, $totalPayment);
-
-            $bill->update([
-                // 'status' => ServiceBillStatus::PAID,
-                'total_amount' => $billPayment
-            ]);
-
-            $totalPayment -= $billPayment;
-
-            if ($totalPayment <= 0) {
-                break;
-            }
-        }
-
-        // $this->serviceOrderPaymentUpdatedPipelineAction
-        //     ->execute(
-        //         new ServiceOrderPaymentUpdatedPipelineData(
-        //             service_order: $this->serviceOrder,
-        //             service_bill: $this->serviceBill,
-        //             service_transaction: $this->serviceTransaction,
-        //             is_payment_paid: $this->serviceBill->is_paid && $this->serviceTransaction->is_paid,
-        //             is_service_order_status_closed: $this->serviceOrder->status == ServiceOrderStatus::CLOSED
-        //         )
-        //     );
+        $this->serviceOrderPaymentUpdatedPipelineAction
+            ->execute(
+                new ServiceOrderPaymentUpdatedPipelineData(
+                    service_order: $this->serviceOrder,
+                    service_bill: $serviceBill,
+                    service_transaction: $this->serviceTransaction,
+                    is_payment_paid: $serviceBill->is_paid && $this->serviceTransaction->is_paid,
+                    is_service_order_status_closed: $this->serviceOrder->status == ServiceOrderStatus::CLOSED
+                )
+            );
     }
 }

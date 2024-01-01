@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\DataTransferObjects;
 
-class ServiceBillBankTransferData
+class ServiceBankTransferData
 {
     public function __construct(
         public readonly string $reference_id,

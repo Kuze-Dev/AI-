@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
 use App\HttpTenantApi\Resources\ServiceBillResource;
 use Domain\ServiceOrder\Actions\UpdateServiceBillProofOfPaymentAction;
+use Domain\ServiceOrder\DataTransferObjects\ServiceBankTransferData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillBankTransferData;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Requests\UpdateServiceBillProofOfPaymentRequest;
@@ -40,7 +41,7 @@ class ServiceBillController
         try {
             $validatedData = $request->validated();
 
-            $data = $updateServiceBillProofOfPayment->execute(ServiceBillBankTransferData::fromRequest($validatedData));
+            $data = $updateServiceBillProofOfPayment->execute(ServiceBankTransferData::fromRequest($validatedData));
 
             return response([
                 'message' => trans('Uploaded Successfully'),
@@ -48,6 +49,7 @@ class ServiceBillController
             ]);
 
         } catch (BadRequestHttpException $e) {
+
             return response(
                 ['message' => trans($e->getMessage())],
                 Response::HTTP_BAD_REQUEST

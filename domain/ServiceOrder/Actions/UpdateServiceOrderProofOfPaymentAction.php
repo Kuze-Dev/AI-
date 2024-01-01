@@ -14,7 +14,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class UpdateServiceBillProofOfPaymentAction
+class UpdateServiceOrderProofOfPaymentAction
 {
     public function __construct(
         private readonly UploadProofofPaymentAction $uploadProofofPaymentAction,

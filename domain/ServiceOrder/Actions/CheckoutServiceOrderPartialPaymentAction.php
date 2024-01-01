@@ -94,8 +94,8 @@ class CheckoutServiceOrderPartialPaymentAction
                         'total' => $amountToPay,
                         'details' => PaymentDetailsData::fromArray(
                             [
-                                'subtotal' => strval($this->serviceOrder->totalBalanceSubtotal()->formatSimple()),
-                                'tax' => strval($this->serviceOrder->totalBalanceTax()->formatSimple()),
+                                // 'subtotal' => strval($this->serviceOrder->totalBalanceSubtotal()->formatSimple()),
+                                // 'tax' => strval($this->serviceOrder->totalBalanceTax()->formatSimple()),
                             ]
                         ),
                     ]),
@@ -108,7 +108,7 @@ class CheckoutServiceOrderPartialPaymentAction
             ->execute($this->serviceOrder, $providerData);
 
         if ($result->success) {
-            $this->createServiceTransaction();
+            $this->createServiceTransaction($amountToPay);
 
             return $result;
         }
@@ -117,7 +117,7 @@ class CheckoutServiceOrderPartialPaymentAction
     }
 
     /** @throws Throwable */
-    private function createServiceTransaction(): void
+    private function createServiceTransaction(float $amountToPay): void
     {
         $payment = Payment::wherePayableType($this->serviceOrder->getTable())
             ->wherePayableId($this->serviceOrder->id)
@@ -132,6 +132,7 @@ class CheckoutServiceOrderPartialPaymentAction
             new CreateServiceTransactionData(
                 service_order: $this->serviceOrder,
                 service_bill: null,
+                total_amount: $amountToPay,
                 service_transaction_status: ServiceTransactionStatus::PENDING,
                 payment: $payment
             )

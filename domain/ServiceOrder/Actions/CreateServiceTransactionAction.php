@@ -18,8 +18,7 @@ class CreateServiceTransactionAction
                 service_bill_id: $createServiceTransactionData->service_bill?->id ?? null,
                 payment_id: $createServiceTransactionData->payment->id,
                 payment_method_id: $createServiceTransactionData->payment->payment_method_id,
-                total_amount: $createServiceTransactionData->service_bill->total_amount ??
-                              floatval($createServiceTransactionData->service_order->totalBalance()->formatSimple()),
+                total_amount: $createServiceTransactionData->service_bill?->total_amount ?? $createServiceTransactionData->total_amount,
                 currency: $createServiceTransactionData->service_order->currency_code,
                 status: $createServiceTransactionData->service_transaction_status,
             )
