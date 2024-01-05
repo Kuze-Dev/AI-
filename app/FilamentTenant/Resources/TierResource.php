@@ -97,7 +97,7 @@ class TierResource extends Resource
                         ->using(function (Tier $record) {
                             try {
                                 return app(DeleteTierAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),
@@ -112,7 +112,7 @@ class TierResource extends Resource
                         ->using(function (Tier $record) {
                             try {
                                 return app(ForceDeleteTierAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

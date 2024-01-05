@@ -113,7 +113,7 @@ class BlockResource extends Resource
                         ->using(function (Block $record) {
                             try {
                                 return app(DeleteBlockAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

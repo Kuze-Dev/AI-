@@ -290,7 +290,7 @@ class PageResource extends Resource
                         ->using(function (Page $record) {
                             try {
                                 return app(DeletePageAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Permission;
 
 abstract class PermissionSeeder extends Seeder
 {
-    public const FILAMENT_ABILITIES = [
+    final public const FILAMENT_ABILITIES = [
         'viewAny',
         'view',
         'create',
@@ -19,7 +19,7 @@ abstract class PermissionSeeder extends Seeder
         'delete',
     ];
 
-    public const FILAMENT_SOFT_DELETES_ABILITIES = [
+    final public const FILAMENT_SOFT_DELETES_ABILITIES = [
         'restoreAny',
         'restore',
         'forceDeleteAny',
