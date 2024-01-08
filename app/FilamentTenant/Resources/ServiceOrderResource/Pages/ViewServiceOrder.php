@@ -583,11 +583,11 @@ class ViewServiceOrder extends EditRecord
             });
     }
 
-    private static function showProofOfPaymentActions(ServiceOrder $record, Closure $set): Action
+    private static function showProofOfPaymentActions(ServiceOrder $record, Closure $set): ComponentsAction
     {
         $order = $record;
 
-        return Action::make('proof_of_payment')
+        return ComponentsAction::make('proof_of_payment')
             ->color('secondary')
             ->label(trans('View Proof of payment'))
             ->size('sm')

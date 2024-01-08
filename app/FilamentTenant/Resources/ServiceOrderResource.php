@@ -9,7 +9,6 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
-use App\FilamentTenant\Support\ButtonAction;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -17,18 +16,15 @@ use Closure;
 use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
-use Domain\Payments\Enums\PaymentRemark;
 use Domain\Service\Models\Service;
 use Domain\ServiceOrder\Actions\CalculateServiceOrderTotalPriceAction;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
-use Domain\ServiceOrder\Actions\ServiceOrderBankTransferAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
@@ -42,8 +38,6 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Throwable;
 
 class ServiceOrderResource extends Resource
 {
@@ -552,100 +546,5 @@ class ServiceOrderResource extends Resource
         }
 
         return false;
-    }
-
-    private static function summaryProofOfPaymentButton(): ButtonAction
-    {
-        return ButtonAction::make('proof_of_payment')
-            ->disableLabel()
-            ->execute(function (ServiceOrder $record, Closure $set) {
-                $footerActions = self::showProofOfPaymentActions($record, $set);
-
-                return $footerActions;
-            })
-            ->fullWidth()
-            ->size('md')
-            ->hidden(function (ServiceOrder $record) {
-
-                if ($record->status === ServiceOrderStatus::FOR_APPROVAL) {
-                    return false;
-                }
-
-                return true;
-            });
-    }
-
-    private static function showProofOfPaymentActions(ServiceOrder $record, Closure $set): Action
-    {
-        $order = $record;
-
-        return Action::make('proof_of_payment')
-            ->color('secondary')
-            ->label(trans('View Proof of payment'))
-            ->size('sm')
-            ->action(function (array $data) use ($record, $set) {
-                app(ServiceOrderBankTransferAction::class)->execute($data, $record, $set);
-            })
-            ->modalHeading(trans('Proof of Payment'))
-            ->modalWidth('lg')
-            ->form([
-                Forms\Components\Textarea::make('customer_message')
-                    ->label(trans('Customer Message'))
-                    ->formatStateUsing(function () use ($order) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
-
-                        return $payment->customer_message;
-                    })->disabled(),
-                Forms\Components\FileUpload::make('bank_proof_image')
-                    ->label(trans('Customer Upload'))
-                    ->formatStateUsing(function () use ($record) {
-                        return $record->latestPayment()?->getMedia('image')
-                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                            ->toArray() ?? [];
-                    })
-                    ->hidden(function () use ($record) {
-                        return (bool) (empty($record->latestPayment()?->getFirstMediaUrl('image')));
-                    })
-                    ->image()
-                    ->getUploadedFileUrlUsing(static function (
-                        Forms\Components\FileUpload $component,
-                        string $file
-                    ): ?string {
-                        $mediaClass = config('media-library.media_model', Media::class);
-
-                        /** @var ?Media $media */
-                        $media = $mediaClass::findByUuid($file);
-
-                        if ($component->getVisibility() === 'private') {
-                            try {
-                                return $media?->getTemporaryUrl(now()->addMinutes(5));
-                            } catch (Throwable $exception) {
-                            }
-                        }
-
-                        return $media?->getUrl();
-                    })->disabled(),
-                Forms\Components\Select::make('payment_remarks')
-                    ->label('Status')
-                    ->required()
-                    ->options(
-                        collect(PaymentRemark::cases())
-                            ->mapWithKeys(fn (PaymentRemark $target) => [$target->value => Str::headline($target->value)])
-                            ->toArray()
-                    )
-                    ->enum(PaymentRemark::class),
-                Forms\Components\Textarea::make('message')
-                    ->maxLength(255)
-                    ->label(trans('Admin Message'))
-                    ->formatStateUsing(function () use ($order) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
-
-                        return $payment->admin_message;
-                    }),
-            ])
-            ->slideOver()
-            ->icon('heroicon-s-eye');
     }
 }

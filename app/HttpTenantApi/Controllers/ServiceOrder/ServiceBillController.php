@@ -6,8 +6,9 @@ namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
 use App\HttpTenantApi\Resources\ServiceBillResource;
 use Domain\ServiceOrder\Actions\UpdateServiceBillProofOfPaymentAction;
+use Domain\ServiceOrder\Actions\UpdateServiceOrderProofOfPaymentAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBankTransferData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceBillBankTransferData;
+use Domain\ServiceOrder\Enums\Type;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Requests\UpdateServiceBillProofOfPaymentRequest;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -36,12 +37,18 @@ class ServiceBillController
 
     #[Post('service-order/service-bills/banktransfer')]
     public function updateBankTransfer(UpdateServiceBillProofOfPaymentRequest $request,
-        UpdateServiceBillProofOfPaymentAction $updateServiceBillProofOfPayment): mixed
+        UpdateServiceBillProofOfPaymentAction $updateServiceBillProofOfPayment, UpdateServiceOrderProofOfPaymentAction $updateServiceOrderProofOfPaymentAction): mixed
     {
         try {
             $validatedData = $request->validated();
 
-            $data = $updateServiceBillProofOfPayment->execute(ServiceBankTransferData::fromRequest($validatedData));
+            if ($validatedData['type'] === Type::SERVICE_BILL->value) {
+                $data = $updateServiceBillProofOfPayment->execute(ServiceBankTransferData::fromRequest($validatedData));
+            } elseif ($validatedData['type'] === Type::SERVICE_ORDER->value) {
+                $data = $updateServiceOrderProofOfPaymentAction->execute(ServiceBankTransferData::fromRequest($validatedData));
+            } else {
+                throw new BadRequestHttpException('Invalid Type');
+            }
 
             return response([
                 'message' => trans('Uploaded Successfully'),
@@ -49,7 +56,6 @@ class ServiceBillController
             ]);
 
         } catch (BadRequestHttpException $e) {
-
             return response(
                 ['message' => trans($e->getMessage())],
                 Response::HTTP_BAD_REQUEST

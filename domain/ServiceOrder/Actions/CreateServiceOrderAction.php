@@ -73,6 +73,7 @@ class CreateServiceOrderAction
             'is_subscription' => $service->is_subscription,
             'needs_approval' => $service->needs_approval,
             'is_auto_generated_bill' => $service->is_auto_generated_bill,
+            'is_partial_payment' => $service->is_partial_payment,
             'schedule' => $serviceOrderData->schedule,
             'status' => $this->getStatus($service),
             'additional_charges' => $serviceOrderData->additional_charges,

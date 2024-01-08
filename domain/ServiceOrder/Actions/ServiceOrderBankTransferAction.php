@@ -7,6 +7,7 @@ namespace Domain\ServiceOrder\Actions;
 use Closure;
 use Domain\Payments\Enums\PaymentRemark;
 use Domain\Payments\Enums\PaymentStatus;
+use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderBankPaymentEvent;
 use Domain\ServiceOrder\Models\ServiceOrder;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 
 class ServiceOrderBankTransferAction
 {
-    public function execute(array $data, ServiceOrder $record, Closure $set)
+    public function execute(array $data, ServiceOrder $record, Closure $set): void
     {
         DB::transaction(function () use ($data, $record, $set) {
 
@@ -65,6 +66,13 @@ class ServiceOrderBankTransferAction
                 $payment->update([
                     'status' => PaymentStatus::PAID,
                 ]);
+
+                if ($record->serviceBills->first()?->status === ServiceBillStatus::PENDING) {
+                    $record->update([
+                        'status' => ServiceOrderStatus::FORPAYMENT,
+                    ]);
+                    $set('status', ucfirst(ServiceOrderStatus::FORPAYMENT->value));
+                }
 
                 Notification::make()
                     ->title(trans('Proof of payment updated successfully'))

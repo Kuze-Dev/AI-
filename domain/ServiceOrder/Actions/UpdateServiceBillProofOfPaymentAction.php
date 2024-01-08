@@ -7,7 +7,6 @@ namespace Domain\ServiceOrder\Actions;
 use Domain\Payments\Actions\UploadProofofPaymentAction;
 use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBankTransferData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceBillBankTransferData;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Http\UploadedFile;

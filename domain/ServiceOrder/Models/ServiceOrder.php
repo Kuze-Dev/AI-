@@ -10,6 +10,7 @@ use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Interfaces\PayableInterface;
+use Domain\Payments\Models\Payment;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
@@ -54,6 +55,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property bool $is_subscription
  * @property bool $needs_approval
  * @property bool $is_auto_generated_bill
+ * @property bool $is_partial_payment
  * @property \Illuminate\Support\Carbon $schedule
  * @property ServiceOrderStatus $status
  * @property string|null $cancelled_reason
@@ -154,6 +156,7 @@ class ServiceOrder extends Model implements PayableInterface
         'is_subscription',
         'needs_approval',
         'is_auto_generated_bill',
+        'is_partial_payment',
         'schedule',
         'status',
         'cancelled_reason',
@@ -175,6 +178,7 @@ class ServiceOrder extends Model implements PayableInterface
         'is_subscription' => 'boolean',
         'needs_approval' => 'boolean',
         'is_auto_generated_bill' => 'boolean',
+        'is_partial_payment' => 'boolean',
         'schedule' => 'datetime',
         'sub_total' => MoneyCast::class,
         'tax_display' => PriceDisplay::class,
@@ -313,6 +317,15 @@ class ServiceOrder extends Model implements PayableInterface
         $serviceTransaction->payment_method : null;
     }
 
+    public function latestPayment(): ?Payment
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction. */
+        $serviceTransaction = $this->latestTransaction();
+
+        return filled($serviceTransaction) ?
+        $serviceTransaction->payment : null;
+    }
+
     public function latestPendingServiceBill(): ?ServiceBill
     {
         /** @var \Domain\ServiceOrder\Models\ServiceBill $serviceBill */
@@ -368,6 +381,7 @@ class ServiceOrder extends Model implements PayableInterface
                 'closed', 'inactive' => 'danger',
                 'completed', 'active' => 'success',
                 'for_payment' => 'secondary',
+                'for_approval' => 'secondary',
             },
         );
     }

@@ -33,6 +33,7 @@ class ServiceOrderResource extends JsonApiResource
             'billing_cycle' => $this->billing_cycle,
             'due_date_every' => $this->due_date_every,
             'is_subscription' => $this->is_subscription,
+            'is_partial_payment' => $this->is_partial_payment,
             'created_at' => $this->created_at,
             'service_address' => $this->serviceOrderServiceAddress,
             'billing_address' => $this->serviceOrderBillingAddress,
