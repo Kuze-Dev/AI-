@@ -37,7 +37,7 @@ class ServiceOrderBankPaymentNotification extends Notification implements Should
         $this->serviceSettings = app(ServiceSettings::class);
 
         $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.
-        '?ServiceOrder='.$this->serviceOrder?->reference.
+        '?ServiceOrder='.$this->serviceOrder->reference.
         '&payment_method='.$this->payment_method;
 
     }
@@ -54,7 +54,7 @@ class ServiceOrderBankPaymentNotification extends Notification implements Should
             ->subject("Payment {$this->paymentRemarks}")
             ->replyTo($this->serviceSettings->email_reply_to ?? [])
             ->from($this->serviceSettings->email_sender_name)
-            ->greeting("Hi {$this->serviceOrder?->customer_full_name},")
+            ->greeting("Hi {$this->serviceOrder->customer_full_name},")
             ->line("Your proof of payment for Service Order #{$this->serviceOrder->reference} has been {$this->paymentRemarks}")
             ->action('View Service Order', $this->url)
             ->line('Thank you!');

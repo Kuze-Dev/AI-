@@ -22,6 +22,7 @@ use Domain\ServiceOrder\Exceptions\ServiceOrderFullyPaidException;
 use Domain\ServiceOrder\Exceptions\ServiceOrderStatusStillPendingException;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use LogicException;
 use Throwable;
 
 class CheckoutServiceOrderPartialPaymentAction
@@ -40,6 +41,10 @@ class CheckoutServiceOrderPartialPaymentAction
         $this->paymentMethod = $this->preparePaymentMethod($checkoutServiceOrderData);
 
         $this->serviceOrder = $this->prepareServiceOrder($checkoutServiceOrderData);
+
+        if (is_null($checkoutServiceOrderData->amount_to_pay)) {
+            throw new LogicException(trans('No amount to pay found'));
+        }
 
         return $this->proceedPayment($checkoutServiceOrderData->amount_to_pay);
     }
