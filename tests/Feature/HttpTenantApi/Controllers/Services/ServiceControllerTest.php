@@ -90,6 +90,8 @@ it('can filter services', function ($attribute) {
     'status',
     'needs_approval',
     'is_auto_generated_bill',
+    //    'is_partial_payment',
+    'is_installment',
     'taxonomies',
 ]);
 

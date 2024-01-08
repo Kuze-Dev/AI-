@@ -37,6 +37,8 @@ class ServiceFactory extends Factory
             'status' => $this->faker->boolean(),
             'needs_approval' => $this->faker->boolean(),
             'is_auto_generated_bill' => $this->faker->boolean(),
+            'is_partial_payment' => $this->faker->boolean(),
+            //            'is_installment' => $this->faker->boolean(),
         ];
     }
 
@@ -88,6 +90,20 @@ class ServiceFactory extends Factory
             'is_auto_generated_bill' => $autoGenerateBill,
         ]);
     }
+
+    public function isPartialPayment(bool $isPartialPayment = true): self
+    {
+        return $this->state([
+            'is_partial_payment' => $isPartialPayment,
+        ]);
+    }
+
+    //    public function isInstallment(bool $isInstallment = true): self
+    //    {
+    //        return $this->state([
+    //            'is_installment' => $isInstallment,
+    //        ]);
+    //    }
 
     public function withDummyBlueprint(): self
     {

@@ -31,6 +31,8 @@ class ServiceResource extends JsonApiResource
             'status' => $this->status,
             'needs_approval' => $this->needs_approval,
             'is_auto_generated_bill' => $this->is_auto_generated_bill,
+            'is_partial_payment' => $this->is_partial_payment,
+            //            'is_installment' => $this->is_installment,
             'service_category' => $this->taxonomyTerms->first()?->name,
         ];
     }
