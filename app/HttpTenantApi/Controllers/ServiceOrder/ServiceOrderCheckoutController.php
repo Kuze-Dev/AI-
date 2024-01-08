@@ -30,7 +30,7 @@ class ServiceOrderCheckoutController
 
         try {
             $validatedData = $request->validated();
-            
+
             if (is_null($validatedData['amount_to_pay'])) {
                 $data = $checkoutServiceOrderAction->execute(
                     CheckoutServiceOrderData::fromRequest($validatedData)

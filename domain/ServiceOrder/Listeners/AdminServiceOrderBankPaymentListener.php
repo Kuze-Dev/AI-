@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Listeners;
 
-use Domain\Payments\Exceptions\PaymentException;
 use Domain\ServiceOrder\Actions\ServiceOrderPaymentUpdatedPipelineAction;
 use Domain\ServiceOrder\Actions\UpdateServiceBillBalancePartialPaymentAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentUpdatedPipelineData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderBankPaymentEvent;
-use Domain\ServiceOrder\Notifications\ServiceBillBankPaymentNotification;
+use Domain\ServiceOrder\Notifications\ServiceOrderBankPaymentNotification;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Notification;
 
@@ -24,6 +23,7 @@ class AdminServiceOrderBankPaymentListener
     {
         $serviceOrder = $event->serviceOrder;
         $paymentRemarks = $event->paymentRemarks;
+
         $payment = $event->payment;
 
         $serviceTransaction = $serviceOrder->latestTransaction();
@@ -50,8 +50,7 @@ class AdminServiceOrderBankPaymentListener
                 )
             );
 
-        // Notification::send($customer, new ServiceBillBankPaymentNotification($serviceBill, $paymentRemarks));
+        Notification::send($customer, new ServiceOrderBankPaymentNotification($serviceBill, $paymentRemarks));
 
     }
-
 }
