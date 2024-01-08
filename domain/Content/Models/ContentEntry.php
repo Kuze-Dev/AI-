@@ -65,7 +65,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @method static ContentEntryBuilder|ContentEntry whereOrder($value)
  * @method static ContentEntryBuilder|ContentEntry wherePublishStatus(?\Domain\Content\Enums\PublishBehavior $publishBehavior = null, ?string $timezone = null)
  * @method static ContentEntryBuilder|ContentEntry wherePublishedAt($value)
- * @method static ContentEntryBuilder|ContentEntry wherePublishedAtRange(?\Carbon\Carbon $publishedAtStart = null, ?\Carbon\Carbon $publishedAtEnd = null)
+ * @method static ContentEntryBuilder|ContentEntry wherePublishedAtRange(?\Illuminate\Support\Carbon $publishedAtStart = null, ?\Illuminate\Support\Carbon $publishedAtEnd = null)
  * @method static ContentEntryBuilder|ContentEntry wherePublishedAtYearMonth(int $year, ?int $month = null)
  * @method static ContentEntryBuilder|ContentEntry whereSlug($value)
  * @method static ContentEntryBuilder|ContentEntry whereTaxonomyTerms(string $taxonomy, array $terms)

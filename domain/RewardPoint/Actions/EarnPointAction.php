@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Domain\RewardPoint\Actions;
 
 use App\Settings\RewardPointsSettings;
-use Carbon\Carbon;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Models\Order;
 use Domain\RewardPoint\Models\PointEarning;
+use Illuminate\Support\Carbon;
 
 class EarnPointAction
 {

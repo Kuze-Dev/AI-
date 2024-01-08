@@ -9,7 +9,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 
 class ActivateAccount extends Notification implements ShouldQueue
@@ -51,7 +50,7 @@ class ActivateAccount extends Notification implements ShouldQueue
             ? call_user_func(static::$createUrlCallback, $notifiable)
             : URL::temporarySignedRoute(
                 self::$route ?? 'activation.activate',
-                Carbon::now()->addMinutes(config('domain.auth.activation.expire', 60)),
+                now()->addMinutes(config('domain.auth.activation.expire', 60)),
                 ['id' => $notifiable->getKey()]
             );
     }
