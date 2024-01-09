@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Discount\DataTransferObjects;
 
-use Carbon\Carbon;
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
 use Domain\Discount\Enums\DiscountRequirementType;
 use Domain\Discount\Enums\DiscountStatus;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 final readonly class DiscountData

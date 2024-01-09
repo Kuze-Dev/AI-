@@ -6,7 +6,6 @@ namespace Domain\Customer\DataTransferObjects;
 
 use App\Features\Customer\TierBase;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
-use Carbon\Carbon;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
@@ -16,6 +15,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 
 final readonly class CustomerData
 {

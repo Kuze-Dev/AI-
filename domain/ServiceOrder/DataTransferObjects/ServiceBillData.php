@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\DataTransferObjects;
 
-use Carbon\Carbon;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Taxation\Enums\PriceDisplay;
+use Illuminate\Support\Carbon;
 
 class ServiceBillData
 {
