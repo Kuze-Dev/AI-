@@ -68,7 +68,7 @@ class CheckoutServiceOrderPartialPaymentAction
         $serviceOrder = ServiceOrder::whereReference($checkoutServiceOrderData->reference_id)
             ->first();
 
-        if (! $serviceOrder->is_partial_payment) {
+        if (! $serviceOrder?->is_partial_payment) {
             throw new ModelNotFoundException(trans('Please pay via service bill'));
         }
         if (is_null($serviceOrder)) {
