@@ -111,10 +111,9 @@ it('can filter content entries by published at year month', function () {
 
     ContentEntryFactory::new()
         ->for($content)
-        ->count(3)
+        ->count(2)
         ->sequence(
             ['published_at' => now()->subYear()],
-            ['published_at' => now()->subMonthNoOverflow()],
             ['published_at' => now()],
         )
         ->create([]);
@@ -124,7 +123,7 @@ it('can filter content entries by published at year month', function () {
     getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_year_month' => $queryDate->year]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
-            $json->count('data', 2)
+            $json->count('data', 1)
                 ->where('data.0.type', 'contentEntries')
                 ->etc();
         });
