@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models\Builders;
 
-use Carbon\Carbon;
 use Domain\Content\Enums\PublishBehavior;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 /**
  * @template TModelClass of \Domain\Content\Models\ContentEntry
@@ -49,7 +49,7 @@ class ContentEntryBuilder extends Builder
     public function wherePublishedAtYearMonth(int $year, ?int $month = null): self
     {
         $selectedDate = tap(
-            Carbon::now()->year($year),
+            now()->year($year),
             fn (Carbon $date) => $month
                 ? $date->month($month)
                 : $date

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\DataTransferObjects;
 
-use Carbon\Carbon;
 use Domain\Blueprint\Enums\FieldType;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class DatetimeFieldData extends FieldData

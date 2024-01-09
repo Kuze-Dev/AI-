@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Database\Factories;
 
-use Carbon\Carbon;
 use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
@@ -13,6 +12,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\ContentEntryResource\Pages\EditContentEntry;
-use Carbon\Carbon;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Content\Database\Factories\ContentEntryFactory;
@@ -61,7 +60,7 @@ it('can render content entry', function () {
         )
         ->createOne([
             'title' => 'Foo',
-            'published_at' => Carbon::now(),
+            'published_at' => now(),
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
@@ -110,7 +109,7 @@ it('can edit content entry', function () {
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
-    $dateTime = Carbon::now();
+    $dateTime = now();
 
     $updatedContentEntry = livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
         ->fillForm([
@@ -360,7 +359,7 @@ it('can create content entry draft', function () {
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
-    $dateTime = Carbon::now();
+    $dateTime = now();
 
     $updatedContentEntry = livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
         ->fillForm([
@@ -466,7 +465,7 @@ it('can overwrite content entry existing draft', function () {
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
-    $dateTime = Carbon::now();
+    $dateTime = now();
 
     livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
         ->fillForm([
@@ -575,7 +574,7 @@ it('can published existing content entry draft', function () {
             'data' => ['main' => ['header' => 'Foo']],
         ]);
 
-    $dateTime = Carbon::now();
+    $dateTime = now();
 
     livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $initialContentEntryDraft->getRouteKey()])
         ->fillForm([

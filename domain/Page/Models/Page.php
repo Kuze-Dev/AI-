@@ -60,7 +60,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @method static PageBuilder|Page whereLocale($value)
  * @method static PageBuilder|Page whereName($value)
  * @method static PageBuilder|Page wherePublishedAt($value)
- * @method static PageBuilder|Page wherePublishedAtRange(?\Carbon\Carbon $publishedAtStart = null, ?\Carbon\Carbon $publishedAtEnd = null)
+ * @method static PageBuilder|Page wherePublishedAtRange(?\Illuminate\Support\Carbon $publishedAtStart = null, ?\Illuminate\Support\Carbon $publishedAtEnd = null)
  * @method static PageBuilder|Page wherePublishedAtYearMonth(int $year, ?int $month = null)
  * @method static PageBuilder|Page whereSlug($value)
  * @method static PageBuilder|Page whereUpdatedAt($value)
