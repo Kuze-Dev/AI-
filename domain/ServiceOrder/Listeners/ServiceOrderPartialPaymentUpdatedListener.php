@@ -75,6 +75,10 @@ class ServiceOrderPartialPaymentUpdatedListener
 
         $serviceBill = $this->serviceOrder->serviceBills()->first();
 
+        if (is_null($serviceBill)) {
+            throw new ModelNotFoundException('no initial service bill found');
+        }
+
         $this->serviceOrderPaymentUpdatedPipelineAction
             ->execute(
                 new ServiceOrderPaymentUpdatedPipelineData(

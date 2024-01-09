@@ -27,9 +27,9 @@ class AdminServiceOrderBankPaymentListener
         $payment = $event->payment;
 
         $serviceTransaction = $serviceOrder->latestTransaction();
-        $customer = $serviceOrder?->customer;
+        $customer = $serviceOrder->customer;
 
-        if (! $serviceOrder || ! $serviceTransaction) {
+        if (! $serviceTransaction) {
             throw new ModelNotFoundException();
         }
 
@@ -38,6 +38,10 @@ class AdminServiceOrderBankPaymentListener
         app(UpdateServiceBillBalancePartialPaymentAction::class)->execute($payment, $serviceOrder);
 
         $serviceBill = $serviceOrder->serviceBills()->first();
+
+        if (is_null($serviceBill)) {
+            throw new ModelNotFoundException('no initial service bill found');
+        }
 
         app(ServiceOrderPaymentUpdatedPipelineAction::class)
             ->execute(
@@ -50,7 +54,7 @@ class AdminServiceOrderBankPaymentListener
                 )
             );
 
-        Notification::send($customer, new ServiceOrderBankPaymentNotification($serviceBill, $paymentRemarks));
+        Notification::send($customer, new ServiceOrderBankPaymentNotification($serviceOrder, $paymentRemarks));
 
     }
 }
