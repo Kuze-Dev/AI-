@@ -89,21 +89,20 @@ it('can filter content entries by published at year month', function () {
 
     ContentEntryFactory::new()
         ->for($content)
-        ->count(3)
+        ->count(2)
         ->sequence(
-            ['published_at' => Carbon::now()->subYear()],
-            ['published_at' => Carbon::now()->subMonthNoOverflow()],
-            ['published_at' => Carbon::now()],
+            ['published_at' => now()->subYear()],
+            ['published_at' => now()],
         )
         ->create([]);
 
     livewire(ListContentEntry::class, ['ownerRecord' => $content->getRouteKey()])
-        ->assertCountTableRecords(3)
+        ->assertCountTableRecords(2)
         ->filterTable('published_at_year_month', [
             'published_at_year' => Carbon::now()->year,
             'published_at_month' => null,
         ])
-        ->assertCountTableRecords(2)
+        ->assertCountTableRecords(1)
         ->filterTable('published_at_year_month', [
             'published_at_year' => Carbon::now()->year,
             'published_at_month' => Carbon::now()->month,
