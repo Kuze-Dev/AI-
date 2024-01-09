@@ -71,7 +71,7 @@ class CheckoutServiceOrderPartialPaymentAction
         if (! $serviceOrder?->is_partial_payment) {
             throw new ModelNotFoundException(trans('Please pay via service bill'));
         }
-        
+
         if ($serviceOrder->totalBalance()->formatSimple() < $checkoutServiceOrderData->amount_to_pay) {
             throw new PaymentExceedLimitException('Amount to pay is higher than balance!');
         }
