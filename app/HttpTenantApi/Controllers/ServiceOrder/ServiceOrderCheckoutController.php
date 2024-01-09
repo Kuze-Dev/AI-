@@ -31,7 +31,7 @@ class ServiceOrderCheckoutController
         try {
             $validatedData = $request->validated();
 
-            if (is_null($validatedData['amount_to_pay'])) {
+            if (! array_key_exists('amount_to_pay', $validatedData)) {
                 $data = $checkoutServiceOrderAction->execute(
                     CheckoutServiceOrderData::fromRequest($validatedData)
                 );
