@@ -76,7 +76,7 @@ class ServiceOrderController
                 )
             );
 
-        } catch (ServiceStatusMustBeActive $b) {
+        } catch (ServiceStatusMustBeActive) {
             return response(
                 ['message' => trans('Service is currently unavailable')],
                 Response::HTTP_NOT_FOUND

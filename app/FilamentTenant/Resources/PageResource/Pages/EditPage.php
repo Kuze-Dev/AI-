@@ -92,7 +92,7 @@ class EditPage extends EditRecord
             Actions\DeleteAction::make()->using(function (Page $record) {
                 try {
                     return app(DeletePageAction::class)->execute($record);
-                } catch (DeleteRestrictedException $e) {
+                } catch (DeleteRestrictedException) {
                     return false;
                 }
             }),

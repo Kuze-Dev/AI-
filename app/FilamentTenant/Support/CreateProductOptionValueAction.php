@@ -153,7 +153,7 @@ class CreateProductOptionValueAction
                 DB::commit();
 
                 return $optionValueModel;
-            } catch (Exception $e) {
+            } catch (Exception) {
                 DB::rollBack();
 
                 return 'Something went wrong';

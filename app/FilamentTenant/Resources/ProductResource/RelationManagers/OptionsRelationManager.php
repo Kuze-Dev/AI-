@@ -111,7 +111,7 @@ class OptionsRelationManager extends RelationManager
                             $action
                                 ->successNotificationTitle(trans('Option value has been removed.'))
                                 ->success();
-                        } catch (Exception $e) {
+                        } catch (Exception) {
                             $action->failureNotificationTitle(trans('Failed to remove Option value.'))
                                 ->failure();
                         }

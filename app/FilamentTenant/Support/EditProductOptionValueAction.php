@@ -97,7 +97,7 @@ class EditProductOptionValueAction
                 DB::commit();
 
                 return $record;
-            } catch (Exception $e) {
+            } catch (Exception) {
                 DB::rollBack();
 
                 return 'Something went wrong';

@@ -135,7 +135,7 @@ class TaxonomyResource extends Resource
                         ->using(function (Taxonomy $record) {
                             try {
                                 return app(DeleteTaxonomyAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),
