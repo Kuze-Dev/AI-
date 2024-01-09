@@ -342,7 +342,7 @@ class ProductResource extends Resource
                         ->using(function (Product $record) {
                             try {
                                 return app(DeleteProductAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         })

@@ -78,7 +78,7 @@ class UpdateOrderAction
                 DB::commit();
 
                 return $order;
-            } catch (Exception $e) {
+            } catch (Exception) {
                 DB::rollBack();
 
                 // Log::info($e);

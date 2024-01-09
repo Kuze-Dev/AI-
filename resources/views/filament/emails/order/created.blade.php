@@ -1,4 +1,4 @@
-@php use Carbon\Carbon; @endphp
+@php use Illuminate\Support\Carbon; @endphp
 <center>
     <table style="padding-bottom: 20px;
     max-width: 811px;

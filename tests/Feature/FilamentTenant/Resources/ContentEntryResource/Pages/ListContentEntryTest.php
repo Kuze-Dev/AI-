@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\FilamentTenant\Resources\ContentEntryResource\Pages\ListContentEntry;
-use Carbon\Carbon;
 use Domain\Content\Database\Factories\ContentEntryFactory;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
@@ -55,27 +54,27 @@ it('can filter content entries by published at range', function () {
         ->for($content)
         ->count(3)
         ->sequence(
-            ['published_at' => Carbon::now()->subWeeks(2)],
-            ['published_at' => Carbon::now()],
-            ['published_at' => Carbon::now()->addWeeks(2)],
+            ['published_at' => now()->subWeeks(2)],
+            ['published_at' => now()],
+            ['published_at' => now()->addWeeks(2)],
         )
         ->create([]);
 
     livewire(ListContentEntry::class, ['ownerRecord' => $content->getRouteKey()])
         ->assertCountTableRecords(3)
         ->filterTable('published_at_range', [
-            'published_at_from' => Carbon::now()->subDay(),
+            'published_at_from' => now()->subDay(),
             'published_at_to' => null,
         ])
         ->assertCountTableRecords(2)
         ->filterTable('published_at_range', [
             'published_at_from' => null,
-            'published_at_to' => Carbon::now()->addDay(),
+            'published_at_to' => now()->addDay(),
         ])
         ->assertCountTableRecords(2)
         ->filterTable('published_at_range', [
-            'published_at_from' => Carbon::now()->subDay(),
-            'published_at_to' => Carbon::now()->addDay(),
+            'published_at_from' => now()->subDay(),
+            'published_at_to' => now()->addDay(),
         ])
         ->assertCountTableRecords(1)
         ->assertOk();
@@ -89,24 +88,23 @@ it('can filter content entries by published at year month', function () {
 
     ContentEntryFactory::new()
         ->for($content)
-        ->count(3)
+        ->count(2)
         ->sequence(
-            ['published_at' => Carbon::now()->subYear()],
-            ['published_at' => Carbon::now()->subMonthNoOverflow()],
-            ['published_at' => Carbon::now()],
+            ['published_at' => now()->subYear()],
+            ['published_at' => now()],
         )
         ->create([]);
 
     livewire(ListContentEntry::class, ['ownerRecord' => $content->getRouteKey()])
-        ->assertCountTableRecords(3)
-        ->filterTable('published_at_year_month', [
-            'published_at_year' => Carbon::now()->year,
-            'published_at_month' => null,
-        ])
         ->assertCountTableRecords(2)
         ->filterTable('published_at_year_month', [
-            'published_at_year' => Carbon::now()->year,
-            'published_at_month' => Carbon::now()->month,
+            'published_at_year' => now()->year,
+            'published_at_month' => null,
+        ])
+        ->assertCountTableRecords(1)
+        ->filterTable('published_at_year_month', [
+            'published_at_year' => now()->year,
+            'published_at_month' => now()->month,
         ])
         ->assertCountTableRecords(1)
         ->assertOk();

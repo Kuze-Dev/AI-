@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ServiceBillResource\Pages\ViewServiceBill;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -19,6 +18,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -163,7 +163,7 @@ class ServiceBillResource extends Resource
         /** @var \Domain\ServiceOrder\Models\ServiceBill|null $latestServiceBill */
         $latestServiceBill = $serviceOrder->latestServiceBill();
 
-        /** @var \Carbon\Carbon|null $referenceDate */
+        /** @var \Illuminate\Support\Carbon|null $referenceDate */
         $referenceDate = $latestServiceBill?->bill_date;
 
         /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */

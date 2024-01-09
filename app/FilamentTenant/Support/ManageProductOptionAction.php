@@ -112,7 +112,7 @@ class ManageProductOptionAction
                 DB::commit();
 
                 return $foundOption ?? 'Process finished.';
-            } catch (Exception $e) {
+            } catch (Exception) {
                 DB::rollBack();
 
                 return 'Something went wrong';

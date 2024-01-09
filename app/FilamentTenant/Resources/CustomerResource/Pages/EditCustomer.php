@@ -65,7 +65,7 @@ class EditCustomer extends EditRecord
                 ->using(function (Customer $record) {
                     try {
                         return app(DeleteCustomerAction::class)->execute($record);
-                    } catch (DeleteRestrictedException $e) {
+                    } catch (DeleteRestrictedException) {
                         return false;
                     }
                 }),
@@ -73,7 +73,7 @@ class EditCustomer extends EditRecord
                 ->using(function (Customer $record) {
                     try {
                         return app(ForceDeleteCustomerAction::class)->execute($record);
-                    } catch (DeleteRestrictedException $e) {
+                    } catch (DeleteRestrictedException) {
                         return false;
                     }
                 }),

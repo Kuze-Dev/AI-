@@ -358,7 +358,7 @@ class CustomerResource extends Resource
                         ->using(function (Customer $record) {
                             try {
                                 return app(DeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),
@@ -375,7 +375,7 @@ class CustomerResource extends Resource
                         ->using(function (Customer $record) {
                             try {
                                 return app(ForceDeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

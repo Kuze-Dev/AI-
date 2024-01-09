@@ -10,7 +10,6 @@ use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\ContentEntry;
@@ -27,6 +26,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -281,7 +281,7 @@ class ContentEntryResource extends Resource
                             ->placeholder('Select Year')
                             ->searchable()
                             ->options(
-                                collect(range(1900, Carbon::now()->addYears(10)->year))
+                                collect(range(1900, now()->addYears(10)->year))
                                     ->mapWithKeys(fn (int $year) => [$year => $year])
                                     ->toArray()
                             )
@@ -289,7 +289,7 @@ class ContentEntryResource extends Resource
                         Forms\Components\Select::make('published_at_month')
                             ->options(
                                 collect(range(1, 12))
-                                    ->mapWithKeys(fn (int $month) => [$month => Carbon::now()->month($month)->format('F')])
+                                    ->mapWithKeys(fn (int $month) => [$month => now()->month($month)->format('F')])
                                     ->toArray()
                             )
                             ->disabled(fn (Closure $get) => blank($get('published_at_year')))

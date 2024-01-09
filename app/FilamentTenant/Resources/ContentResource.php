@@ -219,7 +219,7 @@ class ContentResource extends Resource
                         ->using(function (Content $record) {
                             try {
                                 return app(DeleteContentAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

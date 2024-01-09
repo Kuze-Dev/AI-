@@ -200,11 +200,11 @@ class AddressesRelationManager extends RelationManager
                         ->using(function (Address $record) {
                             try {
                                 return app(DeleteAddressAction::class)->execute($record);
-                            } catch (CantDeleteDefaultAddressException $e) {
+                            } catch (CantDeleteDefaultAddressException) {
                                 Filament::notify('danger', trans('Deleting default address not allowed.'));
 
                                 return false;
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

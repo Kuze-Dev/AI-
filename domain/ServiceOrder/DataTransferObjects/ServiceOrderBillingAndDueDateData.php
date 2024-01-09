@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\DataTransferObjects;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class ServiceOrderBillingAndDueDateData
 {

@@ -11,7 +11,6 @@ use Domain\Shipment\API\USPS\DataTransferObjects\Ratev2InternationalRequestData;
 use Domain\Shipment\API\USPS\Enums\MailType;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
-use Illuminate\Support\Carbon;
 
 class GetUSPSInternationalRateDataAction
 {
@@ -35,7 +34,7 @@ class GetUSPSInternationalRateDataAction
             Length: (string) $parcelData->length,
             Height: (string) $parcelData->height,
             OriginZip: (string) $parcelData->zip_origin,
-            AcceptanceDateTime: (string) Carbon::now()->addDays(2)->setTime(13, 15, 0)->isoFormat('YYYY-MM-DDTHH:mm:ssZ'),
+            AcceptanceDateTime: (string) now()->addDays(2)->setTime(13, 15, 0)->isoFormat('YYYY-MM-DDTHH:mm:ssZ'),
             DestinationPostalCode: (string) $address->zipcode
         );
 

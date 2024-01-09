@@ -107,7 +107,7 @@ class BlueprintResource extends Resource
                         ->using(function (Blueprint $record) {
                             try {
                                 return app(DeleteBlueprintAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

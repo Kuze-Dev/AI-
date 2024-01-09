@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Carbon\Carbon;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\Database\Factories\ServiceBillFactory;
@@ -14,6 +13,7 @@ use Domain\ServiceOrder\Exceptions\NonSubscriptionNotAllowedException;
 use Domain\ServiceOrder\Exceptions\ServiceBillStatusMusBePaidException;
 use Domain\ServiceOrder\Exceptions\ServiceOrderStatusClosedNotAllowedException;
 use Domain\ServiceOrder\Exceptions\ServiceTransactionStatusMusBePaidException;
+use Illuminate\Support\Carbon;
 
 beforeEach(function () {
     testInTenantContext();

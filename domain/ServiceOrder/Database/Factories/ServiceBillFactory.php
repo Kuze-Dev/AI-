@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Database\Factories;
 
-use Carbon\Carbon;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Domain\ServiceOrder\Models\ServiceBill>

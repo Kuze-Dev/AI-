@@ -66,7 +66,7 @@ class PaymentMethodResource extends Resource
                             if ($component->getVisibility() === 'private') {
                                 try {
                                     return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                } catch (Throwable $exception) {
+                                } catch (Throwable) {
                                     // This driver does not support creating temporary URLs.
                                 }
                             }

@@ -36,7 +36,7 @@ class EditDiscount extends EditRecord
                 ->using(function (Discount $record) {
                     try {
                         return app(ForceDeleteDiscountAction::class)->execute($record);
-                    } catch (ExceptionsDeleteRestrictedException $e) {
+                    } catch (ExceptionsDeleteRestrictedException) {
                         return false;
                     }
                 }),
