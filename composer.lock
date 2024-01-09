@@ -281,16 +281,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.295.7",
+            "version": "3.295.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "e3ba36c6e52dce373064fbb1741547828235425f"
+                "reference": "dc23d1d1e2e0413a3707d5dd90d8c43cb6c7521b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/e3ba36c6e52dce373064fbb1741547828235425f",
-                "reference": "e3ba36c6e52dce373064fbb1741547828235425f",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/dc23d1d1e2e0413a3707d5dd90d8c43cb6c7521b",
+                "reference": "dc23d1d1e2e0413a3707d5dd90d8c43cb6c7521b",
                 "shasum": ""
             },
             "require": {
@@ -370,9 +370,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.295.7"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.295.8"
             },
-            "time": "2024-01-05T19:10:48+00:00"
+            "time": "2024-01-08T19:04:58+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -5823,23 +5823,23 @@
         },
         {
             "name": "phenx/php-font-lib",
-            "version": "0.5.4",
+            "version": "0.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/php-font-lib.git",
-                "reference": "dd448ad1ce34c63d09baccd05415e361300c35b4"
+                "reference": "671df0f3516252011aa94f9e8e3b3b66199339f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/php-font-lib/zipball/dd448ad1ce34c63d09baccd05415e361300c35b4",
-                "reference": "dd448ad1ce34c63d09baccd05415e361300c35b4",
+                "url": "https://api.github.com/repos/dompdf/php-font-lib/zipball/671df0f3516252011aa94f9e8e3b3b66199339f8",
+                "reference": "671df0f3516252011aa94f9e8e3b3b66199339f8",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*"
             },
             "require-dev": {
-                "symfony/phpunit-bridge": "^3 || ^4 || ^5"
+                "symfony/phpunit-bridge": "^3 || ^4 || ^5 || ^6"
             },
             "type": "library",
             "autoload": {
@@ -5849,7 +5849,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-3.0"
+                "LGPL-2.1-or-later"
             ],
             "authors": [
                 {
@@ -5861,9 +5861,9 @@
             "homepage": "https://github.com/PhenX/php-font-lib",
             "support": {
                 "issues": "https://github.com/dompdf/php-font-lib/issues",
-                "source": "https://github.com/dompdf/php-font-lib/tree/0.5.4"
+                "source": "https://github.com/dompdf/php-font-lib/tree/0.5.5"
             },
-            "time": "2021-12-17T19:44:54+00:00"
+            "time": "2024-01-07T18:13:29+00:00"
         },
         {
             "name": "phenx/php-svg-lib",
@@ -8438,16 +8438,16 @@
         },
         {
             "name": "spatie/laravel-query-builder",
-            "version": "5.6.0",
+            "version": "5.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-query-builder.git",
-                "reference": "a91a348f2d205026ac726850c969e4da15061aa9"
+                "reference": "ff61a9ea32c5b55cbe63de8e3c6e35a201e6b746"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-query-builder/zipball/a91a348f2d205026ac726850c969e4da15061aa9",
-                "reference": "a91a348f2d205026ac726850c969e4da15061aa9",
+                "url": "https://api.github.com/repos/spatie/laravel-query-builder/zipball/ff61a9ea32c5b55cbe63de8e3c6e35a201e6b746",
+                "reference": "ff61a9ea32c5b55cbe63de8e3c6e35a201e6b746",
                 "shasum": ""
             },
             "require": {
@@ -8508,7 +8508,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-10-05T10:21:47+00:00"
+            "time": "2024-01-08T09:57:13+00:00"
         },
         {
             "name": "spatie/laravel-queueable-action",
@@ -13513,16 +13513,16 @@
         },
         {
             "name": "larastan/larastan",
-            "version": "v2.8.0",
+            "version": "v2.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "d60c1a6d49fcbb54b78922a955a55820abdbe3c7"
+                "reference": "b7cc6a29c457a7d4f3de90466392ae9ad3e17022"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/d60c1a6d49fcbb54b78922a955a55820abdbe3c7",
-                "reference": "d60c1a6d49fcbb54b78922a955a55820abdbe3c7",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/b7cc6a29c457a7d4f3de90466392ae9ad3e17022",
+                "reference": "b7cc6a29c457a7d4f3de90466392ae9ad3e17022",
                 "shasum": ""
             },
             "require": {
@@ -13590,7 +13590,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v2.8.0"
+                "source": "https://github.com/larastan/larastan/tree/v2.8.1"
             },
             "funding": [
                 {
@@ -13610,7 +13610,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2024-01-02T22:09:07+00:00"
+            "time": "2024-01-08T09:11:17+00:00"
         },
         {
             "name": "laravel/pint",
@@ -14865,16 +14865,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.54",
+            "version": "1.10.55",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "3e25f279dada0adc14ffd7bad09af2e2fc3523bb"
+                "reference": "9a88f9d18ddf4cf54c922fbeac16c4cb164c5949"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/3e25f279dada0adc14ffd7bad09af2e2fc3523bb",
-                "reference": "3e25f279dada0adc14ffd7bad09af2e2fc3523bb",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9a88f9d18ddf4cf54c922fbeac16c4cb164c5949",
+                "reference": "9a88f9d18ddf4cf54c922fbeac16c4cb164c5949",
                 "shasum": ""
             },
             "require": {
@@ -14923,7 +14923,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-01-05T15:50:47+00:00"
+            "time": "2024-01-08T12:32:40+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
