@@ -21,34 +21,4 @@ return [
     'user_timezone_field' => 'timezone',
 
     'expires_in_minute' => 60,
-
-//    'http' => [
-//        'route' => [
-//            'name' => 'filament-export.download',
-//            'path' => 'admin/export/download',
-//            'middleware' => [
-//
-//                Authenticate::class,
-//                'verified:filament.auth.verification.notice',
-//                'active:filament.auth.account-deactivated.notice',
-//
-//                EncryptCookies::class,
-//                AddQueuedCookiesToResponse::class,
-//                StartSession::class,
-//                // AuthenticateSession::class,
-//                ShareErrorsFromSession::class,
-//                VerifyCsrfToken::class,
-//                SubstituteBindings::class,
-//                DispatchServingFilamentEvent::class,
-//                MirrorConfigToSubpackages::class,
-//
-//
-//                'universal',
-//                InitializeTenancyByDomain::class,
-//
-//                'tenant',
-//            ]
-//        ]
-//    ]
-
 ];
