@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2d9603669a5d53d0332d5e4ea141bb87",
+    "content-hash": "43ea4c126986de46b274421565fda38a",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -2656,16 +2656,16 @@
         },
         {
             "name": "halcyon-agile/filament-export",
-            "version": "dev-main",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/halcyon-agile/filament-export.git",
-                "reference": "4352af857640cdbdc358a3f6d9bee738a33441e1"
+                "reference": "c4d7edb4b1ec5f6185d3fe2ad84aaa5c388317c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/4352af857640cdbdc358a3f6d9bee738a33441e1",
-                "reference": "4352af857640cdbdc358a3f6d9bee738a33441e1",
+                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/c4d7edb4b1ec5f6185d3fe2ad84aaa5c388317c8",
+                "reference": "c4d7edb4b1ec5f6185d3fe2ad84aaa5c388317c8",
                 "shasum": ""
             },
             "require": {
@@ -2688,7 +2688,6 @@
                 "phpstan/phpstan-phpunit": "^1.3.15",
                 "spatie/laravel-ray": "^1.33"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -2723,9 +2722,9 @@
             ],
             "support": {
                 "issues": "https://github.com/halcyon-agile/filament-export/issues",
-                "source": "https://github.com/halcyon-agile/filament-export/tree/main"
+                "source": "https://github.com/halcyon-agile/filament-export/tree/v1.0.0"
             },
-            "time": "2024-01-10T03:04:02+00:00"
+            "time": "2024-01-10T03:32:36+00:00"
         },
         {
             "name": "halcyon-agile/filament-import",
@@ -17505,7 +17504,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "halcyon-agile/filament-export": 20,
         "timacdonald/json-api": 10
     },
     "prefer-stable": true,
