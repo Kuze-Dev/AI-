@@ -11,19 +11,19 @@ use Domain\Discount\Enums\DiscountStatus;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
-final class DiscountData
+final readonly class DiscountData
 {
     public function __construct(
-        public readonly string $name,
-        public readonly string $slug,
-        public readonly string $code,
-        public readonly DiscountStatus $status,
-        public readonly Carbon $valid_start_at,
-        public readonly DiscountConditionData $discountConditionData,
-        public readonly ?int $max_uses = null,
-        public readonly ?Carbon $valid_end_at = null,
-        public readonly ?string $description = null,
-        public readonly ?DiscountRequirementData $discountRequirementData = null,
+        public string $name,
+        public string $slug,
+        public string $code,
+        public DiscountStatus $status,
+        public Carbon $valid_start_at,
+        public DiscountConditionData $discountConditionData,
+        public ?int $max_uses = null,
+        public ?Carbon $valid_end_at = null,
+        public ?string $description = null,
+        public ?DiscountRequirementData $discountRequirementData = null,
     ) {
     }
 

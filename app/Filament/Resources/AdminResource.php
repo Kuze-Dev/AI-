@@ -209,7 +209,7 @@ class AdminResource extends Resource
                                 $action
                                     ->successNotificationTitle(trans('A fresh verification link has been sent to your email address.'))
                                     ->success();
-                            } catch (Exception $e) {
+                            } catch (Exception) {
                                 $action->failureNotificationTitle(trans('Failed to send verification link.'))
                                     ->failure();
                             }
