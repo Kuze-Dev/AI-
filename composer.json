@@ -16,7 +16,7 @@
         "filament/spatie-laravel-settings-plugin": "^2.0",
         "flowframe/laravel-trend": "^0.1.5",
         "guzzlehttp/guzzle": "^7.2",
-        "halcyon-agile/filament-export": "^1.0",
+        "halcyon-agile/filament-export": "^1.0.1",
         "halcyon-agile/filament-import": "^1.0",
         "ibrahimbougaoua/filament-menu-scroll-fix": "<1.0.2",
         "indeev/laravel-schedule-calendar": "^1.2",
