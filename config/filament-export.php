@@ -11,37 +11,44 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 
 return [
-    'expires_in_minute' => 30,
+    'temporary_files' => [
 
-    'disk_name' => 's3',
+        'disk' => env('FILESYSTEM_DISK', 's3'),
 
-    'http' => [
-        'route' => [
-            'name' => 'filament-export.download',
-            'path' => 'admin/export/download',
-            'middleware' => [
+        'base_directory' => 'filament-export',
+    ],
 
-                Authenticate::class,
-                'verified:filament.auth.verification.notice',
-                'active:filament.auth.account-deactivated.notice',
+    'user_timezone_field' => 'timezone',
 
-                EncryptCookies::class,
-                AddQueuedCookiesToResponse::class,
-                StartSession::class,
-                // AuthenticateSession::class,
-                ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
-                SubstituteBindings::class,
-                DispatchServingFilamentEvent::class,
-                MirrorConfigToSubpackages::class,
+    'expires_in_minute' => 60,
 
-
-                'universal',
-                InitializeTenancyByDomain::class,
-
-                'tenant',
-            ]
-        ]
-    ]
+//    'http' => [
+//        'route' => [
+//            'name' => 'filament-export.download',
+//            'path' => 'admin/export/download',
+//            'middleware' => [
+//
+//                Authenticate::class,
+//                'verified:filament.auth.verification.notice',
+//                'active:filament.auth.account-deactivated.notice',
+//
+//                EncryptCookies::class,
+//                AddQueuedCookiesToResponse::class,
+//                StartSession::class,
+//                // AuthenticateSession::class,
+//                ShareErrorsFromSession::class,
+//                VerifyCsrfToken::class,
+//                SubstituteBindings::class,
+//                DispatchServingFilamentEvent::class,
+//                MirrorConfigToSubpackages::class,
+//
+//
+//                'universal',
+//                InitializeTenancyByDomain::class,
+//
+//                'tenant',
+//            ]
+//        ]
+//    ]
 
 ];
