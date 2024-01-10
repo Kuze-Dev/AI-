@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "43ea4c126986de46b274421565fda38a",
+    "content-hash": "f434fb6bb6d370db55a29afa88ccfb88",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -2656,16 +2656,16 @@
         },
         {
             "name": "halcyon-agile/filament-export",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/halcyon-agile/filament-export.git",
-                "reference": "c4d7edb4b1ec5f6185d3fe2ad84aaa5c388317c8"
+                "reference": "264153839061d845c82b98270a15159a51e09801"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/c4d7edb4b1ec5f6185d3fe2ad84aaa5c388317c8",
-                "reference": "c4d7edb4b1ec5f6185d3fe2ad84aaa5c388317c8",
+                "url": "https://api.github.com/repos/halcyon-agile/filament-export/zipball/264153839061d845c82b98270a15159a51e09801",
+                "reference": "264153839061d845c82b98270a15159a51e09801",
                 "shasum": ""
             },
             "require": {
@@ -2722,9 +2722,9 @@
             ],
             "support": {
                 "issues": "https://github.com/halcyon-agile/filament-export/issues",
-                "source": "https://github.com/halcyon-agile/filament-export/tree/v1.0.0"
+                "source": "https://github.com/halcyon-agile/filament-export/tree/v1.0.1"
             },
-            "time": "2024-01-10T03:32:36+00:00"
+            "time": "2024-01-10T05:17:09+00:00"
         },
         {
             "name": "halcyon-agile/filament-import",
