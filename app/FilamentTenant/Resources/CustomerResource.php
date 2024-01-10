@@ -382,13 +382,13 @@ class CustomerResource extends Resource
                 ]),
             ])
             ->bulkActions([
+                Exports::tableBulk(),
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize('delete'),
                 Tables\Actions\ForceDeleteBulkAction::make()
                     ->authorize('forceDelete'),
                 Tables\Actions\RestoreBulkAction::make()
                     ->authorize('restore'),
-                Exports::tableBulk(),
             ])
             ->defaultSort('updated_at', 'desc');
     }
