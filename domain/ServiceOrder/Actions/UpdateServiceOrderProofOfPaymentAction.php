@@ -7,23 +7,23 @@ namespace Domain\ServiceOrder\Actions;
 use Domain\Payments\Actions\UploadProofofPaymentAction;
 use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBankTransferData;
-use Domain\ServiceOrder\Enums\ServiceBillStatus;
-use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class UpdateServiceBillProofOfPaymentAction
+class UpdateServiceOrderProofOfPaymentAction
 {
     public function __construct(
         private readonly UploadProofofPaymentAction $uploadProofofPaymentAction,
     ) {
     }
 
-    public function execute(ServiceBankTransferData $serviceBankTransferData): ServiceBill
+    public function execute(ServiceBankTransferData $serviceBankTransferData): ServiceOrder
     {
-        $serviceBill = ServiceBill::whereReference($serviceBankTransferData->reference_id)->firstOrFail();
-        $payment = $serviceBill->latestPayment();
+        $serviceOrder = ServiceOrder::whereReference($serviceBankTransferData->reference_id)->firstOrFail();
+        $payment = $serviceOrder->latestPayment();
 
         if (! $payment) {
             throw new BadRequestHttpException('Payment not found!');
@@ -31,12 +31,6 @@ class UpdateServiceBillProofOfPaymentAction
 
         if ($payment->gateway != 'bank-transfer') {
             throw new BadRequestHttpException('You cant upload a proof of payment in this gateway');
-        }
-
-        if (
-            $serviceBill->status != ServiceBillStatus::PENDING
-        ) {
-            throw new BadRequestHttpException('Invalid action');
         }
 
         $proofOfPayment = $serviceBankTransferData->proof_of_payment;
@@ -47,8 +41,8 @@ class UpdateServiceBillProofOfPaymentAction
         $image = $this->convertUrlToUploadedFile($proofOfPayment);
 
         if ($image instanceof UploadedFile) {
-            $serviceBill->update([
-                'status' => ServiceBillStatus::FOR_APPROVAL,
+            $serviceOrder->update([
+                'status' => ServiceOrderStatus::FOR_APPROVAL,
             ]);
 
             $payment->update([
@@ -65,7 +59,7 @@ class UpdateServiceBillProofOfPaymentAction
             throw new BadRequestHttpException('Invalid media');
         }
 
-        return $serviceBill;
+        return $serviceOrder;
     }
 
     private function convertUrlToUploadedFile(string $url): UploadedFile|string

@@ -10,11 +10,11 @@ class ServiceTransactionData
 {
     public function __construct(
         public readonly int $service_order_id,
-        public readonly int $service_bill_id,
+        public readonly ?int $service_bill_id,
         public readonly int $payment_id,
         public readonly int $payment_method_id,
         public readonly string $currency,
-        public readonly float $total_amount,
+        public readonly ?float $total_amount,
         public readonly ServiceTransactionStatus $status,
     ) {
     }
