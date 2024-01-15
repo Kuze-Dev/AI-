@@ -24,7 +24,7 @@ return [
      * This queue will be used to generate derived and responsive images.
      * Leave empty to use the default queue.
      */
-    'queue_name' => App\Jobs\QueueJobPriority::MEDIA_LIBRARY,
+    'queue_name' => '',
 
     /*
      * By default all conversions will be performed on a queue.
