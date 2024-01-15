@@ -33,10 +33,6 @@ environments:
     domain:
       - haspcms-1.com
       - "*.haspcms-1.com"
-    queues:
-      - default-staging
-      - invite_customer-staging
-      - media_library-staging
     cache: hasp-cache
     memory: 2048
     cli-memory: 512
