@@ -12,6 +12,6 @@ enum RegisterStatus: string
 
     public function isAllowedInvite(): bool
     {
-        return $this === self::UNREGISTERED;
+        return $this !== self::REGISTERED;
     }
 }
