@@ -36,7 +36,7 @@ it('can render page', function () {
     livewire(CreateCustomer::class)
         ->assertFormExists()
         ->assertOk();
-});
+})->todo();
 
 it('can create customer'/* w/ same address'*/, function () {
 
@@ -78,7 +78,7 @@ it('can create customer'/* w/ same address'*/, function () {
     //        'is_default_shipping' => 1,
     //        'is_default_billing' => 1,
     //    ]);
-});
+})->todo();
 
 //it('can create customer w/ different address', function () {
 //

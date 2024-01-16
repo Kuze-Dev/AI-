@@ -125,7 +125,7 @@ class InviteCustomerResource extends CustomerResource
                         fn () => trans('A registration link has been sending to selected email address.')
                     )
                     ->action(function (Tables\Actions\BulkAction $action, Collection $records) {
-
+                        /** @var Collection<int, Customer> $records */
                         app(SendRegisterInvitationsAction::class)
                             ->execute(records: $records);
 

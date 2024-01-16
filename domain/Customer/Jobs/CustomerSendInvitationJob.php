@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * @template TModel as Customer
+ */
 class CustomerSendInvitationJob implements ShouldQueue
 {
     use InteractsWithQueue;
@@ -26,6 +29,10 @@ class CustomerSendInvitationJob implements ShouldQueue
 
     private readonly string $keyName;
 
+    /**
+     * @param  Collection<int, TModel>|null  $records
+     * @param  array<RegisterStatus>  $registerStatuses
+     */
     public function __construct(
         private ?int $initialCustomerKey = null,
         private readonly ?Collection $records = null,
@@ -84,16 +91,16 @@ class CustomerSendInvitationJob implements ShouldQueue
             ->whereNot('register_status', RegisterStatus::REGISTERED)
             ->when(
                 $this->records,
-                function (Builder $query) {
+                function (Builder $query, Collection $records) {
                     /** @var Builder<Customer> $query */
-                    return $query->whereIn($this->keyName, $this->records->pluck($this->keyName));
+                    return $query->whereIn($this->keyName, $records->pluck($this->keyName));
                 }
             )
             ->when(
                 $this->registerStatuses,
-                function (Builder $query) {
+                function (Builder $query, array $registerStatuses) {
                     /** @var Builder<Customer> $query */
-                    return $query->whereIn('register_status', $this->registerStatuses);
+                    return $query->whereIn('register_status', $registerStatuses);
                 }
             );
     }
