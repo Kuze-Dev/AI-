@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f434fb6bb6d370db55a29afa88ccfb88",
+    "content-hash": "8953aaf19feb6638e85e060f9f4e0ec8",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -13325,21 +13325,21 @@
         },
         {
             "name": "driftingly/rector-laravel",
-            "version": "0.29.0",
+            "version": "0.30.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/driftingly/rector-laravel.git",
-                "reference": "524f7ae302aa52e343d10630969cb1e36774d6d2"
+                "reference": "871a5921177be5f493646d4a22998c8aa3eedebc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/524f7ae302aa52e343d10630969cb1e36774d6d2",
-                "reference": "524f7ae302aa52e343d10630969cb1e36774d6d2",
+                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/871a5921177be5f493646d4a22998c8aa3eedebc",
+                "reference": "871a5921177be5f493646d4a22998c8aa3eedebc",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2 || ^8.0",
-                "rector/rector": "^0.18.5"
+                "rector/rector": "^0.19.0"
             },
             "type": "rector-extension",
             "autoload": {
@@ -13354,9 +13354,9 @@
             "description": "Rector upgrades rules for Laravel Framework",
             "support": {
                 "issues": "https://github.com/driftingly/rector-laravel/issues",
-                "source": "https://github.com/driftingly/rector-laravel/tree/0.29.0"
+                "source": "https://github.com/driftingly/rector-laravel/tree/0.30.0"
             },
-            "time": "2024-01-04T21:45:25+00:00"
+            "time": "2024-01-11T18:11:35+00:00"
         },
         {
             "name": "fidry/cpu-core-counter",
@@ -15529,21 +15529,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.18.13",
+            "version": "0.19.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "f8011a76d36aa4f839f60f3b4f97707d97176618"
+                "reference": "2bba0dd55ba92c23f1253d9e60d0242a896d1025"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f8011a76d36aa4f839f60f3b4f97707d97176618",
-                "reference": "f8011a76d36aa4f839f60f3b4f97707d97176618",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/2bba0dd55ba92c23f1253d9e60d0242a896d1025",
+                "reference": "2bba0dd55ba92c23f1253d9e60d0242a896d1025",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.10.35"
+                "phpstan/phpstan": "^1.10.52"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -15573,7 +15573,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.18.13"
+                "source": "https://github.com/rectorphp/rector/tree/0.19.1"
             },
             "funding": [
                 {
@@ -15581,7 +15581,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-20T16:08:01+00:00"
+            "time": "2024-01-15T18:02:43+00:00"
         },
         {
             "name": "sebastian/cli-parser",
