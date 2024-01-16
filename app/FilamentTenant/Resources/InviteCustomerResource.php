@@ -8,6 +8,7 @@ use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationAction;
+use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Export\Exports;
 use Domain\Customer\Models\Customer;
@@ -17,6 +18,7 @@ use Exception;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -114,6 +116,21 @@ class InviteCustomerResource extends CustomerResource
                 ]),
             ])
             ->bulkActions([
+                Tables\Actions\BulkAction::make('send-register-invitation')
+                    ->translateLabel()
+                    ->icon('heroicon-o-speakerphone')
+                    ->requiresConfirmation()
+                    ->deselectRecordsAfterCompletion()
+                    ->successNotificationTitle(
+                        fn () => trans('A registration link has been sending to selected email address.')
+                    )
+                    ->action(function (Tables\Actions\BulkAction $action, Collection $records) {
+
+                        app(SendRegisterInvitationsAction::class)
+                            ->execute(records: $records);
+
+                        $action->success();
+                    }),
                 Exports::tableBulk([
                     RegisterStatus::UNREGISTERED,
                     RegisterStatus::INVITED,

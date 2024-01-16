@@ -10,6 +10,7 @@ use Domain\Customer\Models\Customer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
@@ -27,11 +28,16 @@ class CustomerSendInvitationJob implements ShouldQueue
 
     public function __construct(
         private ?int $initialCustomerKey = null,
+        private readonly ?Collection $records = null,
         private readonly array $registerStatuses = []
     ) {
+        $this->records?->ensure(Customer::class);
+
         $this->keyName = (new Customer())->getKeyName();
 
-        $this->initialCustomerKey ??= $this->query()->value($this->keyName);
+        $this->initialCustomerKey
+            ??= $this->records?->sortByDesc($this->keyName)->value($this->keyName)
+            ?? $this->query()->value($this->keyName);
 
         $this->sendRegisterInvitation = app(SendRegisterInvitationAction::class);
     }
@@ -43,7 +49,7 @@ class CustomerSendInvitationJob implements ShouldQueue
         }
 
         $query = $this->query()
-            ->where($this->keyName, '<', $this->initialCustomerKey);
+            ->where($this->keyName, '<=', $this->initialCustomerKey);
 
         $query
             ->limit(self::LIMIT)
@@ -60,6 +66,7 @@ class CustomerSendInvitationJob implements ShouldQueue
         if ($query->wherekeyNot($ids)->exists()) {
             dispatch(new self(
                 initialCustomerKey: $query->value($this->keyName),
+                records: $this->records,
                 registerStatuses: $this->registerStatuses
             ));
         }
@@ -75,6 +82,13 @@ class CustomerSendInvitationJob implements ShouldQueue
 
         return $query->latest($this->keyName)
             ->whereNot('register_status', RegisterStatus::REGISTERED)
+            ->when(
+                $this->records,
+                function (Builder $query) {
+                    /** @var Builder<Customer> $query */
+                    return $query->whereIn($this->keyName, $this->records->pluck($this->keyName));
+                }
+            )
             ->when(
                 $this->registerStatuses,
                 function (Builder $query) {

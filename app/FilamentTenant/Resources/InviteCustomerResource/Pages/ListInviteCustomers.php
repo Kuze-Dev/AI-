@@ -35,13 +35,14 @@ class ListInviteCustomers extends ListCustomers
                                 ])
                         ),
                 ])
+                ->successNotificationTitle(
+                    fn () => trans('A registration link has been sending to all email address.')
+                )
                 ->action(function (Actions\Action $action, array $data) {
                     app(SendRegisterInvitationsAction::class)
-                        ->execute($data['register_status']);
+                        ->execute(registerStatuses: $data['register_status']);
 
-                    $action
-                        ->successNotificationTitle(trans('A registration link has been sending to all email address.'))
-                        ->success();
+                    $action->success();
                 }),
             Exports::headerList([
                 RegisterStatus::UNREGISTERED,
