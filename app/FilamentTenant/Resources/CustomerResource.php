@@ -77,12 +77,10 @@ class CustomerResource extends Resource
                         ->required()
                         ->string()
                         ->rules([
-                            function ($record) {
-                                return function (string $attribute, mixed $value, Closure $fail) {
-                                    if (preg_match('/[^a-zA-Z\s]/', $value)) {
-                                        $fail('Input must not contain numerical characters.');
-                                    }
-                                };
+                            fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                    $fail('Input must not contain numerical characters.');
+                                }
                             },
                         ])
                         ->maxLength(255),
@@ -90,12 +88,10 @@ class CustomerResource extends Resource
                         ->translateLabel()
                         ->required()
                         ->rules([
-                            function ($record) {
-                                return function (string $attribute, mixed $value, Closure $fail) {
-                                    if (preg_match('/[^a-zA-Z\s]/', $value)) {
-                                        $fail('Input must not contain numerical characters.');
-                                    }
-                                };
+                            fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                    $fail('Input must not contain numerical characters.');
+                                }
                             },
                         ])
                         ->string()
@@ -120,7 +116,7 @@ class CustomerResource extends Resource
                     Forms\Components\Select::make('tier_id')
                         ->label(trans('Tier'))
                         ->preload()
-                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
+                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class))
                         ->optionsFromModel(Tier::class, 'name'),
 
                     Forms\Components\Select::make('tier_approval_status')
@@ -204,7 +200,7 @@ class CustomerResource extends Resource
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
-                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class) ? true : false),
+                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class)),
                     Forms\Components\Placeholder::make('is_verified')
                         ->label(trans('Is Verified: '))
                         ->content(function ($record) {
