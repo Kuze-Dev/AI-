@@ -18,7 +18,6 @@ use Tests\RequestFactories\CustomerRequestFactory;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\travelTo;
 use function Pest\Livewire\livewire;
-use function PHPUnit\Framework\assertSame;
 
 uses()->group('customer');
 
@@ -38,16 +37,13 @@ it('can render page', function () {
     //    livewire(CreateCustomer::class)
     //        ->assertFormExists()
     //        ->assertOk();
-    try {
-        CreateCustomer::getUrl();
-        $this->fail('Route [filament.pages.create-customer] defined.');
-    } catch (RouteNotFoundException $e) {
-        assertSame(
-            'Route [filament.pages.create-customer] not defined.',
-            $e->getMessage()
-        );
-    }
-});
+
+    CreateCustomer::getUrl();
+})
+    ->throws(
+        RouteNotFoundException::class,
+        'Route [filament.pages.create-customer] not defined.'
+    );
 
 //it('can create customer w/ different address', function () {
 //
