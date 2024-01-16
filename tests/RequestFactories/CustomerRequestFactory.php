@@ -31,7 +31,7 @@ class CustomerRequestFactory extends RequestFactory
             },
             'gender' => Arr::random(Gender::cases())->value,
             'status' => Arr::random(Status::cases())->value,
-            'register_status' => RegisterStatus::REGISTERED,
+            'register_status' => RegisterStatus::REGISTERED->value,
             'password' => 'secret',
             'password_confirmation' => 'secret',
             'mobile' => $this->faker->numerify('###########'),
