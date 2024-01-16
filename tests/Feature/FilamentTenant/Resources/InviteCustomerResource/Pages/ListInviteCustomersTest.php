@@ -72,9 +72,11 @@ it('can dispatch all send-register-invitation job', function () {
     livewire(ListInviteCustomers::class)
         ->callPageAction(
             'send-register-invitation',
-            data: ['register_status' => collect(RegisterStatus::allowedResendInviteCases())
-                ->map(fn (RegisterStatus $status) => $status->value)
-                ->toArray()]
+            data: [
+                'register_status' => collect(RegisterStatus::allowedResendInviteCases())
+                    ->map(fn (RegisterStatus $status) => $status->value)
+                    ->toArray(),
+            ]
         )
         ->assertHasNoErrors()
         ->assertOk();
