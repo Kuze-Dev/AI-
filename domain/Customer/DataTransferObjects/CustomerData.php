@@ -124,12 +124,12 @@ final readonly class CustomerData
             mobile: $data['mobile'] ?? null,
             gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
-            status: isset($data['status']) ? Status::from($data['status']) : null,
+            status: Status::INACTIVE,
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
             password: $data['password'] ?? null,
             image: $data['image'] ?? null,
-            register_status: RegisterStatus::from($data['register_status']),
+            register_status: RegisterStatus::UNREGISTERED,
             tier_approval_status: TierApprovalStatus::APPROVED,
         );
     }

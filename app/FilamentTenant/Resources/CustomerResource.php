@@ -32,7 +32,6 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -168,48 +167,10 @@ class CustomerResource extends Resource
                                 ->toArray()
                         )
                         ->enum(Gender::class),
-                    Forms\Components\Select::make('status')
-                        ->reactive()
-                        ->translateLabel()
-                        ->nullable()
-                        ->options(
-                            collect(Status::cases())
-                                ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
-                                ->toArray()
-                        )
-                        ->enum(Status::class),
-                    Forms\Components\Select::make('register_status')
-                        ->hidden(fn ($record) => $record?->register_status === RegisterStatus::REGISTERED)
-                        ->placeholder('Select Register status')
-                        ->translateLabel()
-                        ->required()
-                        ->reactive()
-                        ->options(
-                            collect(RegisterStatus::cases())
-                                ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
-                                ->toArray()
-                        )
-                        ->helperText(function ($state, Closure $set) {
-                            if ($state === RegisterStatus::INVITED->value) {
-                                $set('status', Status::INACTIVE->value);
-
-                                return 'Inactive status is required when register status is invited.';
-                            }
-                        })
-                        ->enum(RegisterStatus::class),
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
                         ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class)),
-                    Forms\Components\Placeholder::make('is_verified')
-                        ->label(trans('Is Verified: '))
-                        ->content(function ($record) {
-                            if ($record?->hasVerifiedEmail()) {
-                                return new HtmlString('<span class="px-2 py-1 text-white bg-green-500 rounded-full">Verified</span>');
-                            } else {
-                                return new HtmlString('<span class="px-2 py-1 text-white bg-red-500 rounded-full">Unverified</span>');
-                            }
-                        }),
                 ])
                     ->columns(2)
                     ->disabled(fn ($record) => $record?->trashed()),
