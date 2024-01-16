@@ -9,6 +9,7 @@ use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Export\Exports;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use ErrorException;
@@ -111,6 +112,18 @@ class InviteCustomerResource extends CustomerResource
                             }
                         }),
                 ]),
+            ])
+            ->bulkActions([
+                Exports::tableBulk([
+                    RegisterStatus::UNREGISTERED,
+                    RegisterStatus::INVITED,
+                ]),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->authorize('delete'),
+                Tables\Actions\ForceDeleteBulkAction::make()
+                    ->authorize('forceDelete'),
+                Tables\Actions\RestoreBulkAction::make()
+                    ->authorize('restore'),
             ]);
     }
 
