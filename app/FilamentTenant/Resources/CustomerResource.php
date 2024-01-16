@@ -13,7 +13,6 @@ use Closure;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
-use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
@@ -22,7 +21,6 @@ use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
-use ErrorException;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -40,8 +38,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
-//use Support\Excel\Actions\ExportBulkAction;
-
 class CustomerResource extends Resource
 {
     use ContextualResource;
@@ -53,6 +49,8 @@ class CustomerResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $recordTitleAttribute = 'full_name';
+
+    protected static ?int $navigationSort = 2;
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -278,6 +276,11 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->dateTime(timezone: Filament::auth()->user()?->timezone)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('deleted_at')
+                    ->translateLabel()
+                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
@@ -306,53 +309,12 @@ class CustomerResource extends Resource
                             };
                         });
                     }),
-                Tables\Filters\SelectFilter::make('register_status')
-                    ->translateLabel()
-                    ->default(RegisterStatus::REGISTERED->value)
-                    ->options([
-                        'Registered' => ucfirst(RegisterStatus::REGISTERED->value),
-                        'Unregistered' => ucfirst(RegisterStatus::UNREGISTERED->value),
-                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
                     ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('send-register-invitation')
-                        ->label(fn (Customer $record) => match ($record->register_status) {
-                            RegisterStatus::UNREGISTERED => 'Send register invitation',
-                            RegisterStatus::INVITED => 'Resend register invitation',
-                            default => throw new ErrorException('Invalid register status.'),
-                        })
-                        ->translateLabel()
-                        ->requiresConfirmation()
-                        ->icon('heroicon-o-speakerphone')
-                        ->action(function (Customer $record, Tables\Actions\Action $action): void {
-
-                            if ($record->register_status == RegisterStatus::UNREGISTERED ||
-                                $record->register_status == RegisterStatus::INVITED) {
-                                $success = app(SendRegisterInvitationAction::class)
-                                    ->execute($record);
-
-                                if ($success) {
-                                    $action
-                                        ->successNotificationTitle(trans('A registration link has been sent to your email address.'))
-                                        ->success();
-
-                                    return;
-                                }
-
-                                $action->failureNotificationTitle(trans('Failed to send register invitation.'))
-                                    ->failure();
-                            }
-                        })
-                        ->authorize('sendRegisterInvitation')
-                        ->withActivityLog(
-                            event: 'register-invitation-link-sent',
-                            description: fn (Customer $record) => $record->full_name.' register invitation link sent'
-                        )
-                        ->visible(fn (Customer $record) => $record->register_status !== RegisterStatus::REGISTERED),
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
                         ->using(function (Customer $record) {
@@ -382,7 +344,7 @@ class CustomerResource extends Resource
                 ]),
             ])
             ->bulkActions([
-                Exports::tableBulk(),
+                Exports::tableBulk([RegisterStatus::REGISTERED]),
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize('delete'),
                 Tables\Actions\ForceDeleteBulkAction::make()
@@ -416,6 +378,12 @@ class CustomerResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('register_status', RegisterStatus::REGISTERED);
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

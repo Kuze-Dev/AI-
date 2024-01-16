@@ -14,4 +14,12 @@ enum RegisterStatus: string
     {
         return $this !== self::REGISTERED;
     }
+
+    public static function allowedResendInviteCases(): array
+    {
+        return [
+            self::INVITED,
+            self::UNREGISTERED,
+        ];
+    }
 }

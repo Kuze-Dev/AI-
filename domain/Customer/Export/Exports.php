@@ -18,16 +18,19 @@ final class Exports
     }
 
     /**
+     * @param  array<int, \Domain\Customer\Enums\RegisterStatus>  $registerStatues
+     *
      * @throws PhpVersionNotSupportedException
      * @throws \Exception
      */
-    public static function headerList(): Action
+    public static function headerList(array $registerStatues): Action
     {
         return ExportAction::make()
             ->model(Customer::class)
             ->queue()
             ->query(
                 fn (Builder $query) => $query
+                    ->whereIn('register_status', $registerStatues)
                     ->with('tier')
                     ->latest()
             )
@@ -56,15 +59,18 @@ final class Exports
     }
 
     /**
+     * @param  array<int, \Domain\Customer\Enums\RegisterStatus>  $registerStatues
+     *
      * @throws PhpVersionNotSupportedException
      * @throws \Exception
      */
-    public static function tableBulk(): Action
+    public static function tableBulk(array $registerStatues): Action
     {
         return ExportBulkAction::make()
             ->queue()
             ->query(
                 fn (Builder $query) => $query
+                    ->whereIn('register_status', $registerStatues)
                     ->with('tier')
                     ->latest()
             )
