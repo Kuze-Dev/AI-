@@ -30,7 +30,7 @@ definitions:
         name: Analyse
         script:
           - *setup-script
-          - composer analyse -- --memory-limit=-1
+          - composer analyse-no-memory-limit
         caches:
           - composer
           - phpstan
