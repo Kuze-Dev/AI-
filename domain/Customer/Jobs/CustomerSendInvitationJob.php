@@ -17,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
 /**
  * @template TModel as Customer
  */
-class CustomerSendInvitationJob implements ShouldQueue
+final class CustomerSendInvitationJob implements ShouldQueue
 {
     use InteractsWithQueue;
     use Queueable;
