@@ -7,7 +7,6 @@ use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\CustomerResource\Pages\EditCustomer;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Filament\Facades\Filament;
@@ -63,7 +62,6 @@ it('can edit tier', function () {
             'first_name' => 'test first name',
             'last_name' => 'test last name',
             'mobile' => '09123456789',
-            'status' => Status::ACTIVE->value,
             'birth_date' => now()->subDay(),
         ])
         ->call('save')
@@ -75,7 +73,7 @@ it('can edit tier', function () {
         'first_name' => 'test first name',
         'last_name' => 'test last name',
         'mobile' => '09123456789',
-        'status' => Status::ACTIVE->value,
+        'status' => $customer->status,
         'birth_date' => now()->subDay()->toDateString().' 00:00:00',
     ]);
 });
