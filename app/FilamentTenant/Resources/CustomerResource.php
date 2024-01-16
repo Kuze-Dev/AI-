@@ -13,7 +13,6 @@ use Closure;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
-use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
@@ -22,7 +21,6 @@ use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
-use ErrorException;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -317,40 +315,6 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('send-register-invitation')
-                        ->label(fn (Customer $record) => match ($record->register_status) {
-                            RegisterStatus::UNREGISTERED => 'Send register invitation',
-                            RegisterStatus::INVITED => 'Resend register invitation',
-                            default => throw new ErrorException('Invalid register status.'),
-                        })
-                        ->translateLabel()
-                        ->requiresConfirmation()
-                        ->icon('heroicon-o-speakerphone')
-                        ->action(function (Customer $record, Tables\Actions\Action $action): void {
-
-                            if ($record->register_status == RegisterStatus::UNREGISTERED ||
-                                $record->register_status == RegisterStatus::INVITED) {
-                                $success = app(SendRegisterInvitationAction::class)
-                                    ->execute($record);
-
-                                if ($success) {
-                                    $action
-                                        ->successNotificationTitle(trans('A registration link has been sent to your email address.'))
-                                        ->success();
-
-                                    return;
-                                }
-
-                                $action->failureNotificationTitle(trans('Failed to send register invitation.'))
-                                    ->failure();
-                            }
-                        })
-                        ->authorize('sendRegisterInvitation')
-                        ->withActivityLog(
-                            event: 'register-invitation-link-sent',
-                            description: fn (Customer $record) => $record->full_name.' register invitation link sent'
-                        )
-                        ->visible(fn (Customer $record) => $record->register_status !== RegisterStatus::REGISTERED),
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
                         ->using(function (Customer $record) {
