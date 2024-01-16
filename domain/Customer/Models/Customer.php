@@ -232,6 +232,9 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
 
     public function isAllowedInvite(): bool
     {
-        return $this->status?->isAllowedInvite() && $this->register_status->isAllowedInvite();
+        return
+            ! $this->trashed() &&
+//            $this->status?->isAllowedInvite() &&
+            $this->register_status->isAllowedInvite();
     }
 }

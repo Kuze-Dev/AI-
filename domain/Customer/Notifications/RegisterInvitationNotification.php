@@ -12,7 +12,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Log;
 
 class RegisterInvitationNotification extends Notification implements ShouldQueue
 {
@@ -25,7 +24,6 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
 
     public function toMail(Customer $notifiable): MailMessage
     {
-        Log::info(app(FormSettings::class)->sender_email);
 
         return (new MailMessage())
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))

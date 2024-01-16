@@ -40,8 +40,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
-//use Support\Excel\Actions\ExportBulkAction;
-
 class CustomerResource extends Resource
 {
     use ContextualResource;
@@ -53,6 +51,8 @@ class CustomerResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $recordTitleAttribute = 'full_name';
+
+    protected static ?int $navigationSort = 2;
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -278,6 +278,11 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->dateTime(timezone: Filament::auth()->user()?->timezone)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('deleted_at')
+                    ->translateLabel()
+                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
@@ -306,13 +311,6 @@ class CustomerResource extends Resource
                             };
                         });
                     }),
-                Tables\Filters\SelectFilter::make('register_status')
-                    ->translateLabel()
-                    ->default(RegisterStatus::REGISTERED->value)
-                    ->options([
-                        'Registered' => ucfirst(RegisterStatus::REGISTERED->value),
-                        'Unregistered' => ucfirst(RegisterStatus::UNREGISTERED->value),
-                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -382,7 +380,7 @@ class CustomerResource extends Resource
                 ]),
             ])
             ->bulkActions([
-                Exports::tableBulk(),
+                Exports::tableBulk([RegisterStatus::REGISTERED]),
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize('delete'),
                 Tables\Actions\ForceDeleteBulkAction::make()
@@ -416,6 +414,12 @@ class CustomerResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('register_status', RegisterStatus::REGISTERED);
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

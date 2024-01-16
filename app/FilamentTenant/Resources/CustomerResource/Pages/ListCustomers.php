@@ -105,7 +105,7 @@ class ListCustomers extends ListRecords
             //                        $customer->created_at?->format(config('tables.date_time_format')),
             //                    ]
             //                ),
-            Exports::headerList(),
+            Exports::headerList([RegisterStatus::REGISTERED]),
             Actions\CreateAction::make(),
         ];
     }
