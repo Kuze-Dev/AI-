@@ -7,6 +7,8 @@ use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\InviteCustomerResource\Pages\CreateInviteCustomer;
 use Domain\Address\Database\Factories\StateFactory;
+use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
@@ -61,7 +63,8 @@ it('can create customer'/* w/ same address'*/, function () {
         'last_name' => $data['last_name'],
         'mobile' => $data['mobile'],
         'gender' => $data['gender'],
-        'status' => $data['status'],
+        'status' => Status::INACTIVE,
+        'register_status' => RegisterStatus::UNREGISTERED,
         'birth_date' => $data['birth_date'].' 00:00:00',
     ]);
     //
