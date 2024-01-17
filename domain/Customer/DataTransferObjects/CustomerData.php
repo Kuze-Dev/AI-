@@ -6,7 +6,6 @@ namespace Domain\Customer\DataTransferObjects;
 
 use App\Features\Customer\TierBase;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
-use Carbon\Carbon;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
@@ -16,26 +15,27 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 
-final class CustomerData
+final readonly class CustomerData
 {
     private function __construct(
-        public readonly ?string $first_name = null,
-        public readonly ?string $last_name = null,
-        public readonly ?string $mobile = null,
-        public readonly ?Gender $gender = null,
-        public readonly ?Carbon $birth_date = null,
-        public readonly ?Status $status = null,
-        public readonly ?int $tier_id = null,
-        public readonly ?string $email = null,
-        public readonly ?string $password = null,
-        public readonly UploadedFile|string|null $image = null,
-        public readonly ?AddressData $shipping_address_data = null,
-        public readonly ?AddressData $billing_address_data = null,
-        public readonly EmailVerificationType $email_verification_type = EmailVerificationType::LINK,
-        public readonly RegisterStatus $register_status = RegisterStatus::REGISTERED,
-        public readonly ?TierApprovalStatus $tier_approval_status = null,
-        public readonly bool $through_api_registration = false,
+        public ?string $first_name = null,
+        public ?string $last_name = null,
+        public ?string $mobile = null,
+        public ?Gender $gender = null,
+        public ?Carbon $birth_date = null,
+        public ?Status $status = null,
+        public ?int $tier_id = null,
+        public ?string $email = null,
+        public ?string $password = null,
+        public UploadedFile|string|null $image = null,
+        public ?AddressData $shipping_address_data = null,
+        public ?AddressData $billing_address_data = null,
+        public EmailVerificationType $email_verification_type = EmailVerificationType::LINK,
+        public RegisterStatus $register_status = RegisterStatus::REGISTERED,
+        public ?TierApprovalStatus $tier_approval_status = null,
+        public bool $through_api_registration = false,
     ) {
     }
 

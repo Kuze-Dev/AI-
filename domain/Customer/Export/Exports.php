@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Domain\Customer\Export;
 
 use Domain\Customer\Models\Customer;
-use HalcyonAgile\FilamentExport\ExcelExport;
+use Filament\Support\Actions\Action;
+use HalcyonAgile\FilamentExport\Actions\ExportAction;
+use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
-use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Columns\Column;
+use Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException;
 
 final class Exports
 {
@@ -17,53 +17,78 @@ final class Exports
     {
     }
 
-    private static function export(): array
+    /**
+     * @throws PhpVersionNotSupportedException
+     * @throws \Exception
+     */
+    public static function headerList(): Action
     {
-        return [
-            ExcelExport::make()
-                ->askForFilename()
-                ->askForWriterType()
-                ->queue()
-                ->withChunkSize(500)
-                ->modifyQueryUsing(
-                    fn (Builder $query) =>
-                    /** @var Builder|Customer $query */
-                    $query
-                        ->with('tier')
-                        ->latest()
-                )
-                ->withColumns([
-                    Column::make('cuid'),
-                    Column::make('email'),
-                    Column::make('first_name'),
-                    Column::make('last_name'),
-                    Column::make('mobile'),
-                    Column::make('status')
-                        ->formatStateUsing(
-                            fn (Customer $record) => $record->status?->value ?? 'none'
-                        ),
-                    Column::make('birth_date')
-                        ->formatStateUsing(
-                            fn (Customer $record) => $record->birth_date
-                                ?->format(config('tables.date_time_format'))
-                        ),
-                    Column::make('tier.name'),
-                    Column::make('created_at')
-                        ->formatStateUsing(
-                            fn (Customer $record) => $record->created_at
-                                ?->format(config('tables.date_time_format'))
-                        ),
-                ]),
-        ];
+        return ExportAction::make()
+            ->model(Customer::class)
+            ->queue()
+            ->query(
+                fn (Builder $query) => $query
+                    ->with('tier')
+                    ->latest()
+            )
+            ->mapUsing(
+                ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Gender', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                fn (Customer $customer): array => [
+                    $customer->cuid,
+                    $customer->email,
+                    $customer->first_name,
+                    $customer->last_name,
+                    $customer->mobile,
+                    $customer->gender?->value,
+                    $customer->status?->value,
+                    $customer->birth_date?->format(config('tables.date_format')),
+                    $customer->tier?->name,
+                    $customer->created_at?->format(config('tables.date_time_format')),
+                ]
+            )
+            ->tags([
+                'tenant:'.(tenant('id') ?? 'central'),
+            ])
+            ->withActivityLog(
+                event: 'exported',
+                description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
+            );
     }
 
-    public static function tableBulk(): ExportBulkAction
+    /**
+     * @throws PhpVersionNotSupportedException
+     * @throws \Exception
+     */
+    public static function tableBulk(): Action
     {
-        return ExportBulkAction::make()->exports(self::export());
-    }
-
-    public static function headerList(): ExportAction
-    {
-        return ExportAction::make()->exports(self::export());
+        return ExportBulkAction::make()
+            ->queue()
+            ->query(
+                fn (Builder $query) => $query
+                    ->with('tier')
+                    ->latest()
+            )
+            ->mapUsing(
+                ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                fn (Customer $customer): array => [
+                    $customer->cuid,
+                    $customer->email,
+                    $customer->first_name,
+                    $customer->last_name,
+                    $customer->mobile,
+                    $customer->status?->value,
+                    $customer->birth_date?->format(config('tables.date_format')),
+                    $customer->tier?->name,
+                    $customer->created_at?->format(config('tables.date_time_format')),
+                ]
+            )
+            ->tags([
+                'tenant:'.(tenant('id') ?? 'central'),
+            ])
+            ->withActivityLog(
+                event: 'bulk-exported',
+                description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
+            );
     }
 }

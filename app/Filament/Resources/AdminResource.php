@@ -16,13 +16,13 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
-use Support\Excel\Actions\ExportBulkAction;
 
 class AdminResource extends Resource
 {
@@ -209,7 +209,7 @@ class AdminResource extends Resource
                                 $action
                                     ->successNotificationTitle(trans('A fresh verification link has been sent to your email address.'))
                                     ->success();
-                            } catch (Exception $e) {
+                            } catch (Exception) {
                                 $action->failureNotificationTitle(trans('Failed to send verification link.'))
                                     ->failure();
                             }
@@ -263,6 +263,14 @@ class AdminResource extends Resource
                             $admin->getRoleNames()->implode(', '),
                             $admin->created_at?->format(config('tables.date_time_format')),
                         ]
+                    )
+                    ->tags([
+                        'tenant:'.(tenant('id') ?? 'central'),
+                    ])
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
                     ),
             ])
             ->defaultSort('created_at', 'desc');

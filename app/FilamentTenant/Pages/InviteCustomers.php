@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Pages;
 use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use Artificertech\FilamentMultiContext\Concerns\ContextualPage;
-use Carbon\Carbon;
 use Domain\Customer\Actions\CreateCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationAction;
@@ -34,6 +33,7 @@ use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class InviteCustomers extends Page implements HasTable

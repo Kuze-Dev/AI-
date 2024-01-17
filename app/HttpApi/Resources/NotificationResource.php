@@ -10,7 +10,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
 /**
  * @property-read array $data
  * @property-read string $type
- * @property-read \Carbon\Carbon|null $read_at
+ * @property-read \Illuminate\Support\Carbon|null $read_at
  */
 class NotificationResource extends JsonApiResource
 {

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Carbon\Carbon;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Content\Database\Factories\ContentEntryFactory;
@@ -66,12 +65,12 @@ it('can filter content entries by published at start', function () {
         ->for($content)
         ->count(2)
         ->sequence(
-            ['published_at' => Carbon::now()->subWeeks(2)],
-            ['published_at' => Carbon::now()->addWeeks(2)],
+            ['published_at' => now()->subWeeks(2)],
+            ['published_at' => now()->addWeeks(2)],
         )
         ->create([]);
 
-    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_start' => (string) Carbon::now()]]))
+    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_start' => (string) now()]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('data', 1)
@@ -90,12 +89,12 @@ it('can filter content entries by published at end', function () {
         ->for($content)
         ->count(2)
         ->sequence(
-            ['published_at' => Carbon::now()->subWeeks(2)],
-            ['published_at' => Carbon::now()->addWeeks(2)],
+            ['published_at' => now()->subWeeks(2)],
+            ['published_at' => now()->addWeeks(2)],
         )
         ->create();
 
-    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_end' => (string) Carbon::now()]]))
+    getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_end' => (string) now()]]))
         ->assertOk()
         ->assertJson(function (AssertableJson $json) {
             $json->count('data', 1)
@@ -119,7 +118,7 @@ it('can filter content entries by published at year month', function () {
         )
         ->create([]);
 
-    $queryDate = Carbon::now();
+    $queryDate = now();
 
     getJson("api/contents/{$content->getRouteKey()}/entries?".http_build_query(['filter' => ['published_at_year_month' => $queryDate->year]]))
         ->assertOk()

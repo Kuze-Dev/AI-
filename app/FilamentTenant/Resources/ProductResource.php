@@ -26,12 +26,12 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Support\Excel\Actions\ExportBulkAction;
 
 class ProductResource extends Resource
 {
@@ -145,10 +145,6 @@ class ProductResource extends Resource
                                         ->dehydrateStateUsing(fn ($state) => (float) $state),
                                 ])->columns(3),
                         ]),
-
-                    /** Form for variant section */
-                    // self::getVariantForm(),
-
                     Forms\Components\Section::make('Inventory')
                         ->translateLabel()
                         ->schema([
@@ -346,7 +342,7 @@ class ProductResource extends Resource
                         ->using(function (Product $record) {
                             try {
                                 return app(DeleteProductAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         })

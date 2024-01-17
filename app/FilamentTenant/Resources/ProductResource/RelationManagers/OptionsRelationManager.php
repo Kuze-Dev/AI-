@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ProductResource\RelationManagers;
 
+use App\Features\ECommerce\ColorPallete;
+use App\FilamentTenant\Support\CreateProductOptionValueAction;
+use App\FilamentTenant\Support\EditProductOptionValueAction;
+use App\FilamentTenant\Support\ManageProductOptionAction;
+use Closure;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
@@ -14,6 +19,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class OptionsRelationManager extends RelationManager
@@ -22,17 +28,39 @@ class OptionsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'Product Option Values';
 
+    public Model $ownerRecord;
+
     public static function form(Form $form): Form
     {
-        // Temporarily commented
         return $form->schema([
             \Filament\Forms\Components\TextInput::make('name')
                 ->translateLabel()
                 ->maxLength(100)
-                ->lazy()
                 ->columnSpan(2)
                 ->required(),
+            \Filament\Forms\Components\Group::make()
+                ->schema([
+                    \Filament\Forms\Components\Select::make('icon_type')
+                        ->default('text')
+                        ->required()
+                        ->options(fn () => tenancy()->tenant?->features()->active(ColorPallete::class) ? [
+                            'text' => 'Text',
+                            'color_palette' => 'Color Palette',
+                        ] : [
+                            'text' => 'Text',
+                        ])
+                        ->columnSpan(
+                            fn (Closure $get) => $get('icon_type') == 'color_palette' ? 1 : 2
+                        )
+                        ->hidden(fn (Closure $get) => ! $get('option_is_custom'))
+                        ->reactive(),
 
+                    \Filament\Forms\Components\ColorPicker::make('icon_value')
+                        ->label(trans('Icon Value (HEX)'))
+                        ->hidden(fn (Closure $get) => ! ($get('icon_type') === 'color_palette' && $get('option_is_custom'))),
+                ])
+                ->columns(2)
+                ->columnSpan(2),
         ]);
     }
 
@@ -56,11 +84,11 @@ class OptionsRelationManager extends RelationManager
                     ->sortable(query: function (Builder $query, string $direction): Builder {
                         return $query->orderBy('product_option_values.name', $direction);
                     }),
-                Tables\Columns\TextColumn::make('iconDetails')
+                Tables\Columns\TextColumn::make('icon_details')
                     ->translateLabel(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                EditProductOptionValueAction::proceed(),
                 Tables\Actions\DeleteAction::make()
                     ->translateLabel()
                     ->action(function (ProductOptionValue $record, Tables\Actions\Action $action): void {
@@ -68,7 +96,7 @@ class OptionsRelationManager extends RelationManager
                             if (! $record->productOption instanceof ProductOption) {
                                 $action
                                     ->failureNotificationTitle(trans('The option value is unlinked from an option.'))
-                                    ->success();
+                                    ->failure();
 
                                 return;
                             }
@@ -83,7 +111,7 @@ class OptionsRelationManager extends RelationManager
                             $action
                                 ->successNotificationTitle(trans('Option value has been removed.'))
                                 ->success();
-                        } catch (Exception $e) {
+                        } catch (Exception) {
                             $action->failureNotificationTitle(trans('Failed to remove Option value.'))
                                 ->failure();
                         }
@@ -118,6 +146,10 @@ class OptionsRelationManager extends RelationManager
                             }
                         }
                     }),
+            ])
+            ->headerActions([
+                ManageProductOptionAction::proceed(),
+                CreateProductOptionValueAction::proceed(),
             ])
             ->defaultSort('id', 'asc');
     }

@@ -12,11 +12,9 @@ use Artificertech\FilamentMultiContext\Http\Middleware\ApplyContext;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\UserMenuItem;
-use HalcyonAgile\FilamentExport\Helpers as FilamentExportHelpers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\URL;
 
 class FilamentTenantServiceProvider extends ContextServiceProvider
 {
@@ -62,24 +60,6 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
         });
 
         $this->registerRoutes();
-
-        self::exportHelper();
-    }
-
-    private static function exportHelper(): void
-    {
-        $exportHelper = function (): void {
-            if (! tenancy()->initialized) {
-                return;
-            }
-
-            /** @var \Domain\Tenant\Models\Tenant $tenant */
-            $tenant = tenancy()->tenant;
-
-            URL::formatHostUsing(fn () => $tenant->domainFirstUrl());
-        };
-
-        FilamentExportHelpers::$beforeGenerateDownloadUrl = $exportHelper;
     }
 
     protected function getUserMenuItems(): array

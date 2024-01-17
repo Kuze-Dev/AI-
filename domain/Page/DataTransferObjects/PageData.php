@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Page\DataTransferObjects;
 
-use Carbon\Carbon;
 use Domain\Page\Enums\Visibility;
+use Illuminate\Support\Carbon;
 use Support\MetaData\DataTransferObjects\MetaDataData;
 use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
