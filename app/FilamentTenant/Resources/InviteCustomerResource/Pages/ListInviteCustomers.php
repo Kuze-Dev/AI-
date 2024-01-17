@@ -8,7 +8,6 @@ use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use App\FilamentTenant\Resources\InviteCustomerResource;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Export\Exports;
 use Filament\Forms;
 use Filament\Pages\Actions;
 use Illuminate\Support\Str;
@@ -44,10 +43,6 @@ class ListInviteCustomers extends ListCustomers
 
                     $action->success();
                 }),
-            Exports::headerList([
-                RegisterStatus::UNREGISTERED,
-                RegisterStatus::INVITED,
-            ]),
             Actions\CreateAction::make(),
         ];
     }

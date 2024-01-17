@@ -167,6 +167,17 @@ class CustomerResource extends Resource
                                 ->toArray()
                         )
                         ->enum(Gender::class),
+                    Forms\Components\Select::make('status')
+                        ->reactive()
+                        ->translateLabel()
+                        ->nullable()
+                        ->options(
+                            collect(Status::cases())
+                                ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
+                                ->toArray()
+                        )
+                        ->enum(Status::class)
+                        ->visibleOn('edit'),
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
