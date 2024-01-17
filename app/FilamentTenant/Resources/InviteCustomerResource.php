@@ -10,7 +10,6 @@ use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Export\Exports;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use ErrorException;
@@ -131,10 +130,6 @@ class InviteCustomerResource extends CustomerResource
 
                         $action->success();
                     }),
-                Exports::tableBulk([
-                    RegisterStatus::UNREGISTERED,
-                    RegisterStatus::INVITED,
-                ]),
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize('delete'),
                 Tables\Actions\ForceDeleteBulkAction::make()
