@@ -217,7 +217,7 @@ class MenuResource extends Resource
                                                                     ContentEntry::class => $modeClass::pluck('title', 'id')->toArray(),
                                                                     default => $modeClass::pluck('name', 'id')->toArray()
                                                                 }
-                                                                : null
+                                                            : null
                                                         )
                                                         ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
                                                         ->visible(fn (Closure $get) => filled($get('model_type'))),

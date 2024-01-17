@@ -65,7 +65,7 @@ class EditTier extends EditRecord
     }
 
     /**
-     * @param \Domain\Tier\Models\Tier$record
+     * @param  \Domain\Tier\Models\Tier  $record
      *
      * @throws Throwable
      */
