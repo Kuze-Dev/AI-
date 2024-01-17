@@ -44,24 +44,18 @@ final readonly class CustomerData
         ?Tier $customerTier,
         Tier $defaultTier
     ): self {
-        $registerStatus = RegisterStatus::REGISTERED;
-        $tierId = null;
+        $tier = null;
         $validated = $request->validated();
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
+        unset($request);
 
-        if ($customerTier && $customerTier->isDefault() || ! tenancy()->tenant?->features()->active(TierBase::class)) {
-
-            $registerStatus = self::getStatus($defaultTier, null, null);
-            /** @var \Domain\Tier\Models\Tier $defaultTier */
-            $tierId = $defaultTier->getKey();
+        if (! tenancy()->tenant?->features()->active(TierBase::class) || $defaultTier->is($customerTier)) {
+            $tier = $defaultTier;
         }
 
         if ($customerTier && $customerTier->has_approval && ! $customerTier->isDefault()) {
-
-            $registerStatus = self::getStatus($customerTier, null, null);
-            $tierId = $customerTier->getKey();
+            $tier = $customerTier;
         }
-        unset($request);
 
         return new self(
             first_name: $validated['first_name'],
@@ -70,7 +64,7 @@ final readonly class CustomerData
             gender: Gender::from($validated['gender']),
             birth_date: now()->parse($validated['birth_date']),
             status: Status::ACTIVE,
-            tier_id: $tierId,
+            tier_id: $tier?->getKey(),
             email: $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
@@ -97,7 +91,7 @@ final readonly class CustomerData
             email_verification_type: isset($validated['email_verification_type'])
                 ? EmailVerificationType::from($validated['email_verification_type'])
                 : EmailVerificationType::LINK,
-            register_status: $registerStatus,
+            register_status: RegisterStatus::REGISTERED,
             tier_approval_status: null,
             through_api_registration: true,
         );
@@ -179,7 +173,7 @@ final readonly class CustomerData
             mobile: $data['mobile'] ?? null,
             gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
-            status: isset($data['status']) ? Status::from($data['status']) : null,
+            //            status: isset($data['status']) ? Status::from($data['status']) : null,
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
             password: $data['password'],
