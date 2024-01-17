@@ -119,26 +119,25 @@ class CustomerResource extends Resource
                         ->optionsFromModel(Tier::class, 'name'),
 
                     Forms\Components\Select::make('tier_approval_status')
+//                        ->options(TierApprovalStatus::class)
                         ->options([
-                            TierApprovalStatus::APPROVED->value => 'Approved',
-                            TierApprovalStatus::REJECTED->value => 'Rejected',
+                            TierApprovalStatus::APPROVED->value => Str::headline(TierApprovalStatus::APPROVED->value),
+                            TierApprovalStatus::REJECTED->value => Str::headline(TierApprovalStatus::REJECTED->value),
                         ])
-                        ->hidden(function ($record, $context) {
+                        ->visibleOn('edit')
+                        ->hidden(function (?Customer $record): bool {
 
-                            $tier = Tier::whereId($record?->tier_id)->first();
-                            if (! $tier?->has_approval) {
+                            $tier = $record->tier;
+
+                            if ($tier === null || ! $tier?->has_approval) {
                                 return true;
                             }
 
-                            if ($context === 'create') {
+                            if ($record->tier_approval_status === TierApprovalStatus::APPROVED) {
                                 return true;
                             }
 
-                            if ($record !== null && ($record->tier_approval_status === TierApprovalStatus::APPROVED)) {
-                                return true;
-                            }
-
-                            return (bool) ($record !== null && $tier->isDefault());
+                            return $tier->isDefault();
                         }),
 
                     Forms\Components\TextInput::make('password')
