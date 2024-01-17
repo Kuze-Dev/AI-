@@ -36,7 +36,7 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'connection' => null,
+            'connection' => env('DB_CONNECTION'),
             'table' => 'features',
         ],
 
