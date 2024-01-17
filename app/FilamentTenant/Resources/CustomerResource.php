@@ -127,13 +127,13 @@ class CustomerResource extends Resource
                         ->visibleOn('edit')
                         ->hidden(function (?Customer $record): bool {
 
-                            $tier = $record->tier;
+                            $tier = $record?->tier;
 
-                            if ($tier === null || ! $tier?->has_approval) {
+                            if ($tier === null || ! $tier->has_approval) {
                                 return true;
                             }
 
-                            if ($record->tier_approval_status === TierApprovalStatus::APPROVED) {
+                            if ($record?->tier_approval_status === TierApprovalStatus::APPROVED) {
                                 return true;
                             }
 
