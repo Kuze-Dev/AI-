@@ -10,7 +10,6 @@ use Domain\Customer\Actions\ImportCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Filament\Forms;
@@ -46,11 +45,10 @@ class ListInviteCustomers extends ListCustomers
                             Rule::email(),
                             'distinct',
                         ],
-                        'first_name' => 'required|string|min:3|max:100',
-                        'last_name' => 'required|string|min:3|max:100',
+                        'first_name' => 'nullable|string|min:3|max:100',
+                        'last_name' => 'nullable|string|min:3|max:100',
                         'mobile' => 'nullable|min:3|max:100',
                         'gender' => ['nullable', Rule::enum(Gender::class)],
-                        //                        'status' => ['nullable', Rule::enum(Status::class)],
                         'birth_date' => 'nullable|date',
                         'tier' => [
                             'nullable',

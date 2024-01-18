@@ -150,34 +150,21 @@ final readonly class CustomerData
         );
     }
 
-    public static function fromArrayImportByAdmin(array $data): self
-    {
+    public static function fromArrayImportByAdmin(
+        ?string $customerPassword,
+        ?int $tierKey,
+        array $row
+    ): self {
         return new self(
-            first_name: $data['first_name'] ?? null,
-            last_name: $data['last_name'] ?? null,
-            mobile: $data['mobile'] ?? null,
-            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
-            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
-            status: isset($data['status']) ? Status::from($data['status']) : null,
-            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
-            email: $data['email'],
+            first_name: $row['first_name'] ?? '',
+            last_name: $row['last_name'] ?? '',
+            mobile: $row['mobile'] ? (string) $row['mobile'] : null,
+            gender: isset($row['gender']) ? Gender::from($row['gender']) : null,
+            birth_date: isset($row['birth_date']) ? now()->parse($row['birth_date']) : null,
+            tier_id: $tierKey,
+            email: $row['email'],
+            password: $customerPassword,
             register_status: RegisterStatus::UNREGISTERED,
-        );
-    }
-
-    public static function fromArrayRegisteredImportByAdmin(array $data): self
-    {
-        return new self(
-            first_name: $data['first_name'],
-            last_name: $data['last_name'],
-            mobile: $data['mobile'] ?? null,
-            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
-            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
-            //            status: isset($data['status']) ? Status::from($data['status']) : null,
-            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
-            email: $data['email'],
-            password: $data['password'],
-            register_status: RegisterStatus::REGISTERED,
         );
     }
 
