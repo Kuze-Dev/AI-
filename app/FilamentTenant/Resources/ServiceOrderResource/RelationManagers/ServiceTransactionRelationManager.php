@@ -24,9 +24,9 @@ class ServiceTransactionRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('serviceBill.reference')
-                    ->exists('serviceBill')
-                    ->label(trans('Reference'))
+                Tables\Columns\TextColumn::make('payment.payment_id')
+                    ->exists('payment')
+                    ->label(trans('Payment ID'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_amount')
                     ->exists('serviceBill')

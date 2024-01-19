@@ -17,18 +17,18 @@ use Domain\ServiceOrder\DataTransferObjects\CheckoutServiceOrderData;
 use Domain\ServiceOrder\DataTransferObjects\CreateServiceTransactionData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
-use Domain\ServiceOrder\Exceptions\ServiceBillAlreadyPaidException;
+use Domain\ServiceOrder\Exceptions\PaymentExceedLimitException;
+use Domain\ServiceOrder\Exceptions\ServiceOrderFullyPaidException;
 use Domain\ServiceOrder\Exceptions\ServiceOrderStatusStillPendingException;
-use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use LogicException;
 use Throwable;
 
-class CheckoutServiceOrderAction
+class CheckoutServiceOrderPartialPaymentAction
 {
     public function __construct(
         private PaymentMethod $paymentMethod,
-        private ServiceBill $serviceBill,
         private ServiceOrder $serviceOrder,
         private CreatePaymentAction $createPaymentAction,
         private CreateServiceTransactionAction $createServiceTransactionAction
@@ -40,11 +40,13 @@ class CheckoutServiceOrderAction
     {
         $this->paymentMethod = $this->preparePaymentMethod($checkoutServiceOrderData);
 
-        $this->serviceBill = $this->prepareServiceBill($checkoutServiceOrderData);
+        $this->serviceOrder = $this->prepareServiceOrder($checkoutServiceOrderData);
 
-        $this->serviceOrder = $this->prepareServiceOrder();
+        if (is_null($checkoutServiceOrderData->amount_to_pay)) {
+            throw new LogicException(trans('No amount to pay found'));
+        }
 
-        return $this->proceedPayment();
+        return $this->proceedPayment($checkoutServiceOrderData->amount_to_pay);
     }
 
     /** @throws Throwable */
@@ -61,36 +63,28 @@ class CheckoutServiceOrderAction
     }
 
     /** @throws Throwable */
-    private function prepareServiceBill(CheckoutServiceOrderData $checkoutServiceOrderData): ServiceBill
+    private function prepareServiceOrder(CheckoutServiceOrderData $checkoutServiceOrderData): ServiceOrder
     {
-        $serviceBill = ServiceBill::whereReference($checkoutServiceOrderData->reference_id)
+        $serviceOrder = ServiceOrder::whereReference($checkoutServiceOrderData->reference_id)
             ->first();
 
-        if (is_null($serviceBill)) {
-            throw new ModelNotFoundException(trans('No service bill found'));
+        if (! $serviceOrder?->is_partial_payment) {
+            throw new ModelNotFoundException(trans('Please pay via service bill'));
         }
 
-        if ($serviceBill->is_paid) {
-            throw new ServiceBillAlreadyPaidException();
+        if ($serviceOrder->totalBalance()->formatSimple() < $checkoutServiceOrderData->amount_to_pay) {
+            throw new PaymentExceedLimitException('Amount to pay is higher than balance!');
         }
 
-        return $serviceBill;
-    }
-
-    /** @throws Throwable */
-    private function prepareServiceOrder(): ServiceOrder
-    {
-        $serviceOrder = $this->serviceBill->serviceOrder;
-
-        if (is_null($serviceOrder)) {
-            throw new ModelNotFoundException(trans('No service order found'));
+        if ($serviceOrder->totalBalance()->isZero()) {
+            throw new ServiceOrderFullyPaidException('No current balance!');
         }
 
         return $serviceOrder;
     }
 
     /** @throws Throwable */
-    private function proceedPayment(): PaymentAuthorize
+    private function proceedPayment(float $amountToPay): PaymentAuthorize
     {
         if ($this->serviceOrder->status === ServiceOrderStatus::PENDING) {
             throw new ServiceOrderStatusStillPendingException();
@@ -99,14 +93,14 @@ class CheckoutServiceOrderAction
         $providerData = new CreatepaymentData(
             transactionData: TransactionData::fromArray(
                 [
-                    'reference_id' => $this->serviceBill->reference,
+                    'reference_id' => $this->serviceOrder->reference,
                     'amount' => AmountData::fromArray([
                         'currency' => $this->serviceOrder->currency_code,
-                        'total' => $this->serviceBill->total_amount,
+                        'total' => $amountToPay,
                         'details' => PaymentDetailsData::fromArray(
                             [
-                                'subtotal' => strval($this->serviceBill->sub_total),
-                                'tax' => strval($this->serviceBill->tax_total),
+                                // 'subtotal' => strval($this->serviceOrder->totalBalanceSubtotal()->formatSimple()),
+                                // 'tax' => strval($this->serviceOrder->totalBalanceTax()->formatSimple()),
                             ]
                         ),
                     ]),
@@ -116,10 +110,10 @@ class CheckoutServiceOrderAction
         );
 
         $result = $this->createPaymentAction
-            ->execute($this->serviceBill, $providerData);
+            ->execute($this->serviceOrder, $providerData);
 
         if ($result->success) {
-            $this->createServiceTransaction();
+            $this->createServiceTransaction($amountToPay);
 
             return $result;
         }
@@ -128,10 +122,10 @@ class CheckoutServiceOrderAction
     }
 
     /** @throws Throwable */
-    private function createServiceTransaction(): void
+    private function createServiceTransaction(float $amountToPay): void
     {
-        $payment = Payment::wherePayableType($this->serviceBill->getTable())
-            ->wherePayableId($this->serviceBill->id)
+        $payment = Payment::wherePayableType($this->serviceOrder->getTable())
+            ->wherePayableId($this->serviceOrder->id)
             ->latest()
             ->first();
 
@@ -142,8 +136,8 @@ class CheckoutServiceOrderAction
         $this->createServiceTransactionAction->execute(
             new CreateServiceTransactionData(
                 service_order: $this->serviceOrder,
-                service_bill: $this->serviceBill,
-                total_amount: null,
+                service_bill: null,
+                total_amount: $amountToPay,
                 service_transaction_status: ServiceTransactionStatus::PENDING,
                 payment: $payment
             )

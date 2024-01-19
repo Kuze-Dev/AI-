@@ -20,7 +20,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *
  * @property int $id
  * @property int $service_order_id
- * @property int $service_bill_id
+ * @property int|null $service_bill_id
  * @property int $payment_id
  * @property int $payment_method_id
  * @property string $currency

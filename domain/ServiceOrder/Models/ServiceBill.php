@@ -37,6 +37,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_amount
+ * @property float $total_balance
  * @property ServiceBillStatus $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -91,6 +92,7 @@ class ServiceBill extends Model implements HasMedia, PayableInterface
         'tax_percentage',
         'tax_total',
         'total_amount',
+        'total_balance',
         'status',
     ];
 
@@ -103,6 +105,7 @@ class ServiceBill extends Model implements HasMedia, PayableInterface
         'tax_percentage' => 'float',
         'tax_total' => MoneyCast::class,
         'total_amount' => MoneyCast::class,
+        'total_balance' => MoneyCast::class,
         'status' => ServiceBillStatus::class,
     ];
 
