@@ -64,6 +64,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_price
+ * @property string $payment_type
+ * @property string $payment_value
+ * @property array $payment_plan
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
@@ -166,6 +169,9 @@ class ServiceOrder extends Model implements PayableInterface
         'tax_total',
         'total_price',
         'schema',
+        'payment_value',
+        'payment_plan',
+        'payment_type',
     ];
 
     protected $casts = [
@@ -186,6 +192,7 @@ class ServiceOrder extends Model implements PayableInterface
         'tax_total' => MoneyCast::class,
         'total_price' => MoneyCast::class,
         'status' => ServiceOrderStatus::class,
+        'payment_plan' => 'json',
     ];
 
     public function getRouteKeyName(): string

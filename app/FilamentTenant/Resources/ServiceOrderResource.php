@@ -21,6 +21,8 @@ use Domain\ServiceOrder\Actions\CalculateServiceOrderTotalPriceAction;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
+use Domain\ServiceOrder\Enums\PaymentPlanType;
+use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Taxation\Enums\PriceDisplay;
@@ -32,6 +34,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -231,53 +234,67 @@ class ServiceOrderResource extends Resource
 
                                 Forms\Components\Group::make()
                                     ->schema([
-                                        TextLabel::make('')
-                                            ->label(trans('Payment Plan'))
-                                            ->alignLeft()
-                                            ->size('xl')
-                                            ->weight('bold')
-                                            ->inline()
-                                            ->readOnly(),
+                                        Forms\Components\Fieldset::make('')->schema([
+                                            TextLabel::make('')
+                                                ->label(trans('Payment Plan'))
+                                                ->alignLeft()
+                                                ->size('xl')
+                                                ->weight('bold')
+                                                ->inline()
+                                                ->readOnly(),
 
-                                        Radio::make('payment_type')
-                                            ->label(trans(''))
-                                            ->options([
-                                                'pay_in_full' => 'Pay in full',
-                                                'pay_in_milestone' => 'Pay in milestone',
-                                            ])
-                                            ->reactive()
-                                            ->columnSpan(2)
-                                            ->columns(2),
+                                            Radio::make('payment_type')
+                                                ->label(trans('Pay in'))
+                                                ->options(
+                                                    collect(PaymentPlanType::cases())
+                                                        ->mapWithKeys(fn (PaymentPlanType $target) => [$target->value => Str::headline($target->value)])
+                                                        ->toArray()
+                                                )
+                                                ->enum(PaymentPlanType::class)
+                                                ->default(PaymentPlanType::FULL->value)
+                                                ->reactive()
+                                                ->required()
+                                                ->columnSpan(2)
+                                                ->columns(2),
 
-                                        Forms\Components\Select::make('value')
-                                            ->reactive()
-                                            ->options(function () {
-                                                return ['hello', 'hi'];
-                                            })
-                                            ->columnSpan(2)
-                                            ->columns(2),
+                                            Forms\Components\Select::make('payment_value')
+                                                ->label(trans('Value'))
+                                                ->reactive()
+                                                ->options(
+                                                    collect(PaymentPlanValue::cases())
+                                                        ->mapWithKeys(fn (PaymentPlanValue $target) => [$target->value => Str::headline($target->value)])
+                                                        ->toArray()
+                                                )
+                                                ->enum(PaymentPlanValue::class)
+                                                ->columnSpan(2)
+                                                ->placeholder(trans('Select Percent / Fixed'))
+                                                ->columns(2)
+                                                ->visible(fn (Closure $get) => $get('payment_type') === 'milestone'),
 
-                                        Repeater::make('payment_plan')
-                                            ->label('')
-                                            ->createItemButtonLabel('Add milestone')
-                                            ->columnSpan(2)
-                                            ->defaultItems(0)
-                                            ->reactive()
-                                            ->schema([
-                                                TextInput::make('description')->required()->translateLabel(),
-                                                TextInput::make('percent')->required()->translateLabel(),
-                                            ])->columns(2)
-                                            ->visible(fn (Closure $get) => $get('payment_type') === 'pay_in_milestone'),
+                                            Repeater::make('payment_plan')
+                                                ->label('')
+                                                ->createItemButtonLabel('Add Milestone')
+                                                ->columnSpan(2)
+                                                ->defaultItems(1)
+                                                ->reactive()
+                                                ->schema([
+                                                    TextInput::make('description')->required()->translateLabel()
+                                                    ->afterStateUpdated(function ($component, $state, $livewire) {
+                                                        $items = $component->getContainer()->getParentComponent()->getOldState();
+                                                        $livewire->resetErrorBag($component->getStatePath());
+
+                                                        if (in_array([$component->getName() => $state]['description'], array_column($items, 'description'))) {
+                                                            $livewire->addError($component->getStatePath(), 'duplicated');
+                                                        }
+                                                    }),
+                                                    TextInput::make('amount')->required(),
+                                                    Toggle::make('is_generated')->required()->translateLabel()->visible(false)->default(false),
+                                                ])->columns(2)
+                                                ->visible(fn (Closure $get) => $get('payment_value') && $get('payment_type') === 'milestone'),
+                                        ]),
+
                                     ])
-                                    ->columnSpan(2),
-
-                                TextLabel::make('')
-                                    ->label(trans('Additional Charges'))
-                                    ->alignLeft()
-                                    ->size('xl')
-                                    ->weight('bold')
-                                    ->inline()
-                                    ->readOnly(),
+                                    ->columnSpan(2)->visible(fn (Closure $get) => $get('service_id') && ! Service::whereId($get('service_id'))->first()?->is_subscription),
 
                                 Repeater::make('additional_charges')
                                     ->label('')

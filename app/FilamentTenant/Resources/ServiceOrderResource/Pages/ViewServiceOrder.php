@@ -18,13 +18,16 @@ use Closure;
 use DateTimeZone;
 use Domain\Admin\Models\Admin;
 use Domain\Payments\Enums\PaymentRemark;
+use Domain\ServiceOrder\Actions\GenerateMilestonePipelineAction;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
 use Domain\ServiceOrder\Actions\ServiceOrderBankTransferAction;
 use Domain\ServiceOrder\Actions\UpdateServiceBillAction;
 use Domain\ServiceOrder\Actions\UpdateServiceOrderAction;
+use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
+use Domain\ServiceOrder\Enums\PaymentPlanType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
@@ -41,6 +44,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
@@ -335,6 +339,7 @@ class ViewServiceOrder extends EditRecord
                         ->columns(2)
                         ->columnSpan(2),
                     Placeholder::make('schedule')
+                        ->columnSpan(2)
                         ->content(
                             fn (ServiceOrder $record) => $admin
                                 ? Carbon::parse($record->schedule)
@@ -343,38 +348,64 @@ class ViewServiceOrder extends EditRecord
                                 : trans('No admin information available')
                         )
                         ->visible(fn ($record) => ! $record->service->is_subscription),
-
-                    TextLabel::make('')
-                        ->label(trans('Payment Plan'))
-                        ->alignLeft()
-                        ->size('xl')
-                        ->weight('bold')
-                        ->inline()
-                        ->readOnly(),
-
-                    Repeater::make('payment_plan')
-                        ->label('')
-                        ->columnSpan(2)
-                        ->defaultItems(1)
-                        ->reactive()
+                    Group::make()->columnSpan(2)
                         ->schema([
-                            TextInput::make('description')->required()->translateLabel(),
-                            TextInput::make('percent')->required()->translateLabel(),
-                            Support\ButtonAction::make('Edit')
-                                ->execute(function (ServiceOrder $record, Closure $get, Closure $set) {
-                                    return Forms\Components\Actions\Action::make(trans('generate'))
-                                        ->color('secondary')
-                                        ->label('Generate')
-                                        ->size('lg')
-                                        ->modalHeading(trans('Edit Status'))
-                                        ->modalWidth('xl');
-                                })->columnSpan(1),
-                        ])->columns(3)
-                        ->disabled()
-                        ->visible(fn (ServiceOrder $record) => $record->payment_type === 'pay_in_milestone'),
+                            TextLabel::make('')
+                                ->label(trans('Payment Plan'))
+                                ->alignLeft()
+                                ->size('xl')
+                                ->weight('bold')
+                                ->inline()
+                                ->readOnly()
+                                ->columnSpan(2),
+                            Divider::make('')->columnSpan(2),
+
+                            Repeater::make('payment_plan')
+                                ->label('Payment')
+                                ->columnSpan(2)
+                                ->reactive()
+                                ->itemLabel(function ($uuid, $component) {
+                                    $keys = array_keys($component->getState());
+                                    $index = array_search($uuid, $keys);
+
+                                    return $index + 1;
+                                })
+                                ->schema([
+                                    TextInput::make('description')->required()->translateLabel(),
+                                    TextInput::make('amount')->required()->translateLabel(),
+                                    Support\ButtonAction::make('Edit')
+                                        ->execute(function (ServiceOrder $record, Closure $get, Closure $set, $component) {
+                                            return Forms\Components\Actions\Action::make(trans('generate'))
+                                                ->color('secondary')
+                                                ->label('Generate')
+                                                ->size('lg')
+                                                ->action(function () use ($record, $component) {
+                                                    $state = $component->getContainer()->getState();
+
+                                                    return app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
+                                                })
+                                                ->modalHeading(trans('Edit Status'))
+                                                ->disabled(function () use ($record, $component){
+                                                    $state = $component->getContainer()->getState();
+
+                                                    $key = array_search($state['description'], array_column($record->payment_plan, 'description'));
+
+                                                    if ($key !== false) {
+                                                        return $record->payment_plan[$key]['is_generated'];
+
+                                                    }
+
+                                                    return true;
+                                                })
+                                                ->modalWidth('xl');
+                                        })->columnSpan(1),
+                                ])->columns(4)
+                                ->disabled(),
+
+                        ])
+                        ->visible(fn (ServiceOrder $record) => $record->payment_type === PaymentPlanType::MILESTONE->value),
                 ])
-                ->columns(2)
-                ->visible(fn (Closure $get) => $get('payment_type') !== null),
+                ->columns(2),
             Section::make(trans('Customer'))
                 ->schema([
                     Placeholder::make('first_name')
