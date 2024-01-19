@@ -27,6 +27,8 @@ class ContentEntryResource extends JsonApiResource
             'published_at' => $this->published_at,
             'route_url' => $this->activeRouteUrl?->url,
             'locale' => $this->locale,
+
+            // TODO: remove this
             'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
         ];
     }

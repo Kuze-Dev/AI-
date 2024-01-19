@@ -27,7 +27,7 @@ class ContentEntryController
     public function index(Content $content): JsonApiResourceCollection
     {
         return ContentEntryResource::collection(
-            QueryBuilder::for($content->contentEntries()->with('content.blueprint', 'activeRouteUrl'))
+            QueryBuilder::for($content->contentEntries()->with(['content.blueprint', 'activeRouteUrl', 'blueprintData']))
                 ->allowedFilters([
                     'title',
                     'slug',
@@ -75,7 +75,7 @@ class ContentEntryController
                     'taxonomyTerms.taxonomy',
                     'routeUrls',
                     'metaData',
-                    'blueprintData',
+                    'blueprintData.media',
                 ])
                 ->jsonPaginate()
         );
