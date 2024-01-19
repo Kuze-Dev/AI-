@@ -36,7 +36,7 @@ class CartLineQuery
                         },
                     ],
                 ]);
-            }])
+            }, 'media'])
             ->whereHas('cart', function ($query) {
                 $query->whereBelongsTo(auth()->user());
             })
@@ -51,7 +51,7 @@ class CartLineQuery
     public function guests(array $cartLineIds, string $sessionId): Collection
     {
         $cartLines = CartLine::query()
-            ->with('purchasable')
+            ->with(['purchasable', 'media'])
             ->whereHas('cart', function ($query) use ($sessionId) {
                 $query->where('session_id', $sessionId);
             })

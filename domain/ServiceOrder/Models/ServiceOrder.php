@@ -158,6 +158,7 @@ class ServiceOrder extends Model
         'tax_percentage',
         'tax_total',
         'total_price',
+        'retail_price',
         'schema',
     ];
 
