@@ -46,7 +46,7 @@ class SearchController
 
                 return array_merge(
                     $results,
-                    $search->toArray($request)
+                    (array) $search->toArray($request)
                 );
             },
             []
