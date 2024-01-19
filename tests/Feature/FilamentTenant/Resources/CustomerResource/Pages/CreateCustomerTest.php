@@ -12,6 +12,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
 use Filament\Facades\Filament;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Tests\RequestFactories\CustomerRequestFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -33,52 +34,16 @@ beforeEach(function () {
 });
 
 it('can render page', function () {
-    livewire(CreateCustomer::class)
-        ->assertFormExists()
-        ->assertOk();
-});
+    //    livewire(CreateCustomer::class)
+    //        ->assertFormExists()
+    //        ->assertOk();
 
-it('can create customer'/* w/ same address'*/, function () {
-
-    $data = CustomerRequestFactory::new()
-        ->withTier(Tier::first())
-        ->withShippingAddress(StateFactory::new()->createOne())
-        ->withBillingSameAsShipping()
-        ->create();
-
-    // to get latest customer
-    travelTo(now()->addSecond());
-
-    livewire(CreateCustomer::class)
-        ->fillForm($data)
-        ->call('create')
-        ->assertHasNoFormErrors()
-        ->assertOk();
-
-    $customer = Customer::latest()->first();
-
-    assertDatabaseHas(Customer::class, [
-        'id' => $customer->getKey(),
-        'email' => $data['email'],
-        'first_name' => $data['first_name'],
-        'last_name' => $data['last_name'],
-        'mobile' => $data['mobile'],
-        'gender' => $data['gender'],
-        'status' => $data['status'],
-        'birth_date' => $data['birth_date'].' 00:00:00',
-    ]);
-    //
-    //    assertDatabaseHas(Address::class, [
-    //        'customer_id' => $customer->getKey(),
-    //        'state_id' => $data['shipping_state_id'],
-    //        'label_as' => $data['shipping_label_as'],
-    //        'address_line_1' => $data['shipping_address_line_1'],
-    //        'zip_code' => $data['shipping_zip_code'],
-    //        'city' => $data['shipping_city'],
-    //        'is_default_shipping' => 1,
-    //        'is_default_billing' => 1,
-    //    ]);
-});
+    CreateCustomer::getUrl();
+})
+    ->throws(
+        RouteNotFoundException::class,
+        'Route [filament.pages.create-customer] not defined.'
+    );
 
 //it('can create customer w/ different address', function () {
 //

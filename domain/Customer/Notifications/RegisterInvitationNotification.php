@@ -12,7 +12,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Log;
 
 class RegisterInvitationNotification extends Notification implements ShouldQueue
 {
@@ -25,14 +24,19 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
 
     public function toMail(Customer $notifiable): MailMessage
     {
-        Log::info(app(FormSettings::class)->sender_email);
 
         return (new MailMessage())
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
             ->subject(trans('Register Invitation'))
-            ->line(trans('Join our community to see the products we’re selling.
-                        Click the button below to register your account
-                        and embark on a personalized journey with us!'))
+            ->line(
+                trans(
+                    'Welcome to [:site]!
+            We\'re thrilled to have you on board.
+            If you have any questions or need assistance,
+            feel free to reach out.
+            We\'re here to make your experience with us exceptional.',
+                    ['site' => app(SiteSettings::class)->name]
+                ))
             ->action(trans('Register Email Address'), self::url($notifiable));
     }
 

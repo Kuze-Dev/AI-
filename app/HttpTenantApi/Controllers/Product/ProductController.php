@@ -64,6 +64,7 @@ class ProductController
     {
         $product = QueryBuilder::for(
             Product::whereSlug($product)->whereStatus(true)
+                ->with(['taxonomyTerms.taxonomy'])
         )
             ->allowedIncludes([
                 'taxonomyTerms',

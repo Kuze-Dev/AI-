@@ -1,0 +1,3 @@
+### Search
+GET {{ host }}/search?query=home&filter%5Bmodels%5D=page
+Accept: application/json

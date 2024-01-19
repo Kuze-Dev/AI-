@@ -37,7 +37,11 @@ class CustomerRegisterRequest extends FormRequest
             'mobile' => [Rule::when(is_null($this->invited), 'required|string|unique:customers,mobile', 'required|string')],
             'gender' => ['required', Rule::enum(Gender::class)],
             'tier_id' => [
-                Rule::when((bool) tenancy()->tenant?->features()->active(TierBase::class), 'required', 'nullable'),
+                Rule::when(
+                    (bool) tenancy()->tenant?->features()->active(TierBase::class),
+                    'required',
+                    'nullable'
+                ),
                 Rule::exists(Tier::class, (new Tier())->getRouteKeyName()),
             ],
             'birth_date' => 'required|date',
