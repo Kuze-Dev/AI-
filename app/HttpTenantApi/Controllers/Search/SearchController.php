@@ -11,7 +11,6 @@ use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Spatie\RouteAttributes\Attributes\Get;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
@@ -22,18 +21,32 @@ class SearchController
     #[Get('/search')]
     public function index(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'query' => 'required|string',
+            'filter' => 'nullable|array',
+        ]);
+
         $results = array_reduce(
-            ($request->filter['models'] ?? null)
-                ? explode(',', $request->filter['models'])
+            ($validated['filter']['models'] ?? null)
+                ? explode(',', $validated['filter']['models'])
                 : self::SEARCHABLE_MODELS,
-            function (array $results, string $model) use ($request) {
-                if (! method_exists($this, $method = 'get'.Str::of($model)->studly().'Results')) {
-                    throw new BadMethodCallException("Searching for `{$model}` may be invalid or not yet implemented.");
-                }
+            function (array $results, string $model) use ($request, $validated) {
+
+                $search = match ($model) {
+                    'page' => $this->getPageResults(
+                        $validated['query'], $validated['filter'] ?? null
+                    ),
+                    'contentEntry' => $this->getContentEntryResults(
+                        $validated['query'], $validated['filter'] ?? null
+                    ),
+                    default => throw new BadMethodCallException(
+                        "Searching for `{$model}` may be invalid or not yet implemented."
+                    ),
+                };
 
                 return array_merge(
                     $results,
-                    $this->{$method}($request->get('query'), $request->filter)->toArray($request)
+                    $search->toArray($request)
                 );
             },
             []
@@ -43,7 +56,7 @@ class SearchController
     }
 
     /** @return JsonApiResourceCollection <int, Page> */
-    protected function getPageResults(string $searchQuery, ?array $filter = null): JsonApiResourceCollection
+    protected function getPageResults(string $searchQuery, ?array $filter): JsonApiResourceCollection
     {
         return PageResource::collection(
             Page::query()
@@ -53,10 +66,11 @@ class SearchController
         );
     }
 
-    protected function getContentEntryResults(string $searchQuery, ?array $filter = null): JsonApiResourceCollection
+    protected function getContentEntryResults(string $searchQuery, ?array $filter): JsonApiResourceCollection
     {
         return ContentEntryResource::collection(
             ContentEntry::query()
+                ->with('blueprintData')
                 ->where('title', 'LIKE', "%{$searchQuery}%")
                 ->when(
                     $filter['content_ids'] ?? null,
