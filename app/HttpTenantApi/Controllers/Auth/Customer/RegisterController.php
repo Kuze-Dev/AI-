@@ -67,7 +67,14 @@ class RegisterController
 
         } else {
             $customer = DB::transaction(
-                fn () => $this->createCustomerAction->execute(CustomerData::fromRegistrationRequest($request, $customerTier, $defaultTier))
+                fn () => $this->createCustomerAction
+                    ->execute(
+                        CustomerData::fromRegistrationRequest(
+                            request: $request,
+                            customerTier: $customerTier,
+                            defaultTier: $defaultTier
+                        )
+                    )
             );
             if ($customerTier?->has_approval) {
                 $this->sendForApprovalRegistrationAction->execute($customer);

@@ -18,14 +18,17 @@ class SendRegisterInvitationAction
             throw new NoSenderEmailException('No sender email found. Please update your form settings.');
         }
 
-        if ($customer->register_status === RegisterStatus::REGISTERED) {
+        if (! $customer->isAllowedInvite()) {
             return false;
         }
+
         $customer->notify(new RegisterInvitationNotification());
 
-        $customer->update([
-            'register_status' => RegisterStatus::INVITED,
-        ]);
+        if ($customer->register_status !== RegisterStatus::INVITED) {
+            $customer->update([
+                'register_status' => RegisterStatus::INVITED,
+            ]);
+        }
 
         return true;
     }

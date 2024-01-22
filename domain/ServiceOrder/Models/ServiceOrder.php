@@ -168,6 +168,7 @@ class ServiceOrder extends Model implements PayableInterface
         'tax_percentage',
         'tax_total',
         'total_price',
+        'retail_price',
         'schema',
         'payment_value',
         'payment_plan',

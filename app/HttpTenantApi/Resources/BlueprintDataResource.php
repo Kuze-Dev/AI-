@@ -15,7 +15,7 @@ class BlueprintDataResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
-        $this->load('media');
+        $this->loadMissing('media');
 
         $data = [
             'value' => $this->value,
