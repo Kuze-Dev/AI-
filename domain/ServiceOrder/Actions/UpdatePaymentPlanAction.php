@@ -8,7 +8,7 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
 
 class UpdatePaymentPlanAction
 {
-    public function execute(ServiceBillMilestonePipelineData $serviceBillMilestonePipelineData)
+    public function execute(ServiceBillMilestonePipelineData $serviceBillMilestonePipelineData): void
     {
         $serviceOrder = $serviceBillMilestonePipelineData->service_order;
         $paymentPlan = $serviceBillMilestonePipelineData->payment_plan;

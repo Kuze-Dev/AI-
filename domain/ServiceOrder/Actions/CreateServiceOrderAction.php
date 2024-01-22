@@ -19,6 +19,7 @@ use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Exceptions\InvalidPaymentPlan;
 use Domain\ServiceOrder\Exceptions\ServiceStatusMustBeActive;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 
 class CreateServiceOrderAction
@@ -52,7 +53,10 @@ class CreateServiceOrderAction
         $taxableInfo = $this->getTax($serviceOrderData, $subTotalPrice);
 
         if ($serviceOrderData->payment_value === PaymentPlanValue::FIXED->value) {
-            $paymentPlan = $serviceOrderData->payment_plan;
+            $paymentPlan = $serviceOrderData?->payment_plan;
+            if (is_null($paymentPlan)) {
+                throw new ModelNotFoundException();
+            }
             $amounts = array_column($paymentPlan, 'amount');
             $sum = array_sum(array_map('floatval', $amounts));
 

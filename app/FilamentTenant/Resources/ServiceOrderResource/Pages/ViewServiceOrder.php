@@ -382,7 +382,7 @@ class ViewServiceOrder extends EditRecord
                                                 ->action(function () use ($record, $component) {
                                                     $state = $component->getContainer()->getState();
 
-                                                    return app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
+                                                    app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
                                                 })
                                                 ->modalHeading(trans('Edit Status'))
                                                 ->disabled(function () use ($record, $component) {
