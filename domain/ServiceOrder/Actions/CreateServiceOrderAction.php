@@ -52,14 +52,13 @@ class CreateServiceOrderAction
         $taxableInfo = $this->getTax($serviceOrderData, $subTotalPrice);
 
         $paymentPlan = $serviceOrderData->payment_plan;
-
+        $sum = null;
         if ($paymentPlan) {
             $amounts = array_column($paymentPlan, 'amount');
             $sum = array_sum(array_map('floatval', $amounts));
         }
 
         if ($serviceOrderData->payment_value === PaymentPlanValue::FIXED->value) {
-            $paymentPlan = $serviceOrderData->payment_plan;
             if ($sum > $taxableInfo->total_price) {
                 throw new InvalidPaymentPlan('The payment plan exceeds the total price');
             }
