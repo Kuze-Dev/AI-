@@ -52,16 +52,20 @@ class CreateServiceOrderAction
 
         $taxableInfo = $this->getTax($serviceOrderData, $subTotalPrice);
 
-        if ($serviceOrderData->payment_value === PaymentPlanValue::FIXED->value) {
-            $paymentPlan = $serviceOrderData->payment_plan;
-            if (is_null($paymentPlan)) {
-                throw new ModelNotFoundException();
-            }
-            $amounts = array_column($paymentPlan, 'amount');
-            $sum = array_sum(array_map('floatval', $amounts));
+        $paymentPlan = $serviceOrderData->payment_plan;
+        if (is_null($paymentPlan)) {
+            throw new ModelNotFoundException();
+        }
+        $amounts = array_column($paymentPlan, 'amount');
+        $sum = array_sum(array_map('floatval', $amounts));
 
+        if ($serviceOrderData->payment_value === PaymentPlanValue::FIXED->value) {
             if ($sum > $taxableInfo->total_price) {
                 throw new InvalidPaymentPlan('The payment plan exceeds the total price');
+            }
+        } elseif ($serviceOrderData->payment_value === PaymentPlanValue::PERCENT->value) {
+            if ($sum !== floatval(100)) {
+                throw new InvalidPaymentPlan('The payment plan amount must be equal to 100');
             }
         }
 
