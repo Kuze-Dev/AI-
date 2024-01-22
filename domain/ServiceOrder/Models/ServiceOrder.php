@@ -64,9 +64,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_price
- * @property string $payment_type
- * @property string $payment_value
- * @property array $payment_plan
+ * @property string|null $payment_type
+ * @property string|null $payment_value
+ * @property array|null $payment_plan
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
