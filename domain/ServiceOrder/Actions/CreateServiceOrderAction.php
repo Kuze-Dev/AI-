@@ -100,9 +100,9 @@ class CreateServiceOrderAction
             'tax_percentage' => $taxableInfo->tax_percentage,
             'tax_total' => $taxableInfo->tax_total,
             'total_price' => $taxableInfo->total_price,
-            'payment_type' => $serviceOrderData->payment_type,
-            'payment_value' => $serviceOrderData->payment_value,
-            'payment_plan' => $serviceOrderData->payment_plan,
+            'payment_type' => $serviceOrderData?->payment_type,
+            'payment_value' => $serviceOrderData?->payment_value,
+            'payment_plan' => $serviceOrderData?->payment_plan,
         ]);
 
         if ($serviceOrderData?->payment_type === PaymentPlanType::MILESTONE->value) {
