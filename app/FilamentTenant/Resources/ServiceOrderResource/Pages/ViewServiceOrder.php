@@ -388,6 +388,10 @@ class ViewServiceOrder extends EditRecord
                                                 ->disabled(function () use ($record, $component) {
                                                     $state = $component->getContainer()->getState();
 
+                                                    if (is_null($record->payment_plan)) {
+                                                        return true;
+                                                    }
+
                                                     $key = array_search($state['description'], array_column($record->payment_plan, 'description'));
 
                                                     if ($key !== false) {

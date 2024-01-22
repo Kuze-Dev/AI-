@@ -53,7 +53,7 @@ class CreateServiceOrderAction
         $taxableInfo = $this->getTax($serviceOrderData, $subTotalPrice);
 
         if ($serviceOrderData->payment_value === PaymentPlanValue::FIXED->value) {
-            $paymentPlan = $serviceOrderData?->payment_plan;
+            $paymentPlan = $serviceOrderData->payment_plan;
             if (is_null($paymentPlan)) {
                 throw new ModelNotFoundException();
             }
@@ -77,6 +77,7 @@ class CreateServiceOrderAction
             'customer_last_name' => $customer->last_name,
             'customer_email' => $customer->email,
             'customer_mobile' => $customer->mobile,
+
             'schema' => $service->blueprint?->schema,
             'customer_form' => $serviceOrderData->form,
             'currency_code' => $currency->code,
@@ -105,7 +106,7 @@ class CreateServiceOrderAction
             'payment_plan' => $serviceOrderData->payment_plan,
         ]);
 
-        if ($serviceOrderData?->payment_type === PaymentPlanType::MILESTONE->value) {
+        if ($serviceOrderData->payment_type === PaymentPlanType::MILESTONE->value) {
             $this->serviceOrderMilestoneCreatedPipelineAction->execute(
                 new ServiceOrderCreatedPipelineData(
                     serviceOrder: $serviceOrder,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Actions;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
+use Domain\ServiceOrder\Exceptions\InvalidPaymentPlan;
 
 class UpdatePaymentPlanAction
 {
@@ -14,6 +15,10 @@ class UpdatePaymentPlanAction
         $paymentPlan = $serviceBillMilestonePipelineData->payment_plan;
 
         $data = $serviceOrder->payment_plan;
+        if (is_null($data)) {
+            throw new InvalidPaymentPlan('No payment plan');
+        }
+
         $key = array_search($paymentPlan['description'], array_column($data, 'description'));
 
         if ($key !== false) {

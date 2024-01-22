@@ -34,9 +34,9 @@ class ServiceOrderData
             is_same_as_billing: $data['is_same_as_billing'],
             additional_charges: $data['additional_charges'] ?? [],
             form: $data['form'] ?? null,
-            payment_type: $data['payment_type'] ?? null,
-            payment_value: $data['payment_value'] ?? null,
-            payment_plan: $data['payment_plan'] ?? null,
+            payment_type: $data['payment_type'],
+            payment_value: $data['payment_value'],
+            payment_plan: $data['payment_plan'],
         );
     }
 }
