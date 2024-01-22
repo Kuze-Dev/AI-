@@ -226,6 +226,7 @@ class ServiceOrderResource extends Resource
 
                                     ]),
                                 ])
+
                                     ->visible(
                                         function (array $state) {
                                             return isset($state['service_id']);
@@ -279,14 +280,14 @@ class ServiceOrderResource extends Resource
                                                 ->reactive()
                                                 ->schema([
                                                     TextInput::make('description')->required()->translateLabel()
-                                                    ->afterStateUpdated(function ($component, $state, $livewire) {
-                                                        $items = $component->getContainer()->getParentComponent()->getOldState();
-                                                        $livewire->resetErrorBag($component->getStatePath());
+                                                        ->afterStateUpdated(function ($component, $state, $livewire) {
+                                                            $items = $component->getContainer()->getParentComponent()->getOldState();
+                                                            $livewire->resetErrorBag($component->getStatePath());
 
-                                                        if (in_array([$component->getName() => $state]['description'], array_column($items, 'description'))) {
-                                                            $livewire->addError($component->getStatePath(), 'duplicated');
-                                                        }
-                                                    }),
+                                                            if (in_array([$component->getName() => $state]['description'], array_column($items, 'description'))) {
+                                                                $livewire->addError($component->getStatePath(), 'duplicated');
+                                                            }
+                                                        }),
                                                     TextInput::make('amount')->required(),
                                                     Toggle::make('is_generated')->required()->translateLabel()->visible(false)->default(false),
                                                 ])->columns(2)

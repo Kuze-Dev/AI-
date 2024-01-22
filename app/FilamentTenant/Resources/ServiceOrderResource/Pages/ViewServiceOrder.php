@@ -44,7 +44,6 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
@@ -358,6 +357,7 @@ class ViewServiceOrder extends EditRecord
                                 ->inline()
                                 ->readOnly()
                                 ->columnSpan(2),
+
                             Divider::make('')->columnSpan(2),
 
                             Repeater::make('payment_plan')
@@ -385,7 +385,7 @@ class ViewServiceOrder extends EditRecord
                                                     return app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
                                                 })
                                                 ->modalHeading(trans('Edit Status'))
-                                                ->disabled(function () use ($record, $component){
+                                                ->disabled(function () use ($record, $component) {
                                                     $state = $component->getContainer()->getState();
 
                                                     $key = array_search($state['description'], array_column($record->payment_plan, 'description'));

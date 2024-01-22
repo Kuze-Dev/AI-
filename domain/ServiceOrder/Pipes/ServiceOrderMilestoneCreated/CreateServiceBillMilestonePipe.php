@@ -8,7 +8,6 @@ use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\Actions\UpdateServiceBillMilestoneAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
-use Domain\ServiceOrder\Models\ServiceOrder;
 
 class CreateServiceBillMilestonePipe
 {
@@ -22,14 +21,15 @@ class CreateServiceBillMilestonePipe
         ServiceBillMilestonePipelineData $serviceBillMilestonePipelineData,
         callable $next
     ): void {
-            $updatedValue = $this->updateServiceBillMilestoneAction->execute($serviceBillMilestonePipelineData);
-            $this->createServiceBillAction
-                ->execute(
-                    ServiceBillData::paymentMilestone(
-                        $serviceBillMilestonePipelineData->service_order,
-                        $updatedValue
-                    )
-                );
+        $updatedValue = $this->updateServiceBillMilestoneAction->execute($serviceBillMilestonePipelineData);
+        $this->createServiceBillAction
+            ->execute(
+                ServiceBillData::paymentMilestone(
+                    $serviceBillMilestonePipelineData->service_order,
+                    $updatedValue
+                )
+            );
         $next($serviceBillMilestonePipelineData);
+
     }
 }

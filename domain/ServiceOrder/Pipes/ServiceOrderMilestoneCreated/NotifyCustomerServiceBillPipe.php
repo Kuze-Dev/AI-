@@ -6,7 +6,6 @@ namespace Domain\ServiceOrder\Pipes\ServiceOrderMilestoneCreated;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
-use Domain\ServiceOrder\Models\ServiceOrder;
 
 class NotifyCustomerServiceBillPipe
 {
@@ -15,7 +14,6 @@ class NotifyCustomerServiceBillPipe
         callable $next
     ): void {
         NotifyCustomerLatestServiceBillJob::dispatch($serviceBillMilestonePipelineData->service_order);
-
         $next($serviceBillMilestonePipelineData);
     }
 }

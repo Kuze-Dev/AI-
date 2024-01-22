@@ -17,9 +17,8 @@ class UpdatePaymentPlanPipe
     public function handle(
         ServiceBillMilestonePipelineData $serviceBillMilestonePipelineData,
         callable $next
-    ): void {  
+    ): void {
         $this->updatePaymentPlanAction->execute($serviceBillMilestonePipelineData);
-
         $next($serviceBillMilestonePipelineData);
     }
 }
