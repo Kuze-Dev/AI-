@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\AdminResource\Pages;
 use App\Filament\Resources\AdminResource\RelationManagers\CauserRelationManager;
+use Domain\Admin\Exports\AdminExporter;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Exception;
@@ -14,9 +15,9 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
 use Filament\Tables;
-use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,7 @@ class AdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
+//    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
 
     protected static ?string $recordTitleAttribute = 'full_name';
 
@@ -251,22 +252,7 @@ class AdminResource extends Resource
             ])
             ->bulkActions([
                 ExportBulkAction::make()
-                    ->queue()
-                    ->query(fn (Builder $query) => $query->with('roles')->whereKeyNot(1)->latest())
-                    ->mapUsing(
-                        ['Email', 'First Name',  'Last Name', 'Active', 'Roles', 'Created At'],
-                        fn (Admin $admin): array => [
-                            $admin->email,
-                            $admin->first_name,
-                            $admin->last_name,
-                            $admin->active ? 'Yes' : 'No',
-                            $admin->getRoleNames()->implode(', '),
-                            $admin->created_at?->format(config('tables.date_time_format')),
-                        ]
-                    )
-                    ->tags([
-                        'tenant:'.(tenant('id') ?? 'central'),
-                    ])
+                    ->exporter(AdminExporter::class)
                     ->withActivityLog(
                         event: 'bulk-exported',
                         description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),

@@ -13,6 +13,8 @@ use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Livewire\Auth\VerifyEmail;
 use Closure;
 use Exception;
+use Filament\Actions\Exports\Models\Export;
+use Filament\Actions\Imports\Models\Import;
 use Filament\Actions\MountableAction;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -79,22 +81,22 @@ class CommonServiceProvider extends ServiceProvider
 //            ]);
 //        });
 
-        Filament::registerRenderHook(
-            'footer.start',
-            fn () => <<<'HTML'
-                    <p>
-                        Powered by
-                        <a
-                            href="https://halcyonwebdesign.com.ph/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="transition hover:text-primary-500"
-                        >
-                            Halcyon Web Design
-                        </a>
-                    </p>
-                HTML,
-        );
+//        Filament::registerRenderHook(
+//            'footer.start',
+//            fn () => <<<'HTML'
+//                    <p>
+//                        Powered by
+//                        <a
+//                            href="https://halcyonwebdesign.com.ph/"
+//                            target="_blank"
+//                            rel="noopener noreferrer"
+//                            class="transition hover:text-primary-500"
+//                        >
+//                            Halcyon Web Design
+//                        </a>
+//                    </p>
+//                HTML,
+//        );
 
 //        Filament::registerRenderHook(
 //            'head.end',
@@ -113,6 +115,12 @@ class CommonServiceProvider extends ServiceProvider
                 ->danger()
                 ->send();
         };
+
+        // https://github.com/filamentphp/filament/issues/10002#issuecomment-1837511287
+        Import::polymorphicUserRelationship();
+
+        // https://filamentphp.com/docs/3.x/actions/prebuilt-actions/export#using-a-polymorphic-user-relationship
+        Export::polymorphicUserRelationship();
     }
 
     protected function registerRoutes(): void

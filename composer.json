@@ -77,7 +77,8 @@
             "Domain\\": "domain/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Support\\": "support/"
+            "Support\\": "support/",
+            "Artificertech\\FilamentMultiContext\\": "packages/artificertech/filament-multi-context/src/"
         }
     },
     "autoload-dev": {
