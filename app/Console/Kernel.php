@@ -62,17 +62,6 @@ class Kernel extends ConsoleKernel
             ->sentryMonitor();
 
         $schedule->command(
-            PruneExportTenancyAwareSchedulerCommand::class,
-            ['--tenants' => $tenants]
-        )
-            ->daily();
-        $schedule->command(
-            PruneImportTenancyAwareSchedulerCommand::class,
-            ['--tenants' => $tenants]
-        )
-            ->daily();
-
-        $schedule->command(
             ClearResetsTenancyAwareSchedulerCommand::class, [
                 'customer',
                 '--tenants' => $tenants,
