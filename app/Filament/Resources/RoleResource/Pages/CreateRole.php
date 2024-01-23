@@ -20,7 +20,7 @@ class CreateRole extends CreateRecord
 
     protected static string $resource = RoleResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

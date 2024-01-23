@@ -24,7 +24,7 @@ class CreatePage extends CreateRecord
 
     protected static string $resource = PageResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

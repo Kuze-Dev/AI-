@@ -27,7 +27,7 @@ class EditContent extends EditRecord
      * Declare action buttons that
      * are available on the page.
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -36,7 +36,7 @@ class EditContent extends EditRecord
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
             Actions\Action::make('view-entries')
-                ->color('secondary')
+                ->color('gray')
                 ->record($this->getRecord())
                 ->authorize(ContentEntryResource::canViewAny())
                 ->url(ContentEntryResource::getUrl('index', [$this->getRecord()])),

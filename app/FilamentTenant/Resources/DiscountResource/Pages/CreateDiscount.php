@@ -19,7 +19,7 @@ class CreateDiscount extends CreateRecord
 
     protected static string $resource = DiscountResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

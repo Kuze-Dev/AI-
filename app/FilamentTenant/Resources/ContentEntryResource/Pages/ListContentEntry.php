@@ -31,7 +31,7 @@ class ListContentEntry extends ListRecords
         parent::mount();
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\EditAction::make()
@@ -44,12 +44,12 @@ class ListContentEntry extends ListRecords
         ];
     }
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return $this->ownerRecord->name.' '.Str::headline(static::getResource()::getPluralModelLabel());
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
 

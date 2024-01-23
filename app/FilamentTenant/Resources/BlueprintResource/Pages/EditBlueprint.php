@@ -30,7 +30,7 @@ class EditBlueprint extends EditRecord
 
     protected static string $resource = BlueprintResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')

@@ -10,9 +10,9 @@ use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -29,7 +29,7 @@ class PaymentMethodResource extends Resource
 
     protected static ?string $navigationGroup = 'Shop Configuration';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $recordTitleAttribute = 'title';
 

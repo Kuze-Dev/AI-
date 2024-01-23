@@ -50,7 +50,7 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
                 NavigationGroup::make('Access')
                     ->icon('heroicon-s-lock-closed'),
                 NavigationGroup::make('System')
-                    ->icon('heroicon-s-exclamation'),
+                    ->icon('heroicon-m-exclamation-triangle'),
             ]);
 
             Filament::registerRenderHook(

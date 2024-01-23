@@ -51,7 +51,7 @@ class ServiceSettings extends TenantBaseSettings
                             ->reactive(),
                         Forms\Components\TextInput::make('admin_main_receiver')
                             ->label(trans('Main Receiver'))
-                            ->required(function (Closure $get) {
+                            ->required(function (\Filament\Forms\Get $get) {
                                 return $get('admin_should_receive');
                             })
                             ->dehydrateStateUsing(fn (?string $state) => is_null($state) ? '' : $state),

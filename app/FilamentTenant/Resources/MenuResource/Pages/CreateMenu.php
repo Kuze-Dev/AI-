@@ -19,7 +19,7 @@ class CreateMenu extends CreateRecord
 
     protected static string $resource = MenuResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

@@ -20,7 +20,7 @@ class CreateBlock extends CreateRecord
 
     protected static string $resource = BlockResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

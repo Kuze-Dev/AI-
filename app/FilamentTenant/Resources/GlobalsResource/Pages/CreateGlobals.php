@@ -19,7 +19,7 @@ class CreateGlobals extends CreateRecord
 
     protected static string $resource = GlobalsResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

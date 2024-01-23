@@ -61,7 +61,7 @@ class ViewServiceOrder extends EditRecord
 
     protected static ?string $recordTitleAttribute = 'reference';
 
-    protected function getHeading(): string|Htmlable
+    public function getHeading(): string|Htmlable
     {
         $reference = '';
 
@@ -105,7 +105,7 @@ class ViewServiceOrder extends EditRecord
         return DB::transaction(fn () => $serviceOrder);
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -205,7 +205,7 @@ class ViewServiceOrder extends EditRecord
                                         ->readOnly(),
                                     TextLabel::make('')
                                         ->label(
-                                            fn (Closure $get) => money(
+                                            fn (\Filament\Forms\Get $get) => money(
                                                 ServiceOrderResource::getSubtotal(0, $get('additional_charges')) * 100,
                                                 $get('currency_code')
                                             )
@@ -224,7 +224,7 @@ class ViewServiceOrder extends EditRecord
                                                 ->readOnly(),
                                             TextLabel::make('')
                                                 ->label(
-                                                    function (ServiceOrder $record, Closure $get): Money|string {
+                                                    function (ServiceOrder $record, \Filament\Forms\Get $get): Money|string {
                                                         return $record->tax_display == PriceDisplay::INCLUSIVE
                                                             ? $record->format_tax_for_display
                                                             : money(
@@ -254,7 +254,7 @@ class ViewServiceOrder extends EditRecord
                                         ->color('primary'),
                                     TextLabel::make('')
                                         ->label(
-                                            fn (ServiceOrder $record, Closure $get): Money => money(
+                                            fn (ServiceOrder $record, \Filament\Forms\Get $get): Money => money(
                                                 self::calculateTaxInfo($record, $get('additional_charges'))
                                                     ->total_price * 100,
                                                 $record->currency_code
@@ -410,7 +410,7 @@ class ViewServiceOrder extends EditRecord
                     SchemaFormBuilder::make('customer_form', fn ($record) => $record->service->blueprint->schema)
                         ->schemaData(fn ($record) => $record->service->blueprint->schema),
                 ])
-                ->hidden(fn (Closure $get) => $get('service_id') === null)
+                ->hidden(fn (\Filament\Forms\Get $get) => $get('service_id') === null)
                 ->columns(2),
         ];
     }
@@ -418,7 +418,7 @@ class ViewServiceOrder extends EditRecord
     private static function summaryEditButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make('Edit')
-            ->execute(function (ServiceOrder $record, Closure $get, Closure $set) {
+            ->execute(function (ServiceOrder $record, \Filament\Forms\Get $get, \Filament\Forms\Set $set) {
                 return Forms\Components\Actions\Action::make(trans('edit'))
                     ->color('primary')
                     ->label('Edit')
@@ -566,7 +566,7 @@ class ViewServiceOrder extends EditRecord
     {
         return ButtonAction::make('proof_of_payment')
             ->disableLabel()
-            ->execute(function (ServiceOrder $record, Closure $set) {
+            ->execute(function (ServiceOrder $record, \Filament\Forms\Set $set) {
                 $footerActions = self::showProofOfPaymentActions($record, $set);
 
                 return $footerActions;
@@ -588,7 +588,7 @@ class ViewServiceOrder extends EditRecord
         $order = $record;
 
         return ComponentsAction::make('proof_of_payment')
-            ->color('secondary')
+            ->color('gray')
             ->label(trans('View Proof of payment'))
             ->size('sm')
             ->action(function (array $data) use ($record, $set) {

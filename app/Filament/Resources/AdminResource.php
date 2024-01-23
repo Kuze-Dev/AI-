@@ -12,9 +12,9 @@ use Domain\Auth\Actions\ForgotPasswordAction;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,7 +32,7 @@ class AdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    protected static string|array $middlewares = ['password.confirm:filament.auth.password.confirm'];
+    protected static string|array $$routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
 
     protected static ?string $recordTitleAttribute = 'full_name';
 

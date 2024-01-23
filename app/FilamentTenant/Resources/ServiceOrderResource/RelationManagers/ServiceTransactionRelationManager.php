@@ -8,7 +8,7 @@ use Domain\ServiceOrder\Actions\GenerateServiceTransactionReceiptAction;
 use Domain\ServiceOrder\Models\ServiceTransaction;
 use Exception;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +20,7 @@ class ServiceTransactionRelationManager extends RelationManager
 
     protected static ?string $title = 'Payment';
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -62,7 +62,7 @@ class ServiceTransactionRelationManager extends RelationManager
                     ->translateLabel()
                     ->requiresConfirmation()
                     ->button()
-                    ->icon('heroicon-o-download')
+                    ->icon('heroicon-o-arrow-down-tray')
                     ->action(
                         function (ServiceTransaction $record, Tables\Actions\Action $action) {
                             try {

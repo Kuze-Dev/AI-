@@ -11,9 +11,9 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Site\Models\Site;
 use Filament\Forms;
 use Filament\Notifications\Notification;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -96,7 +96,7 @@ class SiteResource extends Resource
                 Tables\Actions\Action::make('deploy')
                     ->button()
                     ->icon('heroicon-o-cog')
-                    ->color('secondary')
+                    ->color('gray')
                     ->disabled(function (Site $record) {
 
                         return (bool) (is_null($record->deploy_hook));
@@ -167,7 +167,7 @@ class SiteResource extends Resource
             ]);
     }
 
-    protected static function shouldRegisterNavigation(): bool
+    public static function shouldRegisterNavigation(): bool
     {
         return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) ?: false;
     }

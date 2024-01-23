@@ -20,7 +20,7 @@ class CreateForm extends CreateRecord
 
     protected static string $resource = FormResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

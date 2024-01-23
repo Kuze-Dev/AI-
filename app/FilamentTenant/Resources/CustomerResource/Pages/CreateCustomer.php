@@ -22,7 +22,7 @@ class CreateCustomer extends CreateRecord
     protected static string $resource = CustomerResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

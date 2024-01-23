@@ -28,7 +28,7 @@ class CreateProduct extends CreateRecord implements HasProductOptionsContracts, 
 
     protected static string $resource = ProductResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

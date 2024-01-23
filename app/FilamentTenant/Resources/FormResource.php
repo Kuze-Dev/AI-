@@ -17,10 +17,10 @@ use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
 use Exception;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -77,7 +77,7 @@ class FormResource extends Resource
                         Forms\Components\CheckboxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
-                                function (?FormModel $record, Closure $get) {
+                                function (?FormModel $record, \Filament\Forms\Get $get) {
 
                                     return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -141,7 +141,7 @@ class FormResource extends Resource
                     Forms\Components\Section::make('Available Values')
                         ->schema([
                             SchemaInterpolations::make('data')
-                                ->schemaData(fn (Closure $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
+                                ->schemaData(fn (\Filament\Forms\Get $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
                         ])
                         ->columnSpan(['md' => 1])
                         ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
@@ -215,7 +215,7 @@ class FormResource extends Resource
                                 ->columnSpanFull(),
                             Forms\Components\MarkdownEditor::make('template')
                                 ->required()
-                                ->default(function (Closure $get) {
+                                ->default(function (\Filament\Forms\Get $get) {
                                     $blueprint = Blueprint::whereId($get('../../blueprint_id'))->first();
 
                                     if ($blueprint === null) {
@@ -262,7 +262,7 @@ class FormResource extends Resource
                 Tables\Columns\BadgeColumn::make('form_submissions_count')
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
-                    ->icon('heroicon-s-mail')
+                    ->icon('heroicon-m-envelope')
                     ->color(fn (FormModel $record) => $record->store_submission ? 'success' : 'secondary'),
                 Tables\Columns\TagsColumn::make('sites.name')
                     ->toggleable(condition: function () {

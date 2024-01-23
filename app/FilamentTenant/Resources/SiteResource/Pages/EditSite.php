@@ -22,7 +22,7 @@ class EditSite extends EditRecord
      * Declare action buttons that
      * are available on the page.
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')

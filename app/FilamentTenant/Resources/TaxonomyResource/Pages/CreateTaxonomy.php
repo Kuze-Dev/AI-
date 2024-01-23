@@ -19,7 +19,7 @@ class CreateTaxonomy extends CreateRecord
 
     protected static string $resource = TaxonomyResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

@@ -28,7 +28,7 @@ class EditTier extends EditRecord
     protected static string $resource = TierResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')

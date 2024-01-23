@@ -15,9 +15,9 @@ use Domain\Content\Models\Content;
 use Domain\Site\Models\Site;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -31,7 +31,7 @@ class ContentResource extends Resource
 
     protected static ?string $model = Content::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'CMS';
 
@@ -43,7 +43,7 @@ class ContentResource extends Resource
     }
 
     /** @return Builder<Content> */
-    protected static function getGlobalSearchEloquentQuery(): Builder
+    public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('contentEntries');
     }
@@ -65,7 +65,7 @@ class ContentResource extends Resource
                         ->string()
                         ->maxLength(255)
                         ->lazy()
-                        ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                        ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, $state) {
                             if ($get('prefix') === Str::slug($state) || blank($get('prefix'))) {
                                 $set('prefix', Str::slug($state));
                             }
@@ -83,7 +83,7 @@ class ContentResource extends Resource
                         ->maxLength(255)
                         ->alphaDash()
                         ->unique(ignoreRecord: true)
-                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
+                        ->dehydrateStateUsing(fn (\Filament\Forms\Get $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->preload()
@@ -121,7 +121,7 @@ class ContentResource extends Resource
                                     ->searchable()
                                     ->columnSpan(['sm' => 1])
                                     ->required(),
-                            ])->when(fn (Closure $get) => $get('display_publish_dates')),
+                            ])->when(fn (\Filament\Forms\Get $get) => $get('display_publish_dates')),
                     ]),
 
                     Forms\Components\Card::make([
@@ -135,7 +135,7 @@ class ContentResource extends Resource
                         Forms\Components\CheckboxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
-                                function (?Content $record, Closure $get) {
+                                function (?Content $record, \Filament\Forms\Get $get) {
 
                                     return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -213,7 +213,7 @@ class ContentResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('view-entries')
                         ->icon('heroicon-s-eye')
-                        ->color('secondary')
+                        ->color('gray')
                         ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
                     Tables\Actions\DeleteAction::make()
                         ->using(function (Content $record) {

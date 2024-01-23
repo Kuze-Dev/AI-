@@ -38,7 +38,7 @@ class FeatureSelector extends Field
                             ->formatStateUsing(fn (?Model $record) => $record && Feature::for($record)->active($key))
                             ->dehydrated(false),
                         Fieldset::make('Extras')
-                            ->visible(fn (Closure $get) => count($data['extras']) && $get($statePath))
+                            ->visible(fn (\Filament\Forms\Get $get) => count($data['extras']) && $get($statePath))
                             ->schema(function () use ($statePath, $data) {
 
                                 $fields = [];
@@ -110,7 +110,7 @@ class FeatureSelector extends Field
         $this->default([]);
 
         $this->mutateDehydratedStateUsing(
-            fn (self $component, Closure $get) => collect($component->getOptions())
+            fn (self $component, \Filament\Forms\Get $get) => collect($component->getOptions())
                 ->reduce(
                     function (array $state, array $data, string $key) use ($component, $get) {
                         $statePath = $component->getStatePath(false).'.'.class_basename($key);

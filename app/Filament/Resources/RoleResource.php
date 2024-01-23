@@ -14,9 +14,9 @@ use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Role\Models\Role;
 use Filament\Forms;
 use Filament\Notifications\Notification;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +36,7 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static string|array $middlewares = ['password.confirm:filament.auth.password.confirm'];
+    protected static string|array $$routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -162,7 +162,7 @@ class RoleResource extends Resource
             Forms\Components\Hidden::make('permissions')
                 ->reactive()
                 ->formatStateUsing(fn (?Role $record) => $record ? $record->permissions->pluck('id') : [])
-                ->dehydrateStateUsing(function (Closure $get): array {
+                ->dehydrateStateUsing(function (\Filament\Forms\Get $get): array {
                     return self::$permissionGroups->reduce(
                         function (array $permissions, PermissionGroup $permissionGroup, string $groupName) use ($get): array {
                             if ($get($groupName) ?? false) {
@@ -182,7 +182,7 @@ class RoleResource extends Resource
                 ->helperText(trans('Enable all Permissions for this role'))
                 ->reactive()
                 ->formatStateUsing(fn (?Role $record) => self::$permissionGroups->every(fn (PermissionGroup $permissionGroup): bool => $record?->hasPermissionTo($permissionGroup->main) ?? false))
-                ->afterStateUpdated(function (Closure $get, Closure $set, bool $state): void {
+                ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, bool $state): void {
                     self::$permissionGroups->each(function (PermissionGroup $permissionGroup, string $groupName) use ($get, $set, $state): void {
                         $set($groupName, $state);
 
@@ -202,7 +202,7 @@ class RoleResource extends Resource
                                     ->offIcon('heroicon-s-lock-closed')
                                     ->reactive()
                                     ->formatStateUsing(fn (?Role $record) => $record?->hasPermissionTo($permissionGroup->main))
-                                    ->afterStateUpdated(function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
+                                    ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set) use ($groupName, $permissionGroup): void {
                                         self::refreshPermissionGroupAbilitiesState($groupName, $permissionGroup, $get, $set);
                                         self::refreshSelectAllState($get, $set);
                                     })
@@ -230,7 +230,7 @@ class RoleResource extends Resource
                                                     ->values()
                                                     ->toArray();
                                             })
-                                            ->afterStateUpdated(function (Closure $get, Closure $set) use ($groupName, $permissionGroup): void {
+                                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set) use ($groupName, $permissionGroup): void {
                                                 self::refreshPermissionGroupState($groupName, $permissionGroup, $get, $set);
                                                 self::refreshSelectAllState($get, $set);
                                             })

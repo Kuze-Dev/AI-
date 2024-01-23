@@ -16,9 +16,9 @@ use Domain\Globals\Models\Globals;
 use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +32,7 @@ class GlobalsResource extends Resource
 
     protected static ?string $navigationGroup = 'CMS';
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-americas';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -74,7 +74,7 @@ class GlobalsResource extends Resource
                     Forms\Components\CheckboxList::make('sites')
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
-                            function (?Globals $record, Closure $get) {
+                            function (?Globals $record, \Filament\Forms\Get $get) {
 
                                 return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -116,7 +116,7 @@ class GlobalsResource extends Resource
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
-                    ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
+                    ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
     }

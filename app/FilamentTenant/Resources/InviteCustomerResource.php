@@ -14,7 +14,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use ErrorException;
 use Exception;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,7 +25,7 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class InviteCustomerResource extends CustomerResource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-speakerphone';
+    protected static ?string $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 1;
 
@@ -63,7 +63,7 @@ class InviteCustomerResource extends CustomerResource
                         })
                         ->translateLabel()
                         ->requiresConfirmation()
-                        ->icon('heroicon-o-speakerphone')
+                        ->icon('heroicon-o-megaphone')
                         ->action(function (Customer $record, Tables\Actions\Action $action): void {
 
                             $success = app(SendRegisterInvitationAction::class)
@@ -117,7 +117,7 @@ class InviteCustomerResource extends CustomerResource
             ->bulkActions([
                 Tables\Actions\BulkAction::make('send-register-invitation')
                     ->translateLabel()
-                    ->icon('heroicon-o-speakerphone')
+                    ->icon('heroicon-o-megaphone')
                     ->requiresConfirmation()
                     ->deselectRecordsAfterCompletion()
                     ->successNotificationTitle(

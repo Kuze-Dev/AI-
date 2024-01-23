@@ -72,7 +72,7 @@ class TwoFactorAuthentication extends Component implements HasForms
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Wizard::make(fn (Closure $get) => array_filter([
+            Forms\Components\Wizard::make(fn (\Filament\Forms\Get $get) => array_filter([
                 Forms\Components\Wizard\Step::make('Select method')
                     ->schema([
                         Forms\Components\Radio::make('method')
@@ -81,7 +81,7 @@ class TwoFactorAuthentication extends Component implements HasForms
                                 'otp' => 'Via OTP',
                                 'recovery_code' => 'Via Recovery Code',
                             ])
-                            ->afterStateUpdated(fn (Closure $get, Closure $set) => match ($get('method')) {
+                            ->afterStateUpdated(fn (\Filament\Forms\Get $get, \Filament\Forms\Set $set) => match ($get('method')) {
                                 'otp' => $set('recovery_code', ''),
                                 'recovery_code' => $set('code', ''),
                                 default => null,

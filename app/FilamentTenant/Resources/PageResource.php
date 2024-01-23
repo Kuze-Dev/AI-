@@ -21,9 +21,9 @@ use Domain\Site\Models\Site;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -91,7 +91,7 @@ class PageResource extends Resource
                                 ->searchable()
                                 ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                                 ->reactive()
-                                ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
+                                ->afterStateUpdated(function (Forms\Components\Select $component, \Filament\Forms\Get $get) {
                                     $component->getContainer()
                                         ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                         ?->dispatchEvent('route_url::update');
@@ -123,7 +123,7 @@ class PageResource extends Resource
                             Forms\Components\CheckboxList::make('sites')
                                 ->reactive()
                                 ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                                ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                                ->rule(fn (?Page $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                                 ->options(function () {
 
                                     if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
@@ -205,9 +205,9 @@ class PageResource extends Resource
                                     }),
                                 SchemaFormBuilder::make('data')
                                     ->id('schema-form')
-                                    ->dehydrated(fn (Closure $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
-                                    ->disabled(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
-                                    ->schemaData(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
+                                    ->dehydrated(fn (\Filament\Forms\Get $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
+                                    ->disabled(fn (\Filament\Forms\Get $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
+                                    ->schemaData(fn (\Filament\Forms\Get $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
                             ]),
                     ])->columnSpan(2),
                 MetaDataForm::make('Meta Data')

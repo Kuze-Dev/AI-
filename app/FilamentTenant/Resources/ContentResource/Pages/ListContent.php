@@ -28,7 +28,7 @@ class ListContent extends ListRecords
      * Declare action buttons that
      * are available on the page.
      */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),

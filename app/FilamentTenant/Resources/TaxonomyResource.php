@@ -15,9 +15,9 @@ use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -49,12 +49,12 @@ class TaxonomyResource extends Resource
     }
 
     /** @return Builder<Taxonomy> */
-    protected static function getGlobalSearchEloquentQuery(): Builder
+    public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('taxonomyTerms');
     }
 
-    public static function resolveRecordRouteBinding(mixed $key): ?Model
+    public static function resolveRecordRouteBinding(int | string $key): ?Model
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())

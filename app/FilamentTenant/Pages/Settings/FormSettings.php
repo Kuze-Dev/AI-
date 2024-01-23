@@ -41,10 +41,10 @@ class FormSettings extends TenantBaseSettings
                         ->lazy(),
                     Forms\Components\TextInput::make('site_key')
                         ->required()
-                        ->visible(fn (Closure $get) => filled($get('provider'))),
+                        ->visible(fn (\Filament\Forms\Get $get) => filled($get('provider'))),
                     Forms\Components\TextInput::make('secret_key')
                         ->required()
-                        ->visible(fn (Closure $get) => filled($get('provider'))),
+                        ->visible(fn (\Filament\Forms\Get $get) => filled($get('provider'))),
                 ]),
         ];
     }

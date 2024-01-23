@@ -44,7 +44,7 @@ class EditPage extends EditRecord
     protected static string $resource = PageResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             'page_actions' => CustomPageActionGroup::make([
@@ -74,7 +74,7 @@ class EditPage extends EditRecord
                     ->modalCancelAction(function () {
                         return Action::makeModalAction('redirect')
                             ->label(trans('Edit Existing Draft'))
-                            ->color('secondary')
+                            ->color('gray')
                             ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft]));
                     })
                     ->hidden(function () {
@@ -99,7 +99,7 @@ class EditPage extends EditRecord
             Actions\DeleteAction::make(),
             'other_page_actions' => CustomPageActionGroup::make([
                 Action::make('preview')
-                    ->color('secondary')
+                    ->color('gray')
                     ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                     ->label(trans('Preview Page'))
                     ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
@@ -116,7 +116,7 @@ class EditPage extends EditRecord
                 Action::make('preview_microsite_action')
                     ->label('Preview Microsite')
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
-                    ->color('secondary')
+                    ->color('gray')
                     ->record($this->getRecord())
                     ->modalHeading('Preview Microsite')
                     ->slideOver(true)
@@ -152,7 +152,7 @@ class EditPage extends EditRecord
                                 return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
                             })
                             ->reactive()
-                            ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+                            ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
 
                                 /** @var Site */
                                 $site = Site::find($state);
@@ -177,12 +177,12 @@ class EditPage extends EditRecord
                     ]),
                 Action::make('clone-page')
                     ->label(trans('Clone Page'))
-                    ->color('secondary')
+                    ->color('gray')
                     ->record($this->getRecord())
                     ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => $record->slug])),
             ])->view('filament.pages.actions.custom-action-group.index')
                 ->setName('other_page_draft')
-                ->color('secondary')
+                ->color('gray')
                 ->label(trans('More Actions')),
 
         ];

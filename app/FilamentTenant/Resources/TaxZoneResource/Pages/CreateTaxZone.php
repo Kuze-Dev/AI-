@@ -19,7 +19,7 @@ class CreateTaxZone extends CreateRecord
 
     protected static string $resource = TaxZoneResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

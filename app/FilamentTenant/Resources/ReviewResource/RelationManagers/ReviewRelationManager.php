@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ReviewResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 
 class ReviewRelationManager extends RelationManager
@@ -16,7 +16,7 @@ class ReviewRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'comment';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -29,7 +29,7 @@ class ReviewRelationManager extends RelationManager
             ])->columns(1);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

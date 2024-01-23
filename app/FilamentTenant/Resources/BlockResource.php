@@ -14,9 +14,9 @@ use Domain\Page\Actions\DeleteBlockAction;
 use Domain\Page\Models\Block;
 use Exception;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +30,7 @@ class BlockResource extends Resource
 
     protected static ?string $navigationGroup = 'CMS';
 
-    protected static ?string $navigationIcon = 'heroicon-o-template';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -59,13 +59,13 @@ class BlockResource extends Resource
                     ->image(),
                 Forms\Components\Toggle::make('is_fixed_content')
                     ->inline(false)
-                    ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') ? false : true)
                     ->helperText('If enabled, the content below will serve as the default for all related pages')
                     ->reactive(),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
-                    ->hidden(fn (Closure $get) => $get('is_fixed_content') ? false : true)
-                    ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('is_fixed_content') ? false : true)
+                    ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
     }
@@ -99,7 +99,7 @@ class BlockResource extends Resource
                         ->searchable(),
                     Tables\Columns\TextColumn::make('updated_at')
                         ->size('sm')
-                        ->color('secondary')
+                        ->color('gray')
                         ->dateTime(timezone: Auth::user()?->timezone)
                         ->sortable(),
                 ])->space(2),

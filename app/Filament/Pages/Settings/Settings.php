@@ -31,7 +31,7 @@ class Settings extends Page
         abort_unless(self::authorizeAccess(), 403);
     }
 
-    protected static function shouldRegisterNavigation(): bool
+    public static function shouldRegisterNavigation(): bool
     {
         return self::getSettingsPages()->isNotEmpty() && self::authorizeAccess();
     }
@@ -55,7 +55,7 @@ class Settings extends Page
         return Auth::user()?->can('settings.'.$settingsPermissionsParts->join(',')) ?? false;
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         return [
             self::getUrl() => trans('Settings'),

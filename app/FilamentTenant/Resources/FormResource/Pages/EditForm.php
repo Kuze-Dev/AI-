@@ -23,7 +23,7 @@ class EditForm extends EditRecord
     protected static string $resource = FormResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')

@@ -33,7 +33,7 @@ abstract class BaseSettings extends SettingsPage
         parent::mount();
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -75,7 +75,7 @@ abstract class BaseSettings extends SettingsPage
         return static::$slug ?? static::getSettings()::group();
     }
 
-    public static function getRouteName(): string
+    public static function getRouteName(?string $panel = null): string
     {
         return 'filament.pages.settings.'.self::getSlug();
     }
@@ -85,7 +85,7 @@ abstract class BaseSettings extends SettingsPage
         return static::$breadcrumb ?? static::getTitle();
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         $breadcrumb = $this->getBreadcrumb();
 

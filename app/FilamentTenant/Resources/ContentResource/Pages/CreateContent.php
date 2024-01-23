@@ -20,7 +20,7 @@ class CreateContent extends CreateRecord
 
     protected static string $resource = ContentResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

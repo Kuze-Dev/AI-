@@ -20,7 +20,7 @@ class CreateTier extends CreateRecord
 
     protected static string $resource = TierResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

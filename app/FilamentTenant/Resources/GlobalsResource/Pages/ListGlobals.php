@@ -12,7 +12,7 @@ class ListGlobals extends ListRecords
 {
     protected static string $resource = GlobalsResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),

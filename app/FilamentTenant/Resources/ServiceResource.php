@@ -22,9 +22,9 @@ use Domain\Service\Models\Service;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Exception;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +38,7 @@ class ServiceResource extends Resource
 
     protected static ?string $model = Service::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Service Management';
 
@@ -116,9 +116,9 @@ class ServiceResource extends Resource
                                     ->disabled(fn ($record) => $record !== null)
                                     ->reactive(),
                                 SchemaFormBuilder::make('data')
-                                    ->schemaData(fn (Closure $get) => Blueprint::query()
+                                    ->schemaData(fn (\Filament\Forms\Get $get) => Blueprint::query()
                                         ->firstWhere('id', $get('blueprint_id'))?->schema)
-                                    ->hidden(fn (Closure $get) => $get('blueprint_id') === null)
+                                    ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') === null)
                                     ->dehydrated(false)
                                     ->disabled(),
                             ])
@@ -251,7 +251,7 @@ class ServiceResource extends Resource
             ->schema([
                 Forms\Components\Toggle::make('pay_upfront')
                     ->reactive()
-                    ->disabled(fn (Closure $get) => $get('is_subscription') === true),
+                    ->disabled(fn (\Filament\Forms\Get $get) => $get('is_subscription') === true),
                 Forms\Components\TextInput::make('retail_price')
                     ->translateLabel()
                     ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
@@ -305,10 +305,10 @@ class ServiceResource extends Resource
                         fn (Forms\Components\Toggle $component) => $component->dispatchEvent('status::update')
                     ),
                 Forms\Components\Toggle::make('is_subscription')
-                    ->afterStateUpdated(fn (Closure $set, $state) => $set('pay_upfront', $state))
+                    ->afterStateUpdated(fn (\Filament\Forms\Set $set, $state) => $set('pay_upfront', $state))
                     ->label(trans('Subscription Based'))
                     ->reactive()
-                    ->helperText(fn (Closure $get) => $get('is_subscription') === true
+                    ->helperText(fn (\Filament\Forms\Get $get) => $get('is_subscription') === true
                         ? "Please provide values on 'billing cycle' and 'due date every' fields" : ''),
                 Forms\Components\Select::make('billing_cycle')
                     ->options(function () {
@@ -320,11 +320,11 @@ class ServiceResource extends Resource
                         return $billing;
                     })
                     ->reactive()
-                    ->hidden(fn (Closure $get) => $get('is_subscription') === false)
-                    ->required(fn (Closure $get) => $get('is_subscription') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('is_subscription') === false)
+                    ->required(fn (\Filament\Forms\Get $get) => $get('is_subscription') === true),
                 Forms\Components\Select::make('due_date_every')
                     ->reactive()
-                    ->options(function (Closure $get) {
+                    ->options(function (\Filament\Forms\Get $get) {
                         if ($get('billing_cycle') !== BillingCycleEnum::DAILY->value) {
                             return Arr::except(range(0, 31), 0);
                         }
@@ -332,7 +332,7 @@ class ServiceResource extends Resource
                         return null;
                     })
                     ->hidden(
-                        fn (Closure $get) => ($get('is_subscription') === false
+                        fn (\Filament\Forms\Get $get) => ($get('is_subscription') === false
                         || $get('billing_cycle') === BillingCycleEnum::DAILY->value)
                     )
                     ->required(),
@@ -349,7 +349,7 @@ class ServiceResource extends Resource
             ->registerListeners([
                 'status::update' => [
                     function (Forms\Components\Section $component): void {
-                        $component->evaluate(function (Closure $get, Closure $set) {
+                        $component->evaluate(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set) {
                             if ($get('status')) {
                                 $set('status')
                                     ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)));

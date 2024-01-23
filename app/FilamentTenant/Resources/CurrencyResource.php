@@ -10,7 +10,7 @@ use Domain\Currency\Actions\UpdateCurrencyEnabledAction;
 use Domain\Currency\Models\Currency;
 use Exception;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 
 class CurrencyResource extends Resource

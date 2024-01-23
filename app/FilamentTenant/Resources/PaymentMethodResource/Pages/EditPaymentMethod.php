@@ -23,7 +23,7 @@ class EditPaymentMethod extends EditRecord
 
     protected static string $resource = PaymentMethodResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         /** @var PaymentMethod */
         $record = $this->record;

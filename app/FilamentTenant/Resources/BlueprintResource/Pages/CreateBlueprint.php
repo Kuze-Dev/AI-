@@ -20,7 +20,7 @@ class CreateBlueprint extends CreateRecord
 
     protected static string $resource = BlueprintResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

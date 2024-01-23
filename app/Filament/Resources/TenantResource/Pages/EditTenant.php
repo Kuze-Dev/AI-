@@ -22,7 +22,7 @@ class EditTenant extends EditRecord
 
     protected static string $resource = TenantResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -34,7 +34,7 @@ class EditTenant extends EditRecord
 
                     return Action::makeModalAction('redirect')
                         ->label(trans('Cancel & Revert Changes'))
-                        ->color('secondary')
+                        ->color('gray')
                         ->url(TenantResource::getUrl('edit', [$this->record]));
                 })
                 ->modalHeading(fn ($livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)

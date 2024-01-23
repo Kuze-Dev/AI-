@@ -13,10 +13,10 @@ use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Facades\Filament;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +32,7 @@ class ServiceBillResource extends Resource
 
     protected static ?string $slug = 'service-bills';
 
-    public static function getRouteBaseName(): string
+    public static function getRouteBaseName(?string $panel = null): string
     {
         return Filament::currentContext().'.resources.service-orders.service-bills';
     }
@@ -136,7 +136,7 @@ class ServiceBillResource extends Resource
                         }
                     )
                     ->translateLabel()
-                    ->color('secondary')
+                    ->color('gray')
                     ->disabled()
                     ->visible(
                         function (RelationManager $livewire) {

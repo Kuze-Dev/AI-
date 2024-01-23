@@ -36,7 +36,7 @@ class EditService extends EditRecord
     }
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')

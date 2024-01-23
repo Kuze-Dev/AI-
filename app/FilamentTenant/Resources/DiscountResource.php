@@ -31,9 +31,9 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TextInput\Mask;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -168,7 +168,7 @@ class DiscountResource extends Resource
                                     isSigned: false
                                 ))
                                 ->minValue(1)
-                                ->rules(['max:100'], fn (Closure $get) => $get('discountCondition.amount_type') === 'percentage')
+                                ->rules(['max:100'], fn (\Filament\Forms\Get $get) => $get('discountCondition.amount_type') === 'percentage')
                                 ->formatStateUsing(fn ($record) => $record?->discountCondition()->withTrashed()->first()?->amount)
                                 ->label(trans('Discount Amount')),
                         ]),

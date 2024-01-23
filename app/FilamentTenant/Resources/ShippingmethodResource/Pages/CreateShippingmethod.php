@@ -19,7 +19,7 @@ class CreateShippingmethod extends CreateRecord
 
     protected static string $resource = ShippingmethodResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

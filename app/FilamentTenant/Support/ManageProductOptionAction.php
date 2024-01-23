@@ -142,7 +142,7 @@ class ManageProductOptionAction
                                 ->translateLabel()
                                 ->maxLength(100)
                                 ->columnSpan(
-                                    function (Closure $get) {
+                                    function (\Filament\Forms\Get $get) {
                                         return ! is_null($get('id'))
                                             ? ($get('../*')[0]['id'] !== $get('id') ? 2 : 1)
                                             : (count($get('../*')) === 1 ? 1 : 2);
@@ -154,7 +154,7 @@ class ManageProductOptionAction
                                     fn ($state) => $state ? ucfirst(trans('Custom')) : ucfirst(trans('Regular'))
                                 )
                                 ->hidden(
-                                    function (Closure $get) {
+                                    function (\Filament\Forms\Get $get) {
                                         return ! is_null($get('id'))
                                             ? ($get('../*')[0]['id'] !== $get('id'))
                                             : (count($get('../*')) === 1 ? false : true);

@@ -15,7 +15,7 @@ class Dashboard extends BaseDashboard
 
     protected static string $view = 'filament.pages.dashboard';
 
-    protected function getWidgets(): array
+    public function getWidgets(): array
     {
         return [
             AccountWidget::class,

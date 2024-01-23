@@ -50,7 +50,7 @@ class EditContentEntry extends EditRecord
      *
      * @param  mixed  $record
      */
-    public function mount($record, string $ownerRecord = ''): void
+    public function mount(int | string $record, string $ownerRecord = ''): void
     {
         $this->ownerRecord = app(Content::class)
             ->resolveRouteBinding($ownerRecord)
@@ -75,7 +75,7 @@ class EditContentEntry extends EditRecord
         return $record;
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             'content_entries_group_actions' => CustomPageActionGroup::make([
@@ -105,7 +105,7 @@ class EditContentEntry extends EditRecord
                     ->modalCancelAction(function () {
                         return Action::makeModalAction('redirect')
                             ->label(trans('Edit Existing Draft'))
-                            ->color('secondary')
+                            ->color('gray')
                             ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft]));
                     })
                     ->hidden(function () {
@@ -127,7 +127,7 @@ class EditContentEntry extends EditRecord
             Actions\DeleteAction::make(),
             'other_page_actions' => CustomPageActionGroup::make([
                 Action::make('preview')
-                    ->color('secondary')
+                    ->color('gray')
                     ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                     ->label(trans('Preview Page'))
                     ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
@@ -144,7 +144,7 @@ class EditContentEntry extends EditRecord
                 Action::make('preview_microsite_action')
                     ->label('Preview Microsite')
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
-                    ->color('secondary')
+                    ->color('gray')
                     ->record($this->getRecord())
                     ->modalHeading('Preview Microsite')
                     ->slideOver(true)
@@ -180,7 +180,7 @@ class EditContentEntry extends EditRecord
                                 return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
                             })
                             ->reactive()
-                            ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+                            ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
 
                                 /** @var Site */
                                 $site = Site::find($state);
@@ -206,7 +206,7 @@ class EditContentEntry extends EditRecord
 
             ])->view('filament.pages.actions.custom-action-group.index')
                 ->setName('other_page_draft')
-                ->color('secondary')
+                ->color('gray')
                 ->label(trans('More Actions')),
         ];
     }
@@ -298,7 +298,7 @@ class EditContentEntry extends EditRecord
             ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
 

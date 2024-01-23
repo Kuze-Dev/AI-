@@ -49,7 +49,7 @@ class Account extends Page
         $this->afterFill();
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         return [
             url()->current() => $this->getTitle(),
@@ -57,7 +57,7 @@ class Account extends Page
         ];
     }
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return trans('My Account');
     }

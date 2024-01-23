@@ -24,7 +24,7 @@ class EditTaxZone extends EditRecord
 
     protected static string $resource = TaxZoneResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')

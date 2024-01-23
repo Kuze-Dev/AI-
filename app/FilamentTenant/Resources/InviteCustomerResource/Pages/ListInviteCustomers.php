@@ -23,7 +23,7 @@ class ListInviteCustomers extends ListCustomers
     protected static string $resource = InviteCustomerResource::class;
 
     /** @throws \Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             ImportAction::make()
@@ -58,7 +58,7 @@ class ListInviteCustomers extends ListCustomers
                 ),
             Actions\Action::make('send-register-invitation')
                 ->translateLabel()
-                ->icon('heroicon-o-speakerphone')
+                ->icon('heroicon-o-megaphone')
                 ->form(fn () => [
                     Forms\Components\CheckboxList::make('register_status')
                         ->translateLabel()

@@ -60,7 +60,7 @@ class MetaDataForm extends Section
                     return $media?->getUrl();
                 }),
             Forms\Components\TextInput::make('image_alt_text')
-                ->visible(fn (Closure $get) => filled($get('image')))
+                ->visible(fn (\Filament\Forms\Get $get) => filled($get('image')))
                 ->formatStateUsing(fn ($record) => $record?->metaData?->getFirstMedia('image')?->getCustomProperty('alt_text')),
         ]);
     }

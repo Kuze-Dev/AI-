@@ -31,9 +31,9 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -70,19 +70,19 @@ class ServiceOrderResource extends Resource
                                 ->reactive(),
                             Forms\Components\Group::make()->columns(2)->schema([
                                 Placeholder::make('first_name')
-                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()?->first_name
                                         : ''),
                                 Placeholder::make('last_name')
-                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()?->last_name
                                         : ''),
                                 Placeholder::make('email')
-                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()?->email
                                         : ''),
                                 Placeholder::make('mobile')
-                                    ->content(fn (Closure $get) => ($customerId = $get('customer_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($customerId = $get('customer_id'))
                                         ? Customer::whereId($customerId)->first()?->mobile
                                         : ''),
                             ])->visible(
@@ -102,25 +102,25 @@ class ServiceOrderResource extends Resource
                                 ->optionsFromModel(
                                     Address::class,
                                     'address_line_1',
-                                    fn (Builder $query, Closure $get) => $query->where('customer_id', $get('customer_id'))
+                                    fn (Builder $query, \Filament\Forms\Get $get) => $query->where('customer_id', $get('customer_id'))
                                 )
                                 ->reactive(),
 
                             Forms\Components\Group::make()->columns(2)->schema([
                                 Placeholder::make('country')
-                                    ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($addressId = $get('service_address_id'))
                                         ? Address::whereId($addressId)->first()?->state->country->name
                                         : ''),
                                 Placeholder::make('state')
-                                    ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($addressId = $get('service_address_id'))
                                         ? Address::whereId($addressId)->first()?->state->name
                                         : ''),
                                 Placeholder::make('City/Province')
-                                    ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($addressId = $get('service_address_id'))
                                         ? Address::whereId($addressId)->first()?->city
                                         : ''),
                                 Placeholder::make('Zip')
-                                    ->content(fn (Closure $get) => ($addressId = $get('service_address_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($addressId = $get('service_address_id'))
                                         ? Address::whereId($addressId)->first()?->zip_code
                                         : ''),
                                 Checkbox::make('is_same_as_billing')->reactive()->label('Same as Billing Address')->default(true),
@@ -144,25 +144,25 @@ class ServiceOrderResource extends Resource
                                 ->optionsFromModel(
                                     Address::class,
                                     'address_line_1',
-                                    fn (Builder $query, Closure $get) => $query->where('customer_id', $get('customer_id'))
+                                    fn (Builder $query, \Filament\Forms\Get $get) => $query->where('customer_id', $get('customer_id'))
                                 )
                                 ->reactive(),
 
                             Forms\Components\Group::make()->columns(2)->schema([
                                 Placeholder::make('country')
-                                    ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($addressId = $get('billing_address_id'))
                                         ? Address::whereId($addressId)->first()?->state->country->name
                                         : ''),
                                 Placeholder::make('state')
-                                    ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($addressId = $get('billing_address_id'))
                                         ? Address::whereId($addressId)->first()?->state->name
                                         : ''),
                                 Placeholder::make('City/Province')
-                                    ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($addressId = $get('billing_address_id'))
                                         ? Address::whereId($addressId)->first()?->city
                                         : ''),
                                 Placeholder::make('Zip')
-                                    ->content(fn (Closure $get) => ($addressId = $get('billing_address_id'))
+                                    ->content(fn (\Filament\Forms\Get $get) => ($addressId = $get('billing_address_id'))
                                         ? Address::whereId($addressId)->first()?->zip_code
                                         : ''),
                             ])->visible(
@@ -196,26 +196,26 @@ class ServiceOrderResource extends Resource
                                     ->default(now())
                                     ->timezone(Auth::user()?->timezone)
                                     ->visible(
-                                        fn (Closure $get) => ! Service::whereId($get('service_id'))->first()?->is_subscription
+                                        fn (\Filament\Forms\Get $get) => ! Service::whereId($get('service_id'))->first()?->is_subscription
                                     ),
 
                                 Forms\Components\Group::make()->columnSpan(2)->schema([
                                     Forms\Components\Fieldset::make('')->schema([
                                         Placeholder::make('Service')
-                                            ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                            ->content(fn (\Filament\Forms\Get $get) => ($serviceId = $get('service_id'))
                                                 ? Service::whereId($serviceId)->first()?->name
                                                 : ''),
                                         Placeholder::make('Service Price')
-                                            ->content(fn (Closure $get) => self::currencyFormat($get, 'servicePrice')),
+                                            ->content(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'servicePrice')),
                                         Forms\Components\Group::make()->columnSpan(2)->columns(2)->visible(
-                                            fn (Closure $get) => Service::whereId($get('service_id'))->first()?->is_subscription
+                                            fn (\Filament\Forms\Get $get) => Service::whereId($get('service_id'))->first()?->is_subscription
                                         )->schema([
                                             Placeholder::make('Billing Schedule')
-                                                ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                                ->content(fn (\Filament\Forms\Get $get) => ($serviceId = $get('service_id'))
                                                     ? ucfirst(Service::whereId($serviceId)->first()?->billing_cycle->value ?? '')
                                                     : ''),
                                             Placeholder::make('Due Date every')
-                                                ->content(fn (Closure $get) => ($serviceId = $get('service_id'))
+                                                ->content(fn (\Filament\Forms\Get $get) => ($serviceId = $get('service_id'))
                                                     ? self::ordinalNumber(Service::whereId($serviceId)->first()?->due_date_every ?? 0).' days after billing date'
                                                     : ''),
                                         ]),
@@ -260,9 +260,9 @@ class ServiceOrderResource extends Resource
                     Forms\Components\Section::make('Form Title')
                         ->schema([
                             SchemaFormBuilder::make('form', fn (?Service $record) => $record?->blueprint?->schema)
-                                ->schemaData(fn (Closure $get) => Service::whereId($get('service_id'))->first()?->blueprint?->schema),
+                                ->schemaData(fn (\Filament\Forms\Get $get) => Service::whereId($get('service_id'))->first()?->blueprint?->schema),
                         ])
-                        ->hidden(fn (Closure $get) => $get('service_id') === null)
+                        ->hidden(fn (\Filament\Forms\Get $get) => $get('service_id') === null)
                         ->columnSpan(2),
                 ])->columnSpan(2),
 
@@ -278,7 +278,7 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => self::currencyFormat($get, 'servicePrice'))
+                                ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'servicePrice'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -290,7 +290,7 @@ class ServiceOrderResource extends Resource
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => self::currencyFormat($get, 'additionalCharges'))
+                                ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'additionalCharges'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -298,13 +298,13 @@ class ServiceOrderResource extends Resource
                             Forms\Components\Group::make()->columns(2)->columnSpan(2)->schema([
 
                                 TextLabel::make('')
-                                    ->label(fn (Closure $get) => self::currencyFormat($get, 'taxPercentage'))
+                                    ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'taxPercentage'))
                                     ->alignLeft()
                                     ->size('md')
                                     ->inline()
                                     ->readOnly(),
                                 TextLabel::make('')
-                                    ->label(fn (Closure $get) => self::currencyFormat($get, 'taxTotal'))
+                                    ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'taxTotal'))
                                     ->alignRight()
                                     ->size('md')
                                     ->inline()
@@ -322,7 +322,7 @@ class ServiceOrderResource extends Resource
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (Closure $get) => self::currencyFormat($get, 'totalPrice'))
+                                ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'totalPrice'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()

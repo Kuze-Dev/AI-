@@ -79,7 +79,7 @@ class FilamentServiceProvider extends ServiceProvider
                 NavigationGroup::make('Access')
                     ->icon('heroicon-s-lock-closed'),
                 NavigationGroup::make('System')
-                    ->icon('heroicon-s-exclamation'),
+                    ->icon('heroicon-m-exclamation-triangle'),
             ]);
         });
 
@@ -452,7 +452,7 @@ class FilamentServiceProvider extends ServiceProvider
 
     protected function configureComponents(): void
     {
-        PageActions\CreateAction::configureUsing(fn (PageActions\CreateAction $action) => $action->icon('heroicon-o-plus-sm'));
+        PageActions\CreateAction::configureUsing(fn (PageActions\CreateAction $action) => $action->icon('heroicon-o-plus-small'));
         PageActions\DeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
         PageActions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);
         PageActions\ForceDeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);

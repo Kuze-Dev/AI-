@@ -33,7 +33,7 @@ class CreateTenant extends CreateRecord
         $this->validate();
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

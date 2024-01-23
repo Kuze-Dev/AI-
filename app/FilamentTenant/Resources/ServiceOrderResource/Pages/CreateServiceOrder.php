@@ -27,7 +27,7 @@ class CreateServiceOrder extends CreateRecord
         );
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')

@@ -7,9 +7,9 @@ namespace App\Filament\Resources\ActivityResource\RelationManagers;
 use App\Filament\Resources\ActivityResource;
 use Closure;
 use Exception;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables\Actions\ViewAction;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
@@ -22,13 +22,13 @@ class ActivitiesRelationManager extends RelationManager
     protected static ?string $recordTitleAttribute = 'description';
 
     /** @throws Exception */
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return ActivityResource::form($form);
     }
 
     /** @throws Exception */
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return ActivityResource::table($table)
             ->actions([

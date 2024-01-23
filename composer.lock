@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8953aaf19feb6638e85e060f9f4e0ec8",
+    "content-hash": "1b1283511ea9f79e2a0632c85bceb9db",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -13319,21 +13319,20 @@
         },
         {
             "name": "driftingly/rector-laravel",
-            "version": "0.30.0",
+            "version": "0.27.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/driftingly/rector-laravel.git",
-                "reference": "871a5921177be5f493646d4a22998c8aa3eedebc"
+                "reference": "2a73790294cf302c2959bff16319e794280ddad0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/871a5921177be5f493646d4a22998c8aa3eedebc",
-                "reference": "871a5921177be5f493646d4a22998c8aa3eedebc",
+                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/2a73790294cf302c2959bff16319e794280ddad0",
+                "reference": "2a73790294cf302c2959bff16319e794280ddad0",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2 || ^8.0",
-                "rector/rector": "^0.19.0"
+                "php": "^7.2 || ^8.0"
             },
             "type": "rector-extension",
             "autoload": {
@@ -13348,9 +13347,9 @@
             "description": "Rector upgrades rules for Laravel Framework",
             "support": {
                 "issues": "https://github.com/driftingly/rector-laravel/issues",
-                "source": "https://github.com/driftingly/rector-laravel/tree/0.30.0"
+                "source": "https://github.com/driftingly/rector-laravel/tree/0.27.0"
             },
-            "time": "2024-01-11T18:11:35+00:00"
+            "time": "2024-01-03T23:40:50+00:00"
         },
         {
             "name": "fidry/cpu-core-counter",
@@ -13412,6 +13411,46 @@
                 }
             ],
             "time": "2023-09-17T21:38:23+00:00"
+        },
+        {
+            "name": "filament/upgrade",
+            "version": "v3.2.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/filamentphp/upgrade.git",
+                "reference": "7609a2d753a423a559cc3175350b0c1b039defbd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/filamentphp/upgrade/zipball/7609a2d753a423a559cc3175350b0c1b039defbd",
+                "reference": "7609a2d753a423a559cc3175350b0c1b039defbd",
+                "shasum": ""
+            },
+            "require": {
+                "nunomaduro/termwind": "^1.0",
+                "php": "^8.1",
+                "rector/rector": "^0.17"
+            },
+            "bin": [
+                "bin/filament-v3"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Filament\\Upgrade\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Upgrade Filament v2 code to Filament v3.",
+            "homepage": "https://github.com/filamentphp/filament",
+            "support": {
+                "issues": "https://github.com/filamentphp/filament/issues",
+                "source": "https://github.com/filamentphp/filament"
+            },
+            "time": "2024-01-15T20:39:03+00:00"
         },
         {
             "name": "filp/whoops",
@@ -15525,21 +15564,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.19.2",
+            "version": "0.17.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "bc96a99895bf47c6bfe70ea1b799f0081ed5a903"
+                "reference": "e2003ba7c5bda06d7bb419cf4be8dae5f8672132"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/bc96a99895bf47c6bfe70ea1b799f0081ed5a903",
-                "reference": "bc96a99895bf47c6bfe70ea1b799f0081ed5a903",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/e2003ba7c5bda06d7bb419cf4be8dae5f8672132",
+                "reference": "e2003ba7c5bda06d7bb419cf4be8dae5f8672132",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.10.56"
+                "phpstan/phpstan": "^1.10.26"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -15569,7 +15608,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.19.2"
+                "source": "https://github.com/rectorphp/rector/tree/0.17.13"
             },
             "funding": [
                 {
@@ -15577,7 +15616,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-01-19T10:58:30+00:00"
+            "time": "2023-08-14T16:33:29+00:00"
         },
         {
             "name": "sebastian/cli-parser",

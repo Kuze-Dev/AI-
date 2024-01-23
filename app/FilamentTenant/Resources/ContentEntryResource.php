@@ -19,9 +19,9 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -45,7 +45,7 @@ class ContentEntryResource extends Resource
 
     protected static ?string $slug = 'entries';
 
-    public static function getRouteBaseName(): string
+    public static function getRouteBaseName(?string $panel = null): string
     {
         return Filament::currentContext().'.resources.contents.entries';
     }
@@ -80,7 +80,7 @@ class ContentEntryResource extends Resource
     }
 
     /** @return Builder<ContentEntry> */
-    protected static function getGlobalSearchEloquentQuery(): Builder
+    public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->with('content');
     }
@@ -126,7 +126,7 @@ class ContentEntryResource extends Resource
                             ->searchable()
                             ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
-                            ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
+                            ->afterStateUpdated(function (Forms\Components\Select $component, \Filament\Forms\Get $get) {
                                 $component->getContainer()
                                     ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                     ?->dispatchEvent('route_url::update');
@@ -138,7 +138,7 @@ class ContentEntryResource extends Resource
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                            ->rule(fn (?ContentEntry $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                            ->rule(fn (?ContentEntry $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(function ($livewire) {
 
                                 /** @var \Domain\Admin\Models\Admin */
@@ -193,7 +193,7 @@ class ContentEntryResource extends Resource
                                 )
                                 ->dehydrated(false),
                             Forms\Components\Hidden::make('taxonomy_terms')
-                                ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
+                                ->dehydrateStateUsing(fn (\Filament\Forms\Get $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                         ])
                         ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())),
                     Forms\Components\Section::make(trans('Publishing'))
@@ -292,8 +292,8 @@ class ContentEntryResource extends Resource
                                     ->mapWithKeys(fn (int $month) => [$month => now()->month($month)->format('F')])
                                     ->toArray()
                             )
-                            ->disabled(fn (Closure $get) => blank($get('published_at_year')))
-                            ->helperText(fn (Closure $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
+                            ->disabled(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')))
+                            ->helperText(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
                     ])
                     ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->when(
                         filled($data['published_at_year']),

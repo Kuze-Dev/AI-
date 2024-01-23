@@ -21,9 +21,9 @@ use Domain\Product\Models\Product;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
@@ -169,8 +169,8 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
-                                ->hidden(fn (Closure $get) => ! $get('allow_stocks'))
-                                ->required(fn (Closure $get) => $get('allow_stocks')),
+                                ->hidden(fn (\Filament\Forms\Get $get) => ! $get('allow_stocks'))
+                                ->required(fn (\Filament\Forms\Get $get) => $get('allow_stocks')),
                         ])->columns(2),
                     Forms\Components\Section::make('Pricing')
                         ->translateLabel()
@@ -263,7 +263,7 @@ class ProductResource extends Resource
                                         )
                                         ->dehydrated(false),
                                     Forms\Components\Hidden::make('taxonomy_terms')
-                                        ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
+                                        ->dehydrateStateUsing(fn (\Filament\Forms\Get $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
                                 ->when(fn () => ! empty($taxonomies->toArray())),
                         ]),

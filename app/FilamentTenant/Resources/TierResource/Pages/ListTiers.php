@@ -14,7 +14,7 @@ class ListTiers extends ListRecords
     protected static string $resource = TierResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),

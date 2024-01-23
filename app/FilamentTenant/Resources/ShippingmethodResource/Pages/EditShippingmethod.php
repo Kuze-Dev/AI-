@@ -22,7 +22,7 @@ class EditShippingmethod extends EditRecord
 
     protected static string $resource = ShippingmethodResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
 
         $drivers = app(GetAvailableShippingDriverAction::class)->execute();

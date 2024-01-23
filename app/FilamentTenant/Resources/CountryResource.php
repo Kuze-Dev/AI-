@@ -9,7 +9,7 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Address\Models\Country;
 use Exception;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 
 class CountryResource extends Resource
@@ -20,7 +20,7 @@ class CountryResource extends Resource
 
     protected static ?string $navigationGroup = 'eCommerce';
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-americas';
 
     protected static ?string $recordTitleAttribute = 'name';
 

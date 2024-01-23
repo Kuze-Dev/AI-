@@ -10,7 +10,7 @@ use Exception;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasRelationshipTable;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +26,7 @@ class TiersRelationManager extends RelationManager
     protected static ?string $title = 'Tier Discounts';
 
     /** @throws Exception */
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         $tiers = Tier::all();
 

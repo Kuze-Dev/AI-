@@ -23,7 +23,7 @@ class EditBlock extends EditRecord
     protected static string $resource = BlockResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')

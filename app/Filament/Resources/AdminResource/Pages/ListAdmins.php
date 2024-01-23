@@ -25,7 +25,7 @@ class ListAdmins extends ListRecords
     protected static string $resource = AdminResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             ImportAction::make()

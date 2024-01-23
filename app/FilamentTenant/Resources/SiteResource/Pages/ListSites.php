@@ -31,7 +31,7 @@ class ListSites extends ListRecords
         });
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),
