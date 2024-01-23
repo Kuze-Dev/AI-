@@ -13,6 +13,7 @@ use Domain\Auth\TwoFactorAuthenticatable;
 use Domain\Site\Models\Site;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -163,7 +164,7 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         return $this->full_name;
     }
 
-    public function canAccessFilament(): bool
+    public function canAccessPanel(Panel $panel): bool
     {
         return true;
     }

@@ -174,7 +174,7 @@ return [
         App\Providers\FilamentServiceProvider::class,
         App\Providers\HealthCheckServiceProvider::class,
         App\Providers\TenancyServiceProvider::class,
-        App\Providers\FilamentTenantServiceProvider::class,
+//        App\Providers\FilamentTenantServiceProvider::class,
         App\Providers\AboutServiceProvider::class,
 
         /*

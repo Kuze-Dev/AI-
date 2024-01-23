@@ -15,6 +15,7 @@ use App\Filament\Pages\Auth\Account;
 use Closure;
 use Domain\Admin\Models\Admin;
 use Exception;
+use Filament\Actions\MountableAction;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Navigation\NavigationGroup;
@@ -48,40 +49,40 @@ class FilamentServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Filament::serving(function () {
-            /** @phpstan-ignore-next-line `pushMeta()` is defined in the facade's accessor but not doc blocked. */
-            Filament::pushMeta([
-                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="'.asset('/apple-touch-icon.png').'">'),
-                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="'.asset('/favicon-32x32.png').'">'),
-                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="'.asset('/favicon-16x16.png').'">'),
-                new HtmlString('<link rel="manifest" href="'.asset('/site.webmanifest').'">'),
-                new HtmlString('<link rel="mask-icon" href="'.asset('/safari-pinned-tab.svg').'" color="#5bbad5">'),
-                new HtmlString('<meta name="msapplication-TileColor" content="#da532c">'),
-                new HtmlString('<meta name="theme-color" content="#ffffff">'),
-            ]);
-
-            Filament::registerViteTheme('resources/css/filament/app.css');
-
-            if (Filament::currentContext() !== 'filament') {
-                return;
-            }
-
-            Filament::registerUserMenuItems([
-                'account' => UserMenuItem::make()
-                    ->url(
-                        Filament::auth()->user()?->isZeroDayAdmin()
-                            ? null
-                            : Account::getUrl()
-                    ),
-            ]);
-
-            Filament::registerNavigationGroups([
-                NavigationGroup::make('Access')
-                    ->icon('heroicon-s-lock-closed'),
-                NavigationGroup::make('System')
-                    ->icon('heroicon-m-exclamation-triangle'),
-            ]);
-        });
+//        Filament::serving(function () {
+//            /** @phpstan-ignore-next-line `pushMeta()` is defined in the facade's accessor but not doc blocked. */
+//            Filament::pushMeta([
+//                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="'.asset('/apple-touch-icon.png').'">'),
+//                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="'.asset('/favicon-32x32.png').'">'),
+//                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="'.asset('/favicon-16x16.png').'">'),
+//                new HtmlString('<link rel="manifest" href="'.asset('/site.webmanifest').'">'),
+//                new HtmlString('<link rel="mask-icon" href="'.asset('/safari-pinned-tab.svg').'" color="#5bbad5">'),
+//                new HtmlString('<meta name="msapplication-TileColor" content="#da532c">'),
+//                new HtmlString('<meta name="theme-color" content="#ffffff">'),
+//            ]);
+//
+//            Filament::registerViteTheme('resources/css/filament/app.css');
+//
+//            if (Filament::currentContext() !== 'filament') {
+//                return;
+//            }
+//
+//            Filament::registerUserMenuItems([
+//                'account' => UserMenuItem::make()
+//                    ->url(
+//                        Filament::auth()->user()?->isZeroDayAdmin()
+//                            ? null
+//                            : Account::getUrl()
+//                    ),
+//            ]);
+//
+//            Filament::registerNavigationGroups([
+//                NavigationGroup::make('Access')
+//                    ->icon('heroicon-s-lock-closed'),
+//                NavigationGroup::make('System')
+//                    ->icon('heroicon-m-exclamation-triangle'),
+//            ]);
+//        });
 
         Filament::registerRenderHook(
             'footer.start',
@@ -100,12 +101,10 @@ class FilamentServiceProvider extends ServiceProvider
                 HTML,
         );
 
-        Filament::registerRenderHook(
-            'head.end',
-            fn () => Vite::withEntryPoints(['resources/js/filament/app.js'])->toHtml(),
-        );
-
-        ViewLog::can(fn (?Admin $admin) => $admin?->hasRole(config('domain.role.super_admin')));
+//        Filament::registerRenderHook(
+//            'head.end',
+//            fn () => Vite::withEntryPoints(['resources/js/filament/app.js'])->toHtml(),
+//        );
 
         $this->registerRoutes();
 
@@ -165,7 +164,7 @@ class FilamentServiceProvider extends ServiceProvider
 
     protected function registerMacros(): void
     {
-        SupportActions\Action::macro(
+        MountableAction::macro(
             'withActivityLog',
             function (
                 string $logName = 'admin',
@@ -173,9 +172,9 @@ class FilamentServiceProvider extends ServiceProvider
                 Closure|string|null $description = null,
                 Closure|array|null $properties = null,
                 Model|int|string|null $causedBy = null,
-            ): SupportActions\Action {
-                /** @var SupportActions\Action $this */
-                return $this->after(function (SupportActions\Action $action) use ($logName, $event, $description, $properties, $causedBy) {
+            ): MountableAction {
+                /** @var MountableAction $this */
+                return $this->after(function (MountableAction $action) use ($logName, $event, $description, $properties, $causedBy) {
                     $event = $action->evaluate($event) ?? $action->getName();
                     $properties = $action->evaluate($properties);
                     $description = Str::headline($action->evaluate($description ?? $event) ?? $action->getName());

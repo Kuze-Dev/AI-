@@ -20,7 +20,7 @@ class CreateTenant extends CreateRecord
 
     protected static string $resource = TenantResource::class;
 
-    protected function getRules(): array
+    public function getRules(): array
     {
         return tap(
             parent::getRules(),

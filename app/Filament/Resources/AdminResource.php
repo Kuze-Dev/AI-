@@ -32,7 +32,7 @@ class AdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    protected static string|array $$routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
+    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
 
     protected static ?string $recordTitleAttribute = 'full_name';
 

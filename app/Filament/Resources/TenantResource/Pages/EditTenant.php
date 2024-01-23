@@ -47,7 +47,7 @@ class EditTenant extends EditRecord
         ];
     }
 
-    protected function getRules(): array
+    public function getRules(): array
     {
         return tap(
             parent::getRules(),

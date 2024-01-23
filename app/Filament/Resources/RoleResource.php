@@ -36,7 +36,7 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static string|array $$routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
+    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
 
     public static function getGloballySearchableAttributes(): array
     {

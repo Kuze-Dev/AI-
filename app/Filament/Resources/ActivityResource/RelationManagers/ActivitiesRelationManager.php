@@ -51,11 +51,4 @@ class ActivitiesRelationManager extends RelationManager
         return false;
     }
 
-    protected function getTableHeading(): string|Htmlable|Closure|null
-    {
-        return (string) Str::of($this->getOwnerRecord()::class)
-            ->classBasename()
-            ->headline()
-            ->append(' '.static::getTitle());
-    }
 }

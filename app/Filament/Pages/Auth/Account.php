@@ -23,7 +23,7 @@ use Illuminate\Validation\Rules\Password;
  */
 class Account extends Page
 {
-    use HasFormActions;
+//    use HasFormActions;
     use LogsFormActivity;
 
     protected static string $view = 'filament.pages.auth.account';

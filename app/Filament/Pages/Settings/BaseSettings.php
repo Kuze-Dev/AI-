@@ -43,7 +43,7 @@ abstract class BaseSettings extends SettingsPage
         ];
     }
 
-    protected function getFormActions(): array
+    public function getFormActions(): array
     {
         return $this->getCachedActions();
     }
