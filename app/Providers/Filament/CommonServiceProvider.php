@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Providers;
+namespace App\Providers\Filament;
 
 use App\Filament\Livewire\Auth\AccountDeactivatedNotice;
 use App\Filament\Livewire\Auth\ConfirmPassword;
@@ -11,15 +11,11 @@ use App\Filament\Livewire\Auth\RequestPasswordReset;
 use App\Filament\Livewire\Auth\ResetPassword;
 use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Livewire\Auth\VerifyEmail;
-use App\Filament\Pages\Auth\Account;
 use Closure;
-use Domain\Admin\Models\Admin;
 use Exception;
 use Filament\Actions\MountableAction;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Navigation\NavigationGroup;
-use Filament\Navigation\UserMenuItem;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions as PageActions;
 use Filament\Pages\Page;
@@ -27,7 +23,6 @@ use Filament\Support\Actions as SupportActions;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -41,7 +36,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
 /** @property \Illuminate\Foundation\Application $app */
-class FilamentServiceProvider extends ServiceProvider
+class CommonServiceProvider extends ServiceProvider
 {
     public function register(): void
     {

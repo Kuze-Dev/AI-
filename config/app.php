@@ -171,10 +171,10 @@ return [
         App\Providers\HorizonServiceProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\FilamentServiceProvider::class,
+        \App\Providers\Filament\CommonServiceProvider::class,
         App\Providers\HealthCheckServiceProvider::class,
         App\Providers\TenancyServiceProvider::class,
-//        App\Providers\FilamentTenantServiceProvider::class,
+//        App\Providers\Filament\FilamentTenantServiceProvider::class,
         App\Providers\AboutServiceProvider::class,
 
         /*

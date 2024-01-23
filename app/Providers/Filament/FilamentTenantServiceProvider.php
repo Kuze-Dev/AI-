@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Providers;
+namespace App\Providers\Filament;
 
 use App\FilamentTenant\Livewire\Auth;
 use App\FilamentTenant\Middleware\Authenticate;
