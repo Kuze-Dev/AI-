@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
+            ->domain(config('tenancy.central_domains')[0])
             ->databaseNotifications()
             ->middleware([
                 EncryptCookies::class,
