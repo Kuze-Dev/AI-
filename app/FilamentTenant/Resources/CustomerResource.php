@@ -17,11 +17,13 @@ use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Export\Exports;
+use Domain\Customer\Exports\CustomerExporter;
 use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Exception;
+use Filament\Actions\ExportAction;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -30,6 +32,7 @@ use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -314,7 +317,25 @@ class CustomerResource extends Resource
                 ]),
             ])
             ->bulkActions([
-                Exports::tableBulk([RegisterStatus::REGISTERED]),
+                // TODO: export only RegisterStatus::REGISTERED
+                Tables\Actions\ExportBulkAction::make()
+                    ->exporter(CustomerExporter::class)
+//                ->authorize() // TODO: authorize customer export
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Customer $model): Customer {
+                                        if ($model instanceof Customer) {
+                                            return $model;
+                                        }
+                                        return Customer::whereKey($model)->first();
+                                    }
+                                )
+                        ]
+                    ),
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize('delete'),
                 Tables\Actions\ForceDeleteBulkAction::make()

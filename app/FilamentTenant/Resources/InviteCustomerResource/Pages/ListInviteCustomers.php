@@ -10,11 +10,12 @@ use Domain\Customer\Actions\ImportCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Imports\CustomerImporter;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
+use Filament\Actions\ImportAction;
 use Filament\Forms;
 use Filament\Pages\Actions;
-use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -27,35 +28,10 @@ class ListInviteCustomers extends ListCustomers
     {
         return [
             ImportAction::make()
-                ->model(Customer::class)
-                ->uniqueBy('email')
-//                ->batchSize(100)
-//                ->chunkSize(100)
-                ->tags([
-                    'tenant:'.(tenant('id') ?? 'central'),
-                ])
-                ->processRowsUsing(
-                    fn (array $row): Customer => app(ImportCustomerAction::class)
-                        ->execute($row)
-                )
-                ->withValidation(
-                    rules: [
-                        'email' => [
-                            'required',
-                            Rule::email(),
-                            'distinct',
-                        ],
-                        'first_name' => 'nullable|string|min:3|max:100',
-                        'last_name' => 'nullable|string|min:3|max:100',
-                        'mobile' => 'nullable|min:3|max:100',
-                        'gender' => ['nullable', Rule::enum(Gender::class)],
-                        'birth_date' => 'nullable|date',
-                        'tier' => [
-                            'nullable',
-                            Rule::exists(Tier::class, 'name'),
-                        ],
-                    ],
-                ),
+                ->translateLabel()
+                ->importer(CustomerImporter::class),
+//                ->authorize()
+//                ->withActivityLog(),
             Actions\Action::make('send-register-invitation')
                 ->translateLabel()
                 ->icon('heroicon-o-megaphone')

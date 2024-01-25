@@ -22,6 +22,8 @@ use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
 use Livewire\Livewire;
 use Illuminate\Support\Facades\Route;
+use Filament\Actions\Exports\Http\Controllers\DownloadExport;
+use Filament\Actions\Imports\Http\Controllers\DownloadImportFailureCsv;
 
 /** @property \Illuminate\Foundation\Application $app */
 class TenancyServiceProvider extends ServiceProvider
@@ -138,7 +140,9 @@ class TenancyServiceProvider extends ServiceProvider
 
         TenantAssetsController::$tenancyMiddleware = 'tenant';
 
-        $this->prepareLivewireForTenancy();
+        $this->prepareLivewire();
+$this->prepareFilamentExport();
+
     }
 
     protected function bootEvents(): void
@@ -172,18 +176,40 @@ class TenancyServiceProvider extends ServiceProvider
         }
     }
 
-    private function prepareLivewireForTenancy(): void
+    private function prepareLivewire(): void
     {
         // https://github.dev/savannabits/filament-tenancy-starter
-        Livewire::setUpdateRoute(fn($handle) => Route::post('/livewire/update', $handle)
-            ->middleware(
-                [
+        // https://livewire.laravel.com/docs/security#applying-global-livewire-middleware
+        Livewire::setUpdateRoute(
+            fn(mixed $handle) => Route::post('/livewire/update', $handle)
+                ->middleware([
                     'web',
                     'universal',
                     Middleware\InitializeTenancyByDomain::class,
-                ]
-            )
-            ->name('livewire.update')
+                ])
+                ->name('livewire.update')
         );
+    }
+
+    public function prepareFilamentExport()
+    {
+
+        Route::get('/filament/exports/{export}/download', DownloadExport::class)
+            ->name('filament.exports.download')
+            ->middleware([
+                'web',
+                'universal',
+                Middleware\InitializeTenancyByDomain::class,
+                'auth'
+            ]);
+
+        Route::get('/filament/imports/{import}/failed-rows/download', DownloadImportFailureCsv::class)
+            ->name('filament.imports.failed-rows.download')
+            ->middleware([
+                'web',
+                'universal',
+                Middleware\InitializeTenancyByDomain::class,
+                'auth'
+            ]);
     }
 }

@@ -214,8 +214,14 @@ class CommonServiceProvider extends ServiceProvider
                     };
 
                     if ($action instanceof Tables\Actions\BulkAction) {
-                        foreach ($action->getRecords() ?? [] as $record) {
-                            $log($record);
+
+                        if ($action instanceof Tables\Actions\ExportBulkAction) {
+                            $MODEL = $action->getExporter()::getModel();
+                            $action->getRecords()
+                                ?->each(fn (int|string $modelKey) => $log($MODEL::find($modelKey)));
+                        } else {
+                            $action->getRecords()
+                                ?->each(fn (Model $model) => $log($model));
                         }
 
                         return;

@@ -256,7 +256,17 @@ class AdminResource extends Resource
                     ->withActivityLog(
                         event: 'bulk-exported',
                         description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
-                        properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
+                        properties: fn (ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Admin $model): Admin {
+                                        if ($model instanceof Admin) {
+                                            return $model;
+                                        }
+                                        return Admin::whereKey($model)->first();
+                                    }
+                                )
+                        ]
                     ),
             ])
             ->defaultSort('created_at', 'desc');

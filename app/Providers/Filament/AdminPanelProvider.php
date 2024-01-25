@@ -43,6 +43,8 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
             ])
             ->databaseNotifications()
+            ->sidebarCollapsibleOnDesktop()
+            ->maxContentWidth('full')
             ->domains(config('tenancy.central_domains'))
             ->persistentMiddleware(['universal'])
             ->middleware([
