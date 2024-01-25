@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Auth;
 
 class TaxZoneResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = TaxZone::class;
 

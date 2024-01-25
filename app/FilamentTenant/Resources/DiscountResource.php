@@ -52,7 +52,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Discount::class;
 

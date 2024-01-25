@@ -39,7 +39,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class CustomerResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Customer::class;
 

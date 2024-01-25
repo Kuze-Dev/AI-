@@ -27,7 +27,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ContentResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Content::class;
 

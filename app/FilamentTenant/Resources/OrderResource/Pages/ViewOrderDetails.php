@@ -23,7 +23,7 @@ class ViewOrderDetails extends ViewRecord
         return trans('Order Details #').$this->record->reference;
     }
 
-    protected function getRelationManagers(): array
+    public function getRelationManagers(): array
     {
         return [];
     }

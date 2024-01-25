@@ -10,7 +10,6 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 
 class RoleResource extends BaseRoleResource
 {
-    use ContextualResource;
 
     protected static string|array $middlewares = ['password.confirm:filament-tenant.auth.password.confirm'];
 

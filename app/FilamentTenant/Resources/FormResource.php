@@ -29,7 +29,6 @@ use Illuminate\Validation\Rules\Unique;
 
 class FormResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = FormModel::class;
 

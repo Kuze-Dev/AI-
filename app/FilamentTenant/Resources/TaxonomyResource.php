@@ -26,7 +26,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class TaxonomyResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Taxonomy::class;
 

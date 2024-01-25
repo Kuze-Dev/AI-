@@ -115,7 +115,8 @@
             "composer dumpautoload -o",
             "@php artisan optimize:clear --ansi",
             "@php artisan settings:clear-discovered --ansi",
-            "@php artisan settings:clear-cache --ansi"
+            "@php artisan settings:clear-cache --ansi",
+            "@php artisan icons:clear --ansi"
         ],
         "cache-all": [
             "composer dumpautoload -o",
@@ -123,7 +124,8 @@
             "@php artisan config:cache --ansi",
             "@php artisan route:cache --ansi",
             "@php artisan view:cache --ansi",
-            "@php artisan settings:discover --ansi"
+            "@php artisan settings:discover --ansi",
+            "@php artisan icons:cache --ansi"
         ],
         "reset": [
             "composer clear-all",

@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Route;
 
 class ServiceBillResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = ServiceBill::class;
 

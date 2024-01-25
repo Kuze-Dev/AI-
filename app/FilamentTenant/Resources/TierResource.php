@@ -27,7 +27,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class TierResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Tier::class;
 

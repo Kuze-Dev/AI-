@@ -32,7 +32,6 @@ use Throwable;
 
 class OrderResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $navigationGroup = 'eCommerce';
 

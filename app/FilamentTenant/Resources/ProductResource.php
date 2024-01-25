@@ -35,7 +35,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ProductResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $navigationGroup = 'eCommerce';
 

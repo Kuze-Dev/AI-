@@ -23,7 +23,6 @@ use Throwable;
 
 class SiteResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Site::class;
 

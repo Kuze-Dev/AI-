@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\File;
 
 class LocaleResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Locale::class;
 

@@ -11,7 +11,6 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    use ContextualPage;
 
     protected static string $view = 'filament.pages.dashboard';
 

@@ -9,12 +9,12 @@ use Filament\Facades\Filament;
 
 abstract class TenantBaseSettings extends BaseSettings
 {
-    public static function getRouteName(): string
+    public static function getRouteName(?string $panel = null): string
     {
         return Filament::currentContext().'.pages.settings.'.static::getSlug();
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         $breadcrumb = $this->getBreadcrumb();
 

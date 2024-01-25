@@ -26,7 +26,6 @@ use Illuminate\Validation\Rules\Unique;
 
 class GlobalsResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Globals::class;
 

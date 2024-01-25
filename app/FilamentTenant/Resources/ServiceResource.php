@@ -34,7 +34,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ServiceResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Service::class;
 

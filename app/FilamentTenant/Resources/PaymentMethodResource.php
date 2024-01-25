@@ -23,7 +23,6 @@ use Throwable;
 
 class PaymentMethodResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = PaymentMethod::class;
 

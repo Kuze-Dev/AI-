@@ -14,7 +14,6 @@ use Filament\Tables;
 
 class CountryResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Country::class;
 

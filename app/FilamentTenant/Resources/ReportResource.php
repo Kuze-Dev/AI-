@@ -10,7 +10,6 @@ use Filament\Resources\Resource;
 
 class ReportResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $navigationGroup = 'eCommerce';
 

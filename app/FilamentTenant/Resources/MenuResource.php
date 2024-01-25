@@ -32,7 +32,6 @@ use Illuminate\Validation\Rules\Unique;
 
 class MenuResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Menu::class;
 

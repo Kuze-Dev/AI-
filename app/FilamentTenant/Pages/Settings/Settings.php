@@ -9,5 +9,4 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualPage;
 
 class Settings extends BaseSettings
 {
-    use ContextualPage;
 }

@@ -37,7 +37,6 @@ use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 
 class PageResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Page::class;
 

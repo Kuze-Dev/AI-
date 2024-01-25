@@ -24,7 +24,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class BlockResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Block::class;
 

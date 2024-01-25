@@ -41,7 +41,6 @@ use Illuminate\Support\Str;
 
 class ServiceOrderResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = ServiceOrder::class;
 

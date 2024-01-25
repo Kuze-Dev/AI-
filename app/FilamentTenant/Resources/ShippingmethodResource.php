@@ -24,7 +24,6 @@ use Throwable;
 
 class ShippingmethodResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = ShippingMethod::class;
 

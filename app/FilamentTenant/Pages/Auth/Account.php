@@ -8,5 +8,4 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualPage;
 
 class Account extends \App\Filament\Pages\Auth\Account
 {
-    use ContextualPage;
 }

@@ -35,7 +35,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class BlueprintResource extends Resource
 {
-    use ContextualResource;
 
     protected static ?string $model = Blueprint::class;
 
