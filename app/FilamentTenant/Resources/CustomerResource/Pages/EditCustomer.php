@@ -39,7 +39,7 @@ class EditCustomer extends EditRecord
         return [
 
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation(
                     fn ($livewire) => $livewire
                         ->data['tier_approval_status'] === TierApprovalStatus::REJECTED->value
@@ -85,11 +85,6 @@ class EditCustomer extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Customer\Models\Customer  $record
      *
@@ -97,6 +92,7 @@ class EditCustomer extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        ray($this->form->getRawState());
         $customerTier = null;
         if (isset($data['tier_id'])) {
             $customerTier = Tier::whereId($data['tier_id'])->first();

@@ -88,7 +88,7 @@ class TenantResource extends Resource
                                     ->required()
                                     ->unique(
                                         'domains',
-                                        callback: fn (?Tenant $record, Unique $rule, ?string $state) => $rule
+                                        modifyRuleUsing: fn (?Tenant $record, Unique $rule, ?string $state) => $rule
                                             ->when(
                                                 $record?->domains->firstWhere('domain', $state),
                                                 fn (Unique $rule, ?Domain $domain) => $rule->ignore($domain)

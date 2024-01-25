@@ -67,9 +67,9 @@ class CustomerResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Card::make([
-                    Forms\Components\FileUpload::make('image')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('image')
                         ->label(trans('Profile image'))
-                        ->mediaLibraryCollection('image')
+                        ->collection('image')
                         ->nullable()
                         ->image()
                         ->columnSpanFull(),

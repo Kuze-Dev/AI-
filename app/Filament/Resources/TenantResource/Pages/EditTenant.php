@@ -55,15 +55,6 @@ class EditTenant extends EditRecord
         );
     }
 
-    protected function afterValidate(): void
-    {
-        $this->validate();
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
 
     /**
      * @param  Tenant  $record

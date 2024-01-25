@@ -372,51 +372,51 @@ class CommonServiceProvider extends ServiceProvider
             }
         );
 
-        Forms\Components\FileUpload::macro('mediaLibraryCollection', function (string $collection) {
-            /** @var Forms\Components\FileUpload $this */
-            $this->multiple(
-                fn ($record) => $record && ! $record->getRegisteredMediaCollections()
-                    ->firstWhere('name', $collection)
-                    ->singleFile
-            );
-
-            $this->formatStateUsing(
-                fn (?HasMedia $record) => $record ? $record->getMedia($collection)
-                    ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
-                    ->toArray() : []
-            );
-
-            $this->beforeStateDehydrated(null);
-
-            $this->dehydrateStateUsing(function (Forms\Components\FileUpload $component, ?array $state) {
-                $files = array_values($state ?? []);
-
-                return $component->isMultiple() ? $files : ($files[0] ?? null);
-            });
-
-            $this->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                $mediaClass = config('media-library.media_model', Media::class);
-
-                /** @var ?Media $media */
-                $media = $mediaClass::findByUuid($file);
-
-                if ($media === null) {
-                    return null;
-                }
-
-                if ($component->getVisibility() === 'private') {
-                    try {
-                        return $media->getTemporaryUrl(now()->addMinutes(5));
-                    } catch (Throwable) {
-                        // This driver does not support creating temporary URLs.
-                    }
-                }
-
-                return $media->getUrl();
-            });
-
-            return $this;
-        });
+//        Forms\Components\FileUpload::macro('mediaLibraryCollection', function (string $collection) {
+//            /** @var Forms\Components\FileUpload $this */
+//            $this->multiple(
+//                fn ($record) => $record && ! $record->getRegisteredMediaCollections()
+//                    ->firstWhere('name', $collection)
+//                    ->singleFile
+//            );
+//
+//            $this->formatStateUsing(
+//                fn (?HasMedia $record) => $record ? $record->getMedia($collection)
+//                    ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
+//                    ->toArray() : []
+//            );
+//
+//            $this->beforeStateDehydrated(null);
+//
+//            $this->dehydrateStateUsing(function (Forms\Components\FileUpload $component, ?array $state) {
+//                $files = array_values($state ?? []);
+//
+//                return $component->isMultiple() ? $files : ($files[0] ?? null);
+//            });
+//
+//            $this->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+//                $mediaClass = config('media-library.media_model', Media::class);
+//
+//                /** @var ?Media $media */
+//                $media = $mediaClass::findByUuid($file);
+//
+//                if ($media === null) {
+//                    return null;
+//                }
+//
+//                if ($component->getVisibility() === 'private') {
+//                    try {
+//                        return $media->getTemporaryUrl(now()->addMinutes(5));
+//                    } catch (Throwable) {
+//                        // This driver does not support creating temporary URLs.
+//                    }
+//                }
+//
+//                return $media->getUrl();
+//            });
+//
+//            return $this;
+//        });
 
         Tables\Columns\TextColumn::macro('truncate', function (string $size = 'md', bool|Closure $tooltip = false): Tables\Columns\TextColumn {
             /** @var Tables\Columns\TextColumn $this */
@@ -477,15 +477,15 @@ class CommonServiceProvider extends ServiceProvider
 
     private function createActionConfiguration(): Closure
     {
-        return fn (PageActions\Action|Tables\Actions\Action $action) => $action
+        return fn (\Filament\Actions\MountableAction$action) => $action
             ->withActivityLog(
-                event: fn (PageActions\Action|Tables\Actions\Action $action) => match ($action->getName()) {
+                event: fn (\Filament\Actions\MountableAction$action) => match ($action->getName()) {
                     'delete' => 'deleted',
                     'restore' => 'restored',
                     'forceDelete' => 'force-deleted',
                     default => throw new Exception(),
                 },
-                description: fn (PageActions\Action|Tables\Actions\Action $action) => match ($action->getName()) {
+                description: fn (\Filament\Actions\MountableAction$action) => match ($action->getName()) {
                     'delete' => $action->getRecordTitle().' deleted',
                     'restore' => $action->getRecordTitle().' restored',
                     'forceDelete' => $action->getRecordTitle().' force deleted',
@@ -493,7 +493,7 @@ class CommonServiceProvider extends ServiceProvider
                 }
             )
             ->modalSubheading(
-                fn (PageActions\Action|Tables\Actions\Action $action) => trans(
+                fn (\Filament\Actions\MountableAction$action) => trans(
                     'Are you sure you want to :action this :resource?',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),
@@ -502,7 +502,7 @@ class CommonServiceProvider extends ServiceProvider
                 )
             )
             ->failureNotificationTitle(
-                fn (PageActions\Action|Tables\Actions\Action $action) => trans(
+                fn (\Filament\Actions\MountableAction$action) => trans(
                     'Unable to :action :resource.',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),
@@ -532,7 +532,7 @@ class CommonServiceProvider extends ServiceProvider
                 )
             )
             ->failureNotificationTitle(
-                fn (PageActions\Action|Tables\Actions\Action $action) => trans(
+                fn (\Filament\Actions\MountableAction$action) => trans(
                     'Unable to :action :resource/s.',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),
