@@ -42,8 +42,9 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
-            ->domain(config('tenancy.central_domains')[0])
             ->databaseNotifications()
+            ->domains(config('tenancy.central_domains'))
+            ->persistentMiddleware(['universal'])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

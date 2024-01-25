@@ -55,7 +55,7 @@ return [
          * prefix + tenant_id + suffix.
          */
         'prefix' => Str::of(env('APP_NAME'))->lower()->snake().'_',
-        'suffix' => '_'.Str::random(7),
+        'suffix' => '_db',
 
         /**
          * TenantDatabaseManagers are classes that handle the creation & deletion of tenant databases.

@@ -26,10 +26,11 @@ class TenantPanelProvider extends PanelProvider
             ->id('tenant')
             ->path('admin')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
             ])
             ->login()
             ->authGuard('admin')
+            ->brandName(fn() => tenant()->name)
             ->discoverResources(in: app_path('FilamentTenant/Resources'), for: 'App\\FilamentTenant\\Resources')
             ->discoverPages(in: app_path('FilamentTenant/Pages'), for: 'App\\FilamentTenant\\Pages')
             ->pages([
@@ -50,8 +51,13 @@ class TenantPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                'tenant'
             ])
+            ->middleware([
+                'universal',
+                'tenant',
+            ],
+                isPersistent:true
+            )
             ->authMiddleware([
                 Authenticate::class,
                 'verified:filament.auth.verification.notice',

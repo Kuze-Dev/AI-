@@ -20,6 +20,8 @@ use Stancl\Tenancy\Features\TenantConfig;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
+use Livewire\Livewire;
+use Illuminate\Support\Facades\Route;
 
 /** @property \Illuminate\Foundation\Application $app */
 class TenancyServiceProvider extends ServiceProvider
@@ -135,6 +137,8 @@ class TenancyServiceProvider extends ServiceProvider
         DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').Str::of($tenant->name)->lower()->snake().config('tenancy.database.suffix'));
 
         TenantAssetsController::$tenancyMiddleware = 'tenant';
+
+        $this->prepareLivewireForTenancy();
     }
 
     protected function bootEvents(): void
@@ -166,5 +170,20 @@ class TenancyServiceProvider extends ServiceProvider
         foreach (array_reverse($tenancyMiddleware) as $middleware) {
             $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);
         }
+    }
+
+    private function prepareLivewireForTenancy(): void
+    {
+        // https://github.dev/savannabits/filament-tenancy-starter
+        Livewire::setUpdateRoute(fn($handle) => Route::post('/livewire/update', $handle)
+            ->middleware(
+                [
+                    'web',
+                    'universal',
+                    Middleware\InitializeTenancyByDomain::class,
+                ]
+            )
+            ->name('livewire.update')
+        );
     }
 }
