@@ -166,7 +166,6 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
 
     public function canAccessPanel(Panel $panel): bool
     {
-        ray(tenancy()->tenant);
         return true;
     }
 
