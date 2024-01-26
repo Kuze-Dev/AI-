@@ -26,7 +26,7 @@ class EditTenant extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->requiresConfirmation(function ($livewire) {
                     return $livewire->data['is_suspended'] == true ? true : false;
                 })
