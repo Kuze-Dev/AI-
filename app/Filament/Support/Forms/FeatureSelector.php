@@ -18,7 +18,7 @@ class FeatureSelector extends Field
 {
     use HasOptions;
 
-    protected string $view = 'forms::components.group';
+    protected string $view = 'filament-forms::components.group';
 
     protected function setUp(): void
     {

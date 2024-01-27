@@ -10,6 +10,6 @@ class Authenticate extends BaseAuthenticate
 {
     protected function redirectTo($request): string
     {
-        return route('filament-tenant.auth.login');
+        return route('filament.tenant.auth.login');
     }
 }
