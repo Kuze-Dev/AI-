@@ -19,11 +19,14 @@ class CurrencyResource extends Resource
 
     protected static ?string $model = Currency::class;
 
-    protected static ?string $navigationGroup = 'eCommerce';
-
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {

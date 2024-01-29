@@ -47,9 +47,12 @@ class ServiceOrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
-    protected static ?string $navigationGroup = 'Service Management';
-
     protected static ?string $recordTitleAttribute = 'reference';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('Service Management');
+    }
 
     public static function form(Form $form): Form
     {

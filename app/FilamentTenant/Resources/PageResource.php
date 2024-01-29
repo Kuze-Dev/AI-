@@ -41,11 +41,14 @@ class PageResource extends Resource
 
     protected static ?string $model = Page::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     /** @var Collection<int, Block> */
     public static ?Collection $cachedBlocks = null;
