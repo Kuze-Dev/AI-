@@ -39,18 +39,18 @@ class FilamentTenantServiceProvider extends ContextServiceProvider
             ]);
 
             Filament::registerNavigationGroups([
-                NavigationGroup::make('Shop Configuration')
+                NavigationGroup::make(trans('Shop Configuration'))
                     ->icon('heroicon-o-cog'),
-                NavigationGroup::make('Customer Management')
+                NavigationGroup::make(trans('Customer Management'))
                     ->icon('heroicon-s-users'),
-                NavigationGroup::make('CMS')
+                NavigationGroup::make(trans('CMS'))
                     ->icon('heroicon-s-document-text'),
-                NavigationGroup::make('eCommerce')
+                NavigationGroup::make(trans('eCommerce'))
                     ->icon('heroicon-s-shopping-bag'),
-                NavigationGroup::make('Access')
+                NavigationGroup::make(trans('Access'))
                     ->icon('heroicon-s-lock-closed'),
-                NavigationGroup::make('System')
-                    ->icon('heroicon-m-exclamation-triangle'),
+                NavigationGroup::make(trans('System'))
+                    ->icon('heroicon-s-exclamation'),
             ]);
 
             Filament::registerRenderHook(
