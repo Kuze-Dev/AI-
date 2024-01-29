@@ -92,7 +92,6 @@ class EditCustomer extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        ray($this->form->getRawState());
         $customerTier = null;
         if (isset($data['tier_id'])) {
             $customerTier = Tier::whereId($data['tier_id'])->first();

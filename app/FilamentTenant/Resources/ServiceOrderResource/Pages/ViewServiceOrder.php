@@ -628,7 +628,7 @@ class ViewServiceOrder extends EditRecord
                         if ($component->getVisibility() === 'private') {
                             try {
                                 return $media?->getTemporaryUrl(now()->addMinutes(5));
-                            } catch (Throwable $exception) {
+                            } catch (Throwable) {
                             }
                         }
 

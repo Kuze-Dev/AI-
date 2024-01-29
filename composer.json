@@ -152,7 +152,16 @@
         "test-no-timeout": ["Composer\\Config::disableProcessTimeout", "vendor/bin/pest --parallel"],
         "test-coverage": "vendor/bin/pest --parallel --coverage-html build/coverage",
         "refactor": "vendor/bin/rector process",
-        "refactor-dry-run": "vendor/bin/rector process --dry-run"
+        "refactor-dry-run": "vendor/bin/rector process --dry-run",
+        "remove-ray": [
+            "vendor/bin/remove-ray.sh app",
+            "vendor/bin/remove-ray.sh database",
+            "vendor/bin/remove-ray.sh domain",
+            "vendor/bin/remove-ray.sh resources",
+            "vendor/bin/remove-ray.sh routes",
+            "vendor/bin/remove-ray.sh support",
+            "vendor/bin/remove-ray.sh tests"
+        ]
     },
     "extra": {
         "laravel": {

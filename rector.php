@@ -14,6 +14,7 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__.'/domain',
         __DIR__.'/resources',
         __DIR__.'/routes',
+        __DIR__.'/support',
         __DIR__.'/tests',
     ]);
 
