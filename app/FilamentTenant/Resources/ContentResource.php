@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Actions\DeleteContentAction;
@@ -17,8 +16,8 @@ use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +26,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ContentResource extends Resource
 {
-
     protected static ?string $model = Content::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';

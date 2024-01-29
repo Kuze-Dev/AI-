@@ -7,8 +7,6 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Page\Actions\DeleteBlockAction;
 use Domain\Page\Models\Block;
@@ -16,15 +14,14 @@ use Exception;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class BlockResource extends Resource
 {
-
     protected static ?string $model = Block::class;
 
     protected static ?string $navigationGroup = 'CMS';

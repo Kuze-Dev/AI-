@@ -7,8 +7,8 @@ namespace App\FilamentTenant\Resources\TierResource\RelationManagers;
 use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class CustomersRelationManager extends RelationManager
 {

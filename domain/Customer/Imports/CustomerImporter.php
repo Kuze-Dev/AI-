@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Customer\Imports;
 
 use Domain\Customer\Actions\ImportCustomerAction;
@@ -16,11 +18,10 @@ class CustomerImporter extends Importer
 {
     protected static ?string $model = Customer::class;
 
-//    public function getJobQueue(): ?string
-//    {
-//        return 'central';
-//    }
-
+    //    public function getJobQueue(): ?string
+    //    {
+    //        return 'central';
+    //    }
 
     public static function getColumns(): array
     {
@@ -35,20 +36,20 @@ class CustomerImporter extends Importer
 
             ImportColumn::make('first_name')
                 ->requiredMapping()
-                ->rules(['required','string','min:3','max:100']),
+                ->rules(['required', 'string', 'min:3', 'max:100']),
 
             ImportColumn::make('last_name')
                 ->requiredMapping()
-                ->rules(['required','string','min:3','max:100']),
+                ->rules(['required', 'string', 'min:3', 'max:100']),
 
             ImportColumn::make('mobile')
-                ->rules(['nullable','min:3','max:100']),
+                ->rules(['nullable', 'min:3', 'max:100']),
 
             ImportColumn::make('gender')
                 ->rules(['nullable', Rule::enum(Gender::class)]),
 
             ImportColumn::make('birth_date')
-                ->rules(['nullable','date']),
+                ->rules(['nullable', 'date']),
 
             ImportColumn::make('tier_id')
                 ->label('Tier')
@@ -63,10 +64,11 @@ class CustomerImporter extends Importer
     {
         return app(ImportCustomerAction::class)
             ->execute($this->data);
-//        return Customer::firstOrNew([
-//            'email' => $this->data['email'],
-//        ]);
+        //        return Customer::firstOrNew([
+        //            'email' => $this->data['email'],
+        //        ]);
     }
+
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Your customer import has completed and '.

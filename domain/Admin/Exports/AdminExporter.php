@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Admin\Exports;
 
-use App\Jobs\QueueJobPriority;
 use Domain\Admin\Models\Admin;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;

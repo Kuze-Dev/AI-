@@ -11,7 +11,6 @@ use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBi
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Address\Models\Address;
 use Domain\Currency\Models\Currency;
@@ -33,15 +32,14 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ServiceOrderResource extends Resource
 {
-
     protected static ?string $model = ServiceOrder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';

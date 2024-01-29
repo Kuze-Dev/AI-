@@ -6,22 +6,18 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\LocaleResource\Pages\ListLocale;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Internationalization\Models\Locale;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
+use Filament\Tables\Table;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
 class LocaleResource extends Resource
 {
-
     protected static ?string $model = Locale::class;
 
     protected static ?string $navigationGroup = 'CMS';

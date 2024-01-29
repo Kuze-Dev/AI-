@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers\Filament;
 
 use App\FilamentTenant\Middleware\Authenticate;
@@ -32,7 +34,7 @@ class TenantPanelProvider extends PanelProvider
             ])
             ->login()
             ->authGuard('admin')
-            ->brandName(fn() => tenant()->name)
+            ->brandName(fn () => tenant()->name)
             ->discoverResources(in: app_path('FilamentTenant/Resources'), for: 'App\\FilamentTenant\\Resources')
             ->discoverPages(in: app_path('FilamentTenant/Pages'), for: 'App\\FilamentTenant\\Pages')
             ->pages([
@@ -61,7 +63,7 @@ class TenantPanelProvider extends PanelProvider
                 'universal',
                 'tenant',
             ],
-                isPersistent:true
+                isPersistent: true
             )
             ->authMiddleware([
                 Authenticate::class,

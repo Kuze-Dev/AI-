@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Livewire\Auth;
 
-use Closure;
 use Domain\Auth\Actions\AuthenticateTwoFactorAction;
 use Domain\Auth\DataTransferObjects\TwoFactorData;
 use Filament\Facades\Filament;

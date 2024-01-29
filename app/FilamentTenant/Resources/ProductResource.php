@@ -11,7 +11,6 @@ use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationM
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\FilamentTenant\Resources\ReviewResource\RelationManagers\ReviewRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Product\Actions\DeleteProductAction;
 use Domain\Product\Enums\Decision;
@@ -23,9 +22,9 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Table;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
@@ -35,7 +34,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ProductResource extends Resource
 {
-
     protected static ?string $navigationGroup = 'eCommerce';
 
     protected static ?string $recordTitleAttribute = 'name';

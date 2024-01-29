@@ -8,7 +8,6 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Currency\Models\Currency;
 use Domain\Discount\Actions\AutoGenerateCode;
@@ -33,7 +32,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TextInput\Mask;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -43,6 +41,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -52,7 +51,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
 {
-
     protected static ?string $model = Discount::class;
 
     protected static ?string $navigationGroup = 'eCommerce';

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\ShippingMethod\Actions\GetAvailableShippingDriverAction;
@@ -15,8 +14,8 @@ use Exception;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -24,7 +23,6 @@ use Throwable;
 
 class ShippingmethodResource extends Resource
 {
-
     protected static ?string $model = ShippingMethod::class;
 
     protected static ?string $navigationGroup = 'Shop Configuration';

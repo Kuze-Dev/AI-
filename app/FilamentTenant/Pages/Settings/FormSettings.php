@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Pages\Settings;
 
 use App\FilamentTenant\Support\Concerns\AuthorizeCMSSettings;
 use App\Settings\FormSettings as SettingsFormSettings;
-use Closure;
 use Filament\Forms;
 use Support\Captcha\CaptchaProvider;
 

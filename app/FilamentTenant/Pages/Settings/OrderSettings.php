@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Pages\Settings;
 
 use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\OrderSettings as SettingsOrderSettings;
-use Closure;
 use Filament\Forms;
 use Illuminate\Support\Str;
 

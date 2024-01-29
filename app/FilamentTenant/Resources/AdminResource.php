@@ -6,11 +6,9 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\AdminResource as BaseAdminResource;
 use App\FilamentTenant\Resources\AdminResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 
 class AdminResource extends BaseAdminResource
 {
-
     protected static string|array $middlewares = ['password.confirm:filament-tenant.auth.password.confirm'];
 
     public static function getPages(): array

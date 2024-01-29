@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources\CustomerResource\Pages;
 
 use App\FilamentTenant\Resources\CustomerResource;
 use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Export\Exports;
 use Domain\Customer\Exports\CustomerExporter;
 use Exception;
 use Filament\Actions\ExportAction;

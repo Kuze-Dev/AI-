@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Support;
 
 use App\Features\ECommerce\ColorPallete;
-use Closure;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;

@@ -9,7 +9,6 @@ use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
 use App\FilamentTenant\Support\SchemaInterpolations;
 use App\Settings\FormSettings;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
@@ -20,8 +19,8 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -29,7 +28,6 @@ use Illuminate\Validation\Rules\Unique;
 
 class FormResource extends Resource
 {
-
     protected static ?string $model = FormModel::class;
 
     protected static ?string $navigationGroup = 'CMS';

@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\CurrencyResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Currency\Actions\UpdateCurrencyEnabledAction;
 use Domain\Currency\Models\Currency;
 use Exception;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class CurrencyResource extends Resource
 {
-
     protected static ?string $model = Currency::class;
 
     protected static ?string $navigationGroup = 'eCommerce';

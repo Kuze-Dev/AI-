@@ -9,8 +9,6 @@ use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Internationalization\Models\Locale;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Enums\Visibility;
@@ -23,8 +21,8 @@ use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -37,7 +35,6 @@ use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 
 class PageResource extends Resource
 {
-
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationGroup = 'CMS';

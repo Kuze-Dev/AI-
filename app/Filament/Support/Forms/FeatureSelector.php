@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Support\Forms;
 
-use Closure;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Concerns\HasOptions;

@@ -6,18 +6,13 @@ namespace App\FilamentTenant\Resources\InviteCustomerResource\Pages;
 
 use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use App\FilamentTenant\Resources\InviteCustomerResource;
-use Domain\Customer\Actions\ImportCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
-use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Imports\CustomerImporter;
-use Domain\Customer\Models\Customer;
-use Domain\Tier\Models\Tier;
 use Filament\Actions\ImportAction;
 use Filament\Forms;
 use Filament\Pages\Actions;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class ListInviteCustomers extends ListCustomers
 {
@@ -30,8 +25,8 @@ class ListInviteCustomers extends ListCustomers
             ImportAction::make()
                 ->translateLabel()
                 ->importer(CustomerImporter::class),
-//                ->authorize()
-//                ->withActivityLog(),
+            //                ->authorize()
+            //                ->withActivityLog(),
             Actions\Action::make('send-register-invitation')
                 ->translateLabel()
                 ->icon('heroicon-o-megaphone')

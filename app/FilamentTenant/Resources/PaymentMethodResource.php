@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\PaymentMethodResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
@@ -23,7 +22,6 @@ use Throwable;
 
 class PaymentMethodResource extends Resource
 {
-
     protected static ?string $model = PaymentMethod::class;
 
     protected static ?string $navigationGroup = 'Shop Configuration';

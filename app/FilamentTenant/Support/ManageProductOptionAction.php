@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
-use Closure;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductVariant;

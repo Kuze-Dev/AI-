@@ -10,9 +10,9 @@ use Exception;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasRelationshipTable;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
 class TiersRelationManager extends RelationManager

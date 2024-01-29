@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
-use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;

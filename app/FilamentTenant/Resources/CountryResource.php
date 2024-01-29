@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\CountryResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Address\Models\Country;
 use Exception;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class CountryResource extends Resource
 {
-
     protected static ?string $model = Country::class;
 
     protected static ?string $navigationGroup = 'eCommerce';

@@ -55,7 +55,6 @@ class EditTenant extends EditRecord
         );
     }
 
-
     /**
      * @param  Tenant  $record
      *

@@ -10,7 +10,6 @@ use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
-use Closure;
 use Domain\Content\Actions\CreateContentEntryDraftAction;
 use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
@@ -18,11 +17,11 @@ use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Site\Models\Site;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
-use Filament\Actions\Action;
-use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -50,7 +49,7 @@ class EditContentEntry extends EditRecord
      *
      * @param  mixed  $record
      */
-    public function mount(int | string $record, string $ownerRecord = ''): void
+    public function mount(int|string $record, string $ownerRecord = ''): void
     {
         $this->ownerRecord = app(Content::class)
             ->resolveRouteBinding($ownerRecord)

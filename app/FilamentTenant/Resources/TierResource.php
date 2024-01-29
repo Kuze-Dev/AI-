@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\TierResource\RelationManagers\CustomersRelationManager;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Tier\Actions\DeleteTierAction;
 use Domain\Tier\Actions\ForceDeleteTierAction;
 use Domain\Tier\Actions\RestoreTierAction;
@@ -14,12 +13,12 @@ use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Notifications\Notification;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +26,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class TierResource extends Resource
 {
-
     protected static ?string $model = Tier::class;
 
     protected static ?string $navigationGroup = 'Customer Management';

@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Admin\Imports;
 
 use Domain\Admin\Actions\CreateAdminAction;
 use Domain\Admin\Actions\UpdateAdminAction;
 use Domain\Admin\DataTransferObjects\AdminData;
 use Domain\Admin\Models\Admin;
-use Domain\Customer\Enums\Gender;
-use Domain\Customer\Models\Customer;
 use Domain\Role\Models\Role;
-use Domain\Tier\Models\Tier;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -35,14 +34,14 @@ class AdminImporter extends Importer
 
             ImportColumn::make('first_name')
                 ->requiredMapping()
-                ->rules(['required','string','min:3','max:100']),
+                ->rules(['required', 'string', 'min:3', 'max:100']),
 
             ImportColumn::make('last_name')
                 ->requiredMapping()
-                ->rules(['required','string','min:3','max:100']),
+                ->rules(['required', 'string', 'min:3', 'max:100']),
 
             ImportColumn::make('active')
-                ->rules(['nullable','in:Yes,No']),
+                ->rules(['nullable', 'in:Yes,No']),
 
             ImportColumn::make('roles')
                 ->rules([
@@ -51,7 +50,7 @@ class AdminImporter extends Importer
                 ]),
 
             ImportColumn::make('timezone')
-                ->rules(['nullable','timezone']),
+                ->rules(['nullable', 'timezone']),
 
         ];
     }

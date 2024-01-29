@@ -30,7 +30,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Saade\FilamentLaravelLog\Pages\ViewLog;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\MediaLibrary\HasMedia;
@@ -46,62 +45,62 @@ class CommonServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-//        Filament::serving(function () {
-//            /** @phpstan-ignore-next-line `pushMeta()` is defined in the facade's accessor but not doc blocked. */
-//            Filament::pushMeta([
-//                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="'.asset('/apple-touch-icon.png').'">'),
-//                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="'.asset('/favicon-32x32.png').'">'),
-//                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="'.asset('/favicon-16x16.png').'">'),
-//                new HtmlString('<link rel="manifest" href="'.asset('/site.webmanifest').'">'),
-//                new HtmlString('<link rel="mask-icon" href="'.asset('/safari-pinned-tab.svg').'" color="#5bbad5">'),
-//                new HtmlString('<meta name="msapplication-TileColor" content="#da532c">'),
-//                new HtmlString('<meta name="theme-color" content="#ffffff">'),
-//            ]);
-//
-//            Filament::registerViteTheme('resources/css/filament/app.css');
-//
-//            if (Filament::currentContext() !== 'filament') {
-//                return;
-//            }
-//
-//            Filament::registerUserMenuItems([
-//                'account' => UserMenuItem::make()
-//                    ->url(
-//                        Filament::auth()->user()?->isZeroDayAdmin()
-//                            ? null
-//                            : Account::getUrl()
-//                    ),
-//            ]);
-//
-//            Filament::registerNavigationGroups([
-//                NavigationGroup::make('Access')
-//                    ->icon('heroicon-s-lock-closed'),
-//                NavigationGroup::make('System')
-//                    ->icon('heroicon-m-exclamation-triangle'),
-//            ]);
-//        });
+        //        Filament::serving(function () {
+        //            /** @phpstan-ignore-next-line `pushMeta()` is defined in the facade's accessor but not doc blocked. */
+        //            Filament::pushMeta([
+        //                new HtmlString('<link rel="apple-touch-icon" sizes="180x180" href="'.asset('/apple-touch-icon.png').'">'),
+        //                new HtmlString('<link rel="icon" type="image/png" sizes="32x32" href="'.asset('/favicon-32x32.png').'">'),
+        //                new HtmlString('<link rel="icon" type="image/png" sizes="16x16" href="'.asset('/favicon-16x16.png').'">'),
+        //                new HtmlString('<link rel="manifest" href="'.asset('/site.webmanifest').'">'),
+        //                new HtmlString('<link rel="mask-icon" href="'.asset('/safari-pinned-tab.svg').'" color="#5bbad5">'),
+        //                new HtmlString('<meta name="msapplication-TileColor" content="#da532c">'),
+        //                new HtmlString('<meta name="theme-color" content="#ffffff">'),
+        //            ]);
+        //
+        //            Filament::registerViteTheme('resources/css/filament/app.css');
+        //
+        //            if (Filament::currentContext() !== 'filament') {
+        //                return;
+        //            }
+        //
+        //            Filament::registerUserMenuItems([
+        //                'account' => UserMenuItem::make()
+        //                    ->url(
+        //                        Filament::auth()->user()?->isZeroDayAdmin()
+        //                            ? null
+        //                            : Account::getUrl()
+        //                    ),
+        //            ]);
+        //
+        //            Filament::registerNavigationGroups([
+        //                NavigationGroup::make('Access')
+        //                    ->icon('heroicon-s-lock-closed'),
+        //                NavigationGroup::make('System')
+        //                    ->icon('heroicon-m-exclamation-triangle'),
+        //            ]);
+        //        });
 
-//        Filament::registerRenderHook(
-//            'footer.start',
-//            fn () => <<<'HTML'
-//                    <p>
-//                        Powered by
-//                        <a
-//                            href="https://halcyonwebdesign.com.ph/"
-//                            target="_blank"
-//                            rel="noopener noreferrer"
-//                            class="transition hover:text-primary-500"
-//                        >
-//                            Halcyon Web Design
-//                        </a>
-//                    </p>
-//                HTML,
-//        );
+        //        Filament::registerRenderHook(
+        //            'footer.start',
+        //            fn () => <<<'HTML'
+        //                    <p>
+        //                        Powered by
+        //                        <a
+        //                            href="https://halcyonwebdesign.com.ph/"
+        //                            target="_blank"
+        //                            rel="noopener noreferrer"
+        //                            class="transition hover:text-primary-500"
+        //                        >
+        //                            Halcyon Web Design
+        //                        </a>
+        //                    </p>
+        //                HTML,
+        //        );
 
-//        Filament::registerRenderHook(
-//            'head.end',
-//            fn () => Vite::withEntryPoints(['resources/js/filament/app.js'])->toHtml(),
-//        );
+        //        Filament::registerRenderHook(
+        //            'head.end',
+        //            fn () => Vite::withEntryPoints(['resources/js/filament/app.js'])->toHtml(),
+        //        );
 
         $this->registerRoutes();
 
@@ -372,51 +371,51 @@ class CommonServiceProvider extends ServiceProvider
             }
         );
 
-//        Forms\Components\FileUpload::macro('mediaLibraryCollection', function (string $collection) {
-//            /** @var Forms\Components\FileUpload $this */
-//            $this->multiple(
-//                fn ($record) => $record && ! $record->getRegisteredMediaCollections()
-//                    ->firstWhere('name', $collection)
-//                    ->singleFile
-//            );
-//
-//            $this->formatStateUsing(
-//                fn (?HasMedia $record) => $record ? $record->getMedia($collection)
-//                    ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
-//                    ->toArray() : []
-//            );
-//
-//            $this->beforeStateDehydrated(null);
-//
-//            $this->dehydrateStateUsing(function (Forms\Components\FileUpload $component, ?array $state) {
-//                $files = array_values($state ?? []);
-//
-//                return $component->isMultiple() ? $files : ($files[0] ?? null);
-//            });
-//
-//            $this->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-//                $mediaClass = config('media-library.media_model', Media::class);
-//
-//                /** @var ?Media $media */
-//                $media = $mediaClass::findByUuid($file);
-//
-//                if ($media === null) {
-//                    return null;
-//                }
-//
-//                if ($component->getVisibility() === 'private') {
-//                    try {
-//                        return $media->getTemporaryUrl(now()->addMinutes(5));
-//                    } catch (Throwable) {
-//                        // This driver does not support creating temporary URLs.
-//                    }
-//                }
-//
-//                return $media->getUrl();
-//            });
-//
-//            return $this;
-//        });
+        //        Forms\Components\FileUpload::macro('mediaLibraryCollection', function (string $collection) {
+        //            /** @var Forms\Components\FileUpload $this */
+        //            $this->multiple(
+        //                fn ($record) => $record && ! $record->getRegisteredMediaCollections()
+        //                    ->firstWhere('name', $collection)
+        //                    ->singleFile
+        //            );
+        //
+        //            $this->formatStateUsing(
+        //                fn (?HasMedia $record) => $record ? $record->getMedia($collection)
+        //                    ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
+        //                    ->toArray() : []
+        //            );
+        //
+        //            $this->beforeStateDehydrated(null);
+        //
+        //            $this->dehydrateStateUsing(function (Forms\Components\FileUpload $component, ?array $state) {
+        //                $files = array_values($state ?? []);
+        //
+        //                return $component->isMultiple() ? $files : ($files[0] ?? null);
+        //            });
+        //
+        //            $this->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+        //                $mediaClass = config('media-library.media_model', Media::class);
+        //
+        //                /** @var ?Media $media */
+        //                $media = $mediaClass::findByUuid($file);
+        //
+        //                if ($media === null) {
+        //                    return null;
+        //                }
+        //
+        //                if ($component->getVisibility() === 'private') {
+        //                    try {
+        //                        return $media->getTemporaryUrl(now()->addMinutes(5));
+        //                    } catch (Throwable) {
+        //                        // This driver does not support creating temporary URLs.
+        //                    }
+        //                }
+        //
+        //                return $media->getUrl();
+        //            });
+        //
+        //            return $this;
+        //        });
 
         Tables\Columns\TextColumn::macro('truncate', function (string $size = 'md', bool|Closure $tooltip = false): Tables\Columns\TextColumn {
             /** @var Tables\Columns\TextColumn $this */
@@ -477,15 +476,15 @@ class CommonServiceProvider extends ServiceProvider
 
     private function createActionConfiguration(): Closure
     {
-        return fn (\Filament\Actions\MountableAction$action) => $action
+        return fn (\Filament\Actions\MountableAction $action) => $action
             ->withActivityLog(
-                event: fn (\Filament\Actions\MountableAction$action) => match ($action->getName()) {
+                event: fn (\Filament\Actions\MountableAction $action) => match ($action->getName()) {
                     'delete' => 'deleted',
                     'restore' => 'restored',
                     'forceDelete' => 'force-deleted',
                     default => throw new Exception(),
                 },
-                description: fn (\Filament\Actions\MountableAction$action) => match ($action->getName()) {
+                description: fn (\Filament\Actions\MountableAction $action) => match ($action->getName()) {
                     'delete' => $action->getRecordTitle().' deleted',
                     'restore' => $action->getRecordTitle().' restored',
                     'forceDelete' => $action->getRecordTitle().' force deleted',
@@ -493,7 +492,7 @@ class CommonServiceProvider extends ServiceProvider
                 }
             )
             ->modalSubheading(
-                fn (\Filament\Actions\MountableAction$action) => trans(
+                fn (\Filament\Actions\MountableAction $action) => trans(
                     'Are you sure you want to :action this :resource?',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),
@@ -502,7 +501,7 @@ class CommonServiceProvider extends ServiceProvider
                 )
             )
             ->failureNotificationTitle(
-                fn (\Filament\Actions\MountableAction$action) => trans(
+                fn (\Filament\Actions\MountableAction $action) => trans(
                     'Unable to :action :resource.',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),
@@ -532,7 +531,7 @@ class CommonServiceProvider extends ServiceProvider
                 )
             )
             ->failureNotificationTitle(
-                fn (\Filament\Actions\MountableAction$action) => trans(
+                fn (\Filament\Actions\MountableAction $action) => trans(
                     'Unable to :action :resource/s.',
                     [
                         'action' => Str::of($action->getName())->headline()->lower()->toString(),

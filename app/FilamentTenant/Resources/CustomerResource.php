@@ -8,7 +8,6 @@ use App\Features\Customer\TierBase;
 use App\Features\ECommerce\RewardPoints;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
@@ -16,23 +15,20 @@ use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
-use Domain\Customer\Export\Exports;
 use Domain\Customer\Exports\CustomerExporter;
 use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Exception;
-use Filament\Actions\ExportAction;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -42,7 +38,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class CustomerResource extends Resource
 {
-
     protected static ?string $model = Customer::class;
 
     protected static ?string $navigationGroup = 'Customer Management';
@@ -331,9 +326,10 @@ class CustomerResource extends Resource
                                         if ($model instanceof Customer) {
                                             return $model;
                                         }
+
                                         return Customer::whereKey($model)->first();
                                     }
-                                )
+                                ),
                         ]
                     ),
                 Tables\Actions\DeleteBulkAction::make()

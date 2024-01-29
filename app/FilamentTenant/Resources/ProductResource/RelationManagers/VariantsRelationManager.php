@@ -11,8 +11,8 @@ use Domain\Product\Enums\Status;
 use Domain\Product\Models\ProductVariant;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class VariantsRelationManager extends RelationManager
 {

@@ -8,7 +8,6 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\Tree;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Internationalization\Models\Locale;
 use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
@@ -17,8 +16,8 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +25,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class TaxonomyResource extends Resource
 {
-
     protected static ?string $model = Taxonomy::class;
 
     protected static ?string $navigationGroup = 'CMS';
@@ -53,7 +51,7 @@ class TaxonomyResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('taxonomyTerms');
     }
 
-    public static function resolveRecordRouteBinding(int | string $key): ?Model
+    public static function resolveRecordRouteBinding(int|string $key): ?Model
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())

@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
@@ -21,8 +20,8 @@ use Domain\Site\Models\Site;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -32,7 +31,6 @@ use Illuminate\Validation\Rules\Unique;
 
 class MenuResource extends Resource
 {
-
     protected static ?string $model = Menu::class;
 
     protected static ?string $navigationGroup = 'CMS';
@@ -59,7 +57,7 @@ class MenuResource extends Resource
         return [trans('Total Nodes') => $record->nodes_count];
     }
 
-    public static function resolveRecordRouteBinding(int | string $key): ?Model
+    public static function resolveRecordRouteBinding(int|string $key): ?Model
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())

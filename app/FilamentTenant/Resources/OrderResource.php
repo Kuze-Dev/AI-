@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Support;
 use App\Settings\OrderSettings;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderStatuses;
@@ -17,11 +16,11 @@ use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Forms;
-use Filament\Notifications\Notification;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +31,6 @@ use Throwable;
 
 class OrderResource extends Resource
 {
-
     protected static ?string $navigationGroup = 'eCommerce';
 
     protected static ?string $model = Order::class;

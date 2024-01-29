@@ -11,7 +11,6 @@ use App\FilamentTenant\Resources\ServiceResource\Pages\ListServices;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\Settings\ServiceSettings;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Currency\Models\Currency;
@@ -24,9 +23,9 @@ use Exception;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Arr;
@@ -34,7 +33,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ServiceResource extends Resource
 {
-
     protected static ?string $model = Service::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Customer\Exports;
 
 use App\Jobs\QueueJobPriority;
@@ -14,10 +16,10 @@ class CustomerExporter extends Exporter
 {
     protected static ?string $model = Customer::class;
 
-//    public function getJobQueue(): ?string
-//    {
-//        return QueueJobPriority::EXCEL;
-//    }
+    //    public function getJobQueue(): ?string
+    //    {
+    //        return QueueJobPriority::EXCEL;
+    //    }
 
     public static function getColumns(): array
     {

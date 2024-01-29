@@ -15,9 +15,9 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
-use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +33,7 @@ class AdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-//    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
+    //    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
 
     protected static ?string $recordTitleAttribute = 'full_name';
 
@@ -263,9 +263,10 @@ class AdminResource extends Resource
                                         if ($model instanceof Admin) {
                                             return $model;
                                         }
+
                                         return Admin::whereKey($model)->first();
                                     }
-                                )
+                                ),
                         ]
                     ),
             ])

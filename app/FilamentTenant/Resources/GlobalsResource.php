@@ -9,7 +9,6 @@ use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Globals\Models\Globals;
@@ -18,15 +17,14 @@ use Domain\Site\Models\Site;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Unique;
 
 class GlobalsResource extends Resource
 {
-
     protected static ?string $model = Globals::class;
 
     protected static ?string $navigationGroup = 'CMS';

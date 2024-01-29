@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ActivityResource\RelationManagers;
 
 use App\Filament\Resources\ActivityResource;
-use Closure;
 use Exception;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables\Actions\ViewAction;
-use Illuminate\Contracts\Support\Htmlable;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class ActivitiesRelationManager extends RelationManager
 {
@@ -50,5 +47,4 @@ class ActivitiesRelationManager extends RelationManager
     {
         return false;
     }
-
 }

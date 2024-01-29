@@ -35,7 +35,6 @@ class EditAdmin extends EditRecord
         ];
     }
 
-
     /** @param  Admin  $record
      * @throws Throwable
      */

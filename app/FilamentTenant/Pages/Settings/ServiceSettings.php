@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Pages\Settings;
 
 use App\Features\Service\ServiceBase;
 use App\Settings\ServiceSettings as ServiceCategorySettings;
-use Closure;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Forms;
 use Filament\Forms\Components\Card;

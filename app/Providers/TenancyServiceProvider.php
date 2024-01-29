@@ -8,10 +8,14 @@ use App\Tenancy\Jobs\CreateDatabase;
 use App\Tenancy\Jobs\CreateS3Bucket;
 use App\Tenancy\Jobs\DeleteS3Bucket;
 use Domain\Tenant\Models\Tenant;
+use Filament\Actions\Exports\Http\Controllers\DownloadExport;
+use Filament\Actions\Imports\Http\Controllers\DownloadImportFailureCsv;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Controllers\TenantAssetsController;
 use Stancl\Tenancy\DatabaseConfig;
@@ -20,10 +24,6 @@ use Stancl\Tenancy\Features\TenantConfig;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
-use Livewire\Livewire;
-use Illuminate\Support\Facades\Route;
-use Filament\Actions\Exports\Http\Controllers\DownloadExport;
-use Filament\Actions\Imports\Http\Controllers\DownloadImportFailureCsv;
 
 /** @property \Illuminate\Foundation\Application $app */
 class TenancyServiceProvider extends ServiceProvider
@@ -141,7 +141,7 @@ class TenancyServiceProvider extends ServiceProvider
         TenantAssetsController::$tenancyMiddleware = 'tenant';
 
         $this->prepareLivewire();
-$this->prepareFilamentExport();
+        $this->prepareFilamentExport();
 
     }
 
@@ -181,7 +181,7 @@ $this->prepareFilamentExport();
         // https://github.dev/savannabits/filament-tenancy-starter
         // https://livewire.laravel.com/docs/security#applying-global-livewire-middleware
         Livewire::setUpdateRoute(
-            fn(mixed $handle) => Route::post('/livewire/update', $handle)
+            fn (mixed $handle) => Route::post('/livewire/update', $handle)
                 ->middleware([
                     'web',
                     'universal',
@@ -200,7 +200,7 @@ $this->prepareFilamentExport();
                 'web',
                 'universal',
                 Middleware\InitializeTenancyByDomain::class,
-                'auth'
+                'auth',
             ]);
 
         Route::get('/filament/imports/{import}/failed-rows/download', DownloadImportFailureCsv::class)
@@ -209,7 +209,7 @@ $this->prepareFilamentExport();
                 'web',
                 'universal',
                 Middleware\InitializeTenancyByDomain::class,
-                'auth'
+                'auth',
             ]);
     }
 }

@@ -9,7 +9,6 @@ use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\ContentEntry;
@@ -21,8 +20,8 @@ use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -35,7 +34,6 @@ use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 
 class ContentEntryResource extends Resource
 {
-
     protected static ?string $model = ContentEntry::class;
 
     protected static bool $shouldRegisterNavigation = false;

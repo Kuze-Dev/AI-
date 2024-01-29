@@ -6,8 +6,6 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\TaxZoneResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Taxation\Enums\PriceDisplay;
@@ -16,13 +14,12 @@ use Domain\Taxation\Models\TaxZone;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
 class TaxZoneResource extends Resource
 {
-
     protected static ?string $model = TaxZone::class;
 
     protected static ?string $navigationGroup = 'Shop Configuration';

@@ -6,8 +6,6 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\BlueprintResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
@@ -23,8 +21,8 @@ use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -35,7 +33,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class BlueprintResource extends Resource
 {
-
     protected static ?string $model = Blueprint::class;
 
     protected static ?string $navigationGroup = 'CMS';

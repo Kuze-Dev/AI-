@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ServiceBillResource\Pages\ViewServiceBill;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -16,15 +15,14 @@ use Filament\Facades\Filament;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 class ServiceBillResource extends Resource
 {
-
     protected static ?string $model = ServiceBill::class;
 
     protected static bool $shouldRegisterNavigation = false;

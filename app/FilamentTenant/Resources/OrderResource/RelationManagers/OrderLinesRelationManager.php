@@ -8,9 +8,9 @@ use App\FilamentTenant\Resources\OrderResource;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 

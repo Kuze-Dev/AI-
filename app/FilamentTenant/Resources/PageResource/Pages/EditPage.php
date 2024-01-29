@@ -9,7 +9,6 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
-use Closure;
 use Domain\Page\Actions\CreatePageDraftAction;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Actions\PublishedPageDraftAction;
