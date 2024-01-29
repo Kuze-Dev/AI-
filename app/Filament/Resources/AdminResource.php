@@ -29,13 +29,16 @@ class AdminResource extends Resource
 {
     protected static ?string $model = Admin::class;
 
-    protected static ?string $navigationGroup = 'Access';
-
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
     //    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
 
     protected static ?string $recordTitleAttribute = 'full_name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('Access');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {

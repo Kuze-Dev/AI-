@@ -20,13 +20,16 @@ class LocaleResource extends Resource
 {
     protected static ?string $model = Locale::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-language';
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?int $navigationSort = 9;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     /** @throws FileNotFoundException */
     public static function form(Form $form): Form

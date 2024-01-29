@@ -31,15 +31,18 @@ use Throwable;
 
 class OrderResource extends Resource
 {
-    protected static ?string $navigationGroup = 'eCommerce';
-
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?string $recordTitleAttribute = 'reference';
 
-    public static function getNavigationBadge(): ?string
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
+
+    protected static function getNavigationBadge(): ?string
     {
         /** @phpstan-ignore-next-line https://filamentphp.com/docs/2.x/admin/navigation#navigation-item-badges */
         return strval(static::$model::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count());

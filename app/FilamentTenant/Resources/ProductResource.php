@@ -34,13 +34,16 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ProductResource extends Resource
 {
-    protected static ?string $navigationGroup = 'eCommerce';
-
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
 
     public static function form(Form $form): Form
     {

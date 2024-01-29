@@ -15,11 +15,14 @@ class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    protected static ?string $navigationGroup = 'eCommerce';
-
     protected static ?string $navigationIcon = 'heroicon-o-globe-americas';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
