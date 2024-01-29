@@ -53,11 +53,14 @@ class DiscountResource extends Resource
 {
     protected static ?string $model = Discount::class;
 
-    protected static ?string $navigationGroup = 'eCommerce';
-
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
 
     public static function form(Form $form): Form
     {
