@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Core\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\SetList;
+use Rector\ValueObject\PhpVersion;
 use RectorLaravel\Set\LaravelSetList;
 
 return static function (RectorConfig $rectorConfig): void {
@@ -14,7 +14,6 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__.'/domain',
         __DIR__.'/resources',
         __DIR__.'/routes',
-        __DIR__.'/support',
         __DIR__.'/tests',
     ]);
 
@@ -28,9 +27,16 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\Php72\Rector\FuncCall\GetClassOnNullRector::class,
         Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
         Rector\Php81\Rector\ClassConst\FinalizePublicClassConstantRector::class,
+        Spatie\Ray\Rector\RemoveRayCallRector::class,
     ]);
 
     $rectorConfig->phpVersion(PhpVersion::PHP_82);
 
     //     $rectorConfig->phpstanConfig(__DIR__.'/phpstan.neon');
+
+    // Ensure file system caching is used instead of in-memory.
+    $rectorConfig->cacheClass(Rector\Caching\ValueObject\Storage\FileCacheStorage::class);
+
+    // Specify a path that works locally as well as on CI job runners.
+    $rectorConfig->cacheDirectory('build/rector');
 };
