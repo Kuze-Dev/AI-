@@ -42,11 +42,6 @@ class EditProduct extends EditRecord implements HasProductOptionsContracts, HasP
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Product\Models\Product  $record
      *

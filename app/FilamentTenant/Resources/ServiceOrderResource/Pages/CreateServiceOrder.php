@@ -36,9 +36,4 @@ class CreateServiceOrder extends CreateRecord
                 ->keyBindings(['mod+s']),
         ];
     }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
 }

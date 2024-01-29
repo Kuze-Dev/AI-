@@ -44,11 +44,6 @@ class EditDiscount extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @param  \Domain\Discount\Models\Discount  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {

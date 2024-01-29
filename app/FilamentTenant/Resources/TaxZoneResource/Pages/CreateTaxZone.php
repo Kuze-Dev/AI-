@@ -29,11 +29,6 @@ class CreateTaxZone extends CreateRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     protected function handleRecordCreation(array $data): Model
     {
         return DB::transaction(fn () => app(CreateTaxZoneAction::class)->execute(TaxZoneData::formArray($data)));

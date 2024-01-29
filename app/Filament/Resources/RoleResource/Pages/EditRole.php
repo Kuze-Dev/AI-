@@ -32,11 +32,6 @@ class EditRole extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Role\Models\Role  $record
      *

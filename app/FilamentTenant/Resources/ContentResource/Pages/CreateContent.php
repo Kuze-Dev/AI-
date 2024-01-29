@@ -30,11 +30,6 @@ class CreateContent extends CreateRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * Execute database transaction
      * for creating contents.

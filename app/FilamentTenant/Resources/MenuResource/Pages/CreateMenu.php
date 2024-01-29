@@ -29,11 +29,6 @@ class CreateMenu extends CreateRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     protected function handleRecordCreation(array $data): Model
     {
         return DB::transaction(fn () => app(CreateMenuAction::class)->execute(MenuData::fromArray($data)));

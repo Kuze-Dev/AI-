@@ -34,11 +34,6 @@ class EditBlock extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Page\Models\Block  $record
      *

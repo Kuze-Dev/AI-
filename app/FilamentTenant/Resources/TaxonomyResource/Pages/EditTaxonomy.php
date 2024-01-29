@@ -31,11 +31,6 @@ class EditTaxonomy extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @param  \Domain\Taxonomy\Models\Taxonomy  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {

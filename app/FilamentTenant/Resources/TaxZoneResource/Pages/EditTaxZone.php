@@ -35,11 +35,6 @@ class EditTaxZone extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @param  TaxZone  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {

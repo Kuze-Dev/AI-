@@ -43,11 +43,6 @@ class CreateTenant extends CreateRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @throws Throwable */
     public function handleRecordCreation(array $data): Model
     {

@@ -115,11 +115,6 @@ class ViewServiceOrder extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     protected function getFormSchema(): array
     {
         return [

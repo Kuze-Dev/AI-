@@ -34,9 +34,4 @@ class CreateSite extends CreateRecord
                 ->execute(SiteData::fromArray($data))
         );
     }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
 }

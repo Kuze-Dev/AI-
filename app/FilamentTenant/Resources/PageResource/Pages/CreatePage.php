@@ -62,11 +62,6 @@ class CreatePage extends CreateRecord
         $this->logsFormActivityAfterFill();
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {

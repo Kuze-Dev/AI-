@@ -43,11 +43,6 @@ class EditContent extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * Execute database transaction
      * for updating contents.

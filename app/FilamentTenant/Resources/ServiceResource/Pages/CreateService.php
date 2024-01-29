@@ -38,9 +38,4 @@ class CreateService extends CreateRecord
             $this->getCreateAnotherFormAction(),
         ];
     }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
 }

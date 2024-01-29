@@ -34,11 +34,6 @@ class EditForm extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Form\Models\Form  $record
      *

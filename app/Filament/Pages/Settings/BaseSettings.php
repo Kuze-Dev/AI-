@@ -43,11 +43,6 @@ abstract class BaseSettings extends SettingsPage
         ];
     }
 
-    public function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     public static function shouldShowSettingsCard(): bool
     {
         return static::authorizeAccess();

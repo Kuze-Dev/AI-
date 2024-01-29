@@ -31,11 +31,6 @@ class EditMenu extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @param  \Domain\Menu\Models\Menu  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {

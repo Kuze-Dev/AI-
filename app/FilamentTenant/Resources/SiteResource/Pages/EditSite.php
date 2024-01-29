@@ -47,9 +47,4 @@ class EditSite extends EditRecord
                 ->execute($record, SiteData::fromArray($data))
         );
     }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
 }

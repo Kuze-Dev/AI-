@@ -29,11 +29,6 @@ class CreateShippingmethod extends CreateRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     protected function handleRecordCreation(array $data): Model
     {
         return DB::transaction(fn () => app(CreateShippingMethodAction::class)->execute(ShippingMethodData::fromArray($data)));

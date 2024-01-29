@@ -59,11 +59,6 @@ class EditTier extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Tier\Models\Tier  $record
      *

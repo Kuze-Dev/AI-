@@ -51,9 +51,4 @@ class EditService extends EditRecord
                 )),
         ];
     }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
 }

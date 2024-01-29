@@ -41,11 +41,6 @@ class CreateProduct extends CreateRecord implements HasProductOptionsContracts, 
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {

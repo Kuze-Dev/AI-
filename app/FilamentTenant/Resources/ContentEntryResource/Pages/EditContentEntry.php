@@ -210,11 +210,6 @@ class EditContentEntry extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     public function draft(): RedirectResponse|Redirector|false
     {
         $data = $this->form->getState();

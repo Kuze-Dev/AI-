@@ -41,11 +41,6 @@ class EditBlueprint extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @param  Blueprint  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {

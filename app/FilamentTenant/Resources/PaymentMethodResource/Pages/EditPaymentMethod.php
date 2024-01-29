@@ -45,11 +45,6 @@ class EditPaymentMethod extends EditRecord
         return [];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  PaymentMethod  $record
      *

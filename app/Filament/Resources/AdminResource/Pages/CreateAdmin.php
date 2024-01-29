@@ -30,11 +30,6 @@ class CreateAdmin extends CreateRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {

@@ -54,9 +54,4 @@ class EditShippingmethod extends EditRecord
     {
         return DB::transaction(fn () => app(UpdateShippingMethodAction::class)->execute($record, ShippingMethodData::fromArray($data)));
     }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
 }
