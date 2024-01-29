@@ -31,7 +31,7 @@ class TaxZoneResource extends Resource
         return trans('Shop Configuration');
     }
 
-    protected static function getNavigationLabel(): string
+    public static function getNavigationLabel(): string
     {
         return trans('Tax Zone');
     }
