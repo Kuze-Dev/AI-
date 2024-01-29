@@ -25,14 +25,11 @@ class ShippingmethodResource extends Resource
 {
     protected static ?string $model = ShippingMethod::class;
 
+    protected static ?string $navigationGroup = 'Shop Configuration';
+
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
     protected static ?string $recordTitleAttribute = 'title';
-
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('Shop Configuration');
-    }
 
     public static function form(Form $form): Form
     {

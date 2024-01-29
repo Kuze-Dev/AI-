@@ -32,14 +32,11 @@ class RoleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    protected static ?string $navigationGroup = 'Access';
+
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
     protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
-
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('Access');
-    }
 
     public static function getGloballySearchableAttributes(): array
     {

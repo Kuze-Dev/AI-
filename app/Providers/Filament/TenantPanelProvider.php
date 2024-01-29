@@ -8,7 +8,6 @@ use App\FilamentTenant\Middleware\Authenticate;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -45,14 +44,6 @@ class TenantPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 DeployStaticSite::class,
-            ])
-            ->navigationGroups([
-                NavigationGroup::make()->label(trans('Shop Configuration')),
-                NavigationGroup::make()->label(trans('Customer Management')),
-                NavigationGroup::make()->label(trans('CMS')),
-                NavigationGroup::make()->label(trans('eCommerce')),
-                NavigationGroup::make()->label(trans('Access')),
-                NavigationGroup::make()->label(trans('System')),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()

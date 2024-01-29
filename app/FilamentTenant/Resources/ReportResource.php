@@ -9,12 +9,9 @@ use Filament\Resources\Resource;
 
 class ReportResource extends Resource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'eCommerce';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('eCommerce');
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getPages(): array
     {

@@ -24,14 +24,11 @@ class PaymentMethodResource extends Resource
 {
     protected static ?string $model = PaymentMethod::class;
 
+    protected static ?string $navigationGroup = 'Shop Configuration';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $recordTitleAttribute = 'title';
-
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('Shop Configuration');
-    }
 
     public static function getGloballySearchableAttributes(): array
     {

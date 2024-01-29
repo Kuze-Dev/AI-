@@ -28,14 +28,11 @@ class TierResource extends Resource
 {
     protected static ?string $model = Tier::class;
 
+    protected static ?string $navigationGroup = 'Customer Management';
+
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('Customer Management');
-    }
 
     public static function form(Form $form): Form
     {

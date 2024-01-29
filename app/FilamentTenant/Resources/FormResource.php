@@ -30,14 +30,11 @@ class FormResource extends Resource
 {
     protected static ?string $model = FormModel::class;
 
+    protected static ?string $navigationGroup = 'CMS';
+
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('CMS');
-    }
 
     public static function form(Form $form): Form
     {

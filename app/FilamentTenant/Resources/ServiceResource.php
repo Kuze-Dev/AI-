@@ -37,12 +37,9 @@ class ServiceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $navigationGroup = 'Service Management';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('Service Management');
-    }
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function getGloballySearchableAttributes(): array
     {

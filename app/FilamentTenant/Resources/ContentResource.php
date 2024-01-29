@@ -30,12 +30,9 @@ class ContentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $navigationGroup = 'CMS';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('CMS');
-    }
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function getGloballySearchableAttributes(): array
     {

@@ -26,12 +26,9 @@ class SiteResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
+    protected static ?string $navigationGroup = 'CMS';
 
-    public static function getNavigationGroup(): ?string
-    {
-        return trans('CMS');
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
     public static function getGloballySearchableAttributes(): array
     {
