@@ -37,7 +37,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Str;
+use Illuminate\Support\Str;
 
 class ServiceOrderResource extends Resource
 {
@@ -47,9 +47,12 @@ class ServiceOrderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
-    protected static ?string $navigationGroup = 'Service Management';
-
     protected static ?string $recordTitleAttribute = 'reference';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('Service Management');
+    }
 
     public static function form(Form $form): Form
     {

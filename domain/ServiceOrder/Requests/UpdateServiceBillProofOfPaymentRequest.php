@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Requests;
 
-use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Enums\Type;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -32,7 +32,6 @@ class UpdateServiceBillProofOfPaymentRequest extends FormRequest
         return [
             'referenceId' => [
                 'string',
-                Rule::exists(ServiceBill::class, 'reference'),
             ],
             'proofOfPayment' => [
                 'string',
@@ -40,6 +39,10 @@ class UpdateServiceBillProofOfPaymentRequest extends FormRequest
             'notes' => [
                 'string',
                 'nullable',
+            ],
+            'type' => [
+                'required',
+                Rule::enum(Type::class),
             ],
         ];
     }

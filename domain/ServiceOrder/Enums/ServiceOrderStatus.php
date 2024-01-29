@@ -13,4 +13,5 @@ enum ServiceOrderStatus: string
     case ACTIVE = 'active';
     case INACTIVE = 'inactive';
     case CLOSED = 'closed';
+    case FOR_APPROVAL = 'for_approval';
 }

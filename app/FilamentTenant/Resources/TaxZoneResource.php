@@ -26,11 +26,14 @@ class TaxZoneResource extends Resource
 
     protected static ?string $model = TaxZone::class;
 
-    protected static ?string $navigationGroup = 'Shop Configuration';
-
     protected static ?string $navigationIcon = 'heroicon-o-receipt-tax';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('Shop Configuration');
+    }
 
     protected static function getNavigationLabel(): string
     {
