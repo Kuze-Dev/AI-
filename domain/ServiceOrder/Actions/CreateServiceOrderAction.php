@@ -59,8 +59,8 @@ class CreateServiceOrderAction
         }
 
         if ($serviceOrderData->payment_value === PaymentPlanValue::FIXED->value) {
-            if ($sum > $taxableInfo->total_price) {
-                throw new InvalidPaymentPlan('The payment plan exceeds the total price');
+            if ($sum !== $taxableInfo->total_price) {
+                throw new InvalidPaymentPlan('The payment plan must be equal to total price');
             }
         } elseif ($serviceOrderData->payment_value === PaymentPlanValue::PERCENT->value) {
             if ($sum !== floatval(100)) {

@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
+use App\FilamentTenant\Resources\ServiceOrderResource\Rules\PaymentPlanAmountRule;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -278,6 +279,7 @@ class ServiceOrderResource extends Resource
                                                 ->columnSpan(2)
                                                 ->defaultItems(1)
                                                 ->reactive()
+                                                ->rule(fn (Closure $get) => new PaymentPlanAmountRule(floatval(self::currencyFormat($get, 'totalPriceFloat')), $get('payment_value')))
                                                 ->schema([
                                                     TextInput::make('description')->required()->translateLabel()
                                                         ->afterStateUpdated(function ($component, $state, $livewire) {
@@ -551,7 +553,7 @@ class ServiceOrderResource extends Resource
             ->execute($subTotal, $billingAddressData);
     }
 
-    private static function currencyFormat(Closure $get, string $type): string
+    private static function currencyFormat(Closure $get, string $type): string|float
     {
         $currencySymbol = Currency::whereEnabled(true)->firstOrFail()->symbol;
         $servicePrice = Service::whereId($get('service_id'))->first()?->selling_price ?? 0;
@@ -585,6 +587,8 @@ class ServiceOrderResource extends Resource
             $currency = $taxInfo->total_price;
         } elseif ($type == 'taxTotal') {
             $currency = $taxInfo->tax_total;
+        } elseif ($type == 'totalPriceFloat') {
+            return floatval($taxInfo->total_price);
         }
 
         $formatted = $currencySymbol.' '.number_format($currency, 2, '.', ',');

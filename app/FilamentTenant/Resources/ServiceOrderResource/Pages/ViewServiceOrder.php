@@ -28,6 +28,7 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceBillData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
 use Domain\ServiceOrder\Enums\PaymentPlanType;
+use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
@@ -35,6 +36,7 @@ use Domain\ServiceOrder\Exceptions\MissingServiceSettingsConfigurationException;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
 use Domain\Taxation\Enums\PriceDisplay;
+use ErrorException;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action as ComponentsAction;
@@ -372,8 +374,12 @@ class ViewServiceOrder extends EditRecord
                                 })
                                 ->schema([
                                     TextInput::make('description')->required()->translateLabel(),
-                                    TextInput::make('amount')->required()->translateLabel(),
-                                    Support\ButtonAction::make('Edit')
+                                    TextInput::make('amount')->required()->label(fn (ServiceOrder $record) => match ($record->payment_value) {
+                                        PaymentPlanValue::FIXED->value => 'Fixed',
+                                        PaymentPlanValue::PERCENT->value => 'Percent',
+                                        default => throw new ErrorException('Invalid payment_value.'),
+                                    }),
+                                    Support\ButtonAction::make('Generate')
                                         ->execute(function (ServiceOrder $record, Closure $get, Closure $set, $component) {
                                             return Forms\Components\Actions\Action::make(trans('generate'))
                                                 ->color('secondary')
