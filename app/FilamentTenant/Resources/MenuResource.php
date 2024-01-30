@@ -36,11 +36,14 @@ class MenuResource extends Resource
 
     protected static ?string $model = Menu::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-menu';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
