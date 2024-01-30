@@ -257,7 +257,7 @@ class DiscountResource extends Resource
                         'success' => DiscountStatus::ACTIVE->value,
                         'warning' => DiscountStatus::INACTIVE->value,
 
-                    ])->formatStateUsing(fn (string $state): string => trans(ucfirst($state)))->weight('bold'),
+                    ])->formatStateUsing(fn (DiscountStatus $state): string => trans(ucfirst($state->value)))->weight('bold'),
             ])
             ->filters([
                 TrashedFilter::make()

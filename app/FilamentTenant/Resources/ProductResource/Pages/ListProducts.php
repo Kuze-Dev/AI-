@@ -21,6 +21,11 @@ class ListProducts extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        // TODO: excel import export
+        return [
+            Actions\CreateAction::make(),
+        ];
+
         return [
             // ImportProductAction::proceed(),
             ImportProductVariantAction::proceed(),

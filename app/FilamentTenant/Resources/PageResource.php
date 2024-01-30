@@ -234,7 +234,7 @@ class PageResource extends Resource
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\BadgeColumn::make('visibility')
-                    ->formatStateUsing(fn ($state) => Str::headline($state))
+                    ->formatStateUsing(fn (Visibility $state) => Str::headline($state->value))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
