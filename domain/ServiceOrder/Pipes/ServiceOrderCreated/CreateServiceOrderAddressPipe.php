@@ -18,7 +18,7 @@ class CreateServiceOrderAddressPipe
     public function handle(
         ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData,
         callable $next
-    ): ServiceOrderCreatedPipelineData {
+    ): void {
 
         $this->createServiceOrderAddressAction->execute(
             new ServiceOrderAddressData(
@@ -29,6 +29,6 @@ class CreateServiceOrderAddressPipe
             )
         );
 
-        return $next($serviceOrderCreatedPipelineData);
+        $next($serviceOrderCreatedPipelineData);
     }
 }
