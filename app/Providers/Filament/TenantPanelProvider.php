@@ -35,16 +35,16 @@ class TenantPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
-            ->login()
             ->authGuard('admin')
+            ->login()
             ->brandName(fn () => app(SiteSettings::class)->name)
             ->discoverResources(in: app_path('FilamentTenant/Resources'), for: 'App\\FilamentTenant\\Resources')
             ->discoverPages(in: app_path('FilamentTenant/Pages'), for: 'App\\FilamentTenant\\Pages')
+//            ->discoverWidgets(in: app_path('FilamentTenant/Widgets'), for: 'App\\FilamentTenant\\Widgets')
             ->discoverClusters(in: app_path('FilamentTenant/Clusters'), for: 'App\\FilamentTenant\\Clusters')
             ->pages([
                 Pages\Dashboard::class,
             ])
-//            ->discoverWidgets(in: app_path('FilamentTenant/Widgets'), for: 'App\\FilamentTenant\\Widgets')
             ->widgets([
                 AccountWidget::class,
                 DeployStaticSite::class,
@@ -59,6 +59,7 @@ class TenantPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
+            ->unsavedChangesAlerts()
             ->maxContentWidth(MaxWidth::Full)
             ->middleware([
                 EncryptCookies::class,
@@ -71,10 +72,11 @@ class TenantPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->middleware([
-                'universal',
-                'tenant',
-            ],
+            ->middleware(
+                [
+                    'universal',
+                    'tenant',
+                ],
                 isPersistent: true
             )
             ->authMiddleware([

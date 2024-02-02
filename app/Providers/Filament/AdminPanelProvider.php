@@ -28,11 +28,11 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-//            ->default()
             ->id('admin')
+            ->domains(config('tenancy.central_domains'))
             ->path('admin')
-            ->login()
             ->authGuard('admin')
+            ->login()
             ->brandName(fn () => app(SiteSettings::class)->name)
             ->colors([
                 'primary' => Color::Amber,
@@ -54,9 +54,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
+            ->unsavedChangesAlerts()
             ->maxContentWidth(MaxWidth::Full)
-            ->domains(config('tenancy.central_domains'))
-            ->persistentMiddleware(['universal'])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -68,6 +67,12 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->middleware(
+                [
+                    'universal',
+                ],
+                isPersistent: true
+            )
             ->authMiddleware([
                 Authenticate::class,
                 'verified:filament.auth.verification.notice',
