@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Filament\Livewire\Auth\AccountDeactivatedNotice;
-use App\Filament\Livewire\Auth\ConfirmPassword;
 use App\Filament\Livewire\Auth\EmailVerificationNotice;
 use App\Filament\Livewire\Auth\RequestPasswordReset;
 use App\Filament\Livewire\Auth\ResetPassword;
 use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Livewire\Auth\VerifyEmail;
+use App\Filament\Pages\ConfirmPassword;
 use Closure;
 use Exception;
 use Filament\Actions\Exports\Models\Export;
@@ -32,9 +32,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Spatie\Activitylog\ActivityLogger;
 use Spatie\Activitylog\ActivitylogServiceProvider;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Throwable;
 
 /** @property \Illuminate\Foundation\Application $app */
 class CommonServiceProvider extends ServiceProvider
@@ -102,7 +99,7 @@ class CommonServiceProvider extends ServiceProvider
         //            fn () => Vite::withEntryPoints(['resources/js/filament/app.js'])->toHtml(),
         //        );
 
-        $this->registerRoutes();
+        //        $this->registerRoutes();
 
         $this->registerMacros();
 
@@ -122,47 +119,47 @@ class CommonServiceProvider extends ServiceProvider
         Export::polymorphicUserRelationship();
     }
 
-    protected function registerRoutes(): void
-    {
-        Route::middleware(config('filament.middleware.base'))
-            ->domain(config('filament.domain'))
-            ->prefix('admin')
-            ->name('filament.auth.')
-            ->group(function () {
-                Route::get('two-factor', TwoFactorAuthentication::class)
-                    ->middleware('guest:admin')
-                    ->name('two-factor');
-
-                Route::prefix('password')
-                    ->name('password.')
-                    ->group(function () {
-                        Route::get('reset', RequestPasswordReset::class)
-                            ->middleware('guest:admin')
-                            ->name('request');
-                        Route::get('reset/{token}', ResetPassword::class)
-                            ->middleware('guest:admin')
-                            ->name('reset');
-                        Route::get('confirm', ConfirmPassword::class)
-                            ->middleware(\Filament\Http\Middleware\Authenticate::class)
-                            ->name('confirm');
-                    });
-
-                Route::middleware(\Filament\Http\Middleware\Authenticate::class)
-                    ->group(function () {
-                        Route::get('account-deactivated', AccountDeactivatedNotice::class)
-                            ->name('account-deactivated.notice');
-
-                        Route::prefix('verify')
-                            ->name('verification.')
-                            ->group(function () {
-                                Route::get('/', EmailVerificationNotice::class)
-                                    ->name('notice');
-                                Route::get('/{id}/{hash}', VerifyEmail::class)
-                                    ->name('verify');
-                            });
-                    });
-            });
-    }
+    //    protected function registerRoutes(): void
+    //    {
+    //        Route::middleware(config('filament.middleware.base'))
+    //            ->domain(config('filament.domain'))
+    //            ->prefix('admin')
+    //            ->name('filament.auth.')
+    //            ->group(function () {
+    //                Route::get('two-factor', TwoFactorAuthentication::class)
+    //                    ->middleware('guest:admin')
+    //                    ->name('two-factor');
+    //
+    //                Route::prefix('password')
+    //                    ->name('password.')
+    //                    ->group(function () {
+    //                        Route::get('reset', RequestPasswordReset::class)
+    //                            ->middleware('guest:admin')
+    //                            ->name('request');
+    //                        Route::get('reset/{token}', ResetPassword::class)
+    //                            ->middleware('guest:admin')
+    //                            ->name('reset');
+    //                        Route::get('confirm', ConfirmPassword::class)
+    //                            ->middleware(\Filament\Http\Middleware\Authenticate::class)
+    //                            ->name('confirm');
+    //                    });
+    //
+    //                Route::middleware(\Filament\Http\Middleware\Authenticate::class)
+    //                    ->group(function () {
+    //                        Route::get('account-deactivated', AccountDeactivatedNotice::class)
+    //                            ->name('account-deactivated.notice');
+    //
+    //                        Route::prefix('verify')
+    //                            ->name('verification.')
+    //                            ->group(function () {
+    //                                Route::get('/', EmailVerificationNotice::class)
+    //                                    ->name('notice');
+    //                                Route::get('/{id}/{hash}', VerifyEmail::class)
+    //                                    ->name('verify');
+    //                            });
+    //                    });
+    //            });
+    //    }
 
     protected function registerMacros(): void
     {

@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Clusters\Settings\Pages;
 use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\PaymentSettings as SettingsPaymentSettings;
 use Filament\Forms;
+use Illuminate\Auth\Middleware\RequirePassword;
 
 class PaymentSettings extends TenantBaseSettings
 {
@@ -18,7 +19,7 @@ class PaymentSettings extends TenantBaseSettings
 
     protected static ?string $title = 'Payment Settings';
 
-    protected static string|array $middlewares = ['password.confirm:filament-tenant.auth.password.confirm'];
+    protected static string|array $routeMiddleware = RequirePassword::class.':filament.tenant.password.confirm';
 
     protected function getFormSchema(): array
     {

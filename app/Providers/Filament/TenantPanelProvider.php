@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\FilamentTenant\Middleware\Authenticate;
+use App\FilamentTenant\Pages\ConfirmPassword;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\Settings\SiteSettings;
+use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
@@ -15,7 +16,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
-use Filament\Widgets;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -23,6 +23,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class TenantPanelProvider extends PanelProvider
@@ -83,6 +84,11 @@ class TenantPanelProvider extends PanelProvider
                 Authenticate::class,
                 'verified:filament.auth.verification.notice',
                 'active:filament.auth.account-deactivated.notice',
-            ]);
+            ])
+            ->routes(function () {
+                Route::get('password/confirm', ConfirmPassword::class)
+                    ->middleware(Authenticate::class)
+                    ->name('password.confirm');
+            });
     }
 }

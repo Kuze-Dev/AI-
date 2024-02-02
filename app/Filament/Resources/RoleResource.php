@@ -18,6 +18,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -34,7 +35,7 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
+    protected static string|array $routeMiddleware = RequirePassword::class.':filament.admin.password.confirm';
 
     public static function getNavigationGroup(): ?string
     {

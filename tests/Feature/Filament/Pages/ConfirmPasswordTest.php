@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Filament\Livewire\Auth\ConfirmPassword;
+use App\Filament\Pages\ConfirmPassword;
 use Domain\Admin\Database\Factories\AdminFactory;
 
 use function Pest\Livewire\livewire;
@@ -17,14 +17,14 @@ it('can render confirm password', function () {
 
 it('can confirm password', function () {
     livewire(ConfirmPassword::class)
-        ->fill(['password' => 'secret'])
+        ->fillForm(['password' => 'secret'])
         ->call('confirm')
         ->assertHasNoErrors();
 });
 
 it('throws error on invalid password', function () {
     livewire(ConfirmPassword::class)
-        ->fill(['password' => 'invalid'])
+        ->fillForm(['password' => 'invalid'])
         ->call('confirm')
         ->assertHasErrors();
 });
