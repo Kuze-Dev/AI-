@@ -25,7 +25,7 @@ class ListAdmins extends ListRecords
                 ->importer(AdminImporter::class)
                 ->withActivityLog(
                     event: 'imported',
-                    description: fn (ExportAction $action) => 'Imported '.$action->getModelLabel(),
+                    description: fn (ImportAction $action) => 'Imported '.$action->getModelLabel(),
                 ),
             ExportAction::make()
                 ->exporter(AdminExporter::class)
