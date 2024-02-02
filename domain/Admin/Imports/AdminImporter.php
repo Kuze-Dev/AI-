@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Imports;
 
-use Domain\Admin\Actions\CreateAdminAction;
-use Domain\Admin\Actions\UpdateAdminAction;
-use Domain\Admin\DataTransferObjects\AdminData;
 use Domain\Admin\Models\Admin;
 use Domain\Role\Models\Role;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\ValidationRules\Rules\Delimited;
 
+/**
+ * @property-read \Domain\Admin\Models\Admin&\Illuminate\Contracts\Auth\Authenticatable $record
+ */
 class AdminImporter extends Importer
 {
     protected static ?string $model = Admin::class;
@@ -30,56 +32,71 @@ class AdminImporter extends Importer
                     Rule::email(),
                     'prohibited_if:email,'.Admin::whereKey(1)->value('email'),
                     'distinct',
-                ]),
+                ])
+                ->example('example@domain.com'),
 
             ImportColumn::make('first_name')
                 ->requiredMapping()
-                ->rules(['required', 'string', 'min:3', 'max:100']),
+                ->rules(['required', 'string', 'min:3', 'max:100'])
+                ->example('test name'),
 
             ImportColumn::make('last_name')
                 ->requiredMapping()
-                ->rules(['required', 'string', 'min:3', 'max:100']),
+                ->rules(['required', 'string', 'min:3', 'max:100'])
+                ->example('test last name'),
 
             ImportColumn::make('active')
-                ->rules(['nullable', 'in:Yes,No']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'in:yes,no'])
+                ->fillRecordUsing(function (Admin $record, string $state): void {
+                    $record->active = $state === 'yes';
+                })
+                ->example(Arr::random(['yes', 'no'])),
 
             ImportColumn::make('roles')
                 ->rules([
                     'nullable',
                     new Delimited([Rule::exists(Role::class, 'name')]),
-                ]),
+                ])
+                ->fillRecordUsing(function (): void {
+                    // skip process
+                })
+                ->example('role1,role2,role3'),
 
             ImportColumn::make('timezone')
-                ->rules(['nullable', 'timezone']),
+                ->ignoreBlankState()
+                ->rules(['nullable', 'timezone'])
+                ->example(config('domain.admin.default_timezone')),
 
         ];
     }
 
     public function resolveRecord(): ?Admin
     {
-        $row = $this->data;
-        $data = [
-            'first_name' => $row['first_name'],
-            'last_name' => $row['last_name'],
-            'email' => $row['email'],
-            'password' => Str::password(),
-            'timezone' => $row['timezone'] ?? null,
-            'active' => isset($row['active']) ? ($row['active'] === 'Yes') : null,
-            'roles' => isset($row['roles']) ? (Str::of($row['roles'])
-                ->explode(',')
-                ->map(fn (string $role) => trim($role))
-                ->toArray()) : null,
-        ];
-        unset($row);
+        return Admin::firstOrNew(
+            ['email' => $this->data['email']],
+            ['password' => Str::password()]
+        );
+    }
 
-        if ($admin = Admin::whereEmail($data['email'])->first()) {
-            unset($data['password'], $data['email']);
-            $admin = app(UpdateAdminAction::class)->execute($admin, new AdminData(...$data));
-        } else {
-            $admin = app(CreateAdminAction::class)->execute(new AdminData(...$data));
+    public function afterCreate(): void
+    {
+        $this->saveRoles();
+        event(new Registered($this->record));
+    }
+
+    public function afterUpdate(): void
+    {
+        $this->saveRoles();
+    }
+
+    private function saveRoles(): void
+    {
+        if (blank($this->data['roles'])) {
+            return;
         }
 
-        return $admin;
+        $this->record->assignRole(explode(',', $this->data['roles']));
     }
 
     public static function getCompletedNotificationBody(Import $import): string

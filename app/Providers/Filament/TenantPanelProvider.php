@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
+use App\FilamentTenant\Pages\AccountDeactivatedNotice;
 use App\FilamentTenant\Pages\ConfirmPassword;
+use App\FilamentTenant\Pages\EditProfile;
+use App\FilamentTenant\Pages\Login;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\Settings\SiteSettings;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
@@ -37,7 +43,14 @@ class TenantPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->authGuard('admin')
-            ->login()
+            ->login(Login::class)
+            ->profile(EditProfile::class)
+            ->passwordReset()
+            ->emailVerification()
+            ->userMenuItems([
+                'profile' => MenuItem::make()
+                    ->label(fn () => Filament::auth()->user()?->full_name),
+            ])
             ->brandName(fn () => app(SiteSettings::class)->name)
             ->discoverResources(in: app_path('FilamentTenant/Resources'), for: 'App\\FilamentTenant\\Resources')
             ->discoverPages(in: app_path('FilamentTenant/Pages'), for: 'App\\FilamentTenant\\Pages')
@@ -82,13 +95,23 @@ class TenantPanelProvider extends PanelProvider
             )
             ->authMiddleware([
                 Authenticate::class,
-                'verified:filament.auth.verification.notice',
-                'active:filament.auth.account-deactivated.notice',
+                'active:filament.tenant.account-deactivated.notice',
             ])
             ->routes(function () {
+
+                Route::get('two-factor', TwoFactorAuthentication::class)
+                    ->middleware('guest:admin')
+                    ->name('two-factor');
+
                 Route::get('password/confirm', ConfirmPassword::class)
                     ->middleware(Authenticate::class)
                     ->name('password.confirm');
+
+                Route::middleware(Authenticate::class)
+                    ->group(function () {
+                        Route::get('account-deactivated', AccountDeactivatedNotice::class)
+                            ->name('account-deactivated.notice');
+                    });
             });
     }
 }

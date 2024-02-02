@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Filament\Livewire\Auth\AccountDeactivatedNotice;
 use App\Filament\Livewire\Auth\EmailVerificationNotice;
 use App\Filament\Livewire\Auth\RequestPasswordReset;
 use App\Filament\Livewire\Auth\ResetPassword;
-use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Livewire\Auth\VerifyEmail;
-use App\Filament\Pages\ConfirmPassword;
 use Closure;
 use Exception;
 use Filament\Actions\Exports\Models\Export;
@@ -24,7 +21,6 @@ use Filament\Pages\Page;
 use Filament\Support\Actions as SupportActions;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;

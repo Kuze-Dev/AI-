@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Models;
 
-use Domain\Admin\Notifications\ResetPassword;
-use Domain\Admin\Notifications\VerifyEmail;
 use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
 use Domain\Auth\HasActiveState;
 use Domain\Auth\TwoFactorAuthenticatable;
 use Domain\Site\Models\Site;
+use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
@@ -171,12 +170,10 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
 
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmail());
-    }
+        $notification = new \Filament\Notifications\Auth\VerifyEmail();
+        $notification->url = Filament::getVerifyEmailUrl($this);
 
-    public function sendPasswordResetNotification($token): void
-    {
-        $this->notify(new ResetPassword($token));
+        $this->notify($notification);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Spatie\Activitylog\Models\Activity> */

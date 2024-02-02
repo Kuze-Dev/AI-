@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Livewire\Auth\TwoFactorAuthentication;
+use App\Filament\Pages\AccountDeactivatedNotice;
 use App\Filament\Pages\ConfirmPassword;
+use App\Filament\Pages\EditProfile;
+use App\Filament\Pages\Login;
 use App\Settings\SiteSettings;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
@@ -35,7 +41,14 @@ class AdminPanelProvider extends PanelProvider
             ->domains(config('tenancy.central_domains'))
             ->path('admin')
             ->authGuard('admin')
-            ->login()
+            ->login(Login::class)
+            ->profile(EditProfile::class)
+            ->passwordReset()
+            ->emailVerification()
+            ->userMenuItems([
+                'profile' => MenuItem::make()
+                    ->label(fn () => Filament::auth()->user()?->full_name),
+            ])
             ->brandName(fn () => app(SiteSettings::class)->name)
             ->colors([
                 'primary' => Color::Amber,
@@ -78,13 +91,23 @@ class AdminPanelProvider extends PanelProvider
             )
             ->authMiddleware([
                 Authenticate::class,
-                'verified:filament.auth.verification.notice',
-                'active:filament.auth.account-deactivated.notice',
+                'active:filament.admin.account-deactivated.notice',
             ])
             ->routes(function () {
+
+                Route::get('two-factor', TwoFactorAuthentication::class)
+                    ->middleware('guest:admin')
+                    ->name('two-factor');
+
                 Route::get('password/confirm', ConfirmPassword::class)
                     ->middleware(Authenticate::class)
                     ->name('password.confirm');
+
+                Route::middleware(Authenticate::class)
+                    ->group(function () {
+                        Route::get('account-deactivated', AccountDeactivatedNotice::class)
+                            ->name('account-deactivated.notice');
+                    });
             });
     }
 }
