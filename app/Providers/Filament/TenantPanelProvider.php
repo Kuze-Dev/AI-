@@ -39,9 +39,6 @@ class TenantPanelProvider extends PanelProvider
         return $panel
             ->id('tenant')
             ->path('admin')
-            ->colors([
-                'primary' => Color::Blue,
-            ])
             ->authGuard('admin')
             ->login(Login::class)
             ->profile(EditProfile::class)
@@ -50,6 +47,9 @@ class TenantPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => MenuItem::make()
                     ->label(fn () => Filament::auth()->user()?->full_name),
+            ])
+            ->colors([
+                'primary' => Color::Blue,
             ])
             ->brandName(fn () => app(SiteSettings::class)->name)
             ->discoverResources(in: app_path('FilamentTenant/Resources'), for: 'App\\FilamentTenant\\Resources')
