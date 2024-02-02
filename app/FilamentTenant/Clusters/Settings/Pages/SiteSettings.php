@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Pages\Settings;
+namespace App\FilamentTenant\Clusters\Settings\Pages;
 
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\FilamentTenant\Support\Concerns\AuthorizeCMSSettings;
@@ -12,7 +12,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Cache;
-use Livewire\TemporaryUploadedFile;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class SiteSettings extends TenantBaseSettings
 {

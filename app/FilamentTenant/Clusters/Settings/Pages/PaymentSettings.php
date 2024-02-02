@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Pages\Settings;
+namespace App\FilamentTenant\Clusters\Settings\Pages;
 
 use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\PaymentSettings as SettingsPaymentSettings;
@@ -23,7 +23,7 @@ class PaymentSettings extends TenantBaseSettings
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\Card::make([
+            Forms\Components\Section::make([
                 Forms\Components\Section::make(trans('PayPaL'))
                     ->collapsible()
                     ->schema([

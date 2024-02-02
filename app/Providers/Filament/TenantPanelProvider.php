@@ -6,6 +6,7 @@ namespace App\Providers\Filament;
 
 use App\FilamentTenant\Middleware\Authenticate;
 use App\FilamentTenant\Widgets\DeployStaticSite;
+use App\Settings\SiteSettings;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
@@ -13,6 +14,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -35,9 +37,10 @@ class TenantPanelProvider extends PanelProvider
             ])
             ->login()
             ->authGuard('admin')
-            ->brandName(fn () => tenant()->name)
+            ->brandName(fn () => app(SiteSettings::class)->name)
             ->discoverResources(in: app_path('FilamentTenant/Resources'), for: 'App\\FilamentTenant\\Resources')
             ->discoverPages(in: app_path('FilamentTenant/Pages'), for: 'App\\FilamentTenant\\Pages')
+            ->discoverClusters(in: app_path('FilamentTenant/Clusters'), for: 'App\\FilamentTenant\\Clusters')
             ->pages([
                 Pages\Dashboard::class,
             ])
@@ -56,7 +59,7 @@ class TenantPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
-            ->maxContentWidth('full')
+            ->maxContentWidth(MaxWidth::Full)
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

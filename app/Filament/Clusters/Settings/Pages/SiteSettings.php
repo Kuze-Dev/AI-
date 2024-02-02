@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Pages\Settings;
+namespace App\Filament\Clusters\Settings\Pages;
 
 use App\Settings\SiteSettings as ManageSiteSettings;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Livewire\TemporaryUploadedFile;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class SiteSettings extends BaseSettings
 {
@@ -20,7 +20,7 @@ class SiteSettings extends BaseSettings
     protected function getFormSchema(): array
     {
         return [
-            Card::make([
+            Section::make([
                 TextInput::make('name')
                     ->required()
                     ->maxLength(100)

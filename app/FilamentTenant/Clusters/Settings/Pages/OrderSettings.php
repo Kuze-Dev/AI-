@@ -2,51 +2,33 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Pages\Settings;
+namespace App\FilamentTenant\Clusters\Settings\Pages;
 
-use App\Features\Service\ServiceBase;
-use App\Settings\ServiceSettings as ServiceCategorySettings;
-use Domain\Taxonomy\Models\Taxonomy;
+use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
+use App\Settings\OrderSettings as SettingsOrderSettings;
 use Filament\Forms;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Str;
+use Illuminate\Support\Str;
 
-class ServiceSettings extends TenantBaseSettings
+class OrderSettings extends TenantBaseSettings
 {
-    protected static string $settings = ServiceCategorySettings::class;
+    use AuthorizeEcommerceSettings;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string $settings = SettingsOrderSettings::class;
 
-    protected static ?string $title = 'Service Settings';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
-    public static function authorizeAccess(): bool
-    {
-        return parent::authorizeAccess() && tenancy()->tenant?->features()->active(ServiceBase::class);
-    }
+    protected static ?string $title = 'Order Settings';
 
     protected function getFormSchema(): array
     {
         return [
-            Card::make([
-                Select::make('service_category')
-                    ->placeholder(trans('Select Category'))
-                    ->options(Taxonomy::pluck('name', 'id'))
-                    ->columnSpan('full'),
-                Forms\Components\TextInput::make('domain_path_segment')
-                    ->label(trans('Domain Path Segment'))
-                    ->required()
-                    ->dehydrateStateUsing(fn (?string $state) => is_null($state) ? '' : $state),
-            ]),
             Forms\Components\Card::make([
                 Forms\Components\Section::make('Admin Email Notification')
                     ->schema([
                         Forms\Components\Toggle::make('admin_should_receive')
                             ->inline(false)
                             ->label('')
-                            ->helperText('Enable this if you want to receive emails whenever a service order status changes.')
+                            ->helperText('Enable this if you want to receive emails whenever an order is placed.')
                             ->reactive(),
                         Forms\Components\TextInput::make('admin_main_receiver')
                             ->label(trans('Main Receiver'))
@@ -111,15 +93,6 @@ class ServiceSettings extends TenantBaseSettings
                             ->columnSpanFull(),
                     ]),
             ]),
-            Section::make('Service Order Section')
-                ->schema([
-                    TextInput::make('days_before_due_date_notification')
-                        ->placeholder(trans('Days Before Due Date Notification'))
-                        ->numeric()
-                        ->minValue(1)
-                        ->maxValue(31)
-                        ->columnSpan('full'),
-                ]),
         ];
     }
 }

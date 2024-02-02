@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\FilamentTenant\Pages\Settings;
+namespace App\FilamentTenant\Clusters\Settings\Pages;
 
 use App\FilamentTenant\Support\Concerns\AuthorizeCMSSettings;
 use App\Settings\FormSettings as SettingsFormSettings;
