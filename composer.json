@@ -24,7 +24,6 @@
         "laravel/vapor-core": "^2.28",
         "league/flysystem-aws-s3-v3": "^3.13",
         "lloricode/spatie-image-optimizer-health-check": "^2.0",
-        "maatwebsite/excel": "^3.1.50",
         "mohamedsabil83/filament-forms-tinyeditor": "^2.2",
         "pragmarx/google2fa": "^8.0",
         "sentry/sentry-laravel": "^4.1",

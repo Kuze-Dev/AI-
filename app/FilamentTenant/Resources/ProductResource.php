@@ -353,7 +353,7 @@ class ProductResource extends Resource
                 Tables\Actions\DeleteBulkAction::make()
                     ->translateLabel(),
 
-                // TODO: excel import export
+                // TODO: export
                 //                ExportBulkAction::make()
                 //                    ->queue()
                 //                    ->query(fn (Builder $query) => $query->with('productVariants')->latest())
