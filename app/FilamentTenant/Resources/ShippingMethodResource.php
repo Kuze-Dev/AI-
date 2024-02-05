@@ -5,23 +5,21 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ShippingmethodResource\Pages;
-use Domain\Address\Models\Country;
-use Domain\Address\Models\State;
 use Domain\ShippingMethod\Actions\GetAvailableShippingDriverAction;
 use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Exception;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Throwable;
+use Illuminate\Support\Str;
 
-class ShippingmethodResource extends Resource
+class ShippingMethodResource extends Resource
 {
     protected static ?string $model = ShippingMethod::class;
 
@@ -38,38 +36,19 @@ class ShippingmethodResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('title')
                         ->unique(ignoreRecord: true)
                         ->required(),
                     Forms\Components\TextInput::make('subtitle')
                         ->required(),
                     Forms\Components\RichEditor::make('description'),
-                    Forms\Components\FileUpload::make('logo')
-                        ->formatStateUsing(function ($record) {
-                            return $record?->getMedia('logo')
-                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                ->toArray() ?? [];
-                        })
+                    SpatieMediaLibraryFileUpload::make('logo')
                         ->image()
-                        ->beforeStateDehydrated(null)
-                        ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                            $mediaClass = config('media-library.media_model', Media::class);
-
-                            /** @var ?Media $media */
-                            $media = $mediaClass::findByUuid($file);
-
-                            if ($component->getVisibility() === 'private') {
-                                try {
-                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                } catch (Throwable) {
-                                    // This driver does not support creating temporary URLs.
-                                }
-                            }
-
-                            return $media?->getUrl();
-                        }),
+                        ->collection('logo')
+                        ->customProperties(fn (Forms\Get $get) => [
+                            'alt_text' => Str::slug($get('title')),
+                        ]),
                     Forms\Components\Toggle::make('active')
                         ->label('Status')
                         ->inline(false)
@@ -86,8 +65,9 @@ class ShippingmethodResource extends Resource
                             Forms\Components\Select::make('shipper_country_id')
                                 ->label(trans('Shipper country'))
                                 ->required()
+                                ->relationship('country', 'name')
                                 ->preload()
-                                ->optionsFromModel(Country::class, 'name')
+                                ->searchable()
                                 ->reactive()
                                 ->afterStateUpdated(function (callable $set) {
                                     $set('shipper_state_id', null);
@@ -95,12 +75,13 @@ class ShippingmethodResource extends Resource
                             Forms\Components\Select::make('shipper_state_id')
                                 ->label(trans('Shipper state'))
                                 ->required()
-                                ->preload()
-                                ->optionsFromModel(
-                                    State::class,
+                                ->relationship(
+                                    'state',
                                     'name',
-                                    fn (Builder $query, callable $get) => $query->where('country_id', $get('shipper_country_id'))
-                                )
+                                    modifyQueryUsing: fn (Builder $query, Forms\Get $get) => $query
+                                        ->where('country_id', $get('shipper_country_id')))
+                                ->preload()
+                                ->searchable()
                                 ->reactive(),
                             Forms\Components\TextInput::make('shipper_address')
                                 ->translateLabel()
@@ -157,19 +138,12 @@ class ShippingmethodResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
-    public static function getRelations(): array
-    {
-        return [
-
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListShippingmethods::route('/'),
-            'create' => Pages\CreateShippingmethod::route('/create'),
-            'edit' => Pages\EditShippingmethod::route('/{record}/edit'),
+            'index' => Pages\ListShippingMethods::route('/'),
+            'create' => Pages\CreateShippingMethod::route('/create'),
+            'edit' => Pages\EditShippingMethod::route('/{record}/edit'),
         ];
     }
 }

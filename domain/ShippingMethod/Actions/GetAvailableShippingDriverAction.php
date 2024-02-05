@@ -11,22 +11,22 @@ class GetAvailableShippingDriverAction
 {
     public function execute(): array
     {
-        if (tenancy()->initialized) {
-            $tenant = tenancy()->tenant;
-
-            return array_filter(
-                collect(Driver::cases())
-                    ->mapWithKeys(
-                        fn (Driver $target) => [
-                            $target->value => $tenant?->features()->active('ecommerce.'.$target->value) ?
-                             Str::of($target->value)->headline()->upper() : false,
-                        ]
-                    )
-                    ->toArray(),
-                fn ($value) => $value !== false
-            );
+        if (! tenancy()->initialized) {
+            return [];
         }
 
-        return [];
+        $tenant = tenancy()->tenant;
+
+        return array_filter(
+            collect(Driver::cases())
+                ->mapWithKeys(
+                    fn (Driver $target) => [
+                        $target->value => $tenant?->features()->active('ecommerce.'.$target->value) ?
+                         Str::of($target->value)->headline()->upper() : false,
+                    ]
+                )
+                ->toArray(),
+            fn ($value) => $value !== false
+        );
     }
 }
