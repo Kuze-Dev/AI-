@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Once\Cache;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Fixtures\User;
 
@@ -25,6 +26,7 @@ uses(
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
+        Cache::getInstance()->disable();
         Http::preventStrayRequests();
         Mail::fake();
 
@@ -63,6 +65,7 @@ uses(
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
+        Cache::getInstance()->disable();
         Http::preventStrayRequests();
         Mail::fake();
 

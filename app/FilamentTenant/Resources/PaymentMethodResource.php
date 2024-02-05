@@ -9,6 +9,7 @@ use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -16,9 +17,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Throwable;
 
 class PaymentMethodResource extends Resource
 {
@@ -42,48 +41,25 @@ class PaymentMethodResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('title')
                         ->unique(ignoreRecord: true)
                         ->required(),
                     Forms\Components\TextInput::make('subtitle')
                         ->required(),
-                    Forms\Components\FileUpload::make('logo')
-                        ->formatStateUsing(function ($record) {
-                            return $record?->getMedia('logo')
-                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                ->toArray() ?? [];
-                        })
+                    SpatieMediaLibraryFileUpload::make('logo')
                         ->image()
-                        ->beforeStateDehydrated(null)
-                        ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                            $mediaClass = config('media-library.media_model', Media::class);
-
-                            /** @var ?Media $media */
-                            $media = $mediaClass::findByUuid($file);
-
-                            if ($component->getVisibility() === 'private') {
-                                try {
-                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                } catch (Throwable) {
-                                    // This driver does not support creating temporary URLs.
-                                }
-                            }
-
-                            return $media?->getUrl();
-                        }),
+                        ->collection('logo')
+                        ->customProperties(fn (Forms\Get $get) => [
+                            'alt_text' => $get('title'),
+                        ]),
                     Forms\Components\Toggle::make('status')
                         ->inline(false)
                         ->helperText('If enabled, message here')
                         ->reactive(),
                     Forms\Components\Select::make('gateway')
                         ->required()
-                        ->options(function () {
-
-                            return app(GetAvailablePaymentDriverAction::class)->execute();
-
-                        })
+                        ->options(fn () => app(GetAvailablePaymentDriverAction::class)->execute())
                         ->reactive(),
                     Forms\Components\Textarea::make('description')
                         ->maxLength(fn (int $value = 250) => $value),
@@ -94,6 +70,9 @@ class PaymentMethodResource extends Resource
             ]);
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -101,17 +80,18 @@ class PaymentMethodResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\BadgeColumn::make('gateway')
+                Tables\Columns\TextColumn::make('gateway')
+                    ->badge()
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\IconColumn::make('status')
                     ->label(trans('Enabled'))
-                    ->options([
+                    ->icons([
                         'heroicon-o-check-circle' => fn ($state) => $state == true,
                         'heroicon-o-x-circle' => fn ($state) => $state === false,
                     ])
-                    ->color(fn ($state) => $state == true ? 'success' : 'danger'),
+                    ->color(fn (bool $state) => $state ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('subtitle')
                     ->sortable()
                     ->searchable(),
@@ -146,13 +126,6 @@ class PaymentMethodResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-
-        ];
     }
 
     public static function getPages(): array
