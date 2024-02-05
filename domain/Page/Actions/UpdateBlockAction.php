@@ -18,9 +18,9 @@ class UpdateBlockAction
             'data' => $blockData->data,
             'is_fixed_content' => $blockData->is_fixed_content,
         ]);
-
+        
         if ($blockData->image instanceof UploadedFile && $imageString = $blockData->image->get()) {
-            $block->addMediaFromString($imageString)
+            $block->addmedia($blockData->image)
                 ->usingFileName($blockData->image->getClientOriginalName())
                 ->usingName(pathinfo($blockData->image->getClientOriginalName(), PATHINFO_FILENAME))
                 ->toMediaCollection('image');

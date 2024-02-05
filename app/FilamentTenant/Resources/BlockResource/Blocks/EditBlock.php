@@ -9,8 +9,8 @@ use App\FilamentTenant\Resources\BlockResource;
 use Domain\Page\Actions\UpdateBlockAction;
 use Domain\Page\DataTransferObjects\BlockData;
 use Exception;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +27,7 @@ class EditBlock extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -49,7 +49,7 @@ class EditBlock extends EditRecord
                         name: $data['name'],
                         component: $data['component'],
                         image: $data['image'],
-                        blueprint_id: $data['blueprint_id'],
+                        blueprint_id: $data['blueprint_id'] ?? $record->blueprint_id,
                         is_fixed_content: $data['is_fixed_content'],
                         data: $data['data'] ?? null,
                     )
