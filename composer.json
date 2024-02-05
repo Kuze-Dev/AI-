@@ -45,7 +45,8 @@
         "stripe/stripe-php": "^10.18",
         "timacdonald/json-api": "^1.0.0-beta.6",
         "victord11/ssl-certification-health-check": "^1.0",
-        "vyuldashev/xml-to-array": "^1.1"
+        "vyuldashev/xml-to-array": "^1.1",
+        "ext-pdo": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",

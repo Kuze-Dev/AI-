@@ -20,7 +20,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
@@ -76,13 +75,23 @@ class RoleResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->formatStateUsing(fn ($state): string => Str::headline($state))
                     ->searchable(),
-                Tables\Columns\BadgeColumn::make('guard_name'),
-                Tables\Columns\BadgeColumn::make('permissions_count')
+                Tables\Columns\TextColumn::make('guard_name')
+                    ->badge(),
+                Tables\Columns\TextColumn::make('permissions_count')
+                    ->badge()
                     ->counts('permissions')
                     ->colors(['success']),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
+                    ->dateTime()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->dateTime(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('guard_name')

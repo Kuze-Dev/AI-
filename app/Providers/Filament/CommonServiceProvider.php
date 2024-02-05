@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Filament\Livewire\Auth\EmailVerificationNotice;
-use App\Filament\Livewire\Auth\RequestPasswordReset;
-use App\Filament\Livewire\Auth\ResetPassword;
-use App\Filament\Livewire\Auth\VerifyEmail;
 use Closure;
 use Exception;
 use Filament\Actions\Exports\Models\Export;
@@ -15,6 +11,7 @@ use Filament\Actions\Imports\Models\Import;
 use Filament\Actions\MountableAction;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions as PageActions;
 use Filament\Pages\Page;
@@ -452,6 +449,49 @@ class CommonServiceProvider extends ServiceProvider
 
     protected function configureComponents(): void
     {
+        Infolists\Components\TextEntry::configureUsing(
+            function (Infolists\Components\TextEntry $component) {
+                if (Filament::auth()->check()) {
+                    $component
+                        ->timezone(
+                            /** @phpstan-ignore-next-line  */
+                            Filament::auth()->user()->timezone
+                        );
+                }
+            }
+        );
+
+        Forms\Components\DateTimePicker::configureUsing(
+            function (Forms\Components\DateTimePicker $component): void {
+                if (Filament::auth()->check()) {
+                    $component
+                        ->timezone(
+                            /** @phpstan-ignore-next-line  */
+                            Filament::auth()->user()->timezone
+                        );
+                }
+            }
+        );
+        Tables\Columns\TextColumn::configureUsing(
+            function (Tables\Columns\TextColumn $column): void {
+                if (Filament::auth()->check()) {
+                    $column
+                        ->timezone(
+                            /** @phpstan-ignore-next-line  */
+                            Filament::auth()->user()->timezone
+                        );
+                }
+            }
+        );
+        Tables\Table::configureUsing(
+            fn (Tables\Table $table) => $table
+                ->paginated([5, 10, 25, 50, 100])
+        );
+        Forms\Components\TextInput::configureUsing(
+            fn (Forms\Components\TextInput $textInput) => $textInput
+                ->maxLength(255)
+        );
+
         PageActions\CreateAction::configureUsing(fn (PageActions\CreateAction $action) => $action->icon('heroicon-o-plus-small'));
         PageActions\DeleteAction::configureUsing($this->createActionConfiguration(), isImportant: true);
         PageActions\RestoreAction::configureUsing($this->createActionConfiguration(), isImportant: true);

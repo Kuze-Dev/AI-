@@ -21,7 +21,6 @@ use Filament\Tables\Table;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
@@ -139,9 +138,17 @@ class AdminResource extends Resource
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
                 Tables\Columns\TagsColumn::make('roles.name'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
+                    ->dateTime()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->dateTime(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),

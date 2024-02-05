@@ -67,6 +67,10 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'is_suspended',
     ];
 
+    protected $casts = [
+        'is_suspended' => 'boolean',
+    ];
+
     public static function getCustomColumns(): array
     {
         return [
