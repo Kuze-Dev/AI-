@@ -371,7 +371,7 @@ it('can create page with media uploaded', function () {
         'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
 
     ]);
-})->only();
+});
 
 it('can create page with media uploaded inside repeater', function () {
     $block = BlockFactory::new()
@@ -434,4 +434,4 @@ it('can create page with media uploaded inside repeater', function () {
         'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->fields[0]->conversions[0]->name => true]),
 
     ]);
-})->only();
+});

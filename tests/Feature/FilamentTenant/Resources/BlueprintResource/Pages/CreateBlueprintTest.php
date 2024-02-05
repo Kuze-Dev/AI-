@@ -13,7 +13,8 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
+    // v3 upgrade set context to panels
+    Filament::setCurrentPanel(Filament::getPanel('tenant'));
     loginAsSuperAdmin();
 });
 

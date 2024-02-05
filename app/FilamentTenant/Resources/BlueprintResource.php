@@ -142,8 +142,8 @@ class BlueprintResource extends Resource
                 }
 
                 $label = $state['title'];
-
-                if (filled($state['type'])) {
+                
+                if (array_key_exists('type',$state) && filled($state['type'])) {
                     $type = $state['type'] instanceof FieldType
                         ? $state['type']->value
                         : $state['type'];
@@ -214,13 +214,20 @@ class BlueprintResource extends Resource
                 Forms\Components\Section::make('Field Options')
                     ->id('field-options')
                     ->collapsible()
-                    // ->when(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
+                    // ->hidden(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
                     ->columns(['sm' => 2])
-                    ->schema(fn (array $state) => self::getFieldOptionSchema(
-                        $state['type'] instanceof FieldType
-                            ? $state['type']
-                            : FieldType::tryFrom($state['type'] ?? '')
-                    )),
+                    ->schema(function (array $state) {
+
+                        if (! array_key_exists('type',$state)) {
+                            return [];
+                        }
+
+                        return self::getFieldOptionSchema(
+                                $state['type'] instanceof FieldType 
+                                    ? $state['type']
+                                    : FieldType::tryFrom($state['type'] ?? ''));
+                    }),
+                    
             ]);
     }
 
@@ -269,12 +276,12 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('min_files')
                     ->numeric()
                     ->integer()
-                    ->when(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_files')
                     ->numeric()
                     ->integer()
-                    ->when(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             FieldType::MARKDOWN => [
@@ -313,12 +320,12 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (\Filament\Forms\Get $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\TextInput::make('max')
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (\Filament\Forms\Get $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -419,12 +426,12 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (\Filament\Forms\Get $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\TextInput::make('max')
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (\Filament\Forms\Get $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Group::make()
                     ->columnSpanFull()
                     ->hidden(function (\Filament\Forms\Get $get) {
@@ -504,12 +511,12 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('min_files')
                     ->numeric()
                     ->integer()
-                    ->when(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_files')
                     ->numeric()
                     ->integer()
-                    ->when(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Repeater::make('conversions')
                     ->schema([
