@@ -60,7 +60,7 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('name')
                                 ->unique(
                                     ignoreRecord: true,
-                                    callback: function (Unique $rule, $state, $livewire) {
+                                    modifyRuleUsing: function (Unique $rule, $state, $livewire) {
 
                                         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
                                             return false;
@@ -195,7 +195,7 @@ class PageResource extends Resource
                                             ->toArray(),
                                     ])
                                     ->reactive()
-                                    ->afterStateUpdated(function ($component, $state) {
+                                    ->afterStateUpdated(function ( Forms\Components\ViewField $component, $state) {
                                         $block = self::getCachedBlocks()->firstWhere('id', $state);
                                         $component->getContainer()
                                             ->getComponent(fn ($component) => $component->getId() === 'schema-form')

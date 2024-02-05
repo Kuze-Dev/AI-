@@ -71,7 +71,8 @@ class RouteUrlFieldset extends Group
                 ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update')),
             Forms\Components\TextInput::make('url')
                 ->label(trans('URL'))
-                ->disabled(fn (\Filament\Forms\Get $get) => ! (bool) $get('is_override'))
+                ->readOnly(fn (\Filament\Forms\Get $get) => ! (bool) $get('is_override'))
+                // ->disabled(fn (\Filament\Forms\Get $get) => ! (bool) $get('is_override'))
                 ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl?->url)
                 ->lazy()
                 ->required()

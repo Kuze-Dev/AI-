@@ -42,7 +42,7 @@ class MetaDataForm extends Section
                 ->image()
                 ->beforeStateDehydrated(null)
                 ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
                     $mediaClass = config('media-library.media_model', Media::class);
 
                     /** @var ?Media $media */
