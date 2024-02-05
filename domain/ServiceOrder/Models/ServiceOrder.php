@@ -64,6 +64,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_price
+ * @property string|null $payment_type
+ * @property string|null $payment_value
+ * @property array|null $payment_plan
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
@@ -167,6 +170,9 @@ class ServiceOrder extends Model implements PayableInterface
         'total_price',
         'retail_price',
         'schema',
+        'payment_value',
+        'payment_plan',
+        'payment_type',
     ];
 
     protected $casts = [
@@ -187,6 +193,7 @@ class ServiceOrder extends Model implements PayableInterface
         'tax_total' => MoneyCast::class,
         'total_price' => MoneyCast::class,
         'status' => ServiceOrderStatus::class,
+        'payment_plan' => 'json',
     ];
 
     public function getRouteKeyName(): string
@@ -266,6 +273,11 @@ class ServiceOrder extends Model implements PayableInterface
         return money($this->serviceBills()
             ->where('status', 'pending')
             ->sum('total_balance'));
+    }
+
+    public function totalUnpaidBills(): int
+    {
+        return $this->serviceBills()->where('total_balance', '>', 0)->count();
     }
 
     public function totalBalanceTax(): Money

@@ -43,6 +43,7 @@ class ServiceOrderResource extends JsonApiResource
             'last_payment_method' => $this->latestPaymentMethod()?->slug,
             'created_by' => $this->admin?->first_name.' '.$this->admin?->last_name,
             'total_balance' => $this->totalBalance()->formatSimple(),
+
         ];
     }
 

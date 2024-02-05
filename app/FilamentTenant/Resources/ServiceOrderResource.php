@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
+use App\FilamentTenant\Resources\ServiceOrderResource\Rules\PaymentPlanAmountRule;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Closure;
@@ -20,6 +21,8 @@ use Domain\ServiceOrder\Actions\CalculateServiceOrderTotalPriceAction;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
+use Domain\ServiceOrder\Enums\PaymentPlanType;
+use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Taxation\Enums\PriceDisplay;
@@ -27,11 +30,13 @@ use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Toggle;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -222,19 +227,77 @@ class ServiceOrderResource extends Resource
 
                                     ]),
                                 ])
+
                                     ->visible(
                                         function (array $state) {
                                             return isset($state['service_id']);
                                         }
                                     ),
 
-                                TextLabel::make('')
-                                    ->label(trans('Additional Charges'))
-                                    ->alignLeft()
-                                    ->size('xl')
-                                    ->weight('bold')
-                                    ->inline()
-                                    ->readOnly(),
+                                Forms\Components\Group::make()
+                                    ->schema([
+                                        Forms\Components\Fieldset::make('')->schema([
+                                            TextLabel::make('')
+                                                ->label(trans('Payment Plan'))
+                                                ->alignLeft()
+                                                ->size('xl')
+                                                ->weight('bold')
+                                                ->inline()
+                                                ->readOnly(),
+
+                                            Radio::make('payment_type')
+                                                ->label(trans('Pay in'))
+                                                ->options(
+                                                    collect(PaymentPlanType::cases())
+                                                        ->mapWithKeys(fn (PaymentPlanType $target) => [$target->value => Str::headline($target->value)])
+                                                        ->toArray()
+                                                )
+                                                ->enum(PaymentPlanType::class)
+                                                ->default(PaymentPlanType::FULL->value)
+                                                ->reactive()
+                                                ->required()
+                                                ->columnSpan(2)
+                                                ->columns(2),
+
+                                            Forms\Components\Select::make('payment_value')
+                                                ->label(trans('Value'))
+                                                ->reactive()
+                                                ->options(
+                                                    collect(PaymentPlanValue::cases())
+                                                        ->mapWithKeys(fn (PaymentPlanValue $target) => [$target->value => Str::headline($target->value)])
+                                                        ->toArray()
+                                                )
+                                                ->enum(PaymentPlanValue::class)
+                                                ->columnSpan(2)
+                                                ->placeholder(trans('Select Percent / Fixed'))
+                                                ->columns(2)
+                                                ->visible(fn (Closure $get) => $get('payment_type') === 'milestone'),
+
+                                            Repeater::make('payment_plan')
+                                                ->label('')
+                                                ->createItemButtonLabel('Add Milestone')
+                                                ->columnSpan(2)
+                                                ->defaultItems(1)
+                                                ->reactive()
+                                                ->rule(fn (Closure $get) => new PaymentPlanAmountRule(floatval(self::currencyFormat($get, 'totalPriceFloat')), $get('payment_value')))
+                                                ->schema([
+                                                    TextInput::make('description')->required()->translateLabel()
+                                                        ->afterStateUpdated(function ($component, $state, $livewire) {
+                                                            $items = $component->getContainer()->getParentComponent()->getOldState();
+                                                            $livewire->resetErrorBag($component->getStatePath());
+
+                                                            if (in_array([$component->getName() => $state]['description'], array_column($items, 'description'))) {
+                                                                $livewire->addError($component->getStatePath(), 'duplicated');
+                                                            }
+                                                        }),
+                                                    TextInput::make('amount')->required(),
+                                                    Toggle::make('is_generated')->required()->translateLabel()->visible(false)->default(false),
+                                                ])->columns(2)
+                                                ->visible(fn (Closure $get) => $get('payment_value') && $get('payment_type') === 'milestone'),
+                                        ]),
+
+                                    ])
+                                    ->columnSpan(2)->visible(fn (Closure $get) => $get('service_id') && ! Service::whereId($get('service_id'))->first()?->is_subscription),
 
                                 Repeater::make('additional_charges')
                                     ->label('')
@@ -490,7 +553,7 @@ class ServiceOrderResource extends Resource
             ->execute($subTotal, $billingAddressData);
     }
 
-    private static function currencyFormat(Closure $get, string $type): string
+    private static function currencyFormat(Closure $get, string $type): string|float
     {
         $currencySymbol = Currency::whereEnabled(true)->firstOrFail()->symbol;
         $servicePrice = Service::whereId($get('service_id'))->first()?->selling_price ?? 0;
@@ -524,6 +587,8 @@ class ServiceOrderResource extends Resource
             $currency = $taxInfo->total_price;
         } elseif ($type == 'taxTotal') {
             $currency = $taxInfo->tax_total;
+        } elseif ($type == 'totalPriceFloat') {
+            return floatval($taxInfo->total_price);
         }
 
         $formatted = $currencySymbol.' '.number_format($currency, 2, '.', ',');
