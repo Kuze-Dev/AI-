@@ -1,5 +1,5 @@
 image:
-  name: bitnami/laravel:10.2.9
+  name: bitnami/laravel:10.3.2 # https://bitnami.com/stack/laravel
   run-as-user: 1000
 
 definitions:
@@ -9,7 +9,7 @@ definitions:
     composer install --prefer-dist --no-interaction &&
     cp .env.example .env &&
     php artisan key:generate
-#    php artisan about --only=environment
+    php artisan about --only=environment
   steps:
     - step: &common-step
         caches:
