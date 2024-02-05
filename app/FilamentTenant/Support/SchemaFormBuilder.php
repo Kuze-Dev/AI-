@@ -46,7 +46,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class SchemaFormBuilder extends Component
 {
-    protected string $view = 'forms::components.group';
+    protected string $view = 'filament-forms::components.group';
 
     protected SchemaData|Closure|null $schemaData = null;
 
@@ -232,12 +232,18 @@ class SchemaFormBuilder extends Component
             return array_values($state ?? []) ?: null;
         });
 
-        $media->getUploadedFileUrlUsing(function ($file) {
+        $media->getUploadedFileUsing(function ($file) {
 
             if (! is_null($file)) {
-                $media = Media::where('uuid', $file)->first();
-                if ($media) {
-                    return $media->getUrl();
+                $mediaModel = Media::where('uuid', $file)->first();
+                if ($mediaModel) {
+
+                    return [
+                        'name' => $mediaModel->getAttributeValue('name') ?? $mediaModel->getAttributeValue('file_name'),
+                        'size' => $mediaModel->getAttributeValue('size'),
+                        'type' => $mediaModel->getAttributeValue('mime_type'),
+                        'url' => $mediaModel->getUrl(),
+                    ];
                 }
             }
 

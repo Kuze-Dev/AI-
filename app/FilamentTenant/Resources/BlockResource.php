@@ -12,13 +12,16 @@ use Domain\Page\Actions\DeleteBlockAction;
 use Domain\Page\Models\Block;
 use Exception;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Throwable;
 
 class BlockResource extends Resource
 {
@@ -54,8 +57,38 @@ class BlockResource extends Resource
                     ->disabled(fn (?Block $record) => $record !== null)
                     ->reactive(),
                 Forms\Components\FileUpload::make('image')
-                    ->mediaLibraryCollection('image')
-                    ->image(),
+                ->formatStateUsing(function ($record) {
+                    return $record?->getMedia('image')
+                        ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                        ->toArray() ?? [];
+                })
+                ->image()
+                ->beforeStateDehydrated(null)
+                ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
+                ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
+                    $mediaClass = config('media-library.media_model', Media::class);
+
+                    /** @var ?Media $media */
+                    $media = $mediaClass::findByUuid($file);
+            
+                    if ($component->getVisibility() === 'private') {
+                        try {
+                            return $media?->getTemporaryUrl(now()->addMinutes(5));
+                        } catch (Throwable) {
+                            // This driver does not support creating temporary URLs.
+                        }
+                    }
+                    
+                    $url = $media?->getUrl();
+
+                    return [
+                        'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                        'size' => $media->getAttributeValue('size'),
+                        'type' => $media->getAttributeValue('mime_type'),
+                        'url' => $url,
+                    ];
+                   
+                }),
                 Forms\Components\Toggle::make('is_fixed_content')
                     ->inline(false)
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') ? false : true)

@@ -214,7 +214,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Section::make('Field Options')
                     ->id('field-options')
                     ->collapsible()
-                    ->when(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
+                    // ->when(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
                     ->columns(['sm' => 2])
                     ->schema(fn (array $state) => self::getFieldOptionSchema(
                         $state['type'] instanceof FieldType

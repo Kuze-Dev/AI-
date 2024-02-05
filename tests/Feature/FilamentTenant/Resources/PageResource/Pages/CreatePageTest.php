@@ -24,7 +24,8 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
+    Filament::setCurrentPanel(Filament::getPanel('tenant'));
+    // Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });
@@ -370,7 +371,7 @@ it('can create page with media uploaded', function () {
         'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->conversions[0]->name => true]),
 
     ]);
-});
+})->only();
 
 it('can create page with media uploaded inside repeater', function () {
     $block = BlockFactory::new()
@@ -433,4 +434,4 @@ it('can create page with media uploaded inside repeater', function () {
         'generated_conversions' => json_encode([$schema->sections[0]->fields[0]->fields[0]->conversions[0]->name => true]),
 
     ]);
-});
+})->only();

@@ -9,7 +9,7 @@ use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\CreatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +28,8 @@ class CreatePage extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label('Create Page')
+                // ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
