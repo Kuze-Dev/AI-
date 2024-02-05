@@ -23,8 +23,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setCurrentPanel(Filament::getPanel('tenant'));
-    // Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });
