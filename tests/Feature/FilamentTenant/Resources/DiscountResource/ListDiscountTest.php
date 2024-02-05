@@ -6,7 +6,6 @@ use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
 use Domain\Discount\Database\Factories\DiscountConditionFactory;
 use Domain\Discount\Database\Factories\DiscountFactory;
 use Domain\Discount\Database\Factories\DiscountRequirementFactory;
-use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\ForceDeleteAction;
 use Filament\Pages\Actions\RestoreAction;
@@ -18,7 +17,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 it('can render page', function () {

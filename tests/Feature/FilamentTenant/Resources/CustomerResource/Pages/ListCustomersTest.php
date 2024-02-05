@@ -7,7 +7,6 @@ use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Pages\Actions\ForceDeleteAction;
 use Filament\Pages\Actions\RestoreAction;
@@ -21,11 +20,11 @@ use function PHPUnit\Framework\assertCount;
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(TierBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: [
+        CustomerBase::class,
+        AddressBase::class,
+        TierBase::class,
+    ]);
     loginAsSuperAdmin();
 });
 

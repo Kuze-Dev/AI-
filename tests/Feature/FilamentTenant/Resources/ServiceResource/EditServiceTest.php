@@ -13,7 +13,6 @@ use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Database\Factories\MetaDataFactory;
@@ -22,8 +21,7 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(ServiceBase::class);
     loginAsSuperAdmin();
 
     CurrencyFactory::new()->createOne([

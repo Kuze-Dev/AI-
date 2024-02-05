@@ -9,7 +9,6 @@ use App\FilamentTenant\Resources\CustomerResource\Pages\EditCustomer;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
-use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -18,11 +17,11 @@ use function Pest\Livewire\livewire;
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(TierBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: [
+        CustomerBase::class,
+        AddressBase::class,
+        TierBase::class,
+    ]);
     loginAsSuperAdmin();
 });
 

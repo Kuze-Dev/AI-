@@ -11,7 +11,6 @@ use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
-use Filament\Facades\Filament;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Tests\RequestFactories\CustomerRequestFactory;
 
@@ -22,11 +21,13 @@ use function Pest\Livewire\livewire;
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(TierBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(
+        features: [
+            CustomerBase::class,
+            AddressBase::class,
+            TierBase::class,
+        ],
+    );
     if (! Tier::whereName(config('domain.tier.default'))->first()) {
         TierFactory::createDefault();
     }

@@ -6,14 +6,12 @@ use App\FilamentTenant\Resources\TaxonomyResource\Pages\CreateTaxonomy;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Taxonomy\Models\Taxonomy;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });

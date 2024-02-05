@@ -10,16 +10,12 @@ use Domain\Address\Models\Country;
 use Domain\Taxation\Database\Factories\TaxZoneFactory;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
-use Filament\Facades\Filament;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
-    Filament::setContext('filament-tenant');
+    testInTenantContext(TaxZone::class);
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(TaxZone::class);
 
     CountryFactory::new()
         ->count(3)

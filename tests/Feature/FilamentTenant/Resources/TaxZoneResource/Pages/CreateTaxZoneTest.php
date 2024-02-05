@@ -11,14 +11,12 @@ use Domain\Taxation\Database\Factories\TaxZoneFactory;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
 use Domain\Taxation\Models\TaxZone;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
     tenancy()->tenant->features()->activate(ShopconfigurationTaxZone::class);

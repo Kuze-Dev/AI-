@@ -8,7 +8,6 @@ use Domain\Product\Models\Product;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Support\MetaData\Models\MetaData;
 
@@ -17,7 +16,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 

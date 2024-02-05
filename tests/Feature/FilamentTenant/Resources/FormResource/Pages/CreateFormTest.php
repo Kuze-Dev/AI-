@@ -9,7 +9,6 @@ use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Site\Database\Factories\SiteFactory;
-use Filament\Facades\Filament;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Support\Captcha\CaptchaProvider;
 
@@ -19,7 +18,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });

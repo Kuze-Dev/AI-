@@ -6,14 +6,12 @@ use App\FilamentTenant\Resources\ContentResource\Pages\CreateContent;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Content\Models\Content;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 
