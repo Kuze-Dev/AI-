@@ -16,10 +16,8 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext(ShopconfigurationTaxZone::class);
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(ShopconfigurationTaxZone::class);
 
     CountryFactory::new()
         ->count(3)

@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Features\Shopconfiguration\TaxZone;
 use App\FilamentTenant\Resources\TaxZoneResource\Pages\ListTaxZones;
 use Domain\Taxation\Database\Factories\TaxZoneFactory;
-use Filament\Pages\Actions\DeleteAction;
+use Filament\Actions\DeleteAction;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Livewire\livewire;
