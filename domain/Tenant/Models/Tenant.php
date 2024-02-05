@@ -62,11 +62,6 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             ->dontSubmitEmptyLogs();
     }
 
-    protected $fillable = [
-        'name',
-        'is_suspended',
-    ];
-
     protected $casts = [
         'is_suspended' => 'boolean',
     ];

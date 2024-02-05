@@ -22,7 +22,7 @@ class CheckDatabaseConnection implements DataAwareRule, ValidationRule
 
     public function setData($data): self
     {
-        $this->data = $data;
+        $this->data = $data['data'];
 
         return $this;
     }
