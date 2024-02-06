@@ -8,14 +8,16 @@ use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\Service\Models\Service;
-use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\MetaData\Models\MetaData;
 
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -62,10 +64,10 @@ it('can create service', function () {
             'selling_price' => 99.69,
             'billing_cycle' => 'monthly',
             'due_date_every' => 20,
-            'taxonomy_term_id' => $taxonomyTerm->id,
+            'taxonomyTerms' => [$taxonomyTerm->id],
             'media.0' => $image,
-            'meta_data' => $metaData,
-            'meta_data.image.0' => $image,
+            'metaData' => $metaData,
+            'metaData.image.0' => $image,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -84,13 +86,12 @@ it('can create service', function () {
 
     assertDatabaseHas(
         MetaData::class,
-        array_merge(
-            $metaData,
-            [
-                'model_type' => $service->getMorphClass(),
-                'model_id' => $service->getKey(),
-            ]
-        )
+        [
+            'model_type' => $service->getMorphClass(),
+            'model_id' => $service->getKey(),
+            ...$metaData,
+        ]
+
     );
 
     assertDatabaseHas(Media::class, [
@@ -146,6 +147,8 @@ it('can create service with metadata', function () {
 
     $image = UploadedFile::fake()->image('preview.jpeg');
 
+    assertDatabaseEmpty(MetaData::class);
+
     $service = livewire(CreateService::class)
         ->fillForm([
             'name' => 'Test',
@@ -154,8 +157,8 @@ it('can create service with metadata', function () {
             'selling_price' => 99.69,
             'billing_cycle' => 'monthly',
             'due_date_every' => 20,
-            'meta_data' => $metaData,
-            'taxonomy_term_id' => $taxonomyTerm->id,
+            'metaData' => $metaData,
+            'taxonomyTerms' => [$taxonomyTerm->id],
             'media.0' => $image,
         ])
         ->call('create')
@@ -164,15 +167,14 @@ it('can create service with metadata', function () {
         ->instance()
         ->record;
 
+    assertDatabaseCount(MetaData::class, 1);
     assertDatabaseHas(
         MetaData::class,
-        array_merge(
-            $metaData,
-            [
-                'model_type' => $service->getMorphClass(),
-                'model_id' => $service->getKey(),
-            ]
-        )
+        [
+            'model_type' => $service->getMorphClass(),
+            'model_id' => $service->getKey(),
+            ...$metaData,
+        ]
     );
 });
 
@@ -196,7 +198,7 @@ it('can create different types of service', function ($attribute) {
             'is_subscription' => $attribute !== 'once',
             'billing_cycle' => $attribute !== 'once' ? $attribute : null,
             'due_date_every' => $attribute !== ('once' || 'daily') ? 20 : null,
-            'taxonomy_term_id' => $taxonomyTerm->id,
+            'taxonomyTerms' => [$taxonomyTerm->id],
             'media.0' => $image,
         ])
         ->call('create')

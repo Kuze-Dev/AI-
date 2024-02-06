@@ -50,6 +50,7 @@ class PaymentMethodResource extends Resource
                     SpatieMediaLibraryFileUpload::make('logo')
                         ->image()
                         ->collection('logo')
+                        ->preserveFilenames()
                         ->customProperties(fn (Forms\Get $get) => [
                             'alt_text' => $get('title'),
                         ]),

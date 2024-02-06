@@ -68,6 +68,7 @@ class CustomerResource extends Resource
                     Forms\Components\SpatieMediaLibraryFileUpload::make('image')
                         ->label(trans('Profile image'))
                         ->collection('image')
+                        ->preserveFilenames()
                         ->nullable()
                         ->image()
                         ->columnSpanFull(),
