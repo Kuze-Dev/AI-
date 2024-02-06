@@ -49,6 +49,14 @@ class TierPolicy
 
     public function delete(User $user, Tier $tier): bool
     {
+        if (
+            $tier
+                ->loadCount('customers')
+                ->customers_count > 0
+        ) {
+            return false;
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 
@@ -59,6 +67,14 @@ class TierPolicy
 
     public function forceDelete(User $user, Tier $tier): bool
     {
+        if (
+            $tier
+                ->loadCount('customers')
+                ->customers_count > 0
+        ) {
+            return false;
+        }
+
         return $this->checkWildcardPermissions($user);
     }
 }
