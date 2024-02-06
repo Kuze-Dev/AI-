@@ -55,7 +55,7 @@ class ServiceResource extends Resource
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-                        Forms\Components\Card::make([
+                        Forms\Components\Section::make([
                             Forms\Components\TextInput::make('name')
                                 ->label(trans('Service Name'))
                                 ->unique(ignoreRecord: true)
