@@ -17,11 +17,11 @@ use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Exception;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
-use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
@@ -47,201 +47,200 @@ class EditPage extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-        //     'page_actions' => CustomPageActionGroup::make([
-        //         Action::make('published')
-        //             ->label(trans('Published Draft'))
-        //             ->action('published')
-        //             ->hidden(function () {
-        //                 return $this->record->draftable_id == null ? true : false;
-        //             }),
-        //         Action::make('draft')
-        //             ->label(trans('Save As Draft'))
-        //             ->action('draft')
-        //             ->hidden(function () {
+            //     'page_actions' => CustomPageActionGroup::make([
+            //         Action::make('published')
+            //             ->label(trans('Published Draft'))
+            //             ->action('published')
+            //             ->hidden(function () {
+            //                 return $this->record->draftable_id == null ? true : false;
+            //             }),
+            //         Action::make('draft')
+            //             ->label(trans('Save As Draft'))
+            //             ->action('draft')
+            //             ->hidden(function () {
 
-        //                 if ($this->record->draftable_id != null) {
-        //                     return true;
-        //                 }
+            //                 if ($this->record->draftable_id != null) {
+            //                     return true;
+            //                 }
 
-        //                 return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
-        //             }),
-        //         Action::make('overwriteDraft')
-        //             ->label(trans('Save As Draft'))
-        //             ->action('overwriteDraft')
-        //             ->requiresConfirmation()
-        //             ->modalHeading('Draft for this page already exists')
-        //             ->modalSubheading('You have an existing draft for this page. Do you want to overwrite the existing draft?')
-        //             ->modalCancelAction(function () {
-        //                 return Action::makeModalAction('redirect')
-        //                     ->label(trans('Edit Existing Draft'))
-        //                     ->color('gray')
-        //                     ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft]));
-        //             })
-        //             ->hidden(function () {
+            //                 return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
+            //             }),
+            //         Action::make('overwriteDraft')
+            //             ->label(trans('Save As Draft'))
+            //             ->action('overwriteDraft')
+            //             ->requiresConfirmation()
+            //             ->modalHeading('Draft for this page already exists')
+            //             ->modalSubheading('You have an existing draft for this page. Do you want to overwrite the existing draft?')
+            //             ->modalCancelAction(function () {
+            //                 return Action::makeModalAction('redirect')
+            //                     ->label(trans('Edit Existing Draft'))
+            //                     ->color('gray')
+            //                     ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft]));
+            //             })
+            //             ->hidden(function () {
 
-        //                 return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
-        //             }),
-        //         Action::make('save')
-        //             ->label(trans('Save and Continue Editing'))
-        //             ->action('save')
-        //             ->keyBindings(['mod+s']),
-        //     ])
-        //         ->view('filament.pages.actions.custom-action-group.index')
-        //         ->setName('page_draft_actions')
-        //         ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
-        //     Actions\DeleteAction::make()->using(function (Page $record) {
-        //         try {
-        //             return app(DeletePageAction::class)->execute($record);
-        //         } catch (DeleteRestrictedException) {
-        //             return false;
-        //         }
-        //     }),
-        //     Actions\DeleteAction::make(),
-        //     'other_page_actions' => CustomPageActionGroup::make([
-        //         Action::make('preview')
-        //             ->color('gray')
-        //             ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-        //             ->label(trans('Preview Page'))
-        //             ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
-        //                 $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
+            //                 return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
+            //             }),
+            //         Action::make('save')
+            //             ->label(trans('Save and Continue Editing'))
+            //             ->action('save')
+            //             ->keyBindings(['mod+s']),
+            //     ])
+            //         ->view('filament.pages.actions.custom-action-group.index')
+            //         ->setName('page_draft_actions')
+            //         ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
+            //     Actions\DeleteAction::make()->using(function (Page $record) {
+            //         try {
+            //             return app(DeletePageAction::class)->execute($record);
+            //         } catch (DeleteRestrictedException) {
+            //             return false;
+            //         }
+            //     }),
+            //     Actions\DeleteAction::make(),
+            //     'other_page_actions' => CustomPageActionGroup::make([
+            //         Action::make('preview')
+            //             ->color('gray')
+            //             ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+            //             ->label(trans('Preview Page'))
+            //             ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
+            //                 $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
 
-        //                 if (! $domain) {
-        //                     return null;
-        //                 }
+            //                 if (! $domain) {
+            //                     return null;
+            //                 }
 
-        //                 $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
+            //                 $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
 
-        //                 return "https://{$domain}/preview?slug={$this->record->slug}&{$queryString}";
-        //             }, true),
-        //         Action::make('preview_microsite_action')
-        //             ->label('Preview Microsite')
-        //             ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
-        //             ->color('gray')
-        //             ->record($this->getRecord())
-        //             ->modalHeading('Preview Microsite')
-        //             ->slideOver(true)
-        //             ->action(function (Page $record, Action $action, array $data): void {
+            //                 return "https://{$domain}/preview?slug={$this->record->slug}&{$queryString}";
+            //             }, true),
+            //         Action::make('preview_microsite_action')
+            //             ->label('Preview Microsite')
+            //             ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+            //             ->color('gray')
+            //             ->record($this->getRecord())
+            //             ->modalHeading('Preview Microsite')
+            //             ->slideOver(true)
+            //             ->action(function (Page $record, Action $action, array $data): void {
 
-        //                 /** @var Site */
-        //                 $site = Site::find($data['preview_microsite']);
+            //                 /** @var Site */
+            //                 $site = Site::find($data['preview_microsite']);
 
-        //                 if ($site->domain == null) {
+            //                 if ($site->domain == null) {
 
-        //                     Notification::make()
-        //                         ->danger()
-        //                         ->title(trans('No Domain Set'))
-        //                         ->body(trans('Please set a domain for :value to preview.', ['value' => $site->name]))
-        //                         ->send();
-        //                 }
-        //             })
-        //             ->form([
-        //                 Radio::make('preview_microsite')
-        //                     ->required()
-        //                     ->options(function () {
+            //                     Notification::make()
+            //                         ->danger()
+            //                         ->title(trans('No Domain Set'))
+            //                         ->body(trans('Please set a domain for :value to preview.', ['value' => $site->name]))
+            //                         ->send();
+            //                 }
+            //             })
+            //             ->form([
+            //                 Radio::make('preview_microsite')
+            //                     ->required()
+            //                     ->options(function () {
 
-        //                         /** @var Page */
-        //                         $site = $this->getRecord();
+            //                         /** @var Page */
+            //                         $site = $this->getRecord();
 
-        //                         return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
-        //                     })
-        //                     ->descriptions(function () {
+            //                         return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
+            //                     })
+            //                     ->descriptions(function () {
 
-        //                         /** @var Page */
-        //                         $site = $this->getRecord();
+            //                         /** @var Page */
+            //                         $site = $this->getRecord();
 
-        //                         return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
-        //                     })
-        //                     ->reactive()
-        //                     ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
+            //                         return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
+            //                     })
+            //                     ->reactive()
+            //                     ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
 
-        //                         /** @var Site */
-        //                         $site = Site::find($state);
+            //                         /** @var Site */
+            //                         $site = Site::find($state);
 
-        //                         $domain = $site->domain;
+            //                         $domain = $site->domain;
 
-        //                         /** @var CustomPageActionGroup */
-        //                         $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
+            //                         /** @var CustomPageActionGroup */
+            //                         $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
 
-        //                         $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
+            //                         $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
 
-        //                         $modelAction->modalSubmitAction(function () use ($domain) {
+            //                         $modelAction->modalSubmitAction(function () use ($domain) {
 
-        //                             $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
+            //                             $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$this->record->slug], false), '?');
 
-        //                             return Action::makeModalAction('preview')->url("https://{$domain}/preview?slug={$this->record->slug}&{$queryString}", true);
-        //                         });
+            //                             return Action::makeModalAction('preview')->url("https://{$domain}/preview?slug={$this->record->slug}&{$queryString}", true);
+            //                         });
 
-        //                         $set('domain', $domain);
-        //                     }),
+            //                         $set('domain', $domain);
+            //                     }),
 
-        //             ]),
-        //         Action::make('clone-page')
-        //             ->label(trans('Clone Page'))
-        //             ->color('gray')
-        //             ->record($this->getRecord())
-        //             ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => $record->slug])),
-        //     ])->view('filament.pages.actions.custom-action-group.index')
-        //         ->setName('other_page_draft')
-        //         ->color('gray')
-        //         ->label(trans('More Actions')),
-        ActionGroup::make([
+            //             ]),
+            //         Action::make('clone-page')
+            //             ->label(trans('Clone Page'))
+            //             ->color('gray')
+            //             ->record($this->getRecord())
+            //             ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => $record->slug])),
+            //     ])->view('filament.pages.actions.custom-action-group.index')
+            //         ->setName('other_page_draft')
+            //         ->color('gray')
+            //         ->label(trans('More Actions')),
             ActionGroup::make([
+                ActionGroup::make([
+                    // Array of actions
+                    // Action::make('published'),
+
+                    Action::make('published')
+                        ->label(trans('Published Draft'))
+                        ->action('published')
+                        ->hidden(function () {
+                            return $this->record->draftable_id == null ? true : false;
+                        }),
+                    Action::make('draft')
+                        ->label(trans('Save As Draft'))
+                        ->action('draft')
+                        ->hidden(function () {
+
+                            if ($this->record->draftable_id != null) {
+                                return true;
+                            }
+
+                            return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
+                        }),
+                    Action::make('overwriteDraft')
+                        ->label(trans('Save As Draft'))
+                        ->action('overwriteDraft')
+                        ->requiresConfirmation()
+                        ->modalHeading('Draft for this page already exists')
+                        ->modalSubheading('You have an existing draft for this page. Do you want to overwrite the existing draft?')
+                        ->modalCancelAction(function () {
+                            return Action::makeModalAction('redirect')
+                                ->label(trans('Edit Existing Draft'))
+                                ->color('gray')
+                                ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft]));
+                        })
+                        ->hidden(function () {
+
+                            return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
+                        }),
+                    Action::make('save')
+                        ->label(trans('Save and Continue Editing'))
+                        ->action('save')
+                        ->keyBindings(['mod+s']),
+
+                ])->dropdown(false),
                 // Array of actions
-                // Action::make('published'),
-
-                Action::make('published')
-                            ->label(trans('Published Draft'))
-                            ->action('published')
-                            ->hidden(function () {
-                                return $this->record->draftable_id == null ? true : false;
-                            }),
-                        Action::make('draft')
-                            ->label(trans('Save As Draft'))
-                            ->action('draft')
-                            ->hidden(function () {
-        
-                                if ($this->record->draftable_id != null) {
-                                    return true;
-                                }
-        
-                                return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
-                            }),
-                        Action::make('overwriteDraft')
-                            ->label(trans('Save As Draft'))
-                            ->action('overwriteDraft')
-                            ->requiresConfirmation()
-                            ->modalHeading('Draft for this page already exists')
-                            ->modalSubheading('You have an existing draft for this page. Do you want to overwrite the existing draft?')
-                            ->modalCancelAction(function () {
-                                return Action::makeModalAction('redirect')
-                                    ->label(trans('Edit Existing Draft'))
-                                    ->color('gray')
-                                    ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft]));
-                            })
-                            ->hidden(function () {
-        
-                                return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
-                            }),
-                        Action::make('save')
-                            ->label(trans('Save and Continue Editing'))
-                            ->action('save')
-                            ->keyBindings(['mod+s']),
-           
-
-            ])->dropdown(false),
-            // Array of actions
-            // Action::make('draft'),
+                // Action::make('draft'),
             ])
-            ->button()
-            ->icon('')
-            ->label('Save Changes'),
+                ->button()
+                ->icon('')
+                ->label('Save Changes'),
             ActionGroup::make([
                 ActionGroup::make([
                     // Array of actions
                     Action::make('published'),
                 ])->dropdown(false),
                 // Array of actions
-            ])
+            ]),
         ];
     }
 

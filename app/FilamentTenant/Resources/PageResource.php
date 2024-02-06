@@ -195,7 +195,7 @@ class PageResource extends Resource
                                             ->toArray(),
                                     ])
                                     ->reactive()
-                                    ->afterStateUpdated(function ( Forms\Components\ViewField $component, $state) {
+                                    ->afterStateUpdated(function (Forms\Components\ViewField $component, $state) {
                                         $block = self::getCachedBlocks()->firstWhere('id', $state);
                                         $component->getContainer()
                                             ->getComponent(fn ($component) => $component->getId() === 'schema-form')
