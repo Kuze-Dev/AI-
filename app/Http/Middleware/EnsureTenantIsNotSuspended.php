@@ -16,10 +16,8 @@ class EnsureTenantIsNotSuspended
      */
     public function handle(Request $request, Closure $next, ?string $redirectTo = null): Response
     {
-
         if (tenancy()->tenant?->is_suspended) {
             throw new SuspendTenantException();
-            // abort(403, 'ACCESS TO THIS PAGE IS RESTRICTED. PLEASE CONTACT ADMINISTRATOR.');
         }
 
         return $next($request);
