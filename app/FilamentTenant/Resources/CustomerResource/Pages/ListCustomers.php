@@ -8,8 +8,8 @@ use App\FilamentTenant\Resources\CustomerResource;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Exports\CustomerExporter;
 use Exception;
+use Filament\Actions;
 use Filament\Actions\ExportAction;
-use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListCustomers extends ListRecords

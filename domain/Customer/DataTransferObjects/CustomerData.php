@@ -109,46 +109,48 @@ final readonly class CustomerData
         );
     }
 
-    public static function fromArrayCreateByAdmin(array $data): self
-    {
+    //        public static function fromArrayCreateByAdmin(array $data): self
+    //        {
+    //
+    //            return new self(
+    //                first_name: $data['first_name'],
+    //                last_name: $data['last_name'],
+    //                mobile: $data['mobile'] ?? null,
+    //                gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+    //                birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+    //                status: Status::INACTIVE,
+    //                tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
+    //                email: $data['email'],
+    //                password: $data['password'] ?? null,
+    //                image: $data['image'] ?? null,
+    //                register_status: RegisterStatus::UNREGISTERED,
+    //                tier_approval_status: TierApprovalStatus::APPROVED,
+    //            );
+    //        }
 
-        return new self(
-            first_name: $data['first_name'],
-            last_name: $data['last_name'],
-            mobile: $data['mobile'] ?? null,
-            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
-            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
-            status: Status::INACTIVE,
-            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
-            email: $data['email'],
-            password: $data['password'] ?? null,
-            image: $data['image'] ?? null,
-            register_status: RegisterStatus::UNREGISTERED,
-            tier_approval_status: TierApprovalStatus::APPROVED,
-        );
-    }
-
-    public static function fromArrayEditByAdmin(Customer $customer, array $data, ?Tier $tier = null): self
-    {
-
-        $tierApprovalStatus = ! isset($data['tier_approval_status']) ? null : TierApprovalStatus::from($data['tier_approval_status']);
-
-        $registerStatus = self::getStatus($tier, $tierApprovalStatus, $customer);
-
-        return new self(
-            first_name: $data['first_name'],
-            last_name: $data['last_name'],
-            mobile: $data['mobile'] ?? null,
-            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
-            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
-            status: isset($data['status']) ? Status::from($data['status']) : null,
-            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
-            email: $data['email'],
-            image: $data['image'],
-            register_status: $registerStatus,
-            tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
-        );
-    }
+    //    public static function fromArrayEditByAdmin(Customer $customer, array $data, ?Tier $tier = null): self
+    //    {
+    //
+    //        $tierApprovalStatus = ! isset($data['tier_approval_status'])
+    //            ? null
+    //            : TierApprovalStatus::from($data['tier_approval_status']);
+    //
+    //        $registerStatus = self::getStatus($tier, $tierApprovalStatus, $customer);
+    //
+    //        return new self(
+    //            first_name: $data['first_name'],
+    //            last_name: $data['last_name'],
+    //            mobile: $data['mobile'] ?? null,
+    //            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+    //            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+    //            status: isset($data['status']) ? Status::from($data['status']) : null,
+    //            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
+    //            email: $data['email'],
+    //            image: $data['image'],
+    //            register_status: $registerStatus,
+    //            tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
+    //        );
+    //    }
 
     public static function fromArrayImportByAdmin(
         ?string $customerPassword,
@@ -168,7 +170,7 @@ final readonly class CustomerData
         );
     }
 
-    private static function getStatus(
+    public static function getStatus(
         ?Tier $tier = null,
         ?TierApprovalStatus $tierApprovalStatus = null,
         ?Customer $customer = null

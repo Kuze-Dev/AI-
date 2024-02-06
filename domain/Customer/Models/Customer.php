@@ -23,6 +23,7 @@ use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -110,6 +111,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
     use ConstraintsRelationships;
     use EmailVerificationOTP;
     use HasApiTokens;
+    use HasUuids;
     use InteractsWithMedia;
     use LogsActivity;
     use Notifiable;
@@ -145,6 +147,11 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         'email_verified_at' => 'datetime',
         'tier_approval_status' => TierApprovalStatus::class,
     ];
+
+    public function uniqueIds(): array
+    {
+        return ['cuid'];
+    }
 
     public function getRouteKeyName(): string
     {

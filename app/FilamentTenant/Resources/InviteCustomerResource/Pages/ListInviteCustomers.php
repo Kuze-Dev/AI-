@@ -9,9 +9,9 @@ use App\FilamentTenant\Resources\InviteCustomerResource;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Imports\CustomerImporter;
+use Filament\Actions;
 use Filament\Actions\ImportAction;
 use Filament\Forms;
-use Filament\Pages\Actions;
 use Illuminate\Support\Str;
 
 class ListInviteCustomers extends ListCustomers

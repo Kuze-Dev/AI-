@@ -41,7 +41,7 @@ it('can render page', function () {
             'last_name' => $customer->last_name,
             'mobile' => $customer->mobile,
             'status' => $customer->status->value,
-            'birth_date' => $customer->birth_date,
+            'birth_date' => $customer->birth_date->format('Y-m-d'),
         ])
         ->assertOk();
 });

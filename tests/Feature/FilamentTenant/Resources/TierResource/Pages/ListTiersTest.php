@@ -8,6 +8,7 @@ use Domain\Tier\Database\Factories\TierFactory;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;
@@ -46,27 +47,29 @@ it('can delete tier', function () {
 
     assertSoftDeleted($tier);
 });
-//
-//it('can restore tier', function () {
-//    $tier = TierFactory::new()
-//        ->deleted()
-//        ->createOne();
-//
-//    livewire(ListTiers::class)
-//        ->callTableAction(RestoreAction::class, $tier)
-//        ->assertOk();
-//
-//    assertNotSoftDeleted($tier);
-//});
-//
-//it('can force delete tier', function () {
-//    $tier = TierFactory::new()
-//        ->deleted()
-//        ->createOne();
-//
-//    livewire(ListTiers::class)
-//        ->callTableAction(ForceDeleteAction::class, $tier)
-//        ->assertOk();
-//
-//    assertModelMissing($tier);
-//});
+
+it('can restore tier', function () {
+    $tier = TierFactory::new()
+        ->deleted()
+        ->createOne();
+
+    livewire(ListTiers::class)
+        ->filterTable(TrashedFilter::class)
+        ->callTableAction(RestoreAction::class, $tier)
+        ->assertOk();
+
+    assertNotSoftDeleted($tier);
+});
+
+it('can force delete tier', function () {
+    $tier = TierFactory::new()
+        ->deleted()
+        ->createOne();
+
+    livewire(ListTiers::class)
+        ->filterTable(TrashedFilter::class)
+        ->callTableAction(ForceDeleteAction::class, $tier)
+        ->assertOk();
+
+    assertModelMissing($tier);
+});

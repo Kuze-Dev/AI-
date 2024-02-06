@@ -69,7 +69,7 @@ it('can dispatch all send-register-invitation job', function () {
     Queue::fake();
 
     livewire(ListInviteCustomers::class)
-        ->callPageAction(
+        ->callAction(
             'send-register-invitation',
             data: [
                 'register_status' => collect(RegisterStatus::allowedResendInviteCases())

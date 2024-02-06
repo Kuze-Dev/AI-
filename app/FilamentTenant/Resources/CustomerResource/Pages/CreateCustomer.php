@@ -6,15 +6,16 @@ namespace App\FilamentTenant\Resources\CustomerResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\CustomerResource;
-use Domain\Customer\Actions\CreateCustomerAction;
-use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Enums\Status;
+use Domain\Tier\Enums\TierApprovalStatus;
 use Exception;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
+/**
+ * @property-read \Domain\Customer\Models\Customer $record
+ */
 class CreateCustomer extends CreateRecord
 {
     use LogsFormActivity;
@@ -32,12 +33,12 @@ class CreateCustomer extends CreateRecord
         ];
     }
 
-    /** @throws Throwable */
-    protected function handleRecordCreation(array $data): Model
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        return DB::transaction(
-            fn () => app(CreateCustomerAction::class)
-                ->execute(CustomerData::fromArrayCreateByAdmin($data))
-        );
+        $data['status'] = Status::INACTIVE;
+        $data['register_status'] = RegisterStatus::UNREGISTERED;
+        $data['tier_approval_status'] = TierApprovalStatus::APPROVED;
+
+        return parent::mutateFormDataBeforeCreate($data);
     }
 }

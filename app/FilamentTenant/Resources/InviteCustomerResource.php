@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Domain\Customer\Actions\DeleteCustomerAction;
-use Domain\Customer\Actions\ForceDeleteCustomerAction;
-use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Exceptions\NoSenderEmailException;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use ErrorException;
@@ -19,9 +17,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class InviteCustomerResource extends CustomerResource
 {
@@ -66,8 +62,15 @@ class InviteCustomerResource extends CustomerResource
                         ->icon('heroicon-o-megaphone')
                         ->action(function (Customer $record, Tables\Actions\Action $action): void {
 
-                            $success = app(SendRegisterInvitationAction::class)
-                                ->execute($record);
+                            try {
+                                $success = app(SendRegisterInvitationAction::class)
+                                    ->execute($record);
+                            } catch (NoSenderEmailException $e) {
+                                $action->failureNotificationTitle($e->getMessage())
+                                    ->failure();
+
+                                return;
+                            }
 
                             if ($success) {
                                 $action
@@ -87,31 +90,11 @@ class InviteCustomerResource extends CustomerResource
                             description: fn (Customer $record) => $record->full_name.' register invitation link sent'
                         ),
                     Tables\Actions\DeleteAction::make()
-                        ->translateLabel()
-                        ->using(function (Customer $record) {
-                            try {
-                                return app(DeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
+                        ->translateLabel(),
                     Tables\Actions\RestoreAction::make()
-                        ->translateLabel()
-                        ->using(
-                            fn (Customer $record) => DB::transaction(
-                                fn () => app(RestoreCustomerAction::class)
-                                    ->execute($record)
-                            )
-                        ),
+                        ->translateLabel(),
                     Tables\Actions\ForceDeleteAction::make()
-                        ->translateLabel()
-                        ->using(function (Customer $record) {
-                            try {
-                                return app(ForceDeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
+                        ->translateLabel(),
                 ]),
             ])
             ->bulkActions([
