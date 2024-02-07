@@ -19,6 +19,8 @@ use Filament\Tables;
 use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
 use Illuminate\Auth\Middleware\RequirePassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Validation\Rule;
@@ -207,6 +209,7 @@ class AdminResource extends Resource
                         ->requiresConfirmation()
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             try {
+                                VerifyEmail::$createUrlCallback = fn (MustVerifyEmail $notifiable) => Filament::getVerifyEmailUrl($notifiable);
                                 $record->sendEmailVerificationNotification();
                                 $action
                                     ->successNotificationTitle(trans('A fresh verification link has been sent to your email address.'))

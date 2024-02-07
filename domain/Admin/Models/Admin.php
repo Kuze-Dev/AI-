@@ -168,14 +168,6 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         return true;
     }
 
-    public function sendEmailVerificationNotification(): void
-    {
-        $notification = new \Filament\Notifications\Auth\VerifyEmail();
-        $notification->url = Filament::getVerifyEmailUrl($this);
-
-        $this->notify($notification);
-    }
-
     /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Spatie\Activitylog\Models\Activity> */
     public function causerActivities(): MorphMany
     {
