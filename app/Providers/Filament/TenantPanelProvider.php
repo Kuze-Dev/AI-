@@ -88,7 +88,7 @@ class TenantPanelProvider extends PanelProvider
             ])
             ->middleware(
                 [
-                    'universal',
+                    //                    'universal', // PreventAccessFromCentralDomains does not work properly
                     'tenant',
                 ],
                 isPersistent: true
