@@ -128,16 +128,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.298.3",
+            "version": "3.298.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "70fde185df4a8dd99983a308b823991fb5b39060"
+                "reference": "c61e8f8640352c4cad1ec364c0801b8adae8adb9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/70fde185df4a8dd99983a308b823991fb5b39060",
-                "reference": "70fde185df4a8dd99983a308b823991fb5b39060",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/c61e8f8640352c4cad1ec364c0801b8adae8adb9",
+                "reference": "c61e8f8640352c4cad1ec364c0801b8adae8adb9",
                 "shasum": ""
             },
             "require": {
@@ -217,9 +217,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.298.3"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.298.4"
             },
-            "time": "2024-02-05T19:05:28+00:00"
+            "time": "2024-02-06T19:09:25+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -7628,16 +7628,16 @@
         },
         {
             "name": "spatie/eloquent-sortable",
-            "version": "4.1.0",
+            "version": "4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/eloquent-sortable.git",
-                "reference": "960ee1c888171f77cba9e3108da69c00a0d02e9c"
+                "reference": "7614a20c417b53e025b17eac8e84bc3d65962428"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/eloquent-sortable/zipball/960ee1c888171f77cba9e3108da69c00a0d02e9c",
-                "reference": "960ee1c888171f77cba9e3108da69c00a0d02e9c",
+                "url": "https://api.github.com/repos/spatie/eloquent-sortable/zipball/7614a20c417b53e025b17eac8e84bc3d65962428",
+                "reference": "7614a20c417b53e025b17eac8e84bc3d65962428",
                 "shasum": ""
             },
             "require": {
@@ -7686,7 +7686,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/eloquent-sortable/issues",
-                "source": "https://github.com/spatie/eloquent-sortable/tree/4.1.0"
+                "source": "https://github.com/spatie/eloquent-sortable/tree/4.1.1"
             },
             "funding": [
                 {
@@ -7698,7 +7698,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-11T16:39:58+00:00"
+            "time": "2024-01-22T08:45:25+00:00"
         },
         {
             "name": "spatie/enum",
@@ -8460,31 +8460,30 @@
         },
         {
             "name": "spatie/laravel-query-builder",
-            "version": "5.7.0",
+            "version": "5.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-query-builder.git",
-                "reference": "ff61a9ea32c5b55cbe63de8e3c6e35a201e6b746"
+                "reference": "8d8b527a68d4651b7860d9993a33b8d4774a9d72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-query-builder/zipball/ff61a9ea32c5b55cbe63de8e3c6e35a201e6b746",
-                "reference": "ff61a9ea32c5b55cbe63de8e3c6e35a201e6b746",
+                "url": "https://api.github.com/repos/spatie/laravel-query-builder/zipball/8d8b527a68d4651b7860d9993a33b8d4774a9d72",
+                "reference": "8d8b527a68d4651b7860d9993a33b8d4774a9d72",
                 "shasum": ""
             },
             "require": {
-                "illuminate/database": "^9.0|^10.0",
-                "illuminate/http": "^9.0|^10.0",
-                "illuminate/support": "^9.0|^10.0",
-                "php": "^8.0",
+                "illuminate/database": "^10.0|^11.0",
+                "illuminate/http": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.2",
                 "spatie/laravel-package-tools": "^1.11"
             },
             "require-dev": {
                 "ext-json": "*",
                 "mockery/mockery": "^1.4",
                 "orchestra/testbench": "^7.0|^8.0",
-                "pestphp/pest": "^1.20",
-                "phpunit/phpunit": "^9.6.11",
+                "pestphp/pest": "^2.0",
                 "spatie/invade": "^2.0",
                 "spatie/laravel-ray": "^1.28"
             },
@@ -8530,7 +8529,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-01-08T09:57:13+00:00"
+            "time": "2024-02-06T20:07:16+00:00"
         },
         {
             "name": "spatie/laravel-queueable-action",
@@ -12804,16 +12803,16 @@
         },
         {
             "name": "brianium/paratest",
-            "version": "v7.4.0",
+            "version": "v7.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paratestphp/paratest.git",
-                "reference": "4ffc52ebbce2f259d6a15c1ddaf4ad837eef6703"
+                "reference": "b2830e330011d59a799c0002e118f5b4bbdb9604"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paratestphp/paratest/zipball/4ffc52ebbce2f259d6a15c1ddaf4ad837eef6703",
-                "reference": "4ffc52ebbce2f259d6a15c1ddaf4ad837eef6703",
+                "url": "https://api.github.com/repos/paratestphp/paratest/zipball/b2830e330011d59a799c0002e118f5b4bbdb9604",
+                "reference": "b2830e330011d59a799c0002e118f5b4bbdb9604",
                 "shasum": ""
             },
             "require": {
@@ -12827,7 +12826,7 @@
                 "phpunit/php-code-coverage": "^10.1.11 || ^11.0.0",
                 "phpunit/php-file-iterator": "^4.1.0 || ^5.0.0",
                 "phpunit/php-timer": "^6.0.0 || ^7.0.0",
-                "phpunit/phpunit": "^10.5.9 || ^11.0.0",
+                "phpunit/phpunit": "^10.5.9 || ^11.0.2",
                 "sebastian/environment": "^6.0.1 || ^7.0.0",
                 "symfony/console": "^6.4.3 || ^7.0.3",
                 "symfony/process": "^6.4.3 || ^7.0.3"
@@ -12882,7 +12881,7 @@
             ],
             "support": {
                 "issues": "https://github.com/paratestphp/paratest/issues",
-                "source": "https://github.com/paratestphp/paratest/tree/v7.4.0"
+                "source": "https://github.com/paratestphp/paratest/tree/v7.4.1"
             },
             "funding": [
                 {
@@ -12894,7 +12893,7 @@
                     "type": "paypal"
                 }
             ],
-            "time": "2024-02-02T09:37:18+00:00"
+            "time": "2024-02-06T13:50:28+00:00"
         },
         {
             "name": "canvural/larastan-strict-rules",
