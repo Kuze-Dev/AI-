@@ -1,5 +1,5 @@
 image:
-  name: bitnami/laravel:10.2.9
+  name: bitnami/laravel:latest # https://bitnami.com/stack/laravel
   run-as-user: 1000
 
 definitions:
@@ -30,7 +30,7 @@ definitions:
         name: Analyse
         script:
           - *setup-script
-          - composer analyse -- --memory-limit=-1
+          - composer analyse-no-memory-limit
         caches:
           - composer
           - phpstan
@@ -44,7 +44,8 @@ definitions:
         name: Test
         script:
           - *setup-script
-          - composer test -- --ci --passthru-php="-d memory_limit=-1"
+          # TODO: remove test-no-timeout when using stancl/tenancy v4
+          - composer test-no-timeout -- --ci --passthru-php="-d memory_limit=-1"
 
 pipelines:
   branches:

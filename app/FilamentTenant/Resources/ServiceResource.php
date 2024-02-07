@@ -40,9 +40,12 @@ class ServiceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
-    protected static ?string $navigationGroup = 'Service Management';
-
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('Service Management');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -341,6 +344,10 @@ class ServiceResource extends Resource
                     ->reactive(),
                 Forms\Components\Toggle::make('needs_approval')
                     ->label(trans('Needs Approval')),
+                Forms\Components\Toggle::make('is_partial_payment')
+                    ->label(trans('Partial Payment')),
+                //                Forms\Components\Toggle::make('is_installment')
+                //                    ->label(trans('Installment')),
             ])
             ->registerListeners([
                 'status::update' => [

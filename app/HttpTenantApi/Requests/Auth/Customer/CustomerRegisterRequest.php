@@ -33,11 +33,15 @@ class CustomerRegisterRequest extends FormRequest
 
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => [Rule::when($this->invited != null, 'required|unique:customers,email', 'required')],
-            'mobile' => [Rule::when($this->invited != null, 'required|string|unique:customers,mobile', 'required|string')],
+            'email' => [Rule::when(is_null($this->invited), 'required|unique:customers,email', 'required')],
+            'mobile' => [Rule::when(is_null($this->invited), 'required|string|unique:customers,mobile', 'required|string')],
             'gender' => ['required', Rule::enum(Gender::class)],
             'tier_id' => [
-                Rule::when((bool) tenancy()->tenant?->features()->active(TierBase::class), 'required', 'nullable'),
+                Rule::when(
+                    (bool) tenancy()->tenant?->features()->active(TierBase::class),
+                    'required',
+                    'nullable'
+                ),
                 Rule::exists(Tier::class, (new Tier())->getRouteKeyName()),
             ],
             'birth_date' => 'required|date',

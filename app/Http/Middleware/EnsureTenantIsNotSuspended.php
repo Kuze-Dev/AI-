@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureTenantIsNotSuspended
 {
-    public function handle(Request $request, Closure $next, string $redirectTo = null): Response
+    public function handle(Request $request, Closure $next, ?string $redirectTo = null): Response
     {
 
         //check if tenant is suspended

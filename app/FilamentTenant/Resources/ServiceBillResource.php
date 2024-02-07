@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ServiceBillResource\Pages\ViewServiceBill;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -19,6 +18,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -81,11 +81,24 @@ class ServiceBillResource extends Resource
                     ->label('Amount')
                     ->translateLabel()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('total_balance')
+                    ->formatStateUsing(
+                        function (ServiceBill $record): string {
+                            /** @var \Domain\ServiceOrder\Models\ServiceOrder $serviceOrder */
+                            $serviceOrder = $record->serviceOrder;
+
+                            return $serviceOrder->currency_symbol.' '.
+                                number_format((float) $record->total_balance, 2, '.', ',');
+                        }
+                    )
+                    ->label('Balance')
+                    ->translateLabel()
+                    ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
                     ->translateLabel()
                     ->formatStateUsing(
-                        fn (string $state): string => ucfirst($state)
+                        fn (string $state): string => ucfirst(str_replace('_', ' ', strtolower($state)))
                     )
                     ->color(
                         fn (ServiceBill $record): string => $record->getStatusColor()
@@ -98,6 +111,7 @@ class ServiceBillResource extends Resource
                             : $record->bill_date
                     )
                     ->label('Bill Date')
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->translateLabel()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_date')
@@ -106,6 +120,7 @@ class ServiceBillResource extends Resource
                             ? 'N/A'
                             : $record->due_date
                     )
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->label('Due at')
                     ->translateLabel()
                     ->sortable(),
@@ -161,7 +176,7 @@ class ServiceBillResource extends Resource
         /** @var \Domain\ServiceOrder\Models\ServiceBill|null $latestServiceBill */
         $latestServiceBill = $serviceOrder->latestServiceBill();
 
-        /** @var \Carbon\Carbon|null $referenceDate */
+        /** @var \Illuminate\Support\Carbon|null $referenceDate */
         $referenceDate = $latestServiceBill?->bill_date;
 
         /** @var \Domain\ServiceOrder\Models\ServiceTransaction|null $serviceTransaction */
@@ -184,11 +199,7 @@ class ServiceBillResource extends Resource
             $referenceDate = $serviceOrderBillingAndDueDateData->bill_date;
         }
 
-        /** @var string */
-        $timeZone = Auth::user()?->timezone;
-
         $formattedState = Carbon::parse($referenceDate)
-            ->setTimezone($timeZone)
             ->format('F d, Y');
 
         return 'Upcoming Bill: '.$formattedState;

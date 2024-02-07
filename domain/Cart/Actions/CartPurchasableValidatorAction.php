@@ -192,7 +192,7 @@ class CartPurchasableValidatorAction
         }
     }
 
-    public function validateMinimumQuantity(Product $product, int $quantity, CartLine $cartLine = null): void
+    public function validateMinimumQuantity(Product $product, int $quantity, ?CartLine $cartLine = null): void
     {
         //minimum order quantity
         if (! is_null($cartLine)) {
@@ -207,7 +207,7 @@ class CartPurchasableValidatorAction
         }
     }
 
-    public function validateStockControl(Product|ProductVariant $purchasable, int $quantity, CartLine $cartLine = null): void
+    public function validateStockControl(Product|ProductVariant $purchasable, int $quantity, ?CartLine $cartLine = null): void
     {
         if ($quantity > $purchasable->stock) {
             throw new InvalidPurchasableException('The quantity exceeds the available quantity of the purchasable.');

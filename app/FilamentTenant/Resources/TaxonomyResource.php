@@ -30,11 +30,14 @@ class TaxonomyResource extends Resource
 
     protected static ?string $model = Taxonomy::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -135,7 +138,7 @@ class TaxonomyResource extends Resource
                         ->using(function (Taxonomy $record) {
                             try {
                                 return app(DeleteTaxonomyAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Tenant\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Request as RequestFacade;
 use Laravel\Pennant\Concerns\HasFeatures;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -83,5 +84,10 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function apiCalls(): HasMany
     {
         return $this->hasmany(TenantApiCall::class);
+    }
+
+    public function domainFirstUrl(): string
+    {
+        return RequestFacade::getScheme().'://'.$this->domains[0]?->domain;
     }
 }

@@ -67,7 +67,7 @@ class GuestUpdateOrderAction
         return $order;
     }
 
-    private function updateStatus(Order $order, string $status, string $notes = null): Order
+    private function updateStatus(Order $order, string $status, ?string $notes = null): Order
     {
         $orderData = [
             'status' => $status,
@@ -100,7 +100,7 @@ class GuestUpdateOrderAction
     private function updateBankTransfer(
         Order $order,
         string $proofOfPayment,
-        string $notes = null
+        ?string $notes = null
     ): void {
         /** @var \Domain\Payments\Models\Payment $payment */
         $payment = $order->payments->first();

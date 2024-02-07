@@ -17,7 +17,7 @@ class ResetPasswordAction
     ) {
     }
 
-    public function execute(ResetPasswordData $resetPasswordData, string $broker = null): PasswordResetResult
+    public function execute(ResetPasswordData $resetPasswordData, ?string $broker = null): PasswordResetResult
     {
         $result = Password::broker($broker)
             ->reset(

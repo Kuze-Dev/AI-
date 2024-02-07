@@ -8,7 +8,6 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Support;
 use App\Settings\OrderSettings;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderStatuses;
@@ -24,6 +23,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -34,13 +34,16 @@ class OrderResource extends Resource
 {
     use ContextualResource;
 
-    protected static ?string $navigationGroup = 'eCommerce';
-
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?string $recordTitleAttribute = 'reference';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
 
     protected static function getNavigationBadge(): ?string
     {
@@ -946,7 +949,7 @@ class OrderResource extends Resource
                         if ($component->getVisibility() === 'private') {
                             try {
                                 return $media?->getTemporaryUrl(now()->addMinutes(5));
-                            } catch (Throwable $exception) {
+                            } catch (Throwable) {
                             }
                         }
 

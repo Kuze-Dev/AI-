@@ -28,11 +28,14 @@ class BlockResource extends Resource
 
     protected static ?string $model = Block::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-template';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     public static function form(Form $form): Form
     {
@@ -113,7 +116,7 @@ class BlockResource extends Resource
                         ->using(function (Block $record) {
                             try {
                                 return app(DeleteBlockAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

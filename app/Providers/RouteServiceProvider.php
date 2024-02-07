@@ -33,7 +33,7 @@ class RouteServiceProvider extends ServiceProvider
 
                 $ratekey = $request->header('x-rate-key');
 
-                if ($ratekey == env('RATE_LIMIT_KEY')) {
+                if ($ratekey === config('custom.rate_limit_key')) {
 
                     return Limit::none();
                 }

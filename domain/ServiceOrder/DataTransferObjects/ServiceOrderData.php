@@ -17,6 +17,9 @@ class ServiceOrderData
         public readonly bool $is_same_as_billing,
         public readonly array $additional_charges,
         public readonly ?array $form,
+        public readonly ?string $payment_type = null,
+        public readonly ?string $payment_value = null,
+        public readonly ?array $payment_plan = null,
     ) {
     }
 
@@ -31,6 +34,9 @@ class ServiceOrderData
             is_same_as_billing: $data['is_same_as_billing'],
             additional_charges: $data['additional_charges'] ?? [],
             form: $data['form'] ?? null,
+            payment_type: $data['payment_type'],
+            payment_value: $data['payment_value'],
+            payment_plan: $data['payment_plan'],
         );
     }
 }

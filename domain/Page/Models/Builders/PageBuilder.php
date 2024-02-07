@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Page\Models\Builders;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 /**
  * @template TModelClass of \Domain\Page\Models\Page
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 class PageBuilder extends Builder
 {
     /** @return self<\Domain\Page\Models\Page> */
-    public function wherePublishedAtRange(Carbon $publishedAtStart = null, Carbon $publishedAtEnd = null): self
+    public function wherePublishedAtRange(?Carbon $publishedAtStart = null, ?Carbon $publishedAtEnd = null): self
     {
         return $this
             ->when(
@@ -29,10 +29,10 @@ class PageBuilder extends Builder
     }
 
     /** @return self<\Domain\Page\Models\Page> */
-    public function wherePublishedAtYearMonth(int $year, int $month = null): self
+    public function wherePublishedAtYearMonth(int $year, ?int $month = null): self
     {
         $selectedDate = tap(
-            Carbon::now()->year($year),
+            now()->year($year),
             fn (Carbon $date) => $month
                 ? $date->month($month)
                 : $date

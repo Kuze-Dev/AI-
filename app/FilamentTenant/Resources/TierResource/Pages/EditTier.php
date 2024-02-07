@@ -39,7 +39,7 @@ class EditTier extends EditRecord
                 ->using(function (Tier $record) {
                     try {
                         return app(DeleteTierAction::class)->execute($record);
-                    } catch (DeleteRestrictedException $e) {
+                    } catch (DeleteRestrictedException) {
                         return false;
                     }
                 }),
@@ -47,7 +47,7 @@ class EditTier extends EditRecord
                 ->using(function (Tier $record) {
                     try {
                         return app(ForceDeleteTierAction::class)->execute($record);
-                    } catch (DeleteRestrictedException $e) {
+                    } catch (DeleteRestrictedException) {
                         return false;
                     }
                 }),
@@ -65,7 +65,7 @@ class EditTier extends EditRecord
     }
 
     /**
-     * @param \Domain\Tier\Models\Tier$record
+     * @param  \Domain\Tier\Models\Tier  $record
      *
      * @throws Throwable
      */

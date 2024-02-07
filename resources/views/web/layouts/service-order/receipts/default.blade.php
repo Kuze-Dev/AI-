@@ -47,7 +47,7 @@
             <h1>{{ app(\App\Settings\SiteSettings::class)->name }}</h1>
         </td>
         <td align="right">
-            <img src="{{ app(\App\Settings\SiteSettings::class)->logo }}" alt=""/>
+            <img height="100" width="100" src="{{ app(\App\Settings\SiteSettings::class)->getLogoUrl() }}" alt=""/>
         </td>
     </tr>
     <tr>
@@ -150,7 +150,7 @@
                     $transaction->serviceOrder
                         ->currency_code
                 )
-                    ->format()
+                    ->formatLocale()
             }}
         </td>
     </tr>
@@ -169,7 +169,7 @@
                             ->multiply(100),
                         $transaction->serviceOrder
                             ->currency_code
-                    )->format()
+                    )->formatLocale()
                 }}
             </strong>
         </td>
@@ -188,7 +188,7 @@
                         $transaction->serviceOrder
                             ->currency_code
                     )
-                        ->format()
+                        ->formatLocale()
                 }}
             </strong>
         </td>
@@ -206,7 +206,7 @@
                         $tax_total,
                         $transaction->serviceOrder
                             ->currency_code
-                    )->format()
+                    )->formatLocale()
                 }}
             </strong>
         </td>
@@ -225,7 +225,7 @@
                         $transaction->serviceOrder
                             ->currency_code
                     )
-                        ->format()
+                        ->formatLocale()
                 }}
             </strong>
         </td>
@@ -280,7 +280,7 @@
                             $transaction->serviceOrder
                                 ->currency_code
                         )
-                            ->format()
+                            ->formatLocale()
                     }}
                 </strong>
             </td>

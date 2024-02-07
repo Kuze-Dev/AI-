@@ -13,15 +13,14 @@ use Closure;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
-use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
+use Domain\Customer\Export\Exports;
 use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
-use ErrorException;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -33,12 +32,10 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Support\Excel\Actions\ExportBulkAction;
 
 class CustomerResource extends Resource
 {
@@ -46,11 +43,16 @@ class CustomerResource extends Resource
 
     protected static ?string $model = Customer::class;
 
-    protected static ?string $navigationGroup = 'Customer Management';
-
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $recordTitleAttribute = 'full_name';
+
+    protected static ?int $navigationSort = 2;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('Customer Management');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -77,12 +79,10 @@ class CustomerResource extends Resource
                         ->required()
                         ->string()
                         ->rules([
-                            function ($record) {
-                                return function (string $attribute, mixed $value, Closure $fail) {
-                                    if (preg_match('/[^a-zA-Z\s]/', $value)) {
-                                        $fail('Input must not contain numerical characters.');
-                                    }
-                                };
+                            fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                    $fail('Input must not contain numerical characters.');
+                                }
                             },
                         ])
                         ->maxLength(255),
@@ -90,12 +90,10 @@ class CustomerResource extends Resource
                         ->translateLabel()
                         ->required()
                         ->rules([
-                            function ($record) {
-                                return function (string $attribute, mixed $value, Closure $fail) {
-                                    if (preg_match('/[^a-zA-Z\s]/', $value)) {
-                                        $fail('Input must not contain numerical characters.');
-                                    }
-                                };
+                            fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                    $fail('Input must not contain numerical characters.');
+                                }
                             },
                         ])
                         ->string()
@@ -111,6 +109,7 @@ class CustomerResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->label(trans('Mobile Number'))
                         ->nullable()
+                        ->numeric()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('birth_date')
                         ->translateLabel()
@@ -119,30 +118,33 @@ class CustomerResource extends Resource
                     Forms\Components\Select::make('tier_id')
                         ->label(trans('Tier'))
                         ->preload()
-                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
+                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class))
                         ->optionsFromModel(Tier::class, 'name'),
 
                     Forms\Components\Select::make('tier_approval_status')
+//                        ->options(TierApprovalStatus::class)
                         ->options([
-                            TierApprovalStatus::APPROVED->value => 'Approved',
-                            TierApprovalStatus::REJECTED->value => 'Rejected',
+                            TierApprovalStatus::APPROVED->value => Str::headline(TierApprovalStatus::APPROVED->value),
+                            TierApprovalStatus::REJECTED->value => Str::headline(TierApprovalStatus::REJECTED->value),
                         ])
-                        ->hidden(function ($record, $context) {
+                        ->visibleOn('edit')
+                        ->hidden(function (?Customer $record): bool {
 
-                            $tier = Tier::whereId($record?->tier_id)->first();
-                            if (! $tier?->has_approval) {
+                            if ($record === null) {
                                 return true;
                             }
 
-                            if ($context === 'create') {
+                            $tier = $record->tier;
+
+                            if ($tier === null || ! $tier->has_approval) {
                                 return true;
                             }
 
-                            if ($record !== null && ($record->tier_approval_status === TierApprovalStatus::APPROVED)) {
+                            if ($record->tier_approval_status === TierApprovalStatus::APPROVED) {
                                 return true;
                             }
 
-                            return (bool) ($record !== null && $tier->isDefault());
+                            return $tier->isDefault();
                         }),
 
                     Forms\Components\TextInput::make('password')
@@ -180,41 +182,15 @@ class CustomerResource extends Resource
                                 ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
                                 ->toArray()
                         )
-                        ->enum(Status::class),
-                    Forms\Components\Select::make('register_status')
-                        ->hidden(fn ($record) => $record?->register_status === RegisterStatus::REGISTERED)
-                        ->placeholder('Select Register status')
-                        ->translateLabel()
-                        ->required()
-                        ->reactive()
-                        ->options(
-                            collect(RegisterStatus::cases())
-                                ->mapWithKeys(fn (RegisterStatus $target) => [$target->value => Str::headline($target->value)])
-                                ->toArray()
-                        )
-                        ->helperText(function ($state, Closure $set) {
-                            if ($state === RegisterStatus::INVITED->value) {
-                                $set('status', Status::INACTIVE->value);
-
-                                return 'Inactive status is required when register status is invited.';
-                            }
-                        })
-                        ->enum(RegisterStatus::class),
+                        ->enum(Status::class)
+                        ->visibleOn('edit'),
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
-                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class) ? true : false),
-                    Forms\Components\Placeholder::make('is_verified')
-                        ->label(trans('Is Verified: '))
-                        ->content(function ($record) {
-                            if ($record?->hasVerifiedEmail()) {
-                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-green-500 text-white">Verified</span>');
-                            } else {
-                                return new HtmlString('<span class="px-2 py-1 rounded-full bg-red-500 text-white">Unverified</span>');
-                            }
-                        }),
+                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class)),
                 ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->disabled(fn ($record) => $record?->trashed()),
             ]);
     }
 
@@ -236,6 +212,7 @@ class CustomerResource extends Resource
                     ->wrap(),
                 Tables\Columns\TextColumn::make('email')
                     ->translateLabel()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
@@ -273,6 +250,11 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->dateTime(timezone: Filament::auth()->user()?->timezone)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('deleted_at')
+                    ->translateLabel()
+                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
@@ -301,58 +283,18 @@ class CustomerResource extends Resource
                             };
                         });
                     }),
-                Tables\Filters\SelectFilter::make('register_status')
-                    ->translateLabel()
-                    ->default(RegisterStatus::REGISTERED->value)
-                    ->options([
-                        'Registered' => ucfirst(RegisterStatus::REGISTERED->value),
-                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
                     ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('send-register-invitation')
-                        ->label(fn (Customer $record) => match ($record->register_status) {
-                            RegisterStatus::UNREGISTERED => 'Send register invitation',
-                            RegisterStatus::INVITED => 'Resend register invitation',
-                            default => throw new ErrorException('Invalid register status.'),
-                        })
-                        ->translateLabel()
-                        ->requiresConfirmation()
-                        ->icon('heroicon-o-speakerphone')
-                        ->action(function (Customer $record, Tables\Actions\Action $action): void {
-
-                            if ($record->register_status == RegisterStatus::UNREGISTERED ||
-                                $record->register_status == RegisterStatus::INVITED) {
-                                $success = app(SendRegisterInvitationAction::class)
-                                    ->execute($record);
-
-                                if ($success) {
-                                    $action
-                                        ->successNotificationTitle(trans('A registration link has been sent to your email address.'))
-                                        ->success();
-
-                                    return;
-                                }
-
-                                $action->failureNotificationTitle(trans('Failed to send register invitation.'))
-                                    ->failure();
-                            }
-                        })
-                        ->authorize('sendRegisterInvitation')
-                        ->withActivityLog(
-                            event: 'register-invitation-link-sent',
-                            description: fn (Customer $record) => $record->full_name.' register invitation link sent'
-                        )
-                        ->visible(fn (Customer $record) => $record->register_status !== RegisterStatus::REGISTERED),
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
                         ->using(function (Customer $record) {
                             try {
                                 return app(DeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),
@@ -369,40 +311,20 @@ class CustomerResource extends Resource
                         ->using(function (Customer $record) {
                             try {
                                 return app(ForceDeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),
                 ]),
             ])
             ->bulkActions([
+                Exports::tableBulk([RegisterStatus::REGISTERED]),
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize('delete'),
                 Tables\Actions\ForceDeleteBulkAction::make()
                     ->authorize('forceDelete'),
                 Tables\Actions\RestoreBulkAction::make()
                     ->authorize('restore'),
-                ExportBulkAction::make()
-                    ->queue()
-                    ->query(
-                        fn (Builder $query) => $query
-                            ->with('tier')
-                            ->latest()
-                    )
-                    ->mapUsing(
-                        ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
-                        fn (Customer $customer): array => [
-                            $customer->cuid,
-                            $customer->email,
-                            $customer->first_name,
-                            $customer->last_name,
-                            $customer->mobile,
-                            $customer->status?->value,
-                            $customer->birth_date?->format(config('tables.date_format')),
-                            $customer->tier?->name,
-                            $customer->created_at?->format(config('tables.date_time_format')),
-                        ]
-                    ),
             ])
             ->defaultSort('updated_at', 'desc');
     }
@@ -430,6 +352,12 @@ class CustomerResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('register_status', RegisterStatus::REGISTERED);
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

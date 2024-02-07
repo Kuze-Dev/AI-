@@ -27,7 +27,7 @@ class AdminOrderStatusUpdatedEvent
         bool $shouldSendEmail,
         string $status,
         ?string $emailRemarks,
-        Customer $customer = null
+        ?Customer $customer = null
     ) {
         $this->order = $order;
         $this->shouldSendEmail = $shouldSendEmail;

@@ -6,12 +6,12 @@ namespace App\HttpTenantApi\Controllers\Content;
 
 use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentEntryResource;
-use Carbon\Carbon;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -27,7 +27,7 @@ class ContentEntryController
     public function index(Content $content): JsonApiResourceCollection
     {
         return ContentEntryResource::collection(
-            QueryBuilder::for($content->contentEntries()->with('content.blueprint', 'activeRouteUrl'))
+            QueryBuilder::for($content->contentEntries()->with(['content.blueprint', 'activeRouteUrl', 'blueprintData']))
                 ->allowedFilters([
                     'title',
                     'slug',
@@ -75,7 +75,7 @@ class ContentEntryController
                     'taxonomyTerms.taxonomy',
                     'routeUrls',
                     'metaData',
-                    'blueprintData',
+                    'blueprintData.media',
                 ])
                 ->jsonPaginate()
         );

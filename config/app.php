@@ -168,11 +168,13 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\FilamentServiceProvider::class,
         App\Providers\HealthCheckServiceProvider::class,
         App\Providers\TenancyServiceProvider::class,
         App\Providers\FilamentTenantServiceProvider::class,
+        App\Providers\AboutServiceProvider::class,
 
         /*
          * Domain Service Providers...
@@ -191,7 +193,6 @@ return [
         * Support Service Providers...
         */
         Support\Captcha\CaptchaServiceProvider::class,
-        Support\Excel\ExcelServiceProvider::class,
         Domain\Payments\PaymentServiceProvider::class,
 
     ])->toArray(),

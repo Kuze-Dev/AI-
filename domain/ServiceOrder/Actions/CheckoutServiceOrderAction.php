@@ -22,7 +22,6 @@ use Domain\ServiceOrder\Exceptions\ServiceOrderStatusStillPendingException;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 class CheckoutServiceOrderAction
@@ -45,21 +44,7 @@ class CheckoutServiceOrderAction
 
         $this->serviceOrder = $this->prepareServiceOrder();
 
-        $this->validateUser();
-
         return $this->proceedPayment();
-    }
-
-    private function validateUser(): void
-    {
-        $user = Auth::user();
-        if (! $user) {
-            throw new ModelNotFoundException(trans('User not authenticated'));
-        }
-
-        if ($this->serviceOrder->customer && $user->id != $this->serviceOrder->customer->id) {
-            throw new ModelNotFoundException(trans('No service bill found'));
-        }
     }
 
     /** @throws Throwable */
@@ -158,6 +143,7 @@ class CheckoutServiceOrderAction
             new CreateServiceTransactionData(
                 service_order: $this->serviceOrder,
                 service_bill: $this->serviceBill,
+                total_amount: null,
                 service_transaction_status: ServiceTransactionStatus::PENDING,
                 payment: $payment
             )

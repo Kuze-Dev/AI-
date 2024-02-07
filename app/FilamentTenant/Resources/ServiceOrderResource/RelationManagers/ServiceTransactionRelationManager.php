@@ -11,6 +11,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
 class ServiceTransactionRelationManager extends RelationManager
@@ -23,9 +24,9 @@ class ServiceTransactionRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('serviceBill.reference')
-                    ->exists('serviceBill')
-                    ->label(trans('Reference'))
+                Tables\Columns\TextColumn::make('payment.payment_id')
+                    ->exists('payment')
+                    ->label(trans('Payment ID'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_amount')
                     ->exists('serviceBill')
@@ -49,9 +50,11 @@ class ServiceTransactionRelationManager extends RelationManager
                     ->inline(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->translateLabel()
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->translateLabel()
+                    ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->actions([

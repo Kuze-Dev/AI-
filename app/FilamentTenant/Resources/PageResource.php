@@ -10,7 +10,6 @@ use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Carbon\Carbon;
 use Closure;
 use Domain\Internationalization\Models\Locale;
 use Domain\Page\Actions\DeletePageAction;
@@ -29,6 +28,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
@@ -41,11 +41,14 @@ class PageResource extends Resource
 
     protected static ?string $model = Page::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     /** @var Collection<int, Block> */
     public static ?Collection $cachedBlocks = null;
@@ -290,7 +293,7 @@ class PageResource extends Resource
                         ->using(function (Page $record) {
                             try {
                                 return app(DeletePageAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

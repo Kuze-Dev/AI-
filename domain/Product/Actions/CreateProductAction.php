@@ -64,26 +64,23 @@ class CreateProductAction
 
     protected function getProductAttributes(ProductData $productData): array
     {
-        return array_filter(
-            [
-                'name' => $productData->name,
-                'sku' => $productData->sku,
-                'description' => $productData->description,
-                'retail_price' => $productData->retail_price,
-                'selling_price' => $productData->selling_price,
-                'weight' => $productData->weight,
-                'status' => $productData->status,
-                'stock' => $productData->stock,
-                'minimum_order_quantity' => $productData->minimum_order_quantity,
-                'is_digital_product' => $productData->is_digital_product,
-                'is_featured' => $productData->is_featured,
-                'is_special_offer' => $productData->is_special_offer,
-                'allow_customer_remarks' => $productData->allow_customer_remarks,
-                'allow_stocks' => $productData->allow_stocks,
-                'allow_guest_purchase' => $productData->allow_guest_purchase,
-                'dimension' => ['length' => $productData->length, 'width' => $productData->width, 'height' => $productData->height],
-            ],
-            fn ($value) => filled($value)
-        );
+        return [
+            'name' => $productData->name,
+            'sku' => $productData->sku,
+            'description' => $productData->description,
+            'retail_price' => $productData->retail_price,
+            'selling_price' => $productData->selling_price,
+            'weight' => $productData->weight,
+            'status' => $productData->status,
+            'stock' => $productData->stock,
+            'minimum_order_quantity' => $productData->minimum_order_quantity,
+            'is_digital_product' => $productData->is_digital_product,
+            'is_featured' => $productData->is_featured,
+            'is_special_offer' => $productData->is_special_offer,
+            'allow_customer_remarks' => $productData->allow_customer_remarks,
+            'allow_stocks' => $productData->allow_stocks,
+            'allow_guest_purchase' => $productData->allow_guest_purchase,
+            'dimension' => ['length' => $productData->length, 'width' => $productData->width, 'height' => $productData->height],
+        ];
     }
 }

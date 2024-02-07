@@ -33,6 +33,13 @@ class UpdateProductOptionAction
                 $productOptionModel->name = $productOption->name;
                 $productOptionModel->is_custom = $productOption->is_custom;
                 $productOptionModel->save();
+
+                // Update product variant
+                $productData->product_variants = $this->searchAndChangeValueByName(
+                    $productOption->name,
+                    $productData->product_variants ?? [],
+                    $productOption->id
+                );
             } else {
                 $newProductOptionModel = ProductOption::create([
                     'product_id' => $product->id,
@@ -67,9 +74,16 @@ class UpdateProductOptionAction
                     $optionValueModel->data = ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value];
                     $optionValueModel->save();
 
-                    $this->uploadMediaMaterials(
-                        $optionValueModel,
-                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    // $this->uploadMediaMaterials(
+                    //     $optionValueModel,
+                    //     [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    // );
+
+                    $productData->product_variants = $this->searchAndChangeValueByName(
+                        $productOptionValue->name,
+                        $productData->product_variants ?? [],
+                        $productOptionValue->id,
+                        'option_value_id'
                     );
                 } else {
                     $newOptionValueModel = ProductOptionValue::create([
@@ -78,10 +92,10 @@ class UpdateProductOptionAction
                         'data' => ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value],
                     ]);
 
-                    $this->uploadMediaMaterials(
-                        $newOptionValueModel,
-                        [['collection' => 'media', 'materials' => $productOptionValue->images]]
-                    );
+                    // $this->uploadMediaMaterials(
+                    //     $newOptionValueModel,
+                    //     [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    // );
 
                     $productOptionValue = $productOptionValue
                         ->withId($newOptionValueModel->id, $productOptionValue);
@@ -105,7 +119,7 @@ class UpdateProductOptionAction
         $this->sanitizeOptions($productData, $product->id);
     }
 
-    protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, int $productId = null): void
+    protected function sanitizeOptions(ProductData|ProductOptionData $dtoData, ?int $productId = null): void
     {
         $arrayForMapping = [];
 
@@ -143,6 +157,27 @@ class UpdateProductOptionAction
         }
     }
 
+    protected function searchAndChangeValueByName(string $needle, array $haystack, int $newValue, string $field = 'option_id'): array
+    {
+        return collect($haystack)->map(function ($variant) use ($needle, $newValue, $field) {
+            /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
+            $variantCombination = $variant->combination;
+            $newCombinations = collect($variantCombination)->map(function ($combination) use ($needle, $newValue, $field) {
+                if ($field == 'option_id' && strtolower($combination->option) === strtolower($needle)) {
+                    return $combination->withOptionId($newValue, $combination);
+                }
+
+                if ($field == 'option_value_id' && strtolower($combination->option_value) === strtolower($needle)) {
+                    return $combination->withOptionValueId($newValue, $combination);
+                }
+
+                return $combination;
+            });
+
+            return $variant->withCombination($newCombinations->toArray(), $variant);
+        })->toArray();
+    }
+
     protected function searchAndChangeValue(string|int $needle, array $haystack, int $newValue, string $field = 'option_id'): array
     {
         return collect($haystack)->map(function ($variant) use ($needle, $newValue, $field) {
@@ -166,23 +201,23 @@ class UpdateProductOptionAction
         })->toArray();
     }
 
-    protected function uploadMediaMaterials(ProductOptionValue $productOptionValue, array $mediaCollection): void
-    {
-        collect($mediaCollection)->each(function ($media, $key) use ($productOptionValue) {
-            /** @var array<int, array> $mediaMaterials */
-            $mediaMaterials = $media['materials'];
+    // protected function uploadMediaMaterials(ProductOptionValue $productOptionValue, array $mediaCollection): void
+    // {
+    //     collect($mediaCollection)->each(function ($media, $key) use ($productOptionValue) {
+    //         /** @var array<int, array> $mediaMaterials */
+    //         $mediaMaterials = $media['materials'];
 
-            $mediaData = collect($mediaMaterials)->map(function ($material) {
-                /** @var \Illuminate\Http\UploadedFile|string $material */
-                return new MediaData(media: $material);
-            })->toArray();
+    //         $mediaData = collect($mediaMaterials)->map(function ($material) {
+    //             /** @var \Illuminate\Http\UploadedFile|string $material */
+    //             return new MediaData(media: $material);
+    //         })->toArray();
 
-            $syncMediaCollection = new SyncMediaCollectionAction();
+    //         $syncMediaCollection = new SyncMediaCollectionAction();
 
-            $syncMediaCollection->execute($productOptionValue, new MediaCollectionData(
-                collection: $media['collection'],
-                media: $mediaData,
-            ));
-        });
-    }
+    //         $syncMediaCollection->execute($productOptionValue, new MediaCollectionData(
+    //             collection: $media['collection'],
+    //             media: $mediaData,
+    //         ));
+    //     });
+    // }
 }

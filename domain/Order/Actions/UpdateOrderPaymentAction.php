@@ -29,7 +29,7 @@ class UpdateOrderPaymentAction
     ) {
     }
 
-    public function status(Order $order, string|OrderStatuses $status, string $notes = null): Order
+    public function status(Order $order, string|OrderStatuses $status, ?string $notes = null): Order
     {
         $orderData = [
             'status' => $status,
@@ -57,7 +57,7 @@ class UpdateOrderPaymentAction
     public function bankTransfer(
         Order $order,
         string $proofOfPayment,
-        string $notes = null
+        ?string $notes = null
     ): void {
         /** @var \Domain\Payments\Models\Payment $payment */
         $payment = $order->payments->first();

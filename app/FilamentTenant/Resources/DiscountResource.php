@@ -56,11 +56,14 @@ class DiscountResource extends Resource
 
     protected static ?string $model = Discount::class;
 
-    protected static ?string $navigationGroup = 'eCommerce';
-
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
 
     public static function form(Form $form): Form
     {
@@ -277,7 +280,7 @@ class DiscountResource extends Resource
                         ->using(function (Discount $record) {
                             try {
                                 return app(ForceDeleteDiscountAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         })
@@ -287,7 +290,7 @@ class DiscountResource extends Resource
                         ->using(function (Discount $record) {
                             try {
                                 return app(SoftDeleteDiscountAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         })
@@ -297,7 +300,7 @@ class DiscountResource extends Resource
                         ->using(function (Discount $record) {
                             try {
                                 return app(RestoreDiscountAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         })

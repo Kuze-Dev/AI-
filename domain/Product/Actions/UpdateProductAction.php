@@ -27,15 +27,17 @@ class UpdateProductAction
     {
         $product->update($this->getProductAttributes($productData));
 
-        $product->metaData()->exists()
-            ? $this->updateMetaData->execute($product, $productData->meta_data)
-            : $this->createMetaData->execute($product, $productData->meta_data);
+        if (! $productData->skip_media_sync) {
+            $product->metaData()->exists()
+                ? $this->updateMetaData->execute($product, $productData->meta_data)
+                : $this->createMetaData->execute($product, $productData->meta_data);
+        }
 
         $this->updateProductOption->execute($product, $productData);
 
         $this->createOrUpdateProductVariant->execute($product, $productData, false);
 
-        if (isset($productData->media_collection)) {
+        if (isset($productData->media_collection) && ! $productData->skip_media_sync) {
             $this->uploadMediaMaterials(
                 $product,
                 $productData->media_collection,

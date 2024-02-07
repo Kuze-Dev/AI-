@@ -168,7 +168,7 @@ it('can register with wholesaler tier', function () {
         'gender' => $data['gender'],
         'status' => Status::ACTIVE->value,
         'birth_date' => $data['birth_date'].' 00:00:00',
-        'register_status' => RegisterStatus::UNREGISTERED,
+        'register_status' => RegisterStatus::REGISTERED,
     ]);
 });
 

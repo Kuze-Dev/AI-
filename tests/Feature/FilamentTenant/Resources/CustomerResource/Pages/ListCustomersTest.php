@@ -70,6 +70,7 @@ it('can restore customer', function () {
 it('can force delete customer', function () {
     $customer = CustomerFactory::new()
         ->deleted()
+        ->hasAddress()
         ->createOne();
 
     $customer->refresh();

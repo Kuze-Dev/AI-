@@ -1,0 +1,106 @@
+includes:
+    - phpstan-baseline.neon
+
+services:
+    -
+     class: Vural\LarastanStrictRules\Rules\NoLocalQueryScopeRule
+     tags:
+         - phpstan.rules.rule
+    -
+     class: Vural\LarastanStrictRules\Rules\NoPropertyAccessorRule
+     tags:
+         - phpstan.rules.rule
+#    -
+#     class: Vural\LarastanStrictRules\Rules\NoValidationInControllerRule
+#     tags:
+#         - phpstan.rules.rule
+    -
+     class: Vural\LarastanStrictRules\Rules\NoGlobalLaravelFunctionRule
+     tags:
+         - phpstan.rules.rule
+     arguments:
+        allowedFunctions:
+        # Path
+            - app_path
+            - base_path
+            - config_path
+            - database_path
+            - lang_path
+            - public_path
+            - resource_path
+            - storage_path
+        # String
+            - class_basename
+        # Route
+            - asset
+            - route
+        # Misc
+            - abort
+            - abort_if
+            - abort_unless
+            - app
+            - blank
+            - class_uses_recursive
+            - collect
+            - csrf_field
+            - csrf_token
+            - env
+            - method_field
+            - now
+            - old
+            - redirect
+            - report
+            - response
+            - tap
+            - throw_if
+            - throw_unless
+            - trait_uses_recursive
+            - view
+            # additional
+            - config
+            - fake
+            - event
+            - trans
+            - filled
+            - url
+            - session
+            - data_get
+            - dispatch
+            # saas-platform
+            - auth
+            - request
+            - data_set
+
+parameters:
+
+    tmpDir: build/phpstan
+
+    stubFiles:
+        - phpstan-stubs/Permission.stub
+        - phpstan-stubs/PermissionRegistrar.stub
+        - phpstan-stubs/Tenancy.stub
+
+    paths:
+        - app
+        - config
+        - database
+        - domain
+        - support
+
+    # The level 9 is the highest level
+    level: 8
+
+    ignoreErrors:
+        #- '#Access to property \$value on an unknown class StringBackedEnum.#'
+
+    excludePaths:
+        # - ./*/*/FileToBeExcluded.php
+
+    earlyTerminatingFunctionCalls:
+        - rd
+        - dd
+
+    checkOctaneCompatibility: true
+    checkModelProperties: true
+    checkMissingIterableValueType: false
+

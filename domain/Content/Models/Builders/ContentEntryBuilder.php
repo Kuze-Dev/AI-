@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\Content\Models\Builders;
 
-use Carbon\Carbon;
 use Domain\Content\Enums\PublishBehavior;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 /**
  * @template TModelClass of \Domain\Content\Models\ContentEntry
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 class ContentEntryBuilder extends Builder
 {
     /** @return self<\Domain\Content\Models\ContentEntry> */
-    public function wherePublishStatus(PublishBehavior $publishBehavior = null, string $timezone = null): self
+    public function wherePublishStatus(?PublishBehavior $publishBehavior = null, ?string $timezone = null): self
     {
         return $this->where(
             fn ($query) => $query
@@ -32,7 +32,7 @@ class ContentEntryBuilder extends Builder
     }
 
     /** @return self<\Domain\Content\Models\ContentEntry> */
-    public function wherePublishedAtRange(Carbon $publishedAtStart = null, Carbon $publishedAtEnd = null): self
+    public function wherePublishedAtRange(?Carbon $publishedAtStart = null, ?Carbon $publishedAtEnd = null): self
     {
         return $this
             ->when(
@@ -46,10 +46,10 @@ class ContentEntryBuilder extends Builder
     }
 
     /** @return self<\Domain\Content\Models\ContentEntry> */
-    public function wherePublishedAtYearMonth(int $year, int $month = null): self
+    public function wherePublishedAtYearMonth(int $year, ?int $month = null): self
     {
         $selectedDate = tap(
-            Carbon::now()->year($year),
+            now()->year($year),
             fn (Carbon $date) => $month
                 ? $date->month($month)
                 : $date

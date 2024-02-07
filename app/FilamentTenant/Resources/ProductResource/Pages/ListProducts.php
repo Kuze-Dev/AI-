@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
 use App\FilamentTenant\Resources\ProductResource;
-use App\FilamentTenant\Support\ImportProductAction;
 use App\FilamentTenant\Support\ImportProductBatchUpdateAction;
+use App\FilamentTenant\Support\ImportProductVariantAction;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
+use HalcyonAgile\FilamentExport\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
-use Support\Excel\Actions\ExportAction;
 
 class ListProducts extends ListRecords
 {
@@ -22,7 +22,8 @@ class ListProducts extends ListRecords
     protected function getActions(): array
     {
         return [
-            ImportProductAction::proceed(),
+            // ImportProductAction::proceed(),
+            ImportProductVariantAction::proceed(),
             ImportProductBatchUpdateAction::proceed(),
             ExportAction::make()
                 ->model(Product::class)

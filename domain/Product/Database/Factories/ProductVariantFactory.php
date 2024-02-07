@@ -17,7 +17,7 @@ class ProductVariantFactory extends Factory
     public function definition()
     {
         return [
-            'product_id' => $this->faker->numberBetween(1, 5),
+            'product_id' => ProductFactory::new(),
             'sku' => $this->faker->unique()->numerify('SKU###'),
             'combination' => [],
             'retail_price' => $this->faker->randomFloat(2, 0, 100),
@@ -49,10 +49,5 @@ class ProductVariantFactory extends Factory
         }
 
         return $this->state(['combination' => $combinations]);
-    }
-
-    public function setProductId(int $id): self
-    {
-        return $this->state(['product_id' => $id]);
     }
 }

@@ -25,7 +25,7 @@ class CaptchaManager
         $this->config = $container->make('config');
     }
 
-    public function provider(CaptchaProvider $provider = null): BaseProvider
+    public function provider(?CaptchaProvider $provider = null): BaseProvider
     {
         return match ($provider ?? $this->getDefaultProvider()) {
             CaptchaProvider::GOOGLE_RECAPTCHA => $this->createGoogleRecaptchaProvider(),

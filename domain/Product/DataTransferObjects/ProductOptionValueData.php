@@ -15,7 +15,7 @@ class ProductOptionValueData
         public readonly int|string $product_option_id,
         public readonly ?string $icon_value = null,
         public readonly ?string $icon_type = 'text',
-        public readonly UploadedFile|string|null|array $images = null,
+        // public readonly UploadedFile|string|null|array $images = null,
     ) {
     }
 
@@ -25,9 +25,9 @@ class ProductOptionValueData
             id: $data['id'],
             name: $data['name'],
             slug: $data['slug'],
-            icon_type: $data['icon_type'],
-            icon_value: $data['icon_value'],
-            images: $data['images'],
+            icon_type: $data['icon_type'] ?? 'text',
+            icon_value: $data['icon_value'] ?? '',
+            // images: $data['images'] ?? [],
             product_option_id: $data['product_option_id'],
         );
     }
@@ -41,7 +41,7 @@ class ProductOptionValueData
             product_option_id: $data->product_option_id,
             icon_type: $data->icon_type,
             icon_value: $data->icon_value,
-            images: $data->images,
+            // images: $data->images,
         );
     }
 
@@ -54,7 +54,7 @@ class ProductOptionValueData
             product_option_id: $optionId,
             icon_type: $data->icon_type,
             icon_value: $data->icon_value,
-            images: $data->images,
+            // images: $data->images,
         );
     }
 }

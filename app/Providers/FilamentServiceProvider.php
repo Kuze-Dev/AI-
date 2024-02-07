@@ -169,10 +169,10 @@ class FilamentServiceProvider extends ServiceProvider
             'withActivityLog',
             function (
                 string $logName = 'admin',
-                Closure|string $event = null,
-                Closure|string $description = null,
-                Closure|array $properties = null,
-                Model|int|string $causedBy = null,
+                Closure|string|null $event = null,
+                Closure|string|null $description = null,
+                Closure|array|null $properties = null,
+                Model|int|string|null $causedBy = null,
             ): SupportActions\Action {
                 /** @var SupportActions\Action $this */
                 return $this->after(function (SupportActions\Action $action) use ($logName, $event, $description, $properties, $causedBy) {
@@ -226,7 +226,7 @@ class FilamentServiceProvider extends ServiceProvider
 
         Forms\Components\Select::macro(
             'optionsFromModel',
-            function (string|Closure $model, string|Closure $titleColumnName, Closure $callback = null): Forms\Components\Select {
+            function (string|Closure $model, string|Closure $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
                 /** @var Forms\Components\Select $this */
                 if (blank($this->getSearchColumns())) {
                     $this->searchable([$this->evaluate($titleColumnName)]);
@@ -399,7 +399,7 @@ class FilamentServiceProvider extends ServiceProvider
                 if ($component->getVisibility() === 'private') {
                     try {
                         return $media->getTemporaryUrl(now()->addMinutes(5));
-                    } catch (Throwable $exception) {
+                    } catch (Throwable) {
                         // This driver does not support creating temporary URLs.
                     }
                 }

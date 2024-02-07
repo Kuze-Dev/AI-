@@ -30,6 +30,7 @@ class CreateServiceBillAction
             'tax_display' => $serviceBillData->tax_display,
             'tax_total' => $serviceBillData->tax_total,
             'total_amount' => $serviceBillData->total_amount,
+            'total_balance' => $serviceBillData->total_amount,
             'status' => $serviceBillData->status,
         ]);
     }

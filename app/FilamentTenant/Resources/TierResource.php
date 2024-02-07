@@ -31,11 +31,14 @@ class TierResource extends Resource
 
     protected static ?string $model = Tier::class;
 
-    protected static ?string $navigationGroup = 'Customer Management';
-
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('Customer Management');
+    }
 
     public static function form(Form $form): Form
     {
@@ -97,7 +100,7 @@ class TierResource extends Resource
                         ->using(function (Tier $record) {
                             try {
                                 return app(DeleteTierAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),
@@ -112,7 +115,7 @@ class TierResource extends Resource
                         ->using(function (Tier $record) {
                             try {
                                 return app(ForceDeleteTierAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

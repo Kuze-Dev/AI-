@@ -39,11 +39,14 @@ class BlueprintResource extends Resource
 
     protected static ?string $model = Blueprint::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-table';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -107,7 +110,7 @@ class BlueprintResource extends Resource
                         ->using(function (Blueprint $record) {
                             try {
                                 return app(DeleteBlueprintAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

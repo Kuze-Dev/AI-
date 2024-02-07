@@ -78,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Model::shouldBeStrict(! $this->app->isProduction());
+        Model::shouldBeStrict($this->app->isLocal() || $this->app->runningUnitTests());
 
         // Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
@@ -166,9 +166,9 @@ class AppServiceProvider extends ServiceProvider
 
         Rule::macro(
             'email',
-            fn (): string => app()->environment('local', 'testing')
-                ? 'email'
-                : 'email:rfc,dns'
+            fn (): string => app()->isProduction()
+                ? 'email:rfc,dns'
+                : 'email'
         );
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Page\Database\Factories;
 
-use Carbon\Carbon;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\Page;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\Relationship;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 use Support\RouteUrl\Database\Factories\RouteUrlFactory;
 

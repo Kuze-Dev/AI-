@@ -15,6 +15,7 @@ class ServiceBillResource extends JsonApiResource
 {
     public function toAttributes(Request $request): array
     {
+
         return [
             'id' => $this->id,
             'reference' => $this->reference,
@@ -27,6 +28,7 @@ class ServiceBillResource extends JsonApiResource
             'tax_total' => $this->tax_total,
             'additional_charges' => $this->additional_charges,
             'total_amount' => $this->total_amount,
+            'payment_method' => $this->paymentMethod()?->slug,
         ];
     }
 

@@ -20,12 +20,12 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\seed;
 
-function loginAsSuperAdmin(Admin $admin = null): Admin
+function loginAsSuperAdmin(?Admin $admin = null): Admin
 {
     return loginAsAdmin($admin)->assignRole(config('domain.role.super_admin'));
 }
 
-function loginAsAdmin(Admin $admin = null): Admin
+function loginAsAdmin(?Admin $admin = null): Admin
 {
     $admin ??= AdminFactory::new()
         ->createOne();
@@ -33,7 +33,7 @@ function loginAsAdmin(Admin $admin = null): Admin
     return tap($admin, actingAs(...));
 }
 
-function loginAsUser(Admin $user = null): Admin
+function loginAsUser(?Admin $user = null): Admin
 {
     $user ??= AdminFactory::new()
         ->createOne();
@@ -42,12 +42,12 @@ function loginAsUser(Admin $user = null): Admin
 }
 
 function assertActivityLogged(
-    string $logName = null,
-    string $event = null,
-    string $description = null,
-    array $properties = null,
-    Model $causedBy = null,
-    Model $subject = null,
+    ?string $logName = null,
+    ?string $event = null,
+    ?string $description = null,
+    ?array $properties = null,
+    ?Model $causedBy = null,
+    ?Model $subject = null,
 ): void {
     assertDatabaseHas(
         ActivitylogServiceProvider::determineActivityModel(),
@@ -66,6 +66,7 @@ function assertActivityLogged(
 
 function testInTenantContext(): Tenant
 {
+
     /** @var Tenant */
     $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
 

@@ -27,7 +27,7 @@ class UpsResponse implements RateResponse
         return ['is_united_state_domestic' => true] + get_object_vars($this);
     }
 
-    public function getRate(int|string $serviceID = null): float
+    public function getRate(int|string|null $serviceID = null): float
     {
         return (float) $this->package['TotalCharges']['MonetaryValue'];
     }

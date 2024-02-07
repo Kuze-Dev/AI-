@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ConfirmPasswordAction
 {
-    public function execute(string $password, string $guard = null): bool
+    public function execute(string $password, ?string $guard = null): bool
     {
         Validator::validate(
             compact('password'),

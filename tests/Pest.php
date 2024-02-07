@@ -22,7 +22,7 @@ use function Pest\Laravel\seed;
 uses(
     Illuminate\Foundation\Testing\TestCase::class,
     Tests\CreatesApplication::class,
-    Illuminate\Foundation\Testing\LazilyRefreshDatabase::class
+    Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
         Http::preventStrayRequests();
@@ -42,17 +42,18 @@ uses(
             app(PermissionRegistrar::class)->forgetCachedPermissions();
         });
 
-        config()->set(
-            'tenancy.database.prefix',
-            ($token = ParallelTesting::token())
+        config([
+            'tenancy.database.template_tenant_connection' => 'sqlite',
+            'tenancy.database.prefix' => ($token = ParallelTesting::token())
                 ? "test_{$token}_"
-                : 'test_'
-        );
-        config()->set('tenancy.database.template_tenant_connection', 'sqlite');
+                : 'test_',
+        ]);
     })
     ->afterEach(function () {
+        //        if (tenancy()->initialized) {
         tenancy()->end();
         Tenant::all()->each->delete();
+        //        }
     })
     ->in('Feature');
 
@@ -78,16 +79,17 @@ uses(
 
         Relation::morphMap(['test_user' => User::class]);
 
-        config()->set(
-            'tenancy.database.prefix',
-            ($token = ParallelTesting::token())
+        config([
+            'tenancy.database.template_tenant_connection' => 'sqlite',
+            'tenancy.database.prefix' => ($token = ParallelTesting::token())
                 ? "test_{$token}_"
-                : 'test_'
-        );
-        config()->set('tenancy.database.template_tenant_connection', 'sqlite');
+                : 'test_',
+        ]);
     })
     ->afterEach(function () {
+        //        if (tenancy()->initialized) {
         tenancy()->end();
         Tenant::all()->each->delete();
+        //        }
     })
     ->in('Unit');

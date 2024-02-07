@@ -43,7 +43,7 @@ class AddressRequest extends FormRequest
         ];
     }
 
-    public function toDTO(Customer $customer = null, Address $address = null): AddressData
+    public function toDTO(?Customer $customer = null, ?Address $address = null): AddressData
     {
         $validated = $this->validated();
 

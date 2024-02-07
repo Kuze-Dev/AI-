@@ -130,10 +130,10 @@ class OrderPlacedMail extends Notification implements ShouldQueue
         $address = Arr::join(
             array_filter([
                 $this->shippingAddress->address_line_1,
-                $this->shippingAddress->country,
+                $this->shippingAddress->city,
                 $this->shippingAddress->state,
                 $this->shippingAddress->zip_code,
-                $this->shippingAddress->city,
+                $this->shippingAddress->country,
             ]),
             ', '
         );

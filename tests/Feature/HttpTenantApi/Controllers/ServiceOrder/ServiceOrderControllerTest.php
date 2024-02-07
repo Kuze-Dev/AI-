@@ -17,7 +17,9 @@ use function Pest\Laravel\postJson;
 beforeEach(function () {
     testInTenantContext()->features()->activate(ServiceBase::class);
 
-    $this->customer = CustomerFactory::new()->createOne();
+    $this->customer = CustomerFactory::new()
+        ->hasAddress()
+        ->createOne();
 
     Sanctum::actingAs($this->customer);
 

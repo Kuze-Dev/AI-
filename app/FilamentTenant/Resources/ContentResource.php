@@ -33,9 +33,12 @@ class ContentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -219,7 +222,7 @@ class ContentResource extends Resource
                         ->using(function (Content $record) {
                             try {
                                 return app(DeleteContentAction::class)->execute($record);
-                            } catch (DeleteRestrictedException $e) {
+                            } catch (DeleteRestrictedException) {
                                 return false;
                             }
                         }),

@@ -63,7 +63,8 @@ it('cant add to cart when purchasable cant purchase as a guest', function () {
 });
 
 it('can add to cart a purchasable product with variant', function () {
-    $productVariant = ProductVariantFactory::new()->setProductId($this->product->id)
+    $productVariant = ProductVariantFactory::new()
+        ->for($this->product)
         ->createOne();
 
     postJson('api/guest/carts/cartlines', [
@@ -77,7 +78,8 @@ it('can add to cart a purchasable product with variant', function () {
 });
 
 it('can add to cart a purchasable product with remarks', function () {
-    $productVariant = ProductVariantFactory::new()->setProductId($this->product->id)
+    $productVariant = ProductVariantFactory::new()
+        ->for($this->product)
         ->createOne();
 
     postJson('api/guest/carts/cartlines', [

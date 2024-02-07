@@ -8,6 +8,9 @@ use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
+use Support\Common\Actions\SyncMediaCollectionAction;
+use Support\Common\DataTransferObjects\MediaCollectionData;
+use Support\Common\DataTransferObjects\MediaData;
 
 class CreateProductOptionAction
 {
@@ -18,6 +21,7 @@ class CreateProductOptionAction
                 $newProductOptionModel = ProductOption::create([
                     'product_id' => $product->id,
                     'name' => $productOption->name,
+                    'is_custom' => $productOption->is_custom,
                 ]);
 
                 $productData->product_variants = $this->searchAndChangeValue(
@@ -39,7 +43,13 @@ class CreateProductOptionAction
                     $newOptionValueModel = ProductOptionValue::create([
                         'name' => $productOptionValue->name,
                         'product_option_id' => $productOption->id,
+                        'data' => ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value],
                     ]);
+
+                    // $this->uploadMediaMaterials(
+                    //     $newOptionValueModel,
+                    //     [['collection' => 'media', 'materials' => $productOptionValue->images]]
+                    // );
 
                     $productOptionValue = $productOptionValue
                         ->withId($newOptionValueModel->id, $productOptionValue);
@@ -81,4 +91,24 @@ class CreateProductOptionAction
             return $variant->withCombination($newCombinations->toArray(), $variant);
         })->toArray();
     }
+
+    // protected function uploadMediaMaterials(ProductOptionValue $productOptionValue, array $mediaCollection): void
+    // {
+    //     collect($mediaCollection)->each(function ($media, $key) use ($productOptionValue) {
+    //         /** @var array<int, array> $mediaMaterials */
+    //         $mediaMaterials = $media['materials'];
+
+    //         $mediaData = collect($mediaMaterials)->map(function ($material) {
+    //             /** @var \Illuminate\Http\UploadedFile|string $material */
+    //             return new MediaData(media: $material);
+    //         })->toArray();
+
+    //         $syncMediaCollection = new SyncMediaCollectionAction();
+
+    //         $syncMediaCollection->execute($productOptionValue, new MediaCollectionData(
+    //             collection: $media['collection'],
+    //             media: $mediaData,
+    //         ));
+    //     });
+    // }
 }

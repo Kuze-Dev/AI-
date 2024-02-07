@@ -28,11 +28,14 @@ class ShippingmethodResource extends Resource
 
     protected static ?string $model = ShippingMethod::class;
 
-    protected static ?string $navigationGroup = 'Shop Configuration';
-
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
     protected static ?string $recordTitleAttribute = 'title';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('Shop Configuration');
+    }
 
     public static function form(Form $form): Form
     {
@@ -63,7 +66,7 @@ class ShippingmethodResource extends Resource
                             if ($component->getVisibility() === 'private') {
                                 try {
                                     return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                } catch (Throwable $exception) {
+                                } catch (Throwable) {
                                     // This driver does not support creating temporary URLs.
                                 }
                             }

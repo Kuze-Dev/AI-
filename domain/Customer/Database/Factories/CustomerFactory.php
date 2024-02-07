@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Database\Factories;
 
-use Carbon\Carbon;
 use Domain\Address\Database\Factories\AddressFactory;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
@@ -13,6 +12,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -27,7 +27,7 @@ class CustomerFactory extends Factory
         return [
             'tier_id' => TierFactory::new(),
             'cuid' => $this->faker->unique()->uuid(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => $this->faker->unique()->companyEmail(),
             'password' => $this->faker->password(),
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
@@ -40,18 +40,27 @@ class CustomerFactory extends Factory
         ];
     }
 
-    public function configure(): self
+    //    public function configure(): self
+    //    {
+    //        return $this
+    //            ->afterCreating(function (Customer $customer) {
+    //                if ($customer->addresses->isEmpty()) {
+    //                    AddressFactory::new()
+    //                        ->for($customer)
+    //                        ->defaultShipping()
+    //                        ->defaultBilling()
+    //                        ->createOne();
+    //                }
+    //            });
+    //    }
+
+    public function hasAddress(): self
     {
-        return $this
-            ->afterCreating(function (Customer $customer) {
-                if ($customer->addresses->isEmpty()) {
-                    AddressFactory::new()
-                        ->for($customer)
-                        ->defaultShipping()
-                        ->defaultBilling()
-                        ->createOne();
-                }
-            });
+        return $this->has(
+            AddressFactory::new()
+                ->defaultShipping()
+                ->defaultBilling()
+        );
     }
 
     public function deleted(): self
@@ -59,7 +68,7 @@ class CustomerFactory extends Factory
         return $this->state(['deleted_at' => now()]);
     }
 
-    public function verified(Carbon $datetime = null): self
+    public function verified(?Carbon $datetime = null): self
     {
         return $this->state(['email_verified_at' => $datetime ?? now()]);
     }

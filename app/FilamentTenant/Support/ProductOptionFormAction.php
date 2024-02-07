@@ -147,6 +147,19 @@ class ProductOptionFormAction extends Action
         return $outputArray;
     }
 
+    protected function hasMatchingCombinationViaName(array $combination1, array $combination2): bool
+    {
+        $collection1 = collect($combination1);
+        $collection2 = collect($combination2);
+
+        return $collection1->every(function ($option1) use ($collection2) {
+            return $collection2->contains(function ($option2) use ($option1) {
+                return strtolower($option1['option']) === strtolower($option2['option']) &&
+                    strtolower($option1['option_value']) === strtolower($option2['option_value']);
+            });
+        });
+    }
+
     protected function hasMatchingCombination(array $combination1, array $combination2): bool
     {
         $collection1 = collect($combination1);
@@ -164,20 +177,34 @@ class ProductOptionFormAction extends Action
     {
         $mergedCombination = [];
         $result = [];
-
+        $existingProductVariants = $record->productVariants->toArray();
         // Merge new and existing combinations
         $mergedCombination = $this->mergeCombinations($record->productVariants->toArray(), $productVariants);
 
-        $result = collect($mergedCombination)->map(function ($combination) use ($record, $result) {
+        $result = collect($mergedCombination)->map(function ($combination) use ($existingProductVariants, $record, $result) {
             $generatedSku = $this->generateUniqueSku($record, collect($result));
 
-            return array_merge([
-                'sku' => $generatedSku,
-                'selling_price' => $record->selling_price,
-                'retail_price' => $record->retail_price,
-                'stock' => $record->stock ?? null,
-                'status' => $record->status,
-            ], $combination);
+            $matchingItem = collect($existingProductVariants)->first(function ($existingVariant) use ($combination) {
+                return $this->hasMatchingCombinationViaName($combination['combination'], $existingVariant['combination']);
+            });
+
+            if (! is_null($matchingItem)) {
+                return array_merge([
+                    'sku' => $matchingItem['sku'],
+                    'selling_price' => $matchingItem['selling_price'],
+                    'retail_price' => $matchingItem['retail_price'],
+                    'stock' => $matchingItem['stock'],
+                    'status' => $matchingItem['status'],
+                ], $combination);
+            } else {
+                return array_merge([
+                    'sku' => $generatedSku,
+                    'selling_price' => $record->selling_price,
+                    'retail_price' => $record->retail_price,
+                    'stock' => $record->stock ?? null,
+                    'status' => $record->status,
+                ], $combination);
+            }
         })->values()->all();
 
         return array_values($result);

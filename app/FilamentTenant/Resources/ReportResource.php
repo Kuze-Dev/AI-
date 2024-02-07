@@ -12,7 +12,10 @@ class ReportResource extends Resource
 {
     use ContextualResource;
 
-    protected static ?string $navigationGroup = 'eCommerce';
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
 
     public static function getPages(): array
     {

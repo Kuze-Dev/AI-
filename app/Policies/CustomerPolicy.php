@@ -43,17 +43,17 @@ class CustomerPolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function delete(User $user, Customer $customer = null): bool
+    public function delete(User $user, ?Customer $customer = null): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function restore(User $user, Customer $customer = null): bool
+    public function restore(User $user, ?Customer $customer = null): bool
     {
         return $this->checkWildcardPermissions($user);
     }
 
-    public function forceDelete(User $user, Customer $customer = null): bool
+    public function forceDelete(User $user, ?Customer $customer = null): bool
     {
         return $this->checkWildcardPermissions($user);
     }

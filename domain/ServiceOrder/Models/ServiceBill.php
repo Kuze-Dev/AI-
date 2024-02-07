@@ -6,15 +6,20 @@ namespace Domain\ServiceOrder\Models;
 
 use Akaunting\Money\Money;
 use App\Casts\MoneyCast;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Interfaces\PayableInterface;
+use Domain\Payments\Models\Payment;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Queries\ServiceBillQueryBuilder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * Domain\ServiceOrder\Models\ServiceBill
@@ -32,6 +37,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_amount
+ * @property float $total_balance
  * @property ServiceBillStatus $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -67,9 +73,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Eloquent
  */
-class ServiceBill extends Model implements PayableInterface
+class ServiceBill extends Model implements HasMedia, PayableInterface
 {
     use HasPayments;
+    use InteractsWithMedia;
     use SoftDeletes;
 
     protected $fillable = [
@@ -85,6 +92,7 @@ class ServiceBill extends Model implements PayableInterface
         'tax_percentage',
         'tax_total',
         'total_amount',
+        'total_balance',
         'status',
     ];
 
@@ -97,6 +105,7 @@ class ServiceBill extends Model implements PayableInterface
         'tax_percentage' => 'float',
         'tax_total' => MoneyCast::class,
         'total_amount' => MoneyCast::class,
+        'total_balance' => MoneyCast::class,
         'status' => ServiceBillStatus::class,
     ];
 
@@ -113,6 +122,17 @@ class ServiceBill extends Model implements PayableInterface
     public function newEloquentBuilder($query): ServiceBillQueryBuilder
     {
         return new ServiceBillQueryBuilder($query);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $registerMediaConversions = function () {
+            $this->addMediaConversion('preview');
+        };
+
+        $this->addMediaCollection('service_bill_bank_proof_image')
+            ->onlyKeepLatest(5)
+            ->registerMediaConversions($registerMediaConversions);
     }
 
     /** @return Attribute<Money, never> */
@@ -160,6 +180,34 @@ class ServiceBill extends Model implements PayableInterface
     public function serviceTransactions(): HasMany
     {
         return $this->hasMany(ServiceTransaction::class);
+    }
+
+    public function latestTransaction(): ?ServiceTransaction
+    {
+        return $this->serviceTransactions()->latest()->first();
+    }
+
+    public function latestTransactionPaid(): ?ServiceTransaction
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction */
+        $serviceTransaction = $this->latestTransaction();
+
+        return filled($serviceTransaction) && $serviceTransaction->status === ServiceTransactionStatus::PAID
+            ? $serviceTransaction
+            : null;
+    }
+
+    public function latestPayment(): ?Payment
+    {
+        return $this->payments()->latest()->first();
+    }
+
+    public function paymentMethod(): ?PaymentMethod
+    {
+        /** @var \Domain\ServiceOrder\Models\ServiceTransaction $serviceTransaction */
+        $serviceTransaction = $this->latestTransaction();
+
+        return filled($serviceTransaction) ? $serviceTransaction->payment_method : null;
     }
 
     /** @return Attribute<bool, never> */

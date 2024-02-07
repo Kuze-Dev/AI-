@@ -1,0 +1,46 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Access to an undefined property Support\\\\RouteUrl\\\\Contracts\\\\HasRouteUrl\\:\\:\\$activeRouteUrl\\.$#"
+			count: 2
+			path: app/FilamentTenant/Support/RouteUrlFieldset.php
+
+		-
+			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			count: 3
+			path: domain/Auth/Actions/AddSafeDeviceAction.php
+
+		-
+			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			count: 1
+			path: domain/Auth/Actions/CheckIfOnSafeDeviceAction.php
+
+		-
+			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			count: 1
+			path: domain/Auth/Actions/FlushSafeDevicesAction.php
+
+		-
+			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\HasEmailVerificationOTP&Illuminate\\\\Contracts\\\\Auth\\\\MustVerifyEmail\\:\\:\\$emailVerificationOneTimePassword\\.$#"
+			count: 1
+			path: domain/Auth/Actions/GenerateOTPForEmailVerificationAction.php
+
+		-
+			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			count: 2
+			path: domain/Auth/Actions/GenerateRecoveryCodesAction.php
+
+		-
+			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			count: 1
+			path: domain/Auth/Actions/ValidateRecoveryCodeAction.php
+
+		-
+			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			count: 1
+			path: domain/Auth/Actions/ValidateTotpCodeAction.php
+
+		-
+			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\HasEmailVerificationOTP&Illuminate\\\\Contracts\\\\Auth\\\\MustVerifyEmail\\:\\:\\$emailVerificationOneTimePassword\\.$#"
+			count: 1
+			path: domain/Auth/Actions/VerifyEmailViaOTPAction.php

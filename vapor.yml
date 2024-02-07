@@ -16,18 +16,19 @@ environments:
     domain:
       - haspcms.net
       - "*.haspcms.net"
-    timeout: 30
+    timeout: 60
     warm: 10
     cache: hasp-cache
-    memory: 1024
+    memory: 2048
     cli-memory: 512
+    cli-timeout: 900 # max allowed, 15 minutes
     runtime: 'php-8.2:al2'
     build:
       - "composer install --no-dev"
       - "php artisan event:cache"
       # - 'npm ci && npm run build && rm -rf node_modules'
     firewall:
-      rate-limit: 1000
+      rate-limit: 1500
   staging:
     domain:
       - haspcms-1.com
@@ -35,13 +36,15 @@ environments:
     cache: hasp-cache
     memory: 2048
     cli-memory: 512
+    timeout: 60
+    cli-timeout: 900 # max allowed, 15 minutes
     runtime: 'php-8.2:al2'
     build:
       - 'COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev'
       - "php artisan event:cache"
       # - 'npm ci && npm run build && rm -rf node_modules'
     firewall:
-      rate-limit: 1000
+      rate-limit: 1500
 ignore:
     - node_modules
     - public/storage

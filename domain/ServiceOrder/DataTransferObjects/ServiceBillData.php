@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\DataTransferObjects;
 
-use Carbon\Carbon;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Taxation\Enums\PriceDisplay;
+use Illuminate\Support\Carbon;
 
 class ServiceBillData
 {
@@ -25,6 +25,24 @@ class ServiceBillData
         public readonly ?Carbon $bill_date = null,
         public readonly ?Carbon $due_date = null,
     ) {
+    }
+
+    public static function paymentMilestone(ServiceOrder $serviceOrder, array $updatedValue): self
+    {
+        return new self(
+            service_order_id: $serviceOrder->id,
+            currency: $serviceOrder->currency_code,
+            bill_date: null,
+            due_date: null,
+            service_price: $serviceOrder->service_price,
+            additional_charges: $serviceOrder->additional_charges,
+            sub_total: $serviceOrder->sub_total,
+            tax_display: $serviceOrder->tax_display,
+            tax_percentage: $serviceOrder->tax_percentage,
+            tax_total: floatval($updatedValue['taxTotal']),
+            total_amount: floatval($updatedValue['totalAmount']),
+            status: ServiceBillStatus::PENDING,
+        );
     }
 
     public static function initialFromServiceOrder(ServiceOrder $serviceOrder): self
