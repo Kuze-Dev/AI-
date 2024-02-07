@@ -20,7 +20,7 @@ class CreateForm extends CreateRecord
 
     protected static string $resource = FormResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -28,11 +28,6 @@ class CreateForm extends CreateRecord
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @throws Throwable */

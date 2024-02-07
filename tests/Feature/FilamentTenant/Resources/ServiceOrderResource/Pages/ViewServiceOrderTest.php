@@ -7,14 +7,11 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderAddressFactory;
 use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
-use Filament\Facades\Filament;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
-
-    Filament::setContext('filament-tenant');
+    testInTenantContext(ServiceBase::class);
 
     loginAsSuperAdmin();
 });

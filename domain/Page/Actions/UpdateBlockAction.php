@@ -20,7 +20,7 @@ class UpdateBlockAction
         ]);
 
         if ($blockData->image instanceof UploadedFile && $imageString = $blockData->image->get()) {
-            $block->addMediaFromString($imageString)
+            $block->addmedia($blockData->image)
                 ->usingFileName($blockData->image->getClientOriginalName())
                 ->usingName(pathinfo($blockData->image->getClientOriginalName(), PATHINFO_FILENAME))
                 ->toMediaCollection('image');

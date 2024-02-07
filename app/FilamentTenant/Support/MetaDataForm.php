@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
-use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
+/**
+ * @deprecated use MetaDataFormV2
+ */
 class MetaDataForm extends Section
 {
     public function setUp(): void
@@ -43,7 +45,7 @@ class MetaDataForm extends Section
                 ->image()
                 ->beforeStateDehydrated(null)
                 ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
                     $mediaClass = config('media-library.media_model', Media::class);
 
                     /** @var ?Media $media */
@@ -60,7 +62,7 @@ class MetaDataForm extends Section
                     return $media?->getUrl();
                 }),
             Forms\Components\TextInput::make('image_alt_text')
-                ->visible(fn (Closure $get) => filled($get('image')))
+                ->visible(fn (\Filament\Forms\Get $get) => filled($get('image')))
                 ->formatStateUsing(fn ($record) => $record?->metaData?->getFirstMedia('image')?->getCustomProperty('alt_text')),
         ]);
     }

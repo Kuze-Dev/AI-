@@ -6,26 +6,21 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\LocaleResource\Pages\ListLocale;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Internationalization\Models\Locale;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Filters\Layout;
+use Filament\Tables\Table;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
 class LocaleResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Locale::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-translate';
+    protected static ?string $navigationIcon = 'heroicon-o-language';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -55,7 +50,7 @@ class LocaleResource extends Resource
                 ->searchable()
                 ->lazy()
                 ->unique(ignoreRecord: true)
-                ->afterStateUpdated(function (Closure $get, Closure $set, $state) {
+                ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, $state) {
                     if ($get('name') === $state || blank($get('name'))) {
                         $code = preg_replace('/.*\((.*)\)/', '$1', $state);
                         $set('code', $code);
@@ -64,7 +59,7 @@ class LocaleResource extends Resource
                 ->required(),
             Forms\Components\TextInput::make('code')
                 ->unique(ignoreRecord: true)
-                ->dehydrateStateUsing(fn (Closure $get, $state) => $state ?: $get('code'))
+                ->dehydrateStateUsing(fn (\Filament\Forms\Get $get, $state) => $state ?: $get('code'))
                 ->disabled()
                 ->required(),
             Forms\Components\Checkbox::make('is_default')
@@ -86,7 +81,7 @@ class LocaleResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone),
             ])
-            ->filtersLayout(Layout::AboveContent)
+            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->hidden(fn ($record) => $record->is_default),

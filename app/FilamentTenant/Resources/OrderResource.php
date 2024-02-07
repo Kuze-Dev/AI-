@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Support;
 use App\Settings\OrderSettings;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderStatuses;
@@ -17,11 +16,11 @@ use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Resources\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -32,8 +31,6 @@ use Throwable;
 
 class OrderResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
@@ -45,7 +42,7 @@ class OrderResource extends Resource
         return trans('eCommerce');
     }
 
-    protected static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
         /** @phpstan-ignore-next-line https://filamentphp.com/docs/2.x/admin/navigation#navigation-item-badges */
         return strval(static::$model::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count());
@@ -600,7 +597,7 @@ class OrderResource extends Resource
     private static function summaryEditButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make('Edit')
-            ->execute(function (Order $record, Closure $get, Closure $set) {
+            ->execute(function (Order $record, \Filament\Forms\Get $get, \Filament\Forms\Set $set) {
                 return Forms\Components\Actions\Action::make(trans('edit'))
                     ->color('primary')
                     ->label('Edit')
@@ -640,7 +637,7 @@ class OrderResource extends Resource
                         Forms\Components\Textarea::make('email_remarks')
                             ->maxLength(255)
                             ->label(trans('Remarks'))
-                            ->visible(fn (Closure $get) => $get('send_email') == true)
+                            ->visible(fn (\Filament\Forms\Get $get) => $get('send_email') == true)
                             ->dehydrateStateUsing(function (?string $state) use ($get) {
                                 if (filled($state) && $get('send_email') == true) {
                                     return $state;
@@ -743,7 +740,7 @@ class OrderResource extends Resource
     {
         return Support\ButtonAction::make(trans('mark_as_paid'))
             ->disableLabel()
-            ->execute(function (Order $record, Closure $set) {
+            ->execute(function (Order $record, \Filament\Forms\Set $set) {
                 $order = $record;
 
                 return Forms\Components\Actions\Action::make('mark_as_paid')
@@ -806,7 +803,7 @@ class OrderResource extends Resource
     {
         return Support\ButtonAction::make('proof_of_payment')
             ->disableLabel()
-            ->execute(function (Order $record, Closure $set) {
+            ->execute(function (Order $record, \Filament\Forms\Set $set) {
                 $footerActions = self::showProofOfPaymentActions($record, $set);
 
                 $order = $record;
@@ -841,7 +838,7 @@ class OrderResource extends Resource
         $order = $record;
 
         return Forms\Components\Actions\Action::make('proof_of_payment')
-            ->color('secondary')
+            ->color('gray')
             ->label(trans('View Proof of payment'))
             ->size('sm')
             ->action(function (array $data) use ($order, $set) {

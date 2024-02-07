@@ -1,4 +1,4 @@
-<x-dynamic-component
+{{-- <x-dynamic-component
     :component="$getFieldWrapperView()"
     :id="$getId()"
     :label="$getLabel()"
@@ -10,11 +10,21 @@
     :hint-icon="$getHintIcon()"
     :required="$isRequired()"
     :state-path="$getStatePath()"
+> --}}
+@php
+    $statePath = $getStatePath();
+@endphp
+
+<x-dynamic-component
+    :component="$getFieldWrapperView()"
+    :id="$getId()"
+    :field="$field"
 >
+
     <div
         class="flex items-center w-full gap-2 overflow-x-auto whitespace-nowrap"
         x-data="{ 
-            state: $wire.entangle('{{ $getStatePath() }}'), 
+            state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             blocks: @js($blocks),
             showModal: false, 
             blockEvent: function(i) {

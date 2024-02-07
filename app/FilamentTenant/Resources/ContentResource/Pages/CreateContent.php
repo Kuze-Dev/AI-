@@ -20,7 +20,7 @@ class CreateContent extends CreateRecord
 
     protected static string $resource = ContentResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -28,11 +28,6 @@ class CreateContent extends CreateRecord
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /**

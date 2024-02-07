@@ -30,20 +30,15 @@ class EditBlueprint extends EditRecord
 
     protected static string $resource = BlueprintResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panel::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @param  Blueprint  $record */

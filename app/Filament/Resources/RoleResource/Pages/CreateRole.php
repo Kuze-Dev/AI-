@@ -20,7 +20,7 @@ class CreateRole extends CreateRecord
 
     protected static string $resource = RoleResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -28,11 +28,6 @@ class CreateRole extends CreateRecord
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @throws Throwable */

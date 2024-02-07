@@ -4,41 +4,35 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TenantResource\Pages;
 
+use App\Features;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\TenantResource;
-use Domain\Tenant\Actions\UpdateTenantAction;
-use Domain\Tenant\DataTransferObjects\TenantData;
-use Domain\Tenant\Models\Tenant;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
+use Illuminate\Support\Str;
 
+/**
+ * @property-read \Domain\Tenant\Models\Tenant $record
+ */
 class EditTenant extends EditRecord
 {
     use LogsFormActivity;
 
     protected static string $resource = TenantResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->requiresConfirmation(function ($livewire) {
-                    return $livewire->data['is_suspended'] == true ? true : false;
-                })
-                ->modalCancelAction(function ($livewire) {
-
-                    return Action::makeModalAction('redirect')
-                        ->label(trans('Cancel & Revert Changes'))
-                        ->color('secondary')
-                        ->url(TenantResource::getUrl('edit', [$this->record]));
-                })
-                ->modalHeading(fn ($livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
-                ->modalSubheading(fn ($livewire) => $livewire->data['is_suspended'] ? 'The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?' : null)
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+                ->requiresConfirmation(fn (Action $livewire) => $livewire->data['is_suspended'] === true)
+                ->modalCancelAction(fn (Action $livewire) => Action::makeModalAction('redirect')
+                    ->label(trans('Cancel & Revert Changes'))
+                    ->color('gray')
+                    ->url(TenantResource::getUrl('edit', [$this->record])))
+                ->modalHeading(fn (Action $livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
+                ->modalDescription(fn (Action $livewire) => $livewire->data['is_suspended'] ? 'The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?' : null)
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -47,31 +41,72 @@ class EditTenant extends EditRecord
         ];
     }
 
-    protected function getRules(): array
+    //    public function beforeSave(): void
+    //    {
+    //    }
+
+    public function afterSave(): void
     {
-        return tap(
-            parent::getRules(),
-            fn (&$rules) => $rules['data.domains.*.domain'] = ['distinct']
-        );
+        $data = $this->form->getRawState();
+
+        $tenant = $this->record;
+
+        $features = self::getNormalizedFeatureNames($data['features']);
+
+        $activeFeatures = array_keys(array_filter($tenant->features()->all()));
+        $inactiveFeatures = array_diff($activeFeatures, $features);
+
+        foreach ($inactiveFeatures as $inactiveFeature) {
+            $tenant->features()->deactivate($inactiveFeature);
+        }
+
+        foreach ($features as $feature) {
+            $tenant->features()->activate($feature);
+        }
     }
 
-    protected function afterValidate(): void
+    private static function getNormalizedFeatureNames(array $features): array
     {
-        $this->validate();
-    }
+        $bases = [
+            Features\CMS\CMSBase::class,
+            Features\Customer\CustomerBase::class,
+            Features\ECommerce\ECommerceBase::class,
+            Features\Service\ServiceBase::class,
+            Features\Shopconfiguration\ShopconfigurationBase::class,
+        ];
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
+        $bases = collect($bases)
+            ->mapWithKeys(fn (string $base) => [class_basename($base) => $base])
+            ->toArray();
 
-    /**
-     * @param  Tenant  $record
-     *
-     * @throws Throwable
-     */
-    protected function handleRecordUpdate(Model $record, array $data): Model
-    {
-        return DB::transaction(fn () => app(UpdateTenantAction::class)->execute($record, TenantData::fromArray($data)));
+        $results = [];
+        foreach ($features as $k => $extra) {
+            if (is_bool($extra)) {
+                if ($extra) {
+                    $results[] = $bases[$k];
+                }
+
+                continue;
+            }
+
+            if (
+                $features[
+                (string) Str::of('CMSBase_extras')
+                    ->before('_extra')
+                ] === false
+            ) {
+                continue;
+            }
+
+            foreach ($extra as $v) {
+                $results[] = $v;
+            }
+        }
+
+        foreach ($results as $k => $r) {
+            $results[$k] = app($r)->name;
+        }
+
+        return $results;
     }
 }

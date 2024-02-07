@@ -9,10 +9,10 @@ namespace App\FilamentTenant\Resources\ProductResource\RelationManagers;
 use Closure;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\ProductVariant;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class VariantsRelationManager extends RelationManager
 {
@@ -20,7 +20,7 @@ class VariantsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'Variant';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -114,7 +114,7 @@ class VariantsRelationManager extends RelationManager
             ])->columns(1);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

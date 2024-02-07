@@ -62,7 +62,7 @@ enum FieldType: string
             self::MEDIA => MediaFieldData::class,
             self::CHECKBOX => CheckBoxFieldData::class,
             self::RADIO => RadioFieldData::class,
-            self::TINYEDITOR => TinyEditorData::class
+            self::TINYEDITOR => TinyEditorData::class,
         };
     }
 }

@@ -6,15 +6,16 @@ namespace App\FilamentTenant\Resources\CustomerResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\CustomerResource;
-use Domain\Customer\Actions\CreateCustomerAction;
-use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Enums\Status;
+use Domain\Tier\Enums\TierApprovalStatus;
 use Exception;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
+/**
+ * @property-read \Domain\Customer\Models\Customer $record
+ */
 class CreateCustomer extends CreateRecord
 {
     use LogsFormActivity;
@@ -22,27 +23,22 @@ class CreateCustomer extends CreateRecord
     protected static string $resource = CustomerResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
     }
 
-    protected function getFormActions(): array
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        return $this->getCachedActions();
-    }
+        $data['status'] = Status::INACTIVE;
+        $data['register_status'] = RegisterStatus::UNREGISTERED;
+        $data['tier_approval_status'] = TierApprovalStatus::APPROVED;
 
-    /** @throws Throwable */
-    protected function handleRecordCreation(array $data): Model
-    {
-        return DB::transaction(
-            fn () => app(CreateCustomerAction::class)
-                ->execute(CustomerData::fromArrayCreateByAdmin($data))
-        );
+        return parent::mutateFormDataBeforeCreate($data);
     }
 }

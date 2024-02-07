@@ -9,14 +9,12 @@ use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\Taxonomy;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });

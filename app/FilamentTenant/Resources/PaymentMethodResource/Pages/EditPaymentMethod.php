@@ -6,57 +6,55 @@ namespace App\FilamentTenant\Resources\PaymentMethodResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PaymentMethodResource;
-use Domain\PaymentMethod\Actions\UpdatePaymentMethodAction;
-use Domain\PaymentMethod\DataTransferObjects\PaymentMethodData;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
+/**
+ * @property-read PaymentMethod $record
+ */
 class EditPaymentMethod extends EditRecord
 {
     use LogsFormActivity;
 
     protected static string $resource = PaymentMethodResource::class;
 
-    protected function getActions(): array
+    public function mount(int|string $record): void
     {
-        /** @var PaymentMethod */
-        $record = $this->record;
+        parent::mount($record);
 
-        $drivers = app(GetAvailablePaymentDriverAction::class)->execute();
-
-        if (array_key_exists($record->gateway, $drivers)) {
-            return [
-                Action::make('save')
-                    ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
-                    ->action('save')
-                    ->keyBindings(['mod+s']),
-                Actions\DeleteAction::make(),
-            ];
+        if (! $this->hasGatewayDriver()) {
+            Notification::make()
+                ->warning()
+                ->body(trans('Payment Gateway [:gateway] is currently Disabled please inform your service provider if you wish to Re Enabled this feature', [
+                    'gateway' => $this->record->gateway,
+                ]))
+                ->send();
         }
-
-        $this->notify('warning', 'Payment Gateway ['.$record->gateway.'] is currently Disabled please inform your service provider if you wish to Re Enabled this feature');
-
-        return [];
     }
 
-    protected function getFormActions(): array
+    protected function getHeaderActions(): array
     {
-        return $this->getCachedActions();
+        return [
+            Action::make('save')
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s'])
+                ->visible($this->hasGatewayDriver()),
+            Actions\DeleteAction::make()
+                ->visible($this->hasGatewayDriver()),
+        ];
     }
 
-    /**
-     * @param  PaymentMethod  $record
-     *
-     * @throws Throwable
-     */
-    protected function handleRecordUpdate(Model $record, array $data): Model
+    private function hasGatewayDriver(): bool
     {
-        return DB::transaction(fn () => app(UpdatePaymentMethodAction::class)->execute($record, PaymentMethodData::fromArray($data)));
+        return once(function () {
+            $drivers = app(GetAvailablePaymentDriverAction::class)->execute();
+
+            return array_key_exists($this->record->gateway, $drivers);
+        });
     }
 }

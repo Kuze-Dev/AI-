@@ -7,14 +7,13 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\FilamentTenant\Resources\SiteResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Site\Models\Site;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Resources\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Http;
@@ -23,8 +22,6 @@ use Throwable;
 
 class SiteResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Site::class;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -99,7 +96,7 @@ class SiteResource extends Resource
                 Tables\Actions\Action::make('deploy')
                     ->button()
                     ->icon('heroicon-o-cog')
-                    ->color('secondary')
+                    ->color('gray')
                     ->disabled(function (Site $record) {
 
                         return (bool) (is_null($record->deploy_hook));
@@ -170,7 +167,7 @@ class SiteResource extends Resource
             ]);
     }
 
-    protected static function shouldRegisterNavigation(): bool
+    public static function shouldRegisterNavigation(): bool
     {
         return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) ?: false;
     }

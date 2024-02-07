@@ -8,7 +8,6 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Currency\Models\Currency;
 use Domain\Discount\Actions\AutoGenerateCode;
@@ -21,7 +20,6 @@ use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountLimit;
 use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Placeholder;
@@ -30,30 +28,26 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TextInput\Mask;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Discount::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
@@ -69,7 +63,7 @@ class DiscountResource extends Resource
     {
         return $form
             ->schema([
-                Card::make([
+                Section::make([
                     TextInput::make('name')
                         ->label(trans('Name'))
                         ->required()
@@ -93,16 +87,13 @@ class DiscountResource extends Resource
 
                     TextInput::make('max_uses')
                         ->numeric()
-                        ->rules([
-                            function ($record) {
-
-                                return function (string $attribute, mixed $value, Closure $fail) use ($record) {
-                                    if ($value < $record?->max_uses) {
-                                        $fail('The maximum usage must not be less than current. Current is: '.$record->max_uses);
-                                    }
-                                };
+                        ->rule(
+                            fn ($record) => function (string $attribute, mixed $value, Closure $fail) use ($record) {
+                                if ($value < $record?->max_uses) {
+                                    $fail('The maximum usage must not be less than current. Current is: '.$record->max_uses);
+                                }
                             },
-                        ])
+                        )
 
                         ->label(trans('Maximum Usage'))
                         ->helperText(new HtmlString(<<<'HTML'
@@ -110,7 +101,7 @@ class DiscountResource extends Resource
                             HTML)),
                     Placeholder::make('times_used')
                         ->disabled()
-                        ->content(fn ($record) => $record = DiscountLimit::whereCode($record?->code)->count()),
+                        ->content(fn (?Discount $record) => DiscountLimit::whereCode($record?->code)->count()),
 
                 ])
                     ->columnSpan(['lg' => 2]),
@@ -123,7 +114,7 @@ class DiscountResource extends Resource
                                     'inactive' => 'Inactive',
                                 ])->required()
                                 ->default('active')
-                                ->disablePlaceholderSelection()
+                                ->selectablePlaceholder()
                                 ->label(trans('Status')),
 
                             DateTimePicker::make('valid_start_at')
@@ -133,9 +124,7 @@ class DiscountResource extends Resource
                             DateTimePicker::make('valid_end_at')
                                 ->after('valid_start_at')
                                 ->label(trans('Expiration Date'))
-                                ->helperText(new HtmlString(<<<'HTML'
-                                        Leave this blank if no expiry.
-                                    HTML)),
+                                ->helperText(trans('Leave this blank if no expiry.')),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
@@ -164,14 +153,15 @@ class DiscountResource extends Resource
 
                             TextInput::make('discountCondition.amount')
                                 ->required()
-                                ->mask(fn (Mask $mask) => $mask->money(
-                                    prefix: Currency::whereEnabled(true)->value('symbol'),
-                                    thousandsSeparator: ',',
-                                    decimalPlaces: 2,
-                                    isSigned: false
-                                ))
+//                                ->mask(fn (Mask $mask) => $mask->money(
+//                                    prefix: Currency::whereEnabled(true)->value('symbol'),
+//                                    thousandsSeparator: ',',
+//                                    decimalPlaces: 2,
+//                                    isSigned: false
+//                                ))
                                 ->minValue(1)
-                                ->rules(['max:100'], fn (Closure $get) => $get('discountCondition.amount_type') === 'percentage')
+                                ->numeric()
+                                ->rules(['max:100'], fn (Get $get) => $get('discountCondition.amount_type') === 'percentage')
                                 ->formatStateUsing(fn ($record) => $record?->discountCondition()->withTrashed()->first()?->amount)
                                 ->label(trans('Discount Amount')),
                         ]),
@@ -189,16 +179,15 @@ class DiscountResource extends Resource
 
                             TextInput::make('discountRequirement.minimum_amount')
                                 ->label(trans('Minimum purchase amount'))
-                                ->mask(fn (Mask $mask) => $mask->money(
-                                    prefix: Currency::whereEnabled(true)->value('symbol'),
-                                    thousandsSeparator: ',',
-                                    decimalPlaces: 2,
-                                    isSigned: false
-                                ))
+//                                ->mask(fn (Mask $mask) => $mask->money(
+//                                    prefix: Currency::whereEnabled(true)->value('symbol'),
+//                                    thousandsSeparator: ',',
+//                                    decimalPlaces: 2,
+//                                    isSigned: false
+//                                ))
+                                ->numeric()
                                 ->formatStateUsing(fn ($record) => $record?->discountRequirement?->minimum_amount)
-                                ->helperText(new HtmlString(<<<'HTML'
-                                        Leave this blank if no minimum purchase amount.
-                                    HTML))
+                                ->helperText(trans('Leave this blank if no minimum purchase amount.'))
                                 ->minValue(1),
                         ]),
 
@@ -206,6 +195,9 @@ class DiscountResource extends Resource
             ])->columns(3);
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -244,23 +236,19 @@ class DiscountResource extends Resource
                     })
                     ->label(trans('Amount')),
                 TextColumn::make('valid_start_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->date('F j, Y, g:i a')
                     ->label(trans('Start Date')),
 
                 TextColumn::make('valid_end_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->date('F j, Y, g:i a')
                     ->placeholder('No expiry')
                     ->label(trans('Expiration Date')),
 
-                BadgeColumn::make('status')
-                    ->colors([
-
-                        'success' => DiscountStatus::ACTIVE->value,
-                        'warning' => DiscountStatus::INACTIVE->value,
-
-                    ])->formatStateUsing(fn (string $state): string => trans(ucfirst($state)))->weight('bold'),
+                TextColumn::make('status')
+                    ->badge()
+                    ->weight('bold'),
             ])
             ->filters([
                 TrashedFilter::make()
@@ -268,14 +256,14 @@ class DiscountResource extends Resource
                 SelectFilter::make('status')
                     ->label(trans('Status'))
                     ->options([
-                        DiscountStatus::ACTIVE->value => 'Active',
-                        DiscountStatus::INACTIVE->value => 'Inactive',
+                        DiscountStatus::ACTIVE->value => DiscountStatus::ACTIVE->getLabel(),
+                        DiscountStatus::INACTIVE->value => DiscountStatus::INACTIVE->getLabel(),
                     ]),
             ])
             ->actions([
                 ActionGroup::make([
                     EditAction::make()
-                        ->authorize('update'),
+                        ->grouped(),
                     ForceDeleteAction::make()
                         ->using(function (Discount $record) {
                             try {
@@ -283,8 +271,7 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException) {
                                 return false;
                             }
-                        })
-                        ->authorize('forceDelete'),
+                        }),
 
                     DeleteAction::make()
                         ->using(function (Discount $record) {
@@ -293,8 +280,7 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException) {
                                 return false;
                             }
-                        })
-                        ->authorize('delete'),
+                        }),
 
                     RestoreAction::make()
                         ->using(function (Discount $record) {
@@ -303,8 +289,7 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException) {
                                 return false;
                             }
-                        })
-                        ->authorize('restore'),
+                        }),
                 ]),
 
             ])

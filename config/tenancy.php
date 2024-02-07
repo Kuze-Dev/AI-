@@ -42,7 +42,7 @@ return [
      * Database tenancy config. Used by DatabaseTenancyBootstrapper.
      */
     'database' => [
-        'central_connection' => env('DB_CONNECTION', 'central'),
+        'central_connection' => env('DB_CONNECTION', 'mysql'),
 
         /**
          * Connection used as a "template" for the dynamically created tenant database connection.
@@ -55,7 +55,7 @@ return [
          * prefix + tenant_id + suffix.
          */
         'prefix' => Str::of(env('APP_NAME'))->lower()->snake().'_',
-        'suffix' => '_'.Str::random(7),
+        'suffix' => '_db',
 
         /**
          * TenantDatabaseManagers are classes that handle the creation & deletion of tenant databases.
@@ -115,7 +115,7 @@ return [
          * See https://tenancyforlaravel.com/docs/v3/tenancy-bootstrappers/#filesystem-tenancy-boostrapper
          */
         'root_override' => [
-            // Disks whose roots should be overriden after storage_path() is suffixed.
+            // Disks whose roots should be overridden after storage_path() is suffixed.
             'local' => '%storage_path%/app/',
             'public' => '%storage_path%/app/public/',
         ],

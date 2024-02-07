@@ -19,8 +19,13 @@ class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
+        // TODO: import export
+        return [
+            Actions\CreateAction::make(),
+        ];
+
         return [
             // ImportProductAction::proceed(),
             ImportProductVariantAction::proceed(),

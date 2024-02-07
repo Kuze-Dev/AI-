@@ -27,7 +27,7 @@ class CreateServiceOrder extends CreateRecord
         );
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -35,10 +35,5 @@ class CreateServiceOrder extends CreateRecord
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 }

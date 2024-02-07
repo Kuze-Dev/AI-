@@ -2,7 +2,8 @@
     "preset": "laravel",
     "exclude": [
         "config",
-        "build"
+        "build",
+        "packages/artificertech"
     ],
     "notPath": [
         "ray.php"

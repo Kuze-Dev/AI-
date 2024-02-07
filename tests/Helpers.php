@@ -10,8 +10,10 @@ use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -64,8 +66,9 @@ function assertActivityLogged(
     );
 }
 
-function testInTenantContext(): Tenant
+function testInTenantContext(array|string|null $features = null): Tenant
 {
+    Filament::setCurrentPanel(Filament::getPanels()['tenant']);
 
     /** @var Tenant */
     $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
@@ -78,6 +81,12 @@ function testInTenantContext(): Tenant
     $tenant->features()->activate(ECommerceBase::class);
 
     URL::forceRootUrl(Request::getScheme().'://'.$domain);
+
+    if (filled($features)) {
+        foreach (Arr::wrap($features) as $feature) {
+            $tenant->features()->activate($feature);
+        }
+    }
 
     tenancy()->initialize($tenant);
 

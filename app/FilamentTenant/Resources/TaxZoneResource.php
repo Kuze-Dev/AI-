@@ -6,27 +6,23 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\TaxZoneResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
 use Domain\Taxation\Models\TaxZone;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
 class TaxZoneResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = TaxZone::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-receipt-tax';
+    protected static ?string $navigationIcon = 'heroicon-o-receipt-percent';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -35,7 +31,7 @@ class TaxZoneResource extends Resource
         return trans('Shop Configuration');
     }
 
-    protected static function getNavigationLabel(): string
+    public static function getNavigationLabel(): string
     {
         return trans('Tax Zone');
     }
@@ -98,7 +94,7 @@ class TaxZoneResource extends Resource
                     Forms\Components\Group::make([
                         Forms\Components\Select::make('countries')
                             ->label(trans('Country'))
-                            ->afterStateUpdated(fn (Closure $set) => $set('states', []))
+                            ->afterStateUpdated(fn (\Filament\Forms\Set $set) => $set('states', []))
                             ->optionsFromModel(Country::class, 'name')
                             ->preload()
                             ->dehydrateStateUsing(fn ($state) => is_array($state) ? $state : [$state])
@@ -108,7 +104,7 @@ class TaxZoneResource extends Resource
                             ->schema([
                                 Forms\Components\CheckboxList::make('states')
                                     ->options(
-                                        fn (Closure $get) => ($country = $get('countries'))
+                                        fn (\Filament\Forms\Get $get) => ($country = $get('countries'))
                                             ? State::whereCountryId($country)->pluck('name', 'id')
                                             : []
                                     )
@@ -132,7 +128,7 @@ class TaxZoneResource extends Resource
                     Forms\Components\TextInput::make('percentage')
                         ->required()
                         ->numeric()
-                        ->visible(fn (Closure $get) => filled($get('type')))
+                        ->visible(fn (\Filament\Forms\Get $get) => filled($get('type')))
                         ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 ]),
             ]);

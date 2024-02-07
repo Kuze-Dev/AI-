@@ -11,6 +11,8 @@ class QueueJobPriority
         self::MEDIUM,
         self::LOW,
         self::DEFAULT,
+        self::IMPORT,
+        self::EXPORT,
         self::MEDIA_LIBRARY,
         self::DB_BACKUP,
     ];
@@ -22,6 +24,10 @@ class QueueJobPriority
     final public const LOW = 'low';
 
     final public const DEFAULT = 'default';
+
+    final public const IMPORT = 'import';
+
+    final public const EXPORT = 'export';
 
     final public const MEDIA_LIBRARY = 'media_library';
 

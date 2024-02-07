@@ -19,7 +19,7 @@ class CreateTaxonomy extends CreateRecord
 
     protected static string $resource = TaxonomyResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -27,11 +27,6 @@ class CreateTaxonomy extends CreateRecord
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     protected function handleRecordCreation(array $data): Model

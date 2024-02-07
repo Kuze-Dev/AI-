@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Support\Forms;
 
-use Closure;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Concerns\HasOptions;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Pennant\Feature;
 
@@ -18,7 +18,7 @@ class FeatureSelector extends Field
 {
     use HasOptions;
 
-    protected string $view = 'forms::components.group';
+    protected string $view = 'filament-forms::components.group';
 
     protected function setUp(): void
     {
@@ -30,15 +30,16 @@ class FeatureSelector extends Field
             fn (self $component) => collect($component->getOptions())
                 ->map(function (array $data, string $key) {
                     $statePath = class_basename($key);
+                    //                    $statePath = $key;
 
-                    return Card::make([
+                    return Section::make([
                         Toggle::make($statePath)
                             ->label($data['label'])
                             ->reactive()
                             ->formatStateUsing(fn (?Model $record) => $record && Feature::for($record)->active($key))
                             ->dehydrated(false),
                         Fieldset::make('Extras')
-                            ->visible(fn (Closure $get) => count($data['extras']) && $get($statePath))
+                            ->visible(fn (Get $get) => count($data['extras']) && $get($statePath))
                             ->schema(function () use ($statePath, $data) {
 
                                 $fields = [];
@@ -54,7 +55,7 @@ class FeatureSelector extends Field
                                 if (count($unGroupOptions) > 0) {
 
                                     $fields[] = CheckboxList::make($statePath.'_extras')
-                                        ->disableLabel()
+                                        ->hiddenLabel()
                                         ->options($unGroupOptions)
                                         ->formatStateUsing(
                                             function (CheckboxList $component, ?Model $record) {
@@ -65,8 +66,8 @@ class FeatureSelector extends Field
 
                                                 return array_values($state);
                                             }
-                                        )
-                                        ->dehydrated(false);
+                                        );
+                                    //                                        ->dehydrated(false);
                                 }
 
                                 if (count($groupOptions) > 0) {
@@ -79,7 +80,7 @@ class FeatureSelector extends Field
                                             ->label(ucfirst(trans($label)))
                                             ->schema([
                                                 CheckboxList::make($statePath.'_'.$label.'_extras')
-                                                    ->disableLabel()
+                                                    ->hiddenLabel()
                                                     ->bulkToggleable()
                                                     ->options($value)
                                                     ->formatStateUsing(
@@ -91,8 +92,8 @@ class FeatureSelector extends Field
 
                                                             return array_values($state);
                                                         }
-                                                    )
-                                                    ->dehydrated(false),
+                                                    ),
+                                                //                                                    ->dehydrated(false),
                                             ]);
 
                                     }
@@ -110,7 +111,7 @@ class FeatureSelector extends Field
         $this->default([]);
 
         $this->mutateDehydratedStateUsing(
-            fn (self $component, Closure $get) => collect($component->getOptions())
+            fn (self $component, Get $get) => collect($component->getOptions())
                 ->reduce(
                     function (array $state, array $data, string $key) use ($component, $get) {
                         $statePath = $component->getStatePath(false).'.'.class_basename($key);

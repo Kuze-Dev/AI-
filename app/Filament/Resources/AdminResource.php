@@ -7,19 +7,20 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\AdminResource\Pages;
 use App\Filament\Resources\AdminResource\RelationManagers\CauserRelationManager;
+use Domain\Admin\Exports\AdminExporter;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
-use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
+use Filament\Tables\Actions\ExportBulkAction;
+use Filament\Tables\Table;
+use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
@@ -30,7 +31,7 @@ class AdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    protected static string|array $middlewares = ['password.confirm:filament.auth.password.confirm'];
+    protected static string|array $routeMiddleware = RequirePassword::class.':filament.admin.password.confirm';
 
     protected static ?string $recordTitleAttribute = 'full_name';
 
@@ -52,7 +53,7 @@ class AdminResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('first_name')
                         ->required(),
                     Forms\Components\TextInput::make('last_name')
@@ -102,28 +103,18 @@ class AdminResource extends Resource
                             Forms\Components\Select::make('roles')
                                 ->multiple()
                                 ->preload()
-                                ->optionsFromModel(
-                                    config('permission.models.role'),
-                                    'name',
-                                    function (Builder $query) {
-
-                                        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
-                                            return $query->where('guard_name', 'admin');
-                                        }
-
-                                        return $query->where('guard_name', 'admin')->where('name', '!=', config('domain.role.super_admin'));
-                                    }
-                                )
-                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->roles->pluck('id')->toArray() : []),
+                                ->relationship(
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
+                                        ->where('name', '!=', config('domain.role.super_admin'))
+                                ),
                             Forms\Components\Select::make('permissions')
                                 ->multiple()
                                 ->preload()
-                                ->optionsFromModel(
-                                    config('permission.models.permission'),
-                                    'name',
-                                    fn (Builder $query) => $query->where('guard_name', 'admin')
-                                )
-                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->permissions->pluck('id')->toArray() : []),
+                                ->relationship(
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
+                                ),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
@@ -147,9 +138,17 @@ class AdminResource extends Resource
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
                 Tables\Columns\TagsColumn::make('roles.name'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
+                    ->dateTime()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->dateTime(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -242,38 +241,36 @@ class AdminResource extends Resource
                             description: fn (Admin $record) => $record->full_name.' password reset sent'
                         ),
                     Impersonate::make()
-                        ->guard('admin')
+                        ->translateLabel()
+                        ->grouped()
+                        ->guard(Filament::getAuthGuard())
                         ->redirectTo(Filament::getUrl() ?? '/')
                         ->authorize('impersonate')
                         ->withActivityLog(
                             event: 'impersonated',
                             description: fn (Admin $record) => $record->full_name.' impersonated',
-                            causedBy: Auth::user()
+                            causedBy: Filament::auth()->user()
                         ),
                 ]),
             ])
             ->bulkActions([
                 ExportBulkAction::make()
-                    ->queue()
-                    ->query(fn (Builder $query) => $query->with('roles')->whereKeyNot(1)->latest())
-                    ->mapUsing(
-                        ['Email', 'First Name',  'Last Name', 'Active', 'Roles', 'Created At'],
-                        fn (Admin $admin): array => [
-                            $admin->email,
-                            $admin->first_name,
-                            $admin->last_name,
-                            $admin->active ? 'Yes' : 'No',
-                            $admin->getRoleNames()->implode(', '),
-                            $admin->created_at?->format(config('tables.date_time_format')),
-                        ]
-                    )
-                    ->tags([
-                        'tenant:'.(tenant('id') ?? 'central'),
-                    ])
+                    ->exporter(AdminExporter::class)
                     ->withActivityLog(
                         event: 'bulk-exported',
                         description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
-                        properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
+                        properties: fn (ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Admin $model): Admin {
+                                        if ($model instanceof Admin) {
+                                            return $model;
+                                        }
+
+                                        return Admin::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
                     ),
             ])
             ->defaultSort('created_at', 'desc');

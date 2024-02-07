@@ -5,20 +5,17 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\CountryResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Address\Models\Country;
 use Exception;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class CountryResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Country::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-globe';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-americas';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -59,10 +56,5 @@ class CountryResource extends Resource
         return [
             'index' => Pages\ListCountry::route('/'),
         ];
-    }
-
-    public static function canCreate(): bool
-    {
-        return false;
     }
 }

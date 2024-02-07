@@ -66,7 +66,7 @@ class ViewServiceOrder extends EditRecord
 
     protected static ?string $recordTitleAttribute = 'reference';
 
-    protected function getHeading(): string|Htmlable
+    public function getHeading(): string|Htmlable
     {
         $reference = '';
 
@@ -110,7 +110,7 @@ class ViewServiceOrder extends EditRecord
         return DB::transaction(fn () => $serviceOrder);
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -118,11 +118,6 @@ class ViewServiceOrder extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     protected function getFormSchema(): array
@@ -514,7 +509,7 @@ class ViewServiceOrder extends EditRecord
                     SchemaFormBuilder::make('customer_form', fn ($record) => $record->service->blueprint->schema)
                         ->schemaData(fn ($record) => $record->service->blueprint->schema),
                 ])
-                ->hidden(fn (Closure $get) => $get('service_id') === null)
+                ->hidden(fn (\Filament\Forms\Get $get) => $get('service_id') === null)
                 ->columns(2),
         ];
     }
@@ -522,7 +517,7 @@ class ViewServiceOrder extends EditRecord
     private static function summaryEditButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make('Edit')
-            ->execute(function (ServiceOrder $record, Closure $get, Closure $set) {
+            ->execute(function (ServiceOrder $record, \Filament\Forms\Get $get, \Filament\Forms\Set $set) {
                 return Forms\Components\Actions\Action::make(trans('edit'))
                     ->color('primary')
                     ->label('Edit')
@@ -670,7 +665,7 @@ class ViewServiceOrder extends EditRecord
     {
         return ButtonAction::make('proof_of_payment')
             ->disableLabel()
-            ->execute(function (ServiceOrder $record, Closure $set) {
+            ->execute(function (ServiceOrder $record, \Filament\Forms\Set $set) {
                 $footerActions = self::showProofOfPaymentActions($record, $set);
 
                 return $footerActions;
@@ -692,7 +687,7 @@ class ViewServiceOrder extends EditRecord
         $order = $record;
 
         return ComponentsAction::make('proof_of_payment')
-            ->color('secondary')
+            ->color('gray')
             ->label(trans('View Proof of payment'))
             ->size('sm')
             ->action(function (array $data) use ($record, $set) {
@@ -732,7 +727,7 @@ class ViewServiceOrder extends EditRecord
                         if ($component->getVisibility() === 'private') {
                             try {
                                 return $media?->getTemporaryUrl(now()->addMinutes(5));
-                            } catch (Throwable $exception) {
+                            } catch (Throwable) {
                             }
                         }
 

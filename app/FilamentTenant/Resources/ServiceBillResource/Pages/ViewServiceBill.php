@@ -39,12 +39,12 @@ class ViewServiceBill extends ViewRecord
 
     public mixed $ownerRecord;
 
-    protected function getHeading(): string|Htmlable
+    public function getHeading(): string|Htmlable
     {
         return trans('Service Bill Details #').$this->record->reference;
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
 
@@ -130,7 +130,7 @@ class ViewServiceBill extends ViewRecord
                                 ->inline()
                                 ->readOnly(),
                             TextLabel::make('')
-                                ->label(fn ($record, Closure $get) => $record->serviceOrder->currency_symbol.' '.number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
+                                ->label(fn ($record, \Filament\Forms\Get $get) => $record->serviceOrder->currency_symbol.' '.number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
                                     if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
                                         return $carry + ($data['price'] * $data['quantity']);
                                     }
@@ -149,7 +149,7 @@ class ViewServiceBill extends ViewRecord
                                     ->inline()
                                     ->readOnly(),
                                 TextLabel::make('')
-                                    ->label(fn (ServiceBill $record, Closure $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
+                                    ->label(fn (ServiceBill $record, \Filament\Forms\Get $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
                                         :
                                         $record->serviceOrder?->currency_symbol.' '.number_format($record->tax_total, 2, '.', '.'))
                                     ->alignRight()
@@ -169,7 +169,7 @@ class ViewServiceBill extends ViewRecord
                                 ->readOnly()
                                 ->color('primary'),
                             TextLabel::make('')
-                                ->label(fn (ServiceBill $record, Closure $get) => $record->serviceOrder?->currency_symbol.' '.number_format($record->total_amount, 2, '.', '.'))
+                                ->label(fn (ServiceBill $record, \Filament\Forms\Get $get) => $record->serviceOrder?->currency_symbol.' '.number_format($record->total_amount, 2, '.', '.'))
                                 ->alignRight()
                                 ->size('md')
                                 ->inline()
@@ -238,7 +238,7 @@ class ViewServiceBill extends ViewRecord
     {
         return ButtonAction::make('proof_of_payment')
             ->disableLabel()
-            ->execute(function (ServiceBill $record, Closure $set) {
+            ->execute(function (ServiceBill $record, \Filament\Forms\Set $set) {
                 $footerActions = self::showProofOfPaymentActions($record, $set);
 
                 return $footerActions;
@@ -260,7 +260,7 @@ class ViewServiceBill extends ViewRecord
         $order = $record;
 
         return Action::make('proof_of_payment')
-            ->color('secondary')
+            ->color('gray')
             ->label(trans('View Proof of payment'))
             ->size('sm')
             ->action(function (array $data) use ($record, $set) {

@@ -9,10 +9,10 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
@@ -23,7 +23,7 @@ use Spatie\Activitylog\Models\Activity;
 
 class ActivityResource extends Resource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-table';
+    protected static ?string $navigationIcon = 'heroicon-o-table-cells';
 
     protected static ?int $navigationSort = 2;
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Support;
 
 use App\Features\ECommerce\ColorPallete;
-use Closure;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
@@ -191,9 +190,9 @@ class CreateProductOptionValueAction
                             'text' => 'Text',
                         ])
                         ->columnSpan(
-                            fn (Closure $get) => $get('icon_type') == 'color_palette' ? 1 : 2
+                            fn (\Filament\Forms\Get $get) => $get('icon_type') == 'color_palette' ? 1 : 2
                         )
-                        ->hidden(function (Closure $get) {
+                        ->hidden(function (\Filament\Forms\Get $get) {
                             if ($get('product_option_id')) {
                                 $productOption = ProductOption::find((int) $get('product_option_id'));
 
@@ -208,7 +207,7 @@ class CreateProductOptionValueAction
 
                     \Filament\Forms\Components\ColorPicker::make('icon_value')
                         ->label(trans('Icon Value (HEX)'))
-                        ->hidden(function (Closure $get) {
+                        ->hidden(function (\Filament\Forms\Get $get) {
                             if (! ($get('icon_type') === 'color_palette')) {
                                 return true;
                             }

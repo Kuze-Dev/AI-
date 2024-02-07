@@ -8,17 +8,16 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\Tree;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Internationalization\Models\Locale;
 use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -26,8 +25,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class TaxonomyResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Taxonomy::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
@@ -52,12 +49,12 @@ class TaxonomyResource extends Resource
     }
 
     /** @return Builder<Taxonomy> */
-    protected static function getGlobalSearchEloquentQuery(): Builder
+    public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('taxonomyTerms');
     }
 
-    public static function resolveRecordRouteBinding(mixed $key): ?Model
+    public static function resolveRecordRouteBinding(int|string $key): ?Model
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())

@@ -11,39 +11,37 @@ use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
-use Filament\Facades\Filament;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Tests\RequestFactories\CustomerRequestFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\get;
 use function Pest\Laravel\travelTo;
 use function Pest\Livewire\livewire;
 
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(TierBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(
+        features: [
+            CustomerBase::class,
+            AddressBase::class,
+            TierBase::class,
+        ],
+    );
     if (! Tier::whereName(config('domain.tier.default'))->first()) {
         TierFactory::createDefault();
     }
     loginAsSuperAdmin();
 });
 
-it('can render page', function () {
+it('can not render page', function () {
     //    livewire(CreateCustomer::class)
     //        ->assertFormExists()
     //        ->assertOk();
 
-    CreateCustomer::getUrl();
-})
-    ->throws(
-        RouteNotFoundException::class,
-        'Route [filament.pages.create-customer] not defined.'
-    );
+    get(CreateCustomer::getUrl())
+        ->assertForbidden();
+});
 
 //it('can create customer w/ different address', function () {
 //

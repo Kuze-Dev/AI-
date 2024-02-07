@@ -20,7 +20,7 @@ class CreateBlock extends CreateRecord
 
     protected static string $resource = BlockResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -29,11 +29,6 @@ class CreateBlock extends CreateRecord
                 ->keyBindings(['mod+s']),
             $this->getCreateAnotherFormAction(),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @throws Throwable */

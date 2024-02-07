@@ -9,14 +9,12 @@ use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
 use Domain\Site\Database\Factories\SiteFactory;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
     LocaleFactory::createDefault();

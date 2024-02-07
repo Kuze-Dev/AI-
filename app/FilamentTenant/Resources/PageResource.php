@@ -9,8 +9,6 @@ use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Internationalization\Models\Locale;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Enums\Visibility;
@@ -21,10 +19,10 @@ use Domain\Site\Models\Site;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -37,8 +35,6 @@ use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 
 class PageResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document';
@@ -64,7 +60,7 @@ class PageResource extends Resource
                             Forms\Components\TextInput::make('name')
                                 ->unique(
                                     ignoreRecord: true,
-                                    callback: function (Unique $rule, $state, $livewire) {
+                                    modifyRuleUsing: function (Unique $rule, $state, $livewire) {
 
                                         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
                                             return false;
@@ -94,7 +90,7 @@ class PageResource extends Resource
                                 ->searchable()
                                 ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                                 ->reactive()
-                                ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
+                                ->afterStateUpdated(function (Forms\Components\Select $component, \Filament\Forms\Get $get) {
                                     $component->getContainer()
                                         ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                         ?->dispatchEvent('route_url::update');
@@ -126,7 +122,7 @@ class PageResource extends Resource
                             Forms\Components\CheckboxList::make('sites')
                                 ->reactive()
                                 ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                                ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                                ->rule(fn (?Page $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                                 ->options(function () {
 
                                     if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
@@ -199,7 +195,7 @@ class PageResource extends Resource
                                             ->toArray(),
                                     ])
                                     ->reactive()
-                                    ->afterStateUpdated(function ($component, $state) {
+                                    ->afterStateUpdated(function (Forms\Components\ViewField $component, $state) {
                                         $block = self::getCachedBlocks()->firstWhere('id', $state);
                                         $component->getContainer()
                                             ->getComponent(fn ($component) => $component->getId() === 'schema-form')
@@ -208,9 +204,9 @@ class PageResource extends Resource
                                     }),
                                 SchemaFormBuilder::make('data')
                                     ->id('schema-form')
-                                    ->dehydrated(fn (Closure $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
-                                    ->disabled(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
-                                    ->schemaData(fn (Closure $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
+                                    ->dehydrated(fn (\Filament\Forms\Get $get) => ! (self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content))
+                                    ->disabled(fn (\Filament\Forms\Get $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->is_fixed_content ?? false)
+                                    ->schemaData(fn (\Filament\Forms\Get $get) => self::getCachedBlocks()->firstWhere('id', $get('block_id'))?->blueprint->schema),
                             ]),
                     ])->columnSpan(2),
                 MetaDataForm::make('Meta Data')
@@ -238,7 +234,7 @@ class PageResource extends Resource
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\BadgeColumn::make('visibility')
-                    ->formatStateUsing(fn ($state) => Str::headline($state))
+                    ->formatStateUsing(fn (Visibility $state) => Str::headline($state->value))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')

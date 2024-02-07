@@ -19,7 +19,7 @@ class CreateGlobals extends CreateRecord
 
     protected static string $resource = GlobalsResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -27,11 +27,6 @@ class CreateGlobals extends CreateRecord
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     protected function handleRecordCreation(array $data): Model

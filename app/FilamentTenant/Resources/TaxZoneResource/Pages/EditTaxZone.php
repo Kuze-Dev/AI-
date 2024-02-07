@@ -9,14 +9,14 @@ use App\FilamentTenant\Resources\TaxZoneResource;
 use Domain\Taxation\Actions\UpdateTaxZoneAction;
 use Domain\Taxation\DataTransferObjects\TaxZoneData;
 use Domain\Taxation\Models\TaxZone;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 /**
- * @property TaxZone $record
+ * @property-read TaxZone $record
  */
 class EditTaxZone extends EditRecord
 {
@@ -24,20 +24,15 @@ class EditTaxZone extends EditRecord
 
     protected static string $resource = TaxZoneResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @param  TaxZone  $record */

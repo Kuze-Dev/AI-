@@ -18,12 +18,12 @@ class ViewOrderDetails extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
 
-    protected function getHeading(): string|Htmlable
+    public function getHeading(): string|Htmlable
     {
         return trans('Order Details #').$this->record->reference;
     }
 
-    protected function getRelationManagers(): array
+    public function getRelationManagers(): array
     {
         return [];
     }
@@ -145,7 +145,7 @@ class ViewOrderDetails extends ViewRecord
             ->disableLabel()
             ->execute(function () use ($sectionIndex, $orderLine) {
                 return Forms\Components\Actions\Action::make('view_remarks_btn_'.$sectionIndex)
-                    ->color('secondary')
+                    ->color('gray')
                     ->label(trans('View Remarks'))
                     ->size('sm')
                     ->action(function () {

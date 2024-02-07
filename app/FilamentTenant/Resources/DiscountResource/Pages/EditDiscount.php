@@ -11,8 +11,8 @@ use Domain\Discount\Actions\ForceDeleteDiscountAction;
 use Domain\Discount\Actions\UpdateDiscountAction;
 use Domain\Discount\DataTransferObjects\DiscountData;
 use Domain\Discount\Models\Discount;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException as ExceptionsDeleteRestrictedException;
@@ -23,11 +23,11 @@ class EditDiscount extends EditRecord
 
     protected static string $resource = DiscountResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -42,11 +42,6 @@ class EditDiscount extends EditRecord
                 }),
 
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @param  \Domain\Discount\Models\Discount  $record */

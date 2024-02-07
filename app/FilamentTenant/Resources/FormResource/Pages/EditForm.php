@@ -23,7 +23,7 @@ class EditForm extends EditRecord
     protected static string $resource = FormResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -32,11 +32,6 @@ class EditForm extends EditRecord
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /**

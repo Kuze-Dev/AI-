@@ -5,18 +5,15 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\CurrencyResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Currency\Actions\UpdateCurrencyEnabledAction;
 use Domain\Currency\Models\Currency;
 use Exception;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class CurrencyResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Currency::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
@@ -51,12 +48,13 @@ class CurrencyResource extends Resource
                     ->label('Symbol')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\ToggleColumn::make('enabled')->label('status')->disabled(function (Currency $record) {
-                    return $record->enabled;
-                })
-                    ->updateStateUsing(function (Currency $record) {
-                        return app(UpdateCurrencyEnabledAction::class)->execute($record);
-                    }),
+                Tables\Columns\ToggleColumn::make('enabled')
+                    ->label('status')
+                    ->disabled(fn (Currency $record) => $record->enabled)
+                    ->updateStateUsing(
+                        fn (Currency $record) => app(UpdateCurrencyEnabledAction::class)
+                            ->execute($record)
+                    ),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('enabled')
@@ -66,12 +64,16 @@ class CurrencyResource extends Resource
                         '0' => 'Not Selected',
                     ]),
             ])
-            ->actions([Tables\Actions\EditAction::make()
-                ->label('Edit Status')
-                ->modalHeading('Change enabled currency?')
-                ->requiresConfirmation()->action(function (Currency $record) {
-                    return app(UpdateCurrencyEnabledAction::class)->execute($record);
-                })])
+            ->actions([
+                Tables\Actions\EditAction::make()
+                    ->label('Edit Status')
+                    ->modalHeading('Change enabled currency?')
+                    ->requiresConfirmation()
+                    ->action(
+                        fn (Currency $record) => app(UpdateCurrencyEnabledAction::class)
+                            ->execute($record)
+                    ),
+            ])
             ->bulkActions([])
             ->defaultSort('id', 'asc');
     }
@@ -81,10 +83,5 @@ class CurrencyResource extends Resource
         return [
             'index' => Pages\ListCurrency::route('/'),
         ];
-    }
-
-    public static function canCreate(): bool
-    {
-        return false;
     }
 }

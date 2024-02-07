@@ -23,8 +23,4 @@ class {{ resourcePageClass }} extends CreateRecord
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
 }

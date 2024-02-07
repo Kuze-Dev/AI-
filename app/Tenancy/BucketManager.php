@@ -8,7 +8,7 @@ use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Support\Arr;
-use Livewire\FileUploadConfiguration;
+use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 
 class BucketManager
 {

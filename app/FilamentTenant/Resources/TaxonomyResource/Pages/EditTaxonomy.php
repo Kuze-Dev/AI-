@@ -20,7 +20,7 @@ class EditTaxonomy extends EditRecord
 
     protected static string $resource = TaxonomyResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -29,11 +29,6 @@ class EditTaxonomy extends EditRecord
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @param  \Domain\Taxonomy\Models\Taxonomy  $record */

@@ -6,21 +6,20 @@ namespace App\Filament\Resources\AdminResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\AdminResource;
-use Domain\Admin\Actions\CreateAdminAction;
-use Domain\Admin\DataTransferObjects\AdminData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
+use Illuminate\Auth\Events\Registered;
 
+/**
+ * @property-read \Domain\Admin\Models\Admin&\Illuminate\Contracts\Auth\Authenticatable $record
+ */
 class CreateAdmin extends CreateRecord
 {
     use LogsFormActivity;
 
     protected static string $resource = AdminResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -30,14 +29,8 @@ class CreateAdmin extends CreateRecord
         ];
     }
 
-    protected function getFormActions(): array
+    public function afterCreate(): void
     {
-        return $this->getCachedActions();
-    }
-
-    /** @throws Throwable */
-    protected function handleRecordCreation(array $data): Model
-    {
-        return DB::transaction(fn () => app(CreateAdminAction::class)->execute(new AdminData(...$data)));
+        event(new Registered($this->record));
     }
 }

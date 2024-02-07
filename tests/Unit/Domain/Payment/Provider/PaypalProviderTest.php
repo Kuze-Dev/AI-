@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Features\Shopconfiguration\PaymentGateway\PaypalGateway;
-use App\FilamentTenant\Pages\Settings\PaymentSettings;
+use App\Settings\PaymentSettings;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Contracts\PaymentManagerInterface;
@@ -17,7 +17,6 @@ use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Providers\PaypalProvider;
 use Mockery\MockInterface;
 
-use function Pest\Livewire\livewire;
 use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
@@ -28,22 +27,17 @@ beforeEach(function () {
 
     tenancy()->tenant->features()->activate(PaypalGateway::class);
 
-    $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Paypal']);
+    $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Paypal', 'slug' => 'paypal']);
 
     app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new PaypalProvider());
+
+    PaymentSettings::fake([
+        'paypal_secret_id' => 'test_paypal_secret_id',
+        'paypal_secret_key' => 'test_paypal_secret_d',
+    ]);
 });
 
 it('Paypal payment Gateway must be instance of PaypalProvider  ', function () {
-
-    livewire(PaymentSettings::class)
-        ->fillForm([
-
-            'paypal_secret_id' => 'test_paypal_secret_id',
-            'paypal_secret_key' => 'test_paypal_secret_d',
-
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
 
     $paymentGateway = app(PaymentManagerInterface::class)->driver('paypal');
 
@@ -51,16 +45,6 @@ it('Paypal payment Gateway must be instance of PaypalProvider  ', function () {
 });
 
 it('can generate payment authorization dto ', function () {
-
-    livewire(PaymentSettings::class)
-        ->fillForm([
-
-            'paypal_secret_id' => 'test_paypal_secret_id',
-            'paypal_secret_key' => 'test_paypal_secret_d',
-
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
 
     $paymentMethod = PaymentMethod::where('slug', 'paypal')->first();
 
@@ -87,16 +71,6 @@ it('can generate payment authorization dto ', function () {
 });
 
 it('can capture payment', function () {
-
-    livewire(PaymentSettings::class)
-        ->fillForm([
-
-            'paypal_secret_id' => 'test_paypal_secret_id',
-            'paypal_secret_key' => 'test_paypal_secret_d',
-
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
 
     $paymentMethod = PaymentMethod::where('slug', 'paypal')->first();
 

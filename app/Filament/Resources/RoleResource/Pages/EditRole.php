@@ -21,7 +21,7 @@ class EditRole extends EditRecord
 
     protected static string $resource = RoleResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -30,11 +30,6 @@ class EditRole extends EditRecord
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /**

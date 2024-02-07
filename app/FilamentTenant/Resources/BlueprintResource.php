@@ -6,8 +6,6 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\BlueprintResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
@@ -21,10 +19,10 @@ use Domain\Blueprint\Models\Blueprint;
 use ErrorException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -35,11 +33,9 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class BlueprintResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Blueprint::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-table';
+    protected static ?string $navigationIcon = 'heroicon-o-table-cells';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -147,7 +143,7 @@ class BlueprintResource extends Resource
 
                 $label = $state['title'];
 
-                if (filled($state['type'])) {
+                if (array_key_exists('type', $state) && filled($state['type'])) {
                     $type = $state['type'] instanceof FieldType
                         ? $state['type']->value
                         : $state['type'];
@@ -185,7 +181,7 @@ class BlueprintResource extends Resource
                             ->toArray()
                     )
                     ->required()
-                    ->disabled(fn (?Blueprint $record, Closure $get) => (bool) ($record && Arr::first(
+                    ->disabled(fn (?Blueprint $record, \Filament\Forms\Get $get) => (bool) ($record && Arr::first(
                         $record->schema->sections,
                         fn (SectionData $section) => Arr::first(
                             $section->fields,
@@ -200,7 +196,7 @@ class BlueprintResource extends Resource
                     ),
                 Forms\Components\TextInput::make('rules')
                     ->columnSpanFull()
-                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('rules', implode('|', $state ?? []));
                     })
                     ->dehydrateStateUsing(function (?string $state): array {
@@ -218,13 +214,20 @@ class BlueprintResource extends Resource
                 Forms\Components\Section::make('Field Options')
                     ->id('field-options')
                     ->collapsible()
-                    ->when(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
+                    // ->hidden(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
                     ->columns(['sm' => 2])
-                    ->schema(fn (array $state) => self::getFieldOptionSchema(
-                        $state['type'] instanceof FieldType
-                            ? $state['type']
-                            : FieldType::tryFrom($state['type'] ?? '')
-                    )),
+                    ->schema(function (array $state) {
+
+                        if (! array_key_exists('type', $state)) {
+                            return [];
+                        }
+
+                        return self::getFieldOptionSchema(
+                            $state['type'] instanceof FieldType
+                                ? $state['type']
+                                : FieldType::tryFrom($state['type'] ?? ''));
+                    }),
+
             ]);
     }
 
@@ -247,7 +250,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('reorder'),
                 Forms\Components\Toggle::make('can_download'),
                 Forms\Components\TextInput::make('accept')
-                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
                     })
                     ->dehydrateStateUsing(function (?string $state): array {
@@ -273,12 +276,12 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('min_files')
                     ->numeric()
                     ->integer()
-                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_files')
                     ->numeric()
                     ->integer()
-                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             FieldType::MARKDOWN => [
@@ -317,12 +320,12 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (Closure $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\TextInput::make('max')
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (Closure $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -400,7 +403,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
                     ->lazy()
-                    ->afterStateUpdated(function (Closure $set) {
+                    ->afterStateUpdated(function (\Filament\Forms\Set $set) {
                         $set('relation_scopes', []);
                     })
                     ->options(
@@ -423,21 +426,21 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (Closure $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\TextInput::make('max')
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (Closure $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Group::make()
                     ->columnSpanFull()
-                    ->hidden(function (Closure $get) {
+                    ->hidden(function (\Filament\Forms\Get $get) {
                         $modelClass = Relation::getMorphedModel($get('resource'));
                         $relationScopes = config("domain.blueprint.related_resources.{$modelClass}.relation_scopes", []);
 
                         return count($relationScopes) <= 0;
                     })
-                    ->schema(function (Closure $get) {
+                    ->schema(function (\Filament\Forms\Get $get) {
                         $modelClass = Relation::getMorphedModel($get('resource'));
                         $relationScopes = config("domain.blueprint.related_resources.{$modelClass}.relation_scopes", []);
 
@@ -476,7 +479,7 @@ class BlueprintResource extends Resource
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
                 Forms\Components\TextInput::make('accept')
-                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
                     })
                     ->dehydrateStateUsing(function (?string $state): array {
@@ -508,12 +511,12 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('min_files')
                     ->numeric()
                     ->integer()
-                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_files')
                     ->numeric()
                     ->integer()
-                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Repeater::make('conversions')
                     ->schema([

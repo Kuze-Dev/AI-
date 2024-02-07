@@ -8,9 +8,9 @@ use App\FilamentTenant\Resources\OrderResource;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 
@@ -20,7 +20,7 @@ class OrderLinesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'label';
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
 
         return $table
@@ -71,7 +71,7 @@ class OrderLinesRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\Action::make('view')
                     ->label(trans('View Details'))
-                    ->color('secondary')
+                    ->color('gray')
                     ->action(function ($livewire) {
                         return redirect(OrderResource::getUrl('details', ['record' => $livewire->ownerRecord]));
                     })->button(),

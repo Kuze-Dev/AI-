@@ -7,28 +7,26 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Page\Actions\DeleteBlockAction;
 use Domain\Page\Models\Block;
 use Exception;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Throwable;
 
 class BlockResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Block::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-template';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -58,17 +56,47 @@ class BlockResource extends Resource
                     ->disabled(fn (?Block $record) => $record !== null)
                     ->reactive(),
                 Forms\Components\FileUpload::make('image')
-                    ->mediaLibraryCollection('image')
-                    ->image(),
+                    ->formatStateUsing(function ($record) {
+                        return $record?->getMedia('image')
+                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                            ->toArray() ?? [];
+                    })
+                    ->image()
+                    ->beforeStateDehydrated(null)
+                    ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
+                    ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
+                        $mediaClass = config('media-library.media_model', Media::class);
+
+                        /** @var ?Media $media */
+                        $media = $mediaClass::findByUuid($file);
+
+                        if ($component->getVisibility() === 'private') {
+                            try {
+                                return $media?->getTemporaryUrl(now()->addMinutes(5));
+                            } catch (Throwable) {
+                                // This driver does not support creating temporary URLs.
+                            }
+                        }
+
+                        $url = $media?->getUrl();
+
+                        return [
+                            'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                            'size' => $media->getAttributeValue('size'),
+                            'type' => $media->getAttributeValue('mime_type'),
+                            'url' => $url,
+                        ];
+
+                    }),
                 Forms\Components\Toggle::make('is_fixed_content')
                     ->inline(false)
-                    ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') ? false : true)
                     ->helperText('If enabled, the content below will serve as the default for all related pages')
                     ->reactive(),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
-                    ->hidden(fn (Closure $get) => $get('is_fixed_content') ? false : true)
-                    ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('is_fixed_content') ? false : true)
+                    ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
     }
@@ -102,7 +130,7 @@ class BlockResource extends Resource
                         ->searchable(),
                     Tables\Columns\TextColumn::make('updated_at')
                         ->size('sm')
-                        ->color('secondary')
+                        ->color('gray')
                         ->dateTime(timezone: Auth::user()?->timezone)
                         ->sortable(),
                 ])->space(2),

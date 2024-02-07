@@ -170,11 +170,16 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\FilamentServiceProvider::class,
         App\Providers\HealthCheckServiceProvider::class,
         App\Providers\TenancyServiceProvider::class,
-        App\Providers\FilamentTenantServiceProvider::class,
         App\Providers\AboutServiceProvider::class,
+
+        /*
+         * filament
+         */
+        App\Providers\Filament\AdminPanelProvider::class,
+        App\Providers\Filament\TenantPanelProvider::class,
+        App\Providers\Filament\CommonServiceProvider::class,
 
         /*
          * Domain Service Providers...

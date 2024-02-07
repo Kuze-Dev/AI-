@@ -39,3 +39,6 @@ Thumbs.db
 
 # tinkerwell generated
 /.phpactor.json
+
+/public/css/*
+/public/js/*

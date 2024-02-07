@@ -10,7 +10,6 @@ use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
-use Closure;
 use Domain\Content\Actions\CreateContentEntryDraftAction;
 use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
@@ -18,11 +17,11 @@ use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Site\Models\Site;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
-use Filament\Pages\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -50,7 +49,7 @@ class EditContentEntry extends EditRecord
      *
      * @param  mixed  $record
      */
-    public function mount($record, string $ownerRecord = ''): void
+    public function mount(int|string $record, string $ownerRecord = ''): void
     {
         $this->ownerRecord = app(Content::class)
             ->resolveRouteBinding($ownerRecord)
@@ -75,7 +74,7 @@ class EditContentEntry extends EditRecord
         return $record;
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             'content_entries_group_actions' => CustomPageActionGroup::make([
@@ -105,7 +104,7 @@ class EditContentEntry extends EditRecord
                     ->modalCancelAction(function () {
                         return Action::makeModalAction('redirect')
                             ->label(trans('Edit Existing Draft'))
-                            ->color('secondary')
+                            ->color('gray')
                             ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft]));
                     })
                     ->hidden(function () {
@@ -127,7 +126,7 @@ class EditContentEntry extends EditRecord
             Actions\DeleteAction::make(),
             'other_page_actions' => CustomPageActionGroup::make([
                 Action::make('preview')
-                    ->color('secondary')
+                    ->color('gray')
                     ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                     ->label(trans('Preview Page'))
                     ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
@@ -144,7 +143,7 @@ class EditContentEntry extends EditRecord
                 Action::make('preview_microsite_action')
                     ->label('Preview Microsite')
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
-                    ->color('secondary')
+                    ->color('gray')
                     ->record($this->getRecord())
                     ->modalHeading('Preview Microsite')
                     ->slideOver(true)
@@ -180,7 +179,7 @@ class EditContentEntry extends EditRecord
                                 return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
                             })
                             ->reactive()
-                            ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+                            ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
 
                                 /** @var Site */
                                 $site = Site::find($state);
@@ -206,14 +205,9 @@ class EditContentEntry extends EditRecord
 
             ])->view('filament.pages.actions.custom-action-group.index')
                 ->setName('other_page_draft')
-                ->color('secondary')
+                ->color('gray')
                 ->label(trans('More Actions')),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     public function draft(): RedirectResponse|Redirector|false
@@ -298,7 +292,7 @@ class EditContentEntry extends EditRecord
             ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
 

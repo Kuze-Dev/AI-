@@ -16,7 +16,7 @@ class CreateSite extends CreateRecord
 {
     protected static string $resource = SiteResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -33,10 +33,5 @@ class CreateSite extends CreateRecord
             fn () => app(CreateSiteAction::class)
                 ->execute(SiteData::fromArray($data))
         );
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 }

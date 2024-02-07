@@ -20,7 +20,7 @@ class EditMenu extends EditRecord
 
     protected static string $resource = MenuResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
@@ -29,11 +29,6 @@ class EditMenu extends EditRecord
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @param  \Domain\Menu\Models\Menu  $record */

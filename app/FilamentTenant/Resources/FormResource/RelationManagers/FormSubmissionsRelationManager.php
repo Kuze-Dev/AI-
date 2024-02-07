@@ -6,10 +6,10 @@ namespace App\FilamentTenant\Resources\FormResource\RelationManagers;
 
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Form\Models\FormSubmission;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
 class FormSubmissionsRelationManager extends RelationManager
@@ -18,7 +18,7 @@ class FormSubmissionsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'id';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -29,7 +29,7 @@ class FormSubmissionsRelationManager extends RelationManager
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

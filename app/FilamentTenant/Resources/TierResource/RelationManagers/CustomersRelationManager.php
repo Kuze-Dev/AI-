@@ -7,8 +7,8 @@ namespace App\FilamentTenant\Resources\TierResource\RelationManagers;
 use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class CustomersRelationManager extends RelationManager
 {
@@ -19,7 +19,7 @@ class CustomersRelationManager extends RelationManager
     protected static ?string $recordTitleAttribute = 'email';
 
     /** @throws Exception */
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

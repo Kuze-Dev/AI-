@@ -40,7 +40,7 @@ class CreateContentEntry extends CreateRecord
         return trans('Create :label Content Entry', ['label' => $this->ownerRecord->name]);
     }
 
-    protected function getBreadcrumbs(): array
+    public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
 
@@ -56,14 +56,14 @@ class CreateContentEntry extends CreateRecord
         );
     }
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return trans('Create :label Content Entry', [
             'label' => $this->ownerRecord->name,
         ]);
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
@@ -71,11 +71,6 @@ class CreateContentEntry extends CreateRecord
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     protected function handleRecordCreation(array $data): Model

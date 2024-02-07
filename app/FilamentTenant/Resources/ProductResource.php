@@ -11,7 +11,6 @@ use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationM
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\FilamentTenant\Resources\ReviewResource\RelationManagers\ReviewRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Product\Actions\DeleteProductAction;
 use Domain\Product\Enums\Decision;
@@ -21,11 +20,11 @@ use Domain\Product\Models\Product;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Table;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
@@ -35,8 +34,6 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ProductResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $model = Product::class;
@@ -172,8 +169,8 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
-                                ->hidden(fn (Closure $get) => ! $get('allow_stocks'))
-                                ->required(fn (Closure $get) => $get('allow_stocks')),
+                                ->hidden(fn (\Filament\Forms\Get $get) => ! $get('allow_stocks'))
+                                ->required(fn (\Filament\Forms\Get $get) => $get('allow_stocks')),
                         ])->columns(2),
                     Forms\Components\Section::make('Pricing')
                         ->translateLabel()
@@ -266,7 +263,7 @@ class ProductResource extends Resource
                                         )
                                         ->dehydrated(false),
                                     Forms\Components\Hidden::make('taxonomy_terms')
-                                        ->dehydrateStateUsing(fn (Closure $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
+                                        ->dehydrateStateUsing(fn (\Filament\Forms\Get $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
                                 ->when(fn () => ! empty($taxonomies->toArray())),
                         ]),
@@ -293,7 +290,7 @@ class ProductResource extends Resource
                     ->limit(50)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
-                        if (strlen($state) <= $column->getLimit()) {
+                        if (strlen($state) <= $column->getCharacterLimit()) {
                             return null;
                         }
 
@@ -355,62 +352,64 @@ class ProductResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->translateLabel(),
-                ExportBulkAction::make()
-                    ->queue()
-                    ->query(fn (Builder $query) => $query->with('productVariants')->latest())
-                    ->mapUsing(
-                        [
-                            'product_id', 'is_variant', 'variant_id', 'name', 'variant_combination', 'sku',
-                            'retail_price', 'selling_price', 'stock', 'status', 'is_digital_product',
-                            'is_featured', 'is_special_offer', 'allow_customer_remarks', 'allow_stocks',
-                            'allow_guest_purchase', 'weight', 'length', 'width', 'height', 'minimum_order_quantity',
-                        ],
-                        function (Product $product) {
-                            $productData = [
-                                [
-                                    $product->id,
-                                    Decision::NO->value,
-                                    '',
-                                    $product->name,
-                                    '',
-                                    $product->sku,
-                                    $product->retail_price,
-                                    $product->selling_price,
-                                    $product->stock,
-                                    $product->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
-                                    $product->is_digital_product ? Decision::YES->value : Decision::NO->value,
-                                    $product->is_featured ? Decision::YES->value : Decision::NO->value,
-                                    $product->is_special_offer ? Decision::YES->value : Decision::NO->value,
-                                    $product->allow_customer_remarks ? Decision::YES->value : Decision::NO->value,
-                                    $product->allow_stocks ? Decision::YES->value : Decision::NO->value,
-                                    $product->allow_guest_purchase ? Decision::YES->value : Decision::NO->value,
-                                    $product->weight,
-                                    $product->dimension['length'] ?? '',
-                                    $product->dimension['width'] ?? '',
-                                    $product->dimension['height'] ?? '',
-                                    $product->minimum_order_quantity,
-                                ],
-                            ];
-                            foreach ($product->productVariants as $variant) {
-                                $productData[] =
-                                    [
-                                        $variant->product_id,
-                                        Decision::YES->value,
-                                        $variant->id,
-                                        '',
-                                        $variant->combination,
-                                        $variant->sku,
-                                        $variant->retail_price,
-                                        $variant->selling_price,
-                                        $variant->stock,
-                                        $variant->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
 
-                                    ];
-                            }
-
-                            return $productData;
-                        }
-                    ),
+                // TODO: export
+                //                ExportBulkAction::make()
+                //                    ->queue()
+                //                    ->query(fn (Builder $query) => $query->with('productVariants')->latest())
+                //                    ->mapUsing(
+                //                        [
+                //                            'product_id', 'is_variant', 'variant_id', 'name', 'variant_combination', 'sku',
+                //                            'retail_price', 'selling_price', 'stock', 'status', 'is_digital_product',
+                //                            'is_featured', 'is_special_offer', 'allow_customer_remarks', 'allow_stocks',
+                //                            'allow_guest_purchase', 'weight', 'length', 'width', 'height', 'minimum_order_quantity',
+                //                        ],
+                //                        function (Product $product) {
+                //                            $productData = [
+                //                                [
+                //                                    $product->id,
+                //                                    Decision::NO->value,
+                //                                    '',
+                //                                    $product->name,
+                //                                    '',
+                //                                    $product->sku,
+                //                                    $product->retail_price,
+                //                                    $product->selling_price,
+                //                                    $product->stock,
+                //                                    $product->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+                //                                    $product->is_digital_product ? Decision::YES->value : Decision::NO->value,
+                //                                    $product->is_featured ? Decision::YES->value : Decision::NO->value,
+                //                                    $product->is_special_offer ? Decision::YES->value : Decision::NO->value,
+                //                                    $product->allow_customer_remarks ? Decision::YES->value : Decision::NO->value,
+                //                                    $product->allow_stocks ? Decision::YES->value : Decision::NO->value,
+                //                                    $product->allow_guest_purchase ? Decision::YES->value : Decision::NO->value,
+                //                                    $product->weight,
+                //                                    $product->dimension['length'] ?? '',
+                //                                    $product->dimension['width'] ?? '',
+                //                                    $product->dimension['height'] ?? '',
+                //                                    $product->minimum_order_quantity,
+                //                                ],
+                //                            ];
+                //                            foreach ($product->productVariants as $variant) {
+                //                                $productData[] =
+                //                                    [
+                //                                        $variant->product_id,
+                //                                        Decision::YES->value,
+                //                                        $variant->id,
+                //                                        '',
+                //                                        $variant->combination,
+                //                                        $variant->sku,
+                //                                        $variant->retail_price,
+                //                                        $variant->selling_price,
+                //                                        $variant->stock,
+                //                                        $variant->status ? Status::ACTIVE->value : STATUS::INACTIVE->value,
+                //
+                //                                    ];
+                //                            }
+                //
+                //                            return $productData;
+                //                        }
+                //                    ),
 
             ])
             ->defaultSort('updated_at', 'desc');

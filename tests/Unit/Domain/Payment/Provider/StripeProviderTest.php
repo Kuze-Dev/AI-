@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Pages\Settings\PaymentSettings;
+use App\FilamentTenant\Clusters\Settings\Pages\PaymentSettings;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Contracts\PaymentManagerInterface;

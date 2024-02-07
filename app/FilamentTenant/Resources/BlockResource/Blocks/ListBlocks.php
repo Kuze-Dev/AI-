@@ -14,7 +14,7 @@ class ListBlocks extends ListRecords
     protected static string $resource = BlockResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),

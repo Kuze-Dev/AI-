@@ -9,7 +9,7 @@ use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\CreatePageAction;
 use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -24,11 +24,12 @@ class CreatePage extends CreateRecord
 
     protected static string $resource = PageResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label('Create Page')
+                // ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
@@ -60,11 +61,6 @@ class CreatePage extends CreateRecord
         }
 
         $this->logsFormActivityAfterFill();
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /** @throws Throwable */

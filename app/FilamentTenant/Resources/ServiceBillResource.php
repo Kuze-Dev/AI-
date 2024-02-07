@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ServiceBillResource\Pages\ViewServiceBill;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -13,26 +12,24 @@ use Domain\ServiceOrder\Enums\ServiceTransactionStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Facades\Filament;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 class ServiceBillResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = ServiceBill::class;
 
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $slug = 'service-bills';
 
-    public static function getRouteBaseName(): string
+    public static function getRouteBaseName(?string $panel = null): string
     {
         return Filament::currentContext().'.resources.service-orders.service-bills';
     }
@@ -136,7 +133,7 @@ class ServiceBillResource extends Resource
                         }
                     )
                     ->translateLabel()
-                    ->color('secondary')
+                    ->color('gray')
                     ->disabled()
                     ->visible(
                         function (RelationManager $livewire) {

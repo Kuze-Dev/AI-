@@ -8,15 +8,14 @@ use App\Features\ECommerce\ColorPallete;
 use App\FilamentTenant\Support\CreateProductOptionValueAction;
 use App\FilamentTenant\Support\EditProductOptionValueAction;
 use App\FilamentTenant\Support\ManageProductOptionAction;
-use Closure;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 use Exception;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -30,7 +29,7 @@ class OptionsRelationManager extends RelationManager
 
     public Model $ownerRecord;
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form->schema([
             \Filament\Forms\Components\TextInput::make('name')
@@ -50,21 +49,21 @@ class OptionsRelationManager extends RelationManager
                             'text' => 'Text',
                         ])
                         ->columnSpan(
-                            fn (Closure $get) => $get('icon_type') == 'color_palette' ? 1 : 2
+                            fn (\Filament\Forms\Get $get) => $get('icon_type') == 'color_palette' ? 1 : 2
                         )
-                        ->hidden(fn (Closure $get) => ! $get('option_is_custom'))
+                        ->hidden(fn (\Filament\Forms\Get $get) => ! $get('option_is_custom'))
                         ->reactive(),
 
                     \Filament\Forms\Components\ColorPicker::make('icon_value')
                         ->label(trans('Icon Value (HEX)'))
-                        ->hidden(fn (Closure $get) => ! ($get('icon_type') === 'color_palette' && $get('option_is_custom'))),
+                        ->hidden(fn (\Filament\Forms\Get $get) => ! ($get('icon_type') === 'color_palette' && $get('option_is_custom'))),
                 ])
                 ->columns(2)
                 ->columnSpan(2),
         ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

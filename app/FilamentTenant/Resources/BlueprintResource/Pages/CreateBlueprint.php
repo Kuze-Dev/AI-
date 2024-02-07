@@ -20,19 +20,14 @@ class CreateBlueprint extends CreateRecord
 
     protected static string $resource = BlueprintResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     protected function handleRecordCreation(array $data): Model

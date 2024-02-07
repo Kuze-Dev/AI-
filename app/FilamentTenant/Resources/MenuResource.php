@@ -7,7 +7,6 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
@@ -19,10 +18,10 @@ use Domain\Menu\Models\Node;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -32,11 +31,9 @@ use Illuminate\Validation\Rules\Unique;
 
 class MenuResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Menu::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-menu';
+    protected static ?string $navigationIcon = 'heroicon-o-bars-3';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -51,7 +48,7 @@ class MenuResource extends Resource
     }
 
     /** @return Builder<Menu> */
-    protected static function getGlobalSearchEloquentQuery(): Builder
+    public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('nodes');
     }
@@ -63,7 +60,7 @@ class MenuResource extends Resource
         return [trans('Total Nodes') => $record->nodes_count];
     }
 
-    public static function resolveRecordRouteBinding(mixed $key): ?Model
+    public static function resolveRecordRouteBinding(int|string $key): ?Model
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())
@@ -79,7 +76,7 @@ class MenuResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(
-                            callback: function ($livewire, Unique $rule, $state, Closure $get, $record) {
+                            callback: function ($livewire, Unique $rule, $state, \Filament\Forms\Get $get, $record) {
                                 if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
                                     return false;
                                 }
@@ -101,7 +98,7 @@ class MenuResource extends Resource
                     Forms\Components\CheckboxList::make('sites')
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
-                            function (?Menu $record, Closure $get) {
+                            function (?Menu $record, \Filament\Forms\Get $get) {
 
                                 return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -181,9 +178,9 @@ class MenuResource extends Resource
                                                 ->toArray()
                                         ),
                                     Forms\Components\Group::make()
-                                        ->visible(fn (Closure $get) => filled($get('type')))
+                                        ->visible(fn (\Filament\Forms\Get $get) => filled($get('type')))
                                         ->schema(
-                                            fn (Closure $get) => match ($get('type')) {
+                                            fn (\Filament\Forms\Get $get) => match ($get('type')) {
                                                 NodeType::URL->value => [
                                                     Forms\Components\TextInput::make('url')
                                                         ->inputMode('url')
@@ -210,12 +207,12 @@ class MenuResource extends Resource
                                                         ->lazy(),
                                                     Forms\Components\Select::make('model_id')
                                                         ->label(
-                                                            fn (Closure $get) => ($modelClass = Relation::getMorphedModel($get('model_type')))
+                                                            fn (\Filament\Forms\Get $get) => ($modelClass = Relation::getMorphedModel($get('model_type')))
                                                                 ? (string) Str::of($modelClass)->classBasename()->headline()
                                                                 : null
                                                         )
                                                         ->options(
-                                                            fn (Closure $get) => ($modeClass = Relation::getMorphedModel($get('model_type')))
+                                                            fn (\Filament\Forms\Get $get) => ($modeClass = Relation::getMorphedModel($get('model_type')))
                                                                 ? match ($modeClass) {
                                                                     ContentEntry::class => $modeClass::pluck('title', 'id')->toArray(),
                                                                     default => $modeClass::pluck('name', 'id')->toArray()
@@ -223,7 +220,7 @@ class MenuResource extends Resource
                                                             : null
                                                         )
                                                         ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                                                        ->visible(fn (Closure $get) => filled($get('model_type'))),
+                                                        ->visible(fn (\Filament\Forms\Get $get) => filled($get('model_type'))),
                                                 ],
                                                 default => []
                                             }

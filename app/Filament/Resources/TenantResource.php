@@ -11,20 +11,18 @@ use App\Filament\Rules\CheckDatabaseConnection;
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\Filament\Support\Forms\FeatureSelector;
 use Domain\Tenant\Models\Tenant;
+use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Unique;
-use Stancl\Tenancy\Database\Models\Domain;
+use Filament\Tables\Table;
 
 class TenantResource extends Resource
 {
     protected static ?string $model = Tenant::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-office-building';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -37,68 +35,75 @@ class TenantResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
                         ->required(),
                 ]),
+
                 Forms\Components\Section::make(trans('Database'))
-                    ->statePath('database')
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
-                        Forms\Components\TextInput::make('host')
-                            ->required(fn (?Tenant $record) => $record === null)
+
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'db_host')
+                            ->label(trans('Host'))
                             ->columnSpan(['md' => 3])
-                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_host')))
+                            ->required()
                             ->rule(
-                                new CheckDatabaseConnection(config('tenancy.database.template_tenant_connection'), 'data.database'),
+                                new CheckDatabaseConnection(config('tenancy.database.template_tenant_connection')),
                                 fn (string $context) => $context === 'create'
                             ),
-                        Forms\Components\TextInput::make('port')
-                            ->required(fn (?Tenant $record) => $record === null)
-                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_port'))),
-                        Forms\Components\TextInput::make('name')
-                            ->required(fn (?Tenant $record) => $record === null)
+
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'db_port')
+                            ->label(trans('Port'))
+                            ->columnSpan(['md' => 1])
+                            ->required(),
+
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'db_name')
+                            ->label(trans('Name'))
                             ->columnSpanFull()
-                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_name'))),
-                        Forms\Components\TextInput::make('username')
-                            ->required(fn (?Tenant $record) => $record === null)
+                            ->required(),
+
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'db_username')
+                            ->label(trans('Username'))
                             ->columnSpan(['md' => 2])
-                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('db_username'))),
-                        Forms\Components\TextInput::make('password')
+                            ->required(),
+
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'db_password')
+                            ->label(trans('Password'))
+                            ->columnSpan(['md' => 2])
                             ->password()
-                            ->required(fn (?Tenant $record) => $record === null)
-                            ->columnSpan(['md' => 2])
-                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record ? 'nice try, but we won\'t show the password' : null)),
+                            ->revealable(fn (?Tenant $record) => $record === null)
+                            ->required()
+                            ->afterStateHydrated(
+                                fn (Forms\Components\TextInput $component, ?Tenant $record) => $component
+                                    ->state($record ? 'nice try, but we won\'t show the password' : null)),
                     ])
                     ->columns(['md' => 4])
                     ->disabledOn('edit')
                     ->dehydrated(fn (string $context) => $context !== 'edit'),
+
                 Forms\Components\Section::make(trans('Domains'))
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
                         Forms\Components\Repeater::make('domains')
-                            ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Tenant $record, ?array $state) {
-                                $component->state($record?->domains->toArray() ?? $state);
-                            })
-                            ->disableItemMovement()
+                            ->relationship()
+                            ->reorderable(false)
                             ->minItems(1)
-                            ->schema([
+                            ->simple(
                                 Forms\Components\TextInput::make('domain')
                                     ->required()
+                                    ->string()
+                                    ->distinct()
                                     ->unique(
-                                        'domains',
-                                        callback: fn (?Tenant $record, Unique $rule, ?string $state) => $rule
-                                            ->when(
-                                                $record?->domains->firstWhere('domain', $state),
-                                                fn (Unique $rule, ?Domain $domain) => $rule->ignore($domain)
-                                            ),
+                                        ignoreRecord: true
                                     )
-                                    ->rules([new FullyQualifiedDomainNameRule()]),
-                            ]),
+                                    ->rule(new FullyQualifiedDomainNameRule()),
+                            ),
                     ]),
                 Forms\Components\Section::make(trans('Features'))
                     ->collapsed(fn (string $context) => $context === 'edit')
+                    ->dehydrated(false)
                     ->schema([
                         FeatureSelector::make('features')
                             ->options([
@@ -150,18 +155,23 @@ class TenantResource extends Resource
                                 ],
 
                             ]),
-                    ])->hidden(
-                        fn () => ! auth()->user()?->can('tenant.updateFeatures')
+                    ])
+                    ->hidden(
+                        fn () => ! Filament::auth()
+                            ->user()?->can('tenant.updateFeatures')
                     ),
                 Forms\Components\Section::make(trans('Suspension Option'))
-                    ->view('filament.forms.components.redbgheading-section')
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
                         Forms\Components\Toggle::make('is_suspended')
                             ->label('Suspend')
                             ->helpertext('Warning this will suspend the current tenant are you sure with this action?')
                             ->inline(false),
-                    ])->hidden(fn () => ! auth()->user()?->can('tenant.canSuspendTenant')),
+                    ])
+                    ->hidden(
+                        fn () => ! Filament::auth()
+                            ->user()?->can('tenant.canSuspendTenant')
+                    ),
             ])->columns(2);
     }
 
@@ -171,21 +181,29 @@ class TenantResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TagsColumn::make('domains.domain'),
+                Tables\Columns\TextColumn::make('domains.domain')
+                    ->badge(),
                 Tables\Columns\TextColumn::make('total_api_request'),
                 Tables\Columns\IconColumn::make('is_suspended')
                     ->label(trans('Active'))
-                    ->options([
-                        'heroicon-o-check-circle' => fn ($state) => $state == false,
-                        'heroicon-o-x-circle' => fn ($state) => $state === true,
+                    ->icons([
+                        'heroicon-o-check-circle' => false,
+                        'heroicon-o-x-circle' => true,
                     ])
-                    ->color(fn ($state) => $state == false ? 'success' : 'danger'),
+                    ->color(fn (bool $state) => $state ? 'danger' : 'success'),
+
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->translateLabel()
+                    ->dateTime()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->dateTime(),
             ])
             ->filters([])
-
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
