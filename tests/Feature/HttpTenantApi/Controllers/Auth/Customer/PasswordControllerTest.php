@@ -24,10 +24,11 @@ use function PHPUnit\Framework\assertTrue;
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(TierBase::class);
+    testInTenantContext([
+        CustomerBase::class,
+        AddressBase::class,
+        TierBase::class
+    ]);
 });
 
 it('can send link', function () {
