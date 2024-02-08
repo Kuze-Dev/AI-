@@ -61,8 +61,8 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
             ])
             ->navigationGroups([
-                NavigationGroup::make()->label(trans('Access')),
-                NavigationGroup::make()->label(trans('System')),
+                NavigationGroup::make()->label(fn () => trans('Access')),
+                NavigationGroup::make()->label(fn () => trans('System')),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()

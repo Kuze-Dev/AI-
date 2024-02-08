@@ -9,7 +9,6 @@ use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableCo
 use Domain\Auth\HasActiveState;
 use Domain\Auth\TwoFactorAuthenticatable;
 use Domain\Site\Models\Site;
-use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
