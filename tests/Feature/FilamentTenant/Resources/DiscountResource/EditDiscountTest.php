@@ -7,8 +7,8 @@ use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Discount\Database\Factories\DiscountConditionFactory;
 use Domain\Discount\Database\Factories\DiscountFactory;
 use Domain\Discount\Database\Factories\DiscountRequirementFactory;
-
 use Filament\Facades\Filament;
+
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {

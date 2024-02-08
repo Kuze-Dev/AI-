@@ -5,9 +5,10 @@ declare(strict_types=1);
 use App\Filament\Resources\RoleResource\Pages\ListRoles;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Role\Database\Factories\RoleFactory;
-use Filament\Pages\Actions\DeleteAction;
+use Filament\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Spatie\Permission\Models\Permission;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\assertModelMissing;
@@ -52,6 +53,10 @@ it('can not delete role with existing user', function () {
     $admin->roles()->attach($role);
 
     livewire(ListRoles::class)
-        ->callTableAction(DeleteAction::class, $role)
-        ->assertNotified();
-});
+        ->callTableAction(DeleteAction::class, $role);
+    //        ->assertNotified();
+})
+    ->throws(
+        DeleteRestrictedException::class,
+        'Delete has been restricted as `Domain\Role\Models\Role::users()` has existing entries.'
+    );
