@@ -93,7 +93,7 @@ parameters:
     level: 8
 
     ignoreErrors:
-        #- '#Access to property \$value on an unknown class StringBackedEnum.#'
+        - '#Parameter \$syncMediaCollectionAction of method Support\\MetaData\\Actions\\UpdateMetaDataAction::__construct\(\) has typehint with deprecated class Support\\Common\\Actions\\SyncMediaCollectionAction: use https://filamentphp.com/plugins/filament-spatie-media-library #'
 
     excludePaths:
         # - ./*/*/FileToBeExcluded.php
