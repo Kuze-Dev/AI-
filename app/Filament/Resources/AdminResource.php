@@ -19,8 +19,6 @@ use Filament\Tables;
 use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
 use Illuminate\Auth\Middleware\RequirePassword;
-use Illuminate\Auth\Notifications\VerifyEmail;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Validation\Rule;
@@ -139,7 +137,8 @@ class AdminResource extends Resource
                     ->boolean(),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TagsColumn::make('roles.name'),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->badge(),
 
                 Tables\Columns\TextColumn::make('updated_at')
                     ->translateLabel()
@@ -207,9 +206,9 @@ class AdminResource extends Resource
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
+                        ->icon('heroicon-o-envelope')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             try {
-                                VerifyEmail::$createUrlCallback = fn (MustVerifyEmail $notifiable) => Filament::getVerifyEmailUrl($notifiable);
                                 $record->sendEmailVerificationNotification();
                                 $action
                                     ->successNotificationTitle(trans('A fresh verification link has been sent to your email address.'))
@@ -225,7 +224,7 @@ class AdminResource extends Resource
                         ->icon('heroicon-o-lock-open')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             $result = app(ForgotPasswordAction::class)
-                                ->execute($record->email, 'admin');
+                                ->execute($record->email, Filament::getAuthPasswordBroker());
 
                             if ($result->failed()) {
                                 $action->failureNotificationTitle($result->getMessage())

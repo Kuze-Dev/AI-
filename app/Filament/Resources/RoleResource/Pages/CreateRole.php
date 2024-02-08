@@ -8,7 +8,7 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\RoleResource;
 use Domain\Role\Actions\CreateRoleAction;
 use Domain\Role\DataTransferObjects\RoleData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +24,7 @@ class CreateRole extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];

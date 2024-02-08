@@ -40,6 +40,7 @@ class TenantPanelProvider extends PanelProvider
             ->id('tenant')
             ->path('admin')
             ->authGuard('admin')
+            ->authPasswordBroker('admin')
             ->login(Login::class)
             ->profile(EditProfile::class)
             ->passwordReset()

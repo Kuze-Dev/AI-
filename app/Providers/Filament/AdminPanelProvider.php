@@ -40,6 +40,7 @@ class AdminPanelProvider extends PanelProvider
             ->domains(config('tenancy.central_domains'))
             ->path('admin')
             ->authGuard('admin')
+            ->authPasswordBroker('admin')
             ->login(Login::class)
             ->profile(EditProfile::class)
             ->passwordReset()
@@ -66,7 +67,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
-            ->unsavedChangesAlerts()
+            ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
             ->maxContentWidth(MaxWidth::Full)
             ->middleware([
                 EncryptCookies::class,
