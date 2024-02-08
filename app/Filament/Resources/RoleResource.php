@@ -224,24 +224,28 @@ class RoleResource extends Resource
 
     private static function hideFeaturePermission(string $groupName): bool
     {
-
-        /** @var bool */
-        return match ($groupName) {
-            'site' => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class),
-            'country' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'currency' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'discount' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'order' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'product' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'paymentMethod' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'shippingMethod' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'taxZone' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'ecommerceSettings' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'customers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class),
-            'tier' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
-            'service' => tenancy()->tenant?->features()->inactive(\App\Features\Service\ServiceBase::class),
+        $feature = match ($groupName) {
+            'country',
+            'shippingMethod',
+            'currency',
+            'discount',
+            'order',
+            'product',
+            'paymentMethod',
+            'taxZone',
+            'site' => \App\Features\CMS\SitesManagement::class,
+            'ecommerceSettings' => \App\Features\ECommerce\ECommerceBase::class,
+            'customers' => \App\Features\Customer\CustomerBase::class,
+            'tier' => \App\Features\Customer\TierBase::class,
+            'service' => \App\Features\Service\ServiceBase::class,
             default => false
         };
+
+        if ($feature === false) {
+            return false;
+        }
+
+        return tenancy()->tenant?->features()->inactive($feature);
     }
 
     private static function refreshSelectAllState(Forms\Get $get, Forms\Set $set): void
