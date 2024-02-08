@@ -27,7 +27,7 @@ beforeEach(function () {
     testInTenantContext([
         CustomerBase::class,
         AddressBase::class,
-        TierBase::class
+        TierBase::class,
     ]);
 });
 
