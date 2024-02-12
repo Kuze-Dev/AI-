@@ -293,30 +293,9 @@ class OrderResource extends Resource
                     ->sortable()
                     ->label(trans('Order Date'))
                     ->dateTime(timezone: Auth::user()?->timezone),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->label(trans('Status'))
-                    ->formatStateUsing(function ($state) {
-                        if ($state == OrderStatuses::FORPAYMENT->value) {
-                            return 'For Payment';
-                        } elseif ($state == OrderStatuses::FORAPPROVAL->value) {
-                            return 'For Approval';
-                        }
-
-                        return ucfirst($state);
-                    })
-                    ->color(function ($state) {
-                        return match ($state) {
-                            OrderStatuses::FORAPPROVAL->value => 'warning',
-                            OrderStatuses::REFUNDED->value,
-                            OrderStatuses::CANCELLED->value => 'danger',
-                            OrderStatuses::FULFILLED->value,
-                            OrderStatuses::DELIVERED->value => 'success',
-                            OrderStatuses::PACKED->value,
-                            OrderStatuses::PROCESSING->value,
-                            OrderStatuses::SHIPPED->value => 'primary',
-                            default => 'secondary',
-                        };
-                    })
+                Tables\Columns\TextColumn::make('status')
+                    ->translateLabel()
+                    ->badge()
                     ->sortable(),
             ])
             ->filters([
