@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\ECommerce\AllowGuestOrder;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Support;
 use App\Settings\OrderSettings;
@@ -15,8 +16,11 @@ use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
 use Domain\Taxation\Enums\PriceDisplay;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -62,7 +66,7 @@ class OrderResource extends Resource
                 Forms\Components\Group::make()
                     ->schema([
                         Forms\Components\Section::make(function (Order $record) {
-                            if (tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\AllowGuestOrder::class)) {
+                            if (tenancy()->tenant?->features()->inactive(AllowGuestOrder::class)) {
                                 return 'Customer';
                             }
 
@@ -227,24 +231,17 @@ class OrderResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer_id')
-                    ->hidden(function () {
-                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\AllowGuestOrder::class);
-                    })
-                    ->alignLeft()
                     ->label(trans('Customer Type'))
-                    ->formatStateUsing(function (?string $state) {
-                        return $state ? 'Registered'
-                            : 'Guest';
-                    }),
+                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class))
+                    ->alignLeft()
+                    ->formatStateUsing(fn (?string $state) => $state ? trans('Registered') : trans('Guest')),
                 Tables\Columns\TextColumn::make('customer_name')
                     ->label(trans('Customer'))
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query
-                            ->orderBy('customer_first_name', $direction);
-                    })
-                    ->formatStateUsing(function ($record) {
-                        return Str::limit($record->customer_first_name.' '.$record->customer_last_name, 30);
-                    })
+                    ->sortable(
+                        query: fn (Builder $query, string $direction): Builder => $query
+                            ->orderBy('customer_first_name', $direction)
+                    )
+                    ->formatStateUsing(fn ($record) => Str::limit($record->customer_first_name.' '.$record->customer_last_name, 30))
                     ->searchable(query: function (Builder $query, string $search) {
                         $query->where('customer_first_name', 'like', "%{$search}%")
                             ->orWhere('customer_last_name', 'like', "%{$search}%");
@@ -253,13 +250,9 @@ class OrderResource extends Resource
                     ->alignRight()
                     ->label(trans('Tax Total'))
                     ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(function (Order $record) {
-                        return $record->currency_symbol.' '.number_format((float) $record->tax_total, 2, '.', ',');
-                    }),
+                    ->formatStateUsing(fn (Order $record) => $record->currency_symbol.' '.number_format((float) $record->tax_total, 2, '.', ',')),
                 Tables\Columns\TextColumn::make('total')
-                    ->formatStateUsing(function (Order $record) {
-                        return $record->currency_symbol.' '.number_format((float) $record->total, 2, '.', ',');
-                    })
+                    ->formatStateUsing(fn (Order $record) => $record->currency_symbol.' '.number_format((float) $record->total, 2, '.', ','))
                     ->alignRight()
                     ->label(trans('Total'))
                     ->sortable(),
@@ -306,8 +299,8 @@ class OrderResource extends Resource
                         Forms\Components\DatePicker::make('created_until')
                             ->label(trans('Created until')),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
+                    ->query(
+                        fn (Builder $query, array $data): Builder => $query
                             ->when(
                                 $data['created_from'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
@@ -315,8 +308,8 @@ class OrderResource extends Resource
                             ->when(
                                 $data['created_until'],
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    })
+                            )
+                    )
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
 
@@ -345,9 +338,7 @@ class OrderResource extends Resource
                     ])
                     ->attribute('status'),
                 Tables\Filters\SelectFilter::make('customer_id')->label(trans('Customer Type'))
-                    ->hidden(function () {
-                        return ! tenancy()->tenant?->features()->active(\App\Features\ECommerce\AllowGuestOrder::class);
-                    })
+                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class))
                     ->options([
                         OrderUserType::REGISTERED->value => trans('Registered'),
                         OrderUserType::GUEST->value => trans('Guest'),
@@ -446,9 +437,9 @@ class OrderResource extends Resource
                             ->inline()
                             ->formatStateUsing(function ($state) {
                                 /** @var string */
-                                $timeZone = Auth::user()?->timezone;
+                                $timeZone = Filament::auth()->user()?->timezone;
 
-                                $formattedState = Carbon::parse($state)
+                                $formattedState = now()->parse($state)
                                     ->setTimezone($timeZone)
                                     ->translatedFormat('F d, Y g:i A');
 
@@ -467,9 +458,7 @@ class OrderResource extends Resource
                             ->inline()
                             ->readOnly(),
                         Support\TextLabel::make('sub_total')
-                            ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol.' '.number_format($record->sub_total, 2, '.', ',');
-                            })
+                            ->formatStateUsing(fn (Order $record) => $record->currency_symbol.' '.number_format($record->sub_total, 2, '.', ','))
                             ->alignRight()
                             ->size('md')
                             ->inline(),
@@ -486,16 +475,12 @@ class OrderResource extends Resource
                             ->alignRight()
                             ->size('md')
                             ->inline()
-                            ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol.' '.number_format($record->shipping_total, 2, '.', ',');
-                            }),
+                            ->formatStateUsing(fn (Order $record) => $record->currency_symbol.' '.number_format($record->shipping_total, 2, '.', ',')),
                     ]),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
-                            ->label(function (Order $record) {
-                                return trans("Tax Total ( $record->tax_percentage% )");
-                            })
+                            ->label(fn (Order $record) => trans("Tax Total ( $record->tax_percentage% )"))
                             ->alignLeft()
                             ->size('md')
                             ->inline()
@@ -511,9 +496,7 @@ class OrderResource extends Resource
 
                                 return $record->currency_symbol.' '.'0.00';
                             }),
-                    ])->hidden(function (Order $record) {
-                        return $record->tax_display == PriceDisplay::INCLUSIVE;
-                    }),
+                    ])->hidden(fn (Order $record) => $record->tax_display == PriceDisplay::INCLUSIVE),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
@@ -533,9 +516,7 @@ class OrderResource extends Resource
 
                                 return $record->currency_symbol.' '.'0.00';
                             }),
-                    ])->hidden(function (Order $record) {
-                        return (bool) ($record->discount_total == 0);
-                    }),
+                    ])->hidden(fn (Order $record) => $record->discount_total == 0),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
@@ -549,9 +530,7 @@ class OrderResource extends Resource
                             ->size('md')
                             ->inline(),
                     ])
-                    ->hidden(function (Order $record) {
-                        return is_null($record->discount_code) ? true : false;
-                    }),
+                    ->hidden(fn (Order $record) => is_null($record->discount_code)),
                 Forms\Components\Grid::make(2)
                     ->schema([
                         Support\TextLabel::make('')
@@ -566,9 +545,14 @@ class OrderResource extends Resource
                             ->size('md')
                             ->color('primary')
                             ->inline()
-                            ->formatStateUsing(function (Order $record) {
-                                return $record->currency_symbol.' '.number_format($record->total, 2, '.', ',');
-                            }),
+                            ->formatStateUsing(
+                                fn (Order $record) => $record->currency_symbol.' '.
+                                    number_format(
+                                        $record->total,
+                                        2,
+                                        '.',
+                                        ',')
+                            ),
                     ]),
             ])->columnSpan(1);
     }
@@ -576,10 +560,10 @@ class OrderResource extends Resource
     private static function summaryEditButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make('Edit')
-            ->execute(function (Order $record, \Filament\Forms\Get $get, \Filament\Forms\Set $set) {
-                return Forms\Components\Actions\Action::make(trans('edit'))
+            ->execute(
+                fn (Order $record, Get $get, Set $set) => Forms\Components\Actions\Action::make('edit')
                     ->color('primary')
-                    ->label('Edit')
+                    ->label(trans('Edit'))
                     ->size('sm')
                     ->modalHeading(trans('Edit Status'))
                     ->modalWidth('xl')
@@ -605,10 +589,8 @@ class OrderResource extends Resource
 
                                 return $options;
                             })
-                            ->disablePlaceholderSelection()
-                            ->formatStateUsing(function () use ($record) {
-                                return $record->status;
-                            }),
+                            ->selectablePlaceholder()
+                            ->formatStateUsing(fn () => $record->status),
                         Forms\Components\Toggle::make('send_email')
                             ->label(trans('Send email notification'))
                             ->default(false)
@@ -616,7 +598,7 @@ class OrderResource extends Resource
                         Forms\Components\Textarea::make('email_remarks')
                             ->maxLength(255)
                             ->label(trans('Remarks'))
-                            ->visible(fn (\Filament\Forms\Get $get) => $get('send_email') == true)
+                            ->visible(fn (Get $get) => $get('send_email') == true)
                             ->dehydrateStateUsing(function (?string $state) use ($get) {
                                 if (filled($state) && $get('send_email') == true) {
                                     return $state;
@@ -703,23 +685,20 @@ class OrderResource extends Resource
                                 }
                             });
                         }
-                    );
-            })
-            ->disableLabel()
+                    ))
+            ->hiddenLabel()
             ->columnSpan(1)
             ->alignRight()
             ->size('sm')
-            ->hidden(function (Order $record) {
-                return $record->status == OrderStatuses::CANCELLED ||
-                    $record->status == OrderStatuses::FULFILLED;
-            });
+            ->hidden(fn (Order $record) => $record->status == OrderStatuses::CANCELLED ||
+                    $record->status == OrderStatuses::FULFILLED);
     }
 
     private static function summaryMarkAsPaidButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make(trans('mark_as_paid'))
-            ->disableLabel()
-            ->execute(function (Order $record, \Filament\Forms\Set $set) {
+            ->hiddenLabel()
+            ->execute(function (Order $record, Set $set) {
                 $order = $record;
 
                 return Forms\Components\Actions\Action::make('mark_as_paid')
@@ -772,17 +751,17 @@ class OrderResource extends Resource
             })
             ->fullWidth()
             ->size('md')
-            ->hidden(function (Order $record) {
-                return $record->status == OrderStatuses::CANCELLED ||
-                    $record->status == OrderStatuses::FULFILLED;
-            });
+            ->hidden(
+                fn (Order $record) => $record->status == OrderStatuses::CANCELLED ||
+                $record->status == OrderStatuses::FULFILLED
+            );
     }
 
     private static function summaryProofOfPaymentButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make('proof_of_payment')
-            ->disableLabel()
-            ->execute(function (Order $record, \Filament\Forms\Set $set) {
+            ->hiddenLabel()
+            ->execute(function (Order $record, Set $set) {
                 $footerActions = self::showProofOfPaymentActions($record, $set);
 
                 $order = $record;
@@ -904,14 +883,10 @@ class OrderResource extends Resource
 
                 Forms\Components\FileUpload::make('bank_proof_image')
                     ->label(trans('Customer Upload'))
-                    ->formatStateUsing(function () use ($order) {
-                        return $order->payments->first()?->getMedia('image')
-                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                            ->toArray() ?? [];
-                    })
-                    ->hidden(function () use ($order) {
-                        return (bool) (empty($order->payments->first()?->getFirstMediaUrl('image')));
-                    })
+                    ->formatStateUsing(fn () => $order->payments->first()?->getMedia('image')
+                        ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                        ->toArray() ?? [])
+                    ->hidden(fn () => empty($order->payments->first()?->getFirstMediaUrl('image')))
                     ->image()
                     ->getUploadedFileUrlUsing(static function (
                         Forms\Components\FileUpload $component,
@@ -938,7 +913,7 @@ class OrderResource extends Resource
                         'approved' => 'Approved',
                         'declined' => 'Declined',
                     ])
-                    ->disablePlaceholderSelection(function () use ($order) {
+                    ->selectablePlaceholder(function () use ($order) {
                         /** @var \Domain\Payments\Models\Payment $payment */
                         $payment = $order->payments->first();
 
