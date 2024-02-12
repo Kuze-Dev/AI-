@@ -16,8 +16,6 @@ use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
 
 /**
- * @phpstan-ignore-next-line
- *
  * @deprecated use https://filamentphp.com/plugins/filament-spatie-media-library
  */
 class SyncMediaCollectionAction
