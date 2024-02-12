@@ -19,7 +19,6 @@ class CreateCustomerAction
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
         private readonly CreateAddressAction $createAddress,
-        private readonly GenerateCustomerIDAction $generateCustomerID
     ) {
     }
 
