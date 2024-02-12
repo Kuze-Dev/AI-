@@ -27,7 +27,6 @@ return static function (RectorConfig $rectorConfig): void {
         Rector\Php55\Rector\ClassConstFetch\StaticToSelfOnFinalClassRector::class,
         Rector\Php72\Rector\FuncCall\GetClassOnNullRector::class,
         Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
-        Rector\Php81\Rector\ClassConst\FinalizePublicClassConstantRector::class,
         Spatie\Ray\Rector\RemoveRayCallRector::class,
     ]);
 
