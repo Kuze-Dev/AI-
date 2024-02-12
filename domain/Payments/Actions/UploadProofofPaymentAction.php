@@ -12,7 +12,6 @@ use Support\Common\DataTransferObjects\MediaCollectionData;
 class UploadProofofPaymentAction
 {
     public function __construct(
-        /** @phpstan-ignore-next-line  */
         protected SyncMediaCollectionAction $syncMediaCollectionAction
     ) {
     }
