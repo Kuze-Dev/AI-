@@ -46,8 +46,7 @@ class FeatureSelector extends Field
                                     }
                                 })
                                 ->reactive(),
-                            Fieldset::make($data->fieldName().'_extra')
-                                ->label(trans('Extra'))
+                            Fieldset::make(trans('Extra'))
                                 ->visible(
                                     fn (Get $get) => $get($data->fieldName()) === true && filled($data->extra)
                                 )
