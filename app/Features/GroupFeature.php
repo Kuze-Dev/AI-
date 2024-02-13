@@ -40,7 +40,7 @@ final readonly class GroupFeature
         return (string) Str::of($this->base)->replace('\\', '_');
     }
 
-    public function enabled(?Tenant $tenant): bool
+    public function isActive(?Tenant $tenant): bool
     {
         if ($tenant === null) {
             return false;

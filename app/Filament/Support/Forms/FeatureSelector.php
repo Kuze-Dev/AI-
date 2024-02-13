@@ -36,7 +36,7 @@ class FeatureSelector extends Field
                         fn (GroupFeature $data) => Section::make([
                             Toggle::make($data->fieldName())
                                 ->label($data->getFeature()->getLabel())
-                                ->formatStateUsing(fn (?Tenant $record) => $data->enabled($record))
+                                ->formatStateUsing(fn (?Tenant $record) => $data->isActive($record))
                                 ->afterStateUpdated(function (Set $set, bool $state) use ($data) {
 
                                     if (! $state) {
