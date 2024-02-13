@@ -38,12 +38,17 @@ enum OrderStatuses: string implements HasColor, HasLabel
 
     public function getLabel(): string
     {
+        return Str::headline($this->value);
+    }
+
+    public function getCustomLabel(): string
+    {
         if ($this === OrderStatuses::FORPAYMENT) {
             return 'For Payment';
         } elseif ($this === OrderStatuses::FORAPPROVAL) {
             return 'For Approval';
         }
 
-        return Str::headline($this->value);
+        return $this->getLabel();
     }
 }

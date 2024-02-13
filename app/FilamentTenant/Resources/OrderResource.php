@@ -16,11 +16,18 @@ use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
 use Domain\Taxation\Enums\PriceDisplay;
+use Domain\Tenant\TenantHelpers;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\TextEntry\TextEntrySize;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -57,18 +64,180 @@ class OrderResource extends Resource
             ->with(['payments.paymentMethod', 'shippingMethod']);
     }
 
-    public static function form(Form $form): Form
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+
+                Group::make()
+                    ->schema([
+
+                        Section::make()
+                            ->heading(function (Order $record) {
+                                if (TenantHelpers::isFeatureActive(AllowGuestOrder::class)) {
+                                    return trans('Customer');
+                                }
+
+                                return $record->customer_id
+                                    ? trans('Customer (Registered)')
+                                    : trans('Customer (Guest)');
+                            })
+                            ->collapsible()
+                            ->schema([
+
+                                TextEntry::make('customer_first_name')
+                                    ->label(trans('First Name'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('customer_last_name')
+                                    ->label(trans('Last Name'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('customer_email')
+                                    ->label(trans('Email'))
+                                    ->icon('heroicon-m-envelope')
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('customer_mobile')
+                                    ->label(trans('Contact Number'))
+                                    ->size(TextEntrySize::Large),
+
+                            ])
+                            ->columns(),
+
+                        Section::make()
+                            ->heading(trans('Shipping Address'))
+                            ->collapsible()
+                            ->schema([
+
+                                TextEntry::make('shippingAddress.address_line_1')
+                                    ->label(trans('House/Unit/Flr #, Bldg Name, Blk or Lot #'))
+                                    ->size(TextEntrySize::Large)
+                                    ->columnSpanFull(),
+
+                                TextEntry::make('shippingAddress.country')
+                                    ->label(trans('Country'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('shippingAddress.state')
+                                    ->label(trans('State'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('shippingAddress.city')
+                                    ->label(trans('City/Province'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('shippingAddress.zip_code')
+                                    ->label(trans('Zip Code'))
+                                    ->size(TextEntrySize::Large),
+
+                            ])
+                            ->columns(),
+
+                        Section::make()
+                            ->heading(trans('Billing Address'))
+                            ->collapsible()
+                            ->schema([
+
+                                TextEntry::make('billingAddress.address_line_1')
+                                    ->label(trans('House/Unit/Flr #, Bldg Name, Blk or Lot #'))
+                                    ->size(TextEntrySize::Large)
+                                    ->columnSpanFull(),
+
+                                TextEntry::make('billingAddress.country')
+                                    ->label(trans('Country'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('billingAddress.state')
+                                    ->label(trans('State'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('billingAddress.city')
+                                    ->label(trans('City/Province'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('billingAddress.zip_code')
+                                    ->label(trans('Zip Code'))
+                                    ->size(TextEntrySize::Large),
+                            ])
+                            ->columns(),
+
+                        Section::make()
+                            ->heading(trans('Others'))
+                            ->collapsible()
+                            ->schema([
+
+                                TextEntry::make('payments.paymentMethod.title')
+                                    ->label(trans('Payment Method'))
+                                    ->size(TextEntrySize::Large),
+
+                                TextEntry::make('shippingMethod.title')
+                                    ->label(trans('Shipping Method'))
+                                    ->size(TextEntrySize::Large),
+                            ])
+                            ->columns(),
+                    ])
+                    ->columnSpan(2),
+
+                Group::make()
+                    ->schema([
+                        Section::make()
+                            ->heading(trans('Summary'))
+                            ->collapsible()
+                            ->schema([
+
+                                TextEntry::make('status')
+//                                    ->hiddenLabel()
+                                    ->badge()
+//                                    ->color(fn (OrderStatuses $state) => $state->getColor())
+                                    ->formatStateUsing(fn (OrderStatuses $state) => $state->getCustomLabel())
+                                    ->size(TextEntrySize::Large)
+                                    ->hintAction(
+                                        Action::make('edit')
+                                            ->button()
+                                            ->form([
+                                                Forms\Components\Select::make('status')
+                                                    ->options(OrderStatuses::class)
+                                                    ->required()
+                                                    ->default(fn (Order $record) => $record->status),
+                                                Forms\Components\Toggle::make('send_email')
+                                                    ->label(trans('Send email notification'))
+                                                    ->default(false)
+                                                    ->reactive(),
+                                                Forms\Components\Textarea::make('email_remarks')
+                                                    ->maxLength(255)
+                                                    ->label(trans('Remarks'))
+                                                    ->visible(fn (Get $get): bool => $get('send_email') ?? false),
+                                            ])
+                                            ->action(function (array $data, Order $record) {
+
+                                                Notification::make()
+                                                    ->success()
+                                                    ->title(trans('Saved TODO:'))
+                                                    ->send();
+                                            }),
+                                    ),
+                            ]),
+                    ])
+                    ->columnSpan(1),
+
+            ])->columns(3);
+    }
+
+    private static function xxxxxxxxxTODO_REMOVE(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
                         Forms\Components\Section::make(function (Order $record) {
-                            if (tenancy()->tenant?->features()->inactive(AllowGuestOrder::class)) {
-                                return 'Customer';
+                            if (TenantHelpers::isFeatureActive(AllowGuestOrder::class)) {
+                                return trans('Customer');
                             }
 
-                            return $record->customer_id ? 'Customer (Registered)' : 'Customer (Guest)';
+                            return $record->customer_id
+                                ? trans('Customer (Registered)')
+                                : trans('Customer (Guest)');
                         })
                             ->schema([
                                 Forms\Components\Grid::make(2)
@@ -275,8 +444,8 @@ class OrderResource extends Resource
                     ->dateTime(),
                 Tables\Columns\TextColumn::make('status')
                     ->translateLabel()
-                    ->badge()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn (OrderStatuses $state) => $state->getCustomLabel()),
             ])
             ->filters([
                 Tables\Filters\Filter::make('created_at')
