@@ -12,6 +12,7 @@ use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -205,5 +206,13 @@ class Order extends Model implements HasMedia, PayableInterface
     public function getReferenceNumber(): string
     {
         return $this->reference;
+    }
+
+    /** @return Attribute<string, never> */
+    protected function customerFullName(): Attribute
+    {
+        return Attribute::get(
+            fn (): string => "{$this->customer_first_name} {$this->customer_last_name}"
+        );
     }
 }

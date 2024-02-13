@@ -27,9 +27,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
@@ -232,20 +230,25 @@ class OrderResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer_id')
                     ->label(trans('Customer Type'))
-                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class))
+                    ->visible(fn () => tenancy()->tenant?->features()->active(AllowGuestOrder::class))
                     ->alignLeft()
-                    ->formatStateUsing(fn (?string $state) => $state ? trans('Registered') : trans('Guest')),
-                Tables\Columns\TextColumn::make('customer_name')
+                    ->default(false)
+                    ->formatStateUsing(
+                        fn (?string $state) => ray()->pass(filled($state))
+                            ? trans('Registered')
+                            : trans('Guest')
+                    ),
+                Tables\Columns\TextColumn::make('customer_full_name')
                     ->label(trans('Customer'))
-                    ->sortable(
-                        query: fn (Builder $query, string $direction): Builder => $query
-                            ->orderBy('customer_first_name', $direction)
-                    )
-                    ->formatStateUsing(fn ($record) => Str::limit($record->customer_first_name.' '.$record->customer_last_name, 30))
-                    ->searchable(query: function (Builder $query, string $search) {
-                        $query->where('customer_first_name', 'like', "%{$search}%")
-                            ->orWhere('customer_last_name', 'like', "%{$search}%");
-                    })->wrap(),
+                    ->sortable([
+                        'customer_first_name',
+                        'customer_last_name',
+                    ])
+                    ->searchable([
+                        'customer_first_name',
+                        'customer_last_name',
+                    ])
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('tax_total')
                     ->alignRight()
                     ->label(trans('Tax Total'))
@@ -256,28 +259,12 @@ class OrderResource extends Resource
                     ->alignRight()
                     ->label(trans('Total'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('payment_method')
-                    ->label(trans('Payment Method'))
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(function (Order $record) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $record->payments->first();
-
-                        return Str::limit($payment->paymentMethod->title ?? '', 30);
-                    }),
-                Tables\Columns\TextColumn::make('shipping_method')
-                    ->label(trans('Shipping Method'))
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->formatStateUsing(function (Order $record) {
-                        if ($record->shipping_method_id) {
-                            /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
-                            $shippingMethod = $record->shippingMethod;
-
-                            return Str::limit($shippingMethod->title, 30);
-                        }
-
-                        return '';
-                    }),
+                Tables\Columns\TextColumn::make('payments.paymentMethod.title')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('shippingMethod.title')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_paid')
                     ->label(trans('Paid'))
                     ->alignRight()
@@ -285,7 +272,7 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->label(trans('Order Date'))
-                    ->dateTime(timezone: Auth::user()?->timezone),
+                    ->dateTime(),
                 Tables\Columns\TextColumn::make('status')
                     ->translateLabel()
                     ->badge()
@@ -363,7 +350,7 @@ class OrderResource extends Resource
                 //     ->icon('heroicon-o-check')
             ])
             ->actions([])
-            ->defaultSort('id', 'DESC');
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function canCreate(): bool
