@@ -31,6 +31,7 @@ class FeatureSelector extends Field
             ->default([])
             ->schema(
                 fn (self $component) => collect($component->getOptions())
+                    ->ensure(GroupFeature::class)
                     ->map(
                         fn (GroupFeature $data) => Section::make([
                             Toggle::make($data->fieldName())
