@@ -9,9 +9,13 @@ use App\Filament\Resources\TenantResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
+/**
+ * @property-read \Domain\Tenant\Models\Tenant $record
+ */
 class CreateTenant extends CreateRecord
 {
     use LogsFormActivity;
+    use Support;
 
     protected static string $resource = TenantResource::class;
 
@@ -23,5 +27,12 @@ class CreateTenant extends CreateRecord
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
+    }
+
+    public function afterCreate(): void
+    {
+        $data = $this->form->getRawState();
+
+        $this->record->syncFeature(self::getNormalizedFeatureNames($data['features']));
     }
 }

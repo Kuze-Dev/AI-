@@ -89,4 +89,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     {
         return RequestFacade::getScheme().'://'.$this->domains[0]?->domain;
     }
+
+    public function syncFeature(array $features): void
+    {
+        $feature = $this->features();
+        $feature->deactivate(collect($feature->all())->keys());
+        $feature->activate($features);
+    }
 }
