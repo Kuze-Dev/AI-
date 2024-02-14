@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\OrderResource\Pages;
 
 use App\FilamentTenant\Resources\OrderResource;
+use App\FilamentTenant\Resources\OrderResource\Schema;
 use App\FilamentTenant\Support;
 use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Forms;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -27,9 +30,34 @@ class ViewOrderDetails extends ViewRecord
         return trans('Order #:order', ['order' => $this->record->reference]);
     }
 
+    public function getRecordTitle(): string|Htmlable
+    {
+        return parent::getRecordTitle().' '.trans('Details');
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return trans('Details');
+    }
+
     public function getRelationManagers(): array
     {
         return [];
+    }
+
+    public function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+
+                Group::make()
+                    ->schema([
+                    ])
+                    ->columnSpan(2),
+                Group::make()
+                    ->schema(Schema::summarySchema())
+                    ->columnSpan(1),
+            ])->columns(3);
     }
 
     protected function getFormSchema(): array
