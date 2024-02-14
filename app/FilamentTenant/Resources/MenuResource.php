@@ -36,11 +36,14 @@ class MenuResource extends Resource
 
     protected static ?string $model = Menu::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-menu';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -217,7 +220,7 @@ class MenuResource extends Resource
                                                                     ContentEntry::class => $modeClass::pluck('title', 'id')->toArray(),
                                                                     default => $modeClass::pluck('name', 'id')->toArray()
                                                                 }
-                                                                : null
+                                                            : null
                                                         )
                                                         ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
                                                         ->visible(fn (Closure $get) => filled($get('model_type'))),

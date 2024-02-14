@@ -34,11 +34,17 @@ class GenerateServiceTransactionReceiptAction
 
         $disk = config('domain.service-order.disks.receipt-files.driver');
 
-        Pdf::loadView(
-            'web.layouts.service-order.receipts.default',
-            ['transaction' => $serviceTransaction]
-        )
-            ->save($path, $disk);
+        if (is_null($serviceTransaction->service_bill_id)) {
+            Pdf::loadView(
+                'web.layouts.service-order.receipts.partial',
+                ['transaction' => $serviceTransaction]
+            )->save($path, $disk);
+        } else {
+            Pdf::loadView(
+                'web.layouts.service-order.receipts.default',
+                ['transaction' => $serviceTransaction]
+            )->save($path, $disk);
+        }
 
         $customer->addMediaFromDisk($path, $disk)
             ->toMediaCollection('receipts');

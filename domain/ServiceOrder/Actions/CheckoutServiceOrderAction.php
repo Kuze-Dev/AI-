@@ -143,6 +143,7 @@ class CheckoutServiceOrderAction
             new CreateServiceTransactionData(
                 service_order: $this->serviceOrder,
                 service_bill: $this->serviceBill,
+                total_amount: null,
                 service_transaction_status: ServiceTransactionStatus::PENDING,
                 payment: $payment
             )

@@ -34,13 +34,16 @@ class OrderResource extends Resource
 {
     use ContextualResource;
 
-    protected static ?string $navigationGroup = 'eCommerce';
-
     protected static ?string $model = Order::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     protected static ?string $recordTitleAttribute = 'reference';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('eCommerce');
+    }
 
     protected static function getNavigationBadge(): ?string
     {

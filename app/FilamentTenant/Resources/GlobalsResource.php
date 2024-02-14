@@ -30,13 +30,16 @@ class GlobalsResource extends Resource
 
     protected static ?string $model = Globals::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-globe';
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?int $navigationSort = 9;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     public static function form(Form $form): Form
     {

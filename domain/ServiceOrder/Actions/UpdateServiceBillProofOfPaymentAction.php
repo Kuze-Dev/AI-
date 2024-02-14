@@ -6,7 +6,7 @@ namespace Domain\ServiceOrder\Actions;
 
 use Domain\Payments\Actions\UploadProofofPaymentAction;
 use Domain\Payments\DataTransferObjects\ProofOfPaymentData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceBillBankTransferData;
+use Domain\ServiceOrder\DataTransferObjects\ServiceBankTransferData;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Illuminate\Http\UploadedFile;
@@ -20,9 +20,9 @@ class UpdateServiceBillProofOfPaymentAction
     ) {
     }
 
-    public function execute(ServiceBillBankTransferData $serviceBillBankTransferData): ServiceBill
+    public function execute(ServiceBankTransferData $serviceBankTransferData): ServiceBill
     {
-        $serviceBill = ServiceBill::whereReference($serviceBillBankTransferData->reference_id)->firstOrFail();
+        $serviceBill = ServiceBill::whereReference($serviceBankTransferData->reference_id)->firstOrFail();
         $payment = $serviceBill->latestPayment();
 
         if (! $payment) {
@@ -39,7 +39,7 @@ class UpdateServiceBillProofOfPaymentAction
             throw new BadRequestHttpException('Invalid action');
         }
 
-        $proofOfPayment = $serviceBillBankTransferData->proof_of_payment;
+        $proofOfPayment = $serviceBankTransferData->proof_of_payment;
 
         if (! Storage::disk('s3')->exists($proofOfPayment)) {
             throw new BadRequestHttpException('Image not found');
@@ -52,7 +52,7 @@ class UpdateServiceBillProofOfPaymentAction
             ]);
 
             $payment->update([
-                'customer_message' => $serviceBillBankTransferData->notes,
+                'customer_message' => $serviceBankTransferData->notes,
             ]);
 
             $this->uploadProofofPaymentAction->execute(

@@ -41,11 +41,14 @@ class PageResource extends Resource
 
     protected static ?string $model = Page::class;
 
-    protected static ?string $navigationGroup = 'CMS';
-
     protected static ?string $navigationIcon = 'heroicon-o-document';
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationGroup(): ?string
+    {
+        return trans('CMS');
+    }
 
     /** @var Collection<int, Block> */
     public static ?Collection $cachedBlocks = null;
@@ -221,6 +224,10 @@ class PageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|Page $query */
+                        return $query->Where('name', 'like', "%{$search}%");
+                    })
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('name')
                     ->hidden()
