@@ -367,7 +367,6 @@ class OrderResource extends Resource
                                                 ->formatStateUsing(
                                                     fn (Payment $record) => $record->getMedia('image')
                                                         ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
-                                                        ->ray()
                                                         ->toArray()
                                                 ),
                                             Forms\Components\Select::make('remarks')
@@ -536,7 +535,7 @@ class OrderResource extends Resource
                     ->alignLeft()
                     ->default(false)
                     ->formatStateUsing(
-                        fn (?string $state) => ray()->pass(filled($state))
+                        fn (?string $state) => filled($state)
                             ? trans('Registered')
                             : trans('Guest')
                     ),
