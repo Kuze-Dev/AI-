@@ -6,22 +6,18 @@ namespace App\FilamentTenant\Resources;
 
 use App\Features\ECommerce\AllowGuestOrder;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Support;
 use App\Settings\OrderSettings;
-use Closure;
-use Domain\Customer\Models\Customer;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Enums\OrderUserType;
 use Domain\Order\Events\AdminOrderBankPaymentEvent;
 use Domain\Order\Events\AdminOrderStatusUpdatedEvent;
 use Domain\Order\Models\Order;
-use Domain\Taxation\Enums\PriceDisplay;
+use Domain\Payments\Models\Payment;
 use Domain\Tenant\TenantHelpers;
-use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\Section;
@@ -34,9 +30,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Throwable;
 
 class OrderResource extends Resource
 {
@@ -53,15 +49,7 @@ class OrderResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        /** @phpstan-ignore-next-line https://filamentphp.com/docs/2.x/admin/navigation#navigation-item-badges */
-        return strval(static::$model::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count());
-    }
-
-    /** @return Builder<\Domain\Order\Models\Order> */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->with(['payments.paymentMethod', 'shippingMethod']);
+        return (string) Order::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count();
     }
 
     public static function infolist(Infolist $infolist): Infolist
@@ -187,205 +175,350 @@ class OrderResource extends Resource
                             ->schema([
 
                                 TextEntry::make('status')
-//                                    ->hiddenLabel()
+                                    ->hiddenLabel()
                                     ->badge()
-//                                    ->color(fn (OrderStatuses $state) => $state->getColor())
-                                    ->formatStateUsing(fn (OrderStatuses $state) => $state->getCustomLabel())
-                                    ->size(TextEntrySize::Large)
-                                    ->hintAction(
-                                        Action::make('edit')
-                                            ->button()
-                                            ->form([
-                                                Forms\Components\Select::make('status')
-                                                    ->options(OrderStatuses::class)
-                                                    ->required()
-                                                    ->default(fn (Order $record) => $record->status),
-                                                Forms\Components\Toggle::make('send_email')
-                                                    ->label(trans('Send email notification'))
-                                                    ->default(false)
-                                                    ->reactive(),
-                                                Forms\Components\Textarea::make('email_remarks')
-                                                    ->maxLength(255)
-                                                    ->label(trans('Remarks'))
-                                                    ->visible(fn (Get $get): bool => $get('send_email') ?? false),
-                                            ])
-                                            ->action(function (array $data, Order $record) {
+                                    ->tooltip(trans('Status'))
+                                    ->size(TextEntrySize::Large),
+
+                                Actions::make([
+                                    Action::make('edit')
+                                        ->translateLabel()
+                                        ->button()
+                                        ->size('sm')
+                                        ->modalHeading(trans('Edit Status'))
+                                        ->modalWidth('xl')
+                                        ->form([
+                                            Forms\Components\Select::make('status')
+                                                ->translateLabel()
+                                                ->options(
+                                                    fn (Order $record) => OrderStatuses::forOrderUpdate($record)
+                                                        ->mapWithKeys(fn (OrderStatuses $case) => [
+                                                            $case->value => $case->getLabel(),
+                                                        ])
+                                                )
+//                                                ->in(
+//                                                    fn (Order $record) => OrderStatuses::forOrderUpdate($record)
+//                                                        ->map(fn (OrderStatuses $case) => $case->value)
+//                                                )
+                                                ->required()
+                                                ->default(fn (Order $record) => $record->status),
+                                            Forms\Components\Toggle::make('send_email')
+                                                ->label(trans('Send email notification'))
+                                                ->default(false)
+                                                ->reactive(),
+                                            Forms\Components\Textarea::make('email_remarks')
+                                                ->label(trans('Remarks'))
+                                                ->nullable()
+                                                ->maxLength(255)
+                                                ->visible(fn (Get $get): bool => $get('send_email') ?? false),
+                                        ])
+                                        ->action(function (array $data, Order $record) {
+
+                                            $data['email_remarks'] ??= null;
+
+                                            if ($data['send_email'] === true) {
+                                                $fromEmail = app(OrderSettings::class)->email_sender_name;
+
+                                                if (empty($fromEmail)) {
+                                                    Notification::make()
+                                                        ->title(trans('Email sender not found, please update your order settings.'))
+                                                        ->warning()
+                                                        ->send();
+
+                                                    return;
+                                                }
+                                            }
+
+                                            DB::transaction(function () use ($data, $record) {
+
+                                                if ($data['status'] === OrderStatuses::CANCELLED) {
+                                                    if (! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
+                                                        Notification::make()
+                                                            ->title(trans("You can't cancel this order."))
+                                                            ->warning()
+                                                            ->send();
+
+                                                        return;
+                                                    }
+
+                                                    /** @var Payment $payment */
+                                                    $payment = $record->payments->first();
+
+                                                    $payment->update([
+                                                        'status' => 'cancelled',
+                                                    ]);
+
+                                                    $result = $record->update([
+                                                        'status' => $data['status'],
+                                                        'cancelled_at' => now(),
+                                                    ]);
+                                                } else {
+                                                    $result = $record->update([
+                                                        'status' => $data['status'],
+                                                    ]);
+                                                }
+
+                                                event(new AdminOrderStatusUpdatedEvent(
+                                                    $record,
+                                                    $data['send_email'],
+                                                    $data['status']->value,
+                                                    $data['email_remarks'],
+                                                    $record->customer,
+                                                ));
+
+                                                if ($result) {
+                                                    Notification::make()
+                                                        ->title(trans('Order updated successfully'))
+                                                        ->success()
+                                                        ->send();
+                                                }
+                                            });
+                                        })
+                                        ->hidden(
+                                            fn (Order $record) => $record->status == OrderStatuses::CANCELLED ||
+                                            $record->status == OrderStatuses::FULFILLED
+                                        ),
+                                ]),
+
+                                TextEntry::make('created_at')
+                                    ->label(trans('Order Date'))
+                                    ->dateTime(format: 'F d, Y g:i A')
+                                    ->inlineLabel()
+                                    ->columnSpanFull(),
+
+                                Actions::make([
+                                    Action::make('update_payment_status')
+                                        ->label(
+                                            fn (Order $record) => $record->is_paid
+                                                ? trans('Unmark as paid')
+                                                : trans('Mark as paid')
+                                        )
+//                                        ->color(
+//                                            fn (Order $record) => $record->is_paid
+//                                                ? 'secondary'
+//                                                : 'primary'
+//                                        )
+                                        ->button()
+                                        ->requiresConfirmation()
+                                        ->action(function (array $data, Order $record, Set $set) {
+
+                                            DB::transaction(function () use ($record) {
+                                                $isPaid = ! $record->is_paid;
+
+                                                $result = $record->update([
+                                                    'is_paid' => $isPaid,
+                                                ]);
+
+                                                if (! $result) {
+                                                    return;
+                                                }
+                                                /** @var Payment $payment */
+                                                $payment = $record->payments->first();
+
+                                                $payment->update([
+                                                    'status' => $record->is_paid ? 'paid' : 'pending',
+                                                ]);
+
+                                                // $set('is_paid', $isPaid);
+                                                Notification::make()
+                                                    ->title(trans('Order marked successfully'))
+                                                    ->success()
+                                                    ->send();
+
+                                            });
+                                        }),
+                                ])
+                                    ->hidden(
+                                        fn (Order $record) => $record->status === OrderStatuses::CANCELLED ||
+                                            $record->status === OrderStatuses::FULFILLED
+                                    )
+                                    ->fullWidth()
+                                    ->alignCenter()
+                                    ->columnSpanFull(),
+
+                                Actions::make([
+                                    Action::make('view_proof_of_payment')
+                                        ->translateLabel()
+                                        ->button()
+                                        ->outlined()
+                                        ->icon('heroicon-o-eye')
+                                        ->slideOver()
+                                        ->modalHeading(trans('Proof of Payment'))
+                                        ->size('sm')
+                                        ->disabledForm(function (Order $record) {
+
+                                            /** @var Payment $payment */
+                                            $payment = $record->payments->first();
+
+                                            return $payment->remarks !== null;
+                                        })
+                                        ->form(fn (Order $record) => [
+
+                                            Forms\Components\Textarea::make('customer_message')
+                                                ->translateLabel()
+                                                ->model(fn () => $record->payments[0])
+                                                ->disabled()
+                                                ->default(fn (Payment $record) => $record->customer_message),
+                                            Forms\Components\SpatieMediaLibraryFileUpload::make('customer_upload')
+                                                ->translateLabel()
+                                                ->model(fn () => $record->payments[0])
+                                                ->collection('image')
+                                                ->disabled()
+                                                ->formatStateUsing(
+                                                    fn (Payment $record) => $record->getMedia('image')
+                                                        ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
+                                                        ->ray()
+                                                        ->toArray()
+                                                ),
+                                            Forms\Components\Select::make('remarks')
+                                                ->label('Status')
+                                                ->model(fn () => $record->payments[0])
+                                                ->options([
+                                                    'approved' => 'Approved',
+                                                    'declined' => 'Declined',
+                                                ])
+                                                ->required()
+                                                ->in([
+                                                    'approved',
+                                                    'declined',
+                                                ])
+                                                ->default(fn (Payment $record) => $record->remarks),
+                                            Forms\Components\Textarea::make('admin_message')
+                                                ->translateLabel()
+                                                ->model(fn () => $record->payments[0])
+                                                ->maxLength(255)
+                                                ->default(fn (Payment $record) => $record->admin_message),
+
+                                        ])
+                                        ->action(function (array $data, Order $record) {
+                                            /** @var Payment $payment */
+                                            $payment = $record->payments->first();
+
+                                            if ($payment->remarks !== null) {
+                                                Notification::make()
+                                                    ->title(trans('Invalid action.'))
+                                                    ->warning()
+                                                    ->send();
+
+                                                return;
+                                            }
+
+                                            DB::transaction(function () use ($payment, $data, $record) {
+
+                                                $result = $payment->update($data);
+
+                                                if (! $result) {
+                                                    return;
+                                                }
+
+                                                $isPaid = $data['remarks'] === 'approved';
+
+                                                $record->update([
+                                                    'is_paid' => $isPaid,
+                                                ]);
+
+                                                if ($isPaid) {
+                                                    $payment->update([
+                                                        'status' => 'paid',
+                                                    ]);
+
+                                                    $record->update([
+                                                        'status' => OrderStatuses::PROCESSING,
+                                                    ]);
+
+                                                } else {
+                                                    $payment->update([
+                                                        'status' => 'cancelled',
+                                                    ]);
+
+                                                    $record->update([
+                                                        'status' => OrderStatuses::CANCELLED,
+                                                    ]);
+
+                                                }
+
+                                                $customer = $record->customer;
+
+                                                if ($customer) {
+                                                    event(new AdminOrderBankPaymentEvent(
+                                                        $customer,
+                                                        $record,
+                                                        $data['remarks'],
+                                                    ));
+                                                }
 
                                                 Notification::make()
+                                                    ->title(trans('Proof of payment updated successfully'))
                                                     ->success()
-                                                    ->title(trans('Saved TODO:'))
                                                     ->send();
-                                            }),
-                                    ),
-                            ]),
+
+                                            });
+                                        }),
+                                ])
+                                    ->hidden(function (Order $record) {
+
+                                        /** @var Payment|null $payment */
+                                        $payment = $record->payments->first();
+
+                                        if ($payment === null) {
+                                            return true;
+                                        }
+
+                                        if ($payment->gateway === 'bank-transfer') {
+                                            return blank($payment->getFirstMediaUrl('image'));
+                                        }
+
+                                        return true;
+                                    })
+                                    ->fullWidth()
+                                    ->alignCenter()
+                                    ->columnSpanFull(),
+
+                                TextEntry::make('sub_total')
+                                    ->translateLabel()
+                                    ->inlineLabel()
+                                    ->prefix(fn (Order $record) => $record->currency_symbol)
+                                    ->columnSpanFull(),
+
+                                TextEntry::make('shipping_total')
+                                    ->label(trans('Total Shipping Fee'))
+                                    ->inlineLabel()
+                                    ->prefix(fn (Order $record) => $record->currency_symbol)
+                                    ->columnSpanFull(),
+
+                                TextEntry::make('tax_total')
+                                    ->label(fn (Order $record) => trans('Tax Total ( :percent% )', [
+                                        'percent' => $record->tax_percentage,
+                                    ]))
+                                    ->inlineLabel()
+                                    ->prefix(fn (Order $record) => $record->currency_symbol)
+                                    ->columnSpanFull(),
+
+                                TextEntry::make('discount_total')
+                                    ->label(trans('Total Discount'))
+                                    ->inlineLabel()
+                                    ->prefix(fn (Order $record) => $record->currency_symbol)
+                                    ->columnSpanFull()
+                                    ->hidden(fn (Order $record) => $record->discount_total == 0),
+
+                                TextEntry::make('discount_code')
+                                    ->translateLabel()
+                                    ->inlineLabel()
+                                    ->prefix(fn (Order $record) => $record->currency_symbol)
+                                    ->columnSpanFull()
+                                    ->hidden(fn (Order $record) => $record->discount_code === null),
+
+                                TextEntry::make('total')
+                                    ->label(trans('Grand Total'))
+                                    ->inlineLabel()
+                                    ->prefix(fn (Order $record) => $record->currency_symbol)
+                                    ->columnSpanFull(),
+
+                            ])
+                            ->columns(),
                     ])
                     ->columnSpan(1),
 
-            ])->columns(3);
-    }
-
-    private static function xxxxxxxxxTODO_REMOVE(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Group::make()
-                    ->schema([
-                        Forms\Components\Section::make(function (Order $record) {
-                            if (TenantHelpers::isFeatureActive(AllowGuestOrder::class)) {
-                                return trans('Customer');
-                            }
-
-                            return $record->customer_id
-                                ? trans('Customer (Registered)')
-                                : trans('Customer (Guest)');
-                        })
-                            ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('first_name')
-                                            ->label(trans('First Name'))
-                                            ->content(fn (Order $record): string => $record->customer_first_name),
-                                        Forms\Components\Placeholder::make('last_name')
-                                            ->label(trans('Last Name'))
-                                            ->content(fn (Order $record): string => $record->customer_last_name),
-                                    ]),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('email')
-                                            ->label(trans('Email'))
-                                            ->content(fn (Order $record): string => $record->customer_email),
-                                        Forms\Components\Placeholder::make('contact_number')
-                                            ->label(trans('Contact Number'))
-                                            ->content(fn (Order $record): string => $record->customer_mobile),
-                                    ]),
-                            ])->collapsible(),
-                        Forms\Components\Section::make(trans('Shipping Address'))
-                            ->schema([
-                                Forms\Components\Placeholder::make('sa_line_one')
-                                    ->label(trans('House/Unit/Flr #, Bldg Name, Blk or Lot #'))
-                                    ->content(function (Order $record): string {
-                                        /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
-                                        $orderShippingAddress = $record->shippingAddress;
-
-                                        return $orderShippingAddress->address_line_1;
-                                    }),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('sa_country')
-                                            ->label(trans('Country'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
-                                                $orderShippingAddress = $record->shippingAddress;
-
-                                                return $orderShippingAddress->country;
-                                            }),
-                                        Forms\Components\Placeholder::make('sa_state')
-                                            ->label(trans('State'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
-                                                $orderShippingAddress = $record->shippingAddress;
-
-                                                return $orderShippingAddress->state;
-                                            }),
-                                    ]),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('sa_city_province')
-                                            ->label(trans('City/Province'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
-                                                $orderShippingAddress = $record->shippingAddress;
-
-                                                return $orderShippingAddress->city;
-                                            }),
-                                        Forms\Components\Placeholder::make('sa_zip_code')
-                                            ->label(trans('Zip Code'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Order\Models\OrderAddress $orderShippingAddress */
-                                                $orderShippingAddress = $record->shippingAddress;
-
-                                                return $orderShippingAddress->zip_code;
-                                            }),
-                                    ]),
-                            ])->collapsible(),
-                        Forms\Components\Section::make(trans('Billing Address'))
-                            ->schema([
-                                Forms\Components\Placeholder::make('ba_line_one')
-                                    ->label(trans('House/Unit/Flr #, Bldg Name, Blk or Lot #'))
-                                    ->content(function (Order $record): string {
-                                        /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
-                                        $orderBillingAddress = $record->billingAddress;
-
-                                        return $orderBillingAddress->address_line_1;
-                                    }),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('ba_country')
-                                            ->label(trans('Country'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
-                                                $orderBillingAddress = $record->billingAddress;
-
-                                                return $orderBillingAddress->country;
-                                            }),
-                                        Forms\Components\Placeholder::make('ba_state')
-                                            ->label(trans('State'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
-                                                $orderBillingAddress = $record->billingAddress;
-
-                                                return $orderBillingAddress->state;
-                                            }),
-                                    ]),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('ba_city_province')
-                                            ->label(trans('City/Province'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
-                                                $orderBillingAddress = $record->billingAddress;
-
-                                                return $orderBillingAddress->city;
-                                            }),
-                                        Forms\Components\Placeholder::make('ba_zip_code')
-                                            ->label(trans('Zip Code'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Order\Models\OrderAddress $orderBillingAddress */
-                                                $orderBillingAddress = $record->billingAddress;
-
-                                                return $orderBillingAddress->zip_code;
-                                            }),
-                                    ]),
-                            ])->collapsible(),
-                        Forms\Components\Section::make(trans('Others'))
-                            ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-
-                                        Forms\Components\Placeholder::make('payment_method')
-                                            ->label(trans('Payment Method'))
-                                            ->content(function (Order $record): string {
-                                                /** @var \Domain\Payments\Models\Payment $payment */
-                                                $payment = $record->payments->first();
-
-                                                return $payment->paymentMethod?->title ?? '';
-                                            }),
-                                        Forms\Components\Placeholder::make('shipping_method')
-                                            ->label(trans('Shipping Method'))
-                                            ->content(function (Order $record): string {
-                                                if ($record->shipping_method_id) {
-                                                    /** @var \Domain\ShippingMethod\Models\ShippingMethod $shippingMethod */
-                                                    $shippingMethod = $record->shippingMethod;
-
-                                                    return $shippingMethod->title;
-                                                }
-
-                                                return '';
-                                            }),
-                                    ]),
-                            ])->collapsible(),
-                    ])->columnSpan(2),
-                self::summaryCard(),
             ])->columns(3);
     }
 
@@ -444,8 +577,7 @@ class OrderResource extends Resource
                     ->dateTime(),
                 Tables\Columns\TextColumn::make('status')
                     ->translateLabel()
-                    ->sortable()
-                    ->formatStateUsing(fn (OrderStatuses $state) => $state->getCustomLabel()),
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('created_at')
@@ -542,556 +674,5 @@ class OrderResource extends Resource
             'view' => OrderResource\Pages\ViewOrder::route('/{record}'),
             'details' => OrderResource\Pages\ViewOrderDetails::route('/details/{record}'),
         ];
-    }
-
-    public static function summaryCard(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make(trans('Summary'))
-            ->schema([
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Support\BadgeLabel::make(trans('status'))
-                            ->formatStateUsing(function (string $state): string {
-                                if ($state == OrderStatuses::FORPAYMENT->value) {
-                                    return trans('For Payment');
-                                } elseif ($state == OrderStatuses::FORAPPROVAL->value) {
-                                    return 'For Approval';
-                                }
-
-                                return trans(ucfirst($state));
-                            })
-                            ->color(function ($state) {
-                                $newState = str_replace(' ', '_', strtolower($state));
-
-                                return match ($newState) {
-                                    OrderStatuses::FORAPPROVAL->value => 'warning',
-                                    OrderStatuses::REFUNDED->value,
-                                    OrderStatuses::CANCELLED->value => 'danger',
-                                    OrderStatuses::FULFILLED->value,
-                                    OrderStatuses::DELIVERED->value => 'success',
-                                    OrderStatuses::PROCESSING->value,
-                                    OrderStatuses::PACKED->value,
-                                    OrderStatuses::SHIPPED->value => 'primary',
-                                    default => 'secondary',
-                                };
-                            })
-                            ->inline()
-                            ->alignLeft(),
-                        self::summaryEditButton(),
-                    ]),
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Support\TextLabel::make('')
-                            ->label(trans('Order Date'))
-                            ->alignLeft()
-                            ->size('md')
-                            ->inline()
-                            ->readOnly(),
-                        Support\TextLabel::make('created_at')
-                            ->alignRight()
-                            ->size('md')
-                            ->inline()
-                            ->formatStateUsing(function ($state) {
-                                /** @var string */
-                                $timeZone = Filament::auth()->user()?->timezone;
-
-                                $formattedState = now()->parse($state)
-                                    ->setTimezone($timeZone)
-                                    ->translatedFormat('F d, Y g:i A');
-
-                                return $formattedState;
-                            }),
-                    ]),
-                self::summaryMarkAsPaidButton(),
-                self::summaryProofOfPaymentButton(),
-                Support\Divider::make(''),
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Support\TextLabel::make('')
-                            ->label(trans('Subtotal'))
-                            ->alignLeft()
-                            ->size('md')
-                            ->inline()
-                            ->readOnly(),
-                        Support\TextLabel::make('sub_total')
-                            ->formatStateUsing(fn (Order $record) => $record->currency_symbol.' '.number_format($record->sub_total, 2, '.', ','))
-                            ->alignRight()
-                            ->size('md')
-                            ->inline(),
-                    ]),
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Support\TextLabel::make('')
-                            ->label(trans('Total Shipping Fee'))
-                            ->alignLeft()
-                            ->size('md')
-                            ->inline()
-                            ->readOnly(),
-                        Support\TextLabel::make('shipping_total')
-                            ->alignRight()
-                            ->size('md')
-                            ->inline()
-                            ->formatStateUsing(fn (Order $record) => $record->currency_symbol.' '.number_format($record->shipping_total, 2, '.', ',')),
-                    ]),
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Support\TextLabel::make('')
-                            ->label(fn (Order $record) => trans("Tax Total ( $record->tax_percentage% )"))
-                            ->alignLeft()
-                            ->size('md')
-                            ->inline()
-                            ->readOnly(),
-                        Support\TextLabel::make('tax_total')
-                            ->alignRight()
-                            ->size('md')
-                            ->inline()
-                            ->formatStateUsing(function (Order $record) {
-                                if ($record->tax_total) {
-                                    return $record->currency_symbol.' '.number_format($record->tax_total, 2, '.', ',');
-                                }
-
-                                return $record->currency_symbol.' '.'0.00';
-                            }),
-                    ])->hidden(fn (Order $record) => $record->tax_display == PriceDisplay::INCLUSIVE),
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Support\TextLabel::make('')
-                            ->label(trans('Total Discount'))
-                            ->alignLeft()
-                            ->size('md')
-                            ->inline()
-                            ->readOnly(),
-                        Support\TextLabel::make('discount_total')
-                            ->alignRight()
-                            ->size('md')
-                            ->inline()
-                            ->formatStateUsing(function (Order $record) {
-                                if ($record->discount_total) {
-                                    return $record->currency_symbol.' '.number_format($record->discount_total, 2, '.', ',');
-                                }
-
-                                return $record->currency_symbol.' '.'0.00';
-                            }),
-                    ])->hidden(fn (Order $record) => $record->discount_total == 0),
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Support\TextLabel::make('')
-                            ->label(trans('Discount Code'))
-                            ->alignLeft()
-                            ->size('md')
-                            ->inline()
-                            ->readOnly(),
-                        Support\TextLabel::make('discount_code')
-                            ->alignRight()
-                            ->size('md')
-                            ->inline(),
-                    ])
-                    ->hidden(fn (Order $record) => is_null($record->discount_code)),
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Support\TextLabel::make('')
-                            ->label(trans('Grand Total'))
-                            ->alignLeft()
-                            ->size('md')
-                            ->color('primary')
-                            ->inline()
-                            ->readOnly(),
-                        Support\TextLabel::make('total')
-                            ->alignRight()
-                            ->size('md')
-                            ->color('primary')
-                            ->inline()
-                            ->formatStateUsing(
-                                fn (Order $record) => $record->currency_symbol.' '.
-                                    number_format(
-                                        $record->total,
-                                        2,
-                                        '.',
-                                        ',')
-                            ),
-                    ]),
-            ])->columnSpan(1);
-    }
-
-    private static function summaryEditButton(): Support\ButtonAction
-    {
-        return Support\ButtonAction::make('Edit')
-            ->execute(
-                fn (Order $record, Get $get, Set $set) => Forms\Components\Actions\Action::make('edit')
-                    ->color('primary')
-                    ->label(trans('Edit'))
-                    ->size('sm')
-                    ->modalHeading(trans('Edit Status'))
-                    ->modalWidth('xl')
-                    ->form([
-                        Forms\Components\Select::make('status_options')
-                            ->label('')
-                            ->options(function () use ($record) {
-                                $options = [
-                                    OrderStatuses::PENDING->value => trans('Pending'),
-                                    OrderStatuses::FORPAYMENT->value => trans('For Payment'),
-                                    OrderStatuses::FORAPPROVAL->value => trans('For Approval'),
-                                    OrderStatuses::PROCESSING->value => trans('Processing'),
-                                    OrderStatuses::CANCELLED->value => trans('Cancelled'),
-                                    OrderStatuses::REFUNDED->value => trans('Refunded'),
-                                    OrderStatuses::PACKED->value => trans('Packed'),
-                                    OrderStatuses::SHIPPED->value => trans('Shipped'),
-                                    OrderStatuses::DELIVERED->value => trans('Delivered'),
-                                ];
-
-                                if ($record->is_paid) {
-                                    $options[OrderStatuses::FULFILLED->value] = trans('Fulfilled');
-                                }
-
-                                return $options;
-                            })
-                            ->selectablePlaceholder()
-                            ->formatStateUsing(fn () => $record->status),
-                        Forms\Components\Toggle::make('send_email')
-                            ->label(trans('Send email notification'))
-                            ->default(false)
-                            ->reactive(),
-                        Forms\Components\Textarea::make('email_remarks')
-                            ->maxLength(255)
-                            ->label(trans('Remarks'))
-                            ->visible(fn (Get $get) => $get('send_email') == true)
-                            ->dehydrateStateUsing(function (?string $state) use ($get) {
-                                if (filled($state) && $get('send_email') == true) {
-                                    return $state;
-                                }
-
-                                return null;
-                            }),
-                    ])
-                    ->action(
-                        function (array $data, $livewire) use ($record, $set) {
-
-                            DB::transaction(function () use ($data, $livewire, $record, $set) {
-                                $shouldSendEmail = $livewire->mountedFormComponentActionData['send_email'];
-                                $emailRemarks = $livewire->mountedFormComponentActionData['email_remarks'];
-
-                                if ($shouldSendEmail) {
-                                    $fromEmail = app(OrderSettings::class)->email_sender_name;
-
-                                    if (empty($fromEmail)) {
-                                        Notification::make()
-                                            ->title(trans('Email sender not found, please update your order settings.'))
-                                            ->warning()
-                                            ->send();
-
-                                        return;
-                                    }
-                                }
-
-                                $status = $data['status_options'];
-                                $updateData = ['status' => $status];
-
-                                if ($status == OrderStatuses::CANCELLED->value) {
-                                    if (! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
-                                        Notification::make()
-                                            ->title(trans("You can't cancel this order."))
-                                            ->warning()
-                                            ->send();
-
-                                        return;
-                                    }
-
-                                    $updateData['cancelled_at'] = now();
-
-                                    $order = $record;
-
-                                    /** @var \Domain\Payments\Models\Payment $payment */
-                                    $payment = $order->payments->first();
-
-                                    $payment->update([
-                                        'status' => 'cancelled',
-                                    ]);
-                                }
-
-                                $result = $record->update($updateData);
-
-                                if ($result) {
-                                    $set('status', ucfirst($data['status_options']));
-                                    Notification::make()
-                                        ->title(trans('Order updated successfully'))
-                                        ->success()
-                                        ->send();
-                                }
-
-                                if ($record->customer_id) {
-                                    //registered
-                                    $customer = Customer::where('id', $record->customer_id)->first();
-                                    if ($customer) {
-                                        event(new AdminOrderStatusUpdatedEvent(
-                                            $record,
-                                            $shouldSendEmail,
-                                            $data['status_options'],
-                                            $emailRemarks,
-                                            $customer,
-                                        ));
-                                    }
-                                } else {
-                                    //guest
-                                    event(new AdminOrderStatusUpdatedEvent(
-                                        $record,
-                                        $shouldSendEmail,
-                                        $data['status_options'],
-                                        $emailRemarks
-                                    ));
-                                }
-                            });
-                        }
-                    ))
-            ->hiddenLabel()
-            ->columnSpan(1)
-            ->alignRight()
-            ->size('sm')
-            ->hidden(fn (Order $record) => $record->status == OrderStatuses::CANCELLED ||
-                    $record->status == OrderStatuses::FULFILLED);
-    }
-
-    private static function summaryMarkAsPaidButton(): Support\ButtonAction
-    {
-        return Support\ButtonAction::make(trans('mark_as_paid'))
-            ->hiddenLabel()
-            ->execute(function (Order $record, Set $set) {
-                $order = $record;
-
-                return Forms\Components\Actions\Action::make('mark_as_paid')
-                    ->color(function () use ($order) {
-                        if ($order->is_paid) {
-                            return 'secondary';
-                        }
-
-                        return 'primary';
-                    })
-                    ->label(function () use ($order) {
-                        if ($order->is_paid) {
-                            return trans('Unmark as paid');
-                        }
-
-                        return trans('Mark as paid');
-                    })
-                    ->size('sm')
-                    ->action(function () use ($order, $set) {
-                        DB::transaction(function () use ($order, $set) {
-                            $isPaid = ! $order->is_paid;
-
-                            $result = $order->update([
-                                'is_paid' => $isPaid,
-                            ]);
-
-                            if ($result) {
-                                /** @var \Domain\Payments\Models\Payment $payment */
-                                $payment = $order->payments->first();
-
-                                if ($order->is_paid) {
-                                    $payment->update([
-                                        'status' => 'paid',
-                                    ]);
-                                } else {
-                                    $payment->update([
-                                        'status' => 'pending',
-                                    ]);
-                                }
-
-                                $set('is_paid', $isPaid);
-                                Notification::make()
-                                    ->title(trans('Order marked successfully'))
-                                    ->success()
-                                    ->send();
-                            }
-                        });
-                    })
-                    ->requiresConfirmation();
-            })
-            ->fullWidth()
-            ->size('md')
-            ->hidden(
-                fn (Order $record) => $record->status == OrderStatuses::CANCELLED ||
-                $record->status == OrderStatuses::FULFILLED
-            );
-    }
-
-    private static function summaryProofOfPaymentButton(): Support\ButtonAction
-    {
-        return Support\ButtonAction::make('proof_of_payment')
-            ->hiddenLabel()
-            ->execute(function (Order $record, Set $set) {
-                $footerActions = self::showProofOfPaymentActions($record, $set);
-
-                $order = $record;
-
-                /** @var \Domain\Payments\Models\Payment $payment */
-                $payment = $order->payments->first();
-
-                if (! is_null($payment->remarks)) {
-                    return $footerActions->modalActions([])->disableForm();
-                }
-
-                return $footerActions;
-            })
-            ->fullWidth()
-            ->size('md')
-            ->hidden(function (Order $record) {
-                $order = $record;
-
-                /** @var \Domain\Payments\Models\Payment $payment */
-                $payment = $order->payments->first();
-
-                if ($payment->gateway == 'bank-transfer') {
-                    return (bool) (empty($order->payments->first()?->getFirstMediaUrl('image')));
-                }
-
-                return true;
-            });
-    }
-
-    private static function showProofOfPaymentActions(Order $record, Closure $set): Forms\Components\Actions\Action
-    {
-        $order = $record;
-
-        return Forms\Components\Actions\Action::make('proof_of_payment')
-            ->color('gray')
-            ->label(trans('View Proof of payment'))
-            ->size('sm')
-            ->action(function (array $data) use ($order, $set) {
-                DB::transaction(function () use ($data, $order, $set) {
-
-                    $paymentRemarks = $data['payment_remarks'];
-                    $message = $data['message'];
-
-                    /** @var \Domain\Payments\Models\Payment $payment */
-                    $payment = $order->payments->first();
-
-                    if (! is_null($payment->remarks)) {
-                        Notification::make()
-                            ->title(trans('Invalid action.'))
-                            ->warning()
-                            ->send();
-
-                        return;
-                    }
-
-                    $result = $payment->update([
-                        'remarks' => $paymentRemarks,
-                        'admin_message' => $message,
-                    ]);
-
-                    if ($result) {
-                        $isPaid = $paymentRemarks == 'approved' ? true : false;
-
-                        $order->update([
-                            'is_paid' => $isPaid,
-                        ]);
-
-                        if ($isPaid) {
-                            $payment->update([
-                                'status' => 'paid',
-                            ]);
-
-                            $order->update([
-                                'status' => OrderStatuses::PROCESSING,
-                            ]);
-
-                            $set('status', ucfirst(OrderStatuses::PROCESSING->value));
-                        } else {
-                            $payment->update([
-                                'status' => 'cancelled',
-                            ]);
-
-                            $order->update([
-                                'status' => OrderStatuses::CANCELLED,
-                            ]);
-
-                            $set('status', ucfirst(OrderStatuses::CANCELLED->value));
-                        }
-
-                        Notification::make()
-                            ->title(trans('Proof of payment updated successfully'))
-                            ->success()
-                            ->send();
-
-                        $customer = Customer::where('id', $order->customer_id)->first();
-
-                        if ($customer) {
-                            event(new AdminOrderBankPaymentEvent(
-                                $customer,
-                                $order,
-                                $paymentRemarks,
-                            ));
-                        }
-                    }
-                });
-            })
-            ->modalHeading(trans('Proof of Payment'))
-            ->modalWidth('lg')
-            ->form([
-                Forms\Components\Textarea::make('customer_message')
-                    ->label(trans('Customer Message'))
-                    ->formatStateUsing(function () use ($order) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
-
-                        return $payment->customer_message;
-                    })
-                    ->disabled(),
-
-                Forms\Components\FileUpload::make('bank_proof_image')
-                    ->label(trans('Customer Upload'))
-                    ->formatStateUsing(fn () => $order->payments->first()?->getMedia('image')
-                        ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                        ->toArray() ?? [])
-                    ->hidden(fn () => empty($order->payments->first()?->getFirstMediaUrl('image')))
-                    ->image()
-                    ->getUploadedFileUrlUsing(static function (
-                        Forms\Components\FileUpload $component,
-                        string $file
-                    ): ?string {
-                        $mediaClass = config('media-library.media_model', Media::class);
-
-                        /** @var ?Media $media */
-                        $media = $mediaClass::findByUuid($file);
-
-                        if ($component->getVisibility() === 'private') {
-                            try {
-                                return $media?->getTemporaryUrl(now()->addMinutes(5));
-                            } catch (Throwable) {
-                            }
-                        }
-
-                        return $media?->getUrl();
-                    })
-                    ->disabled(),
-                Forms\Components\Select::make('payment_remarks')
-                    ->label('Status')
-                    ->options([
-                        'approved' => 'Approved',
-                        'declined' => 'Declined',
-                    ])
-                    ->selectablePlaceholder(function () use ($order) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
-
-                        return in_array($payment->remarks, ['approved', 'declined']);
-                    })
-                    ->formatStateUsing(function () use ($order) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
-
-                        return $payment->remarks;
-                    }),
-                Forms\Components\Textarea::make('message')
-                    ->maxLength(255)
-                    ->label(trans('Admin Message'))
-                    ->formatStateUsing(function () use ($order) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
-
-                        return $payment->admin_message;
-                    }),
-            ])
-            ->slideOver()
-            ->icon('heroicon-s-eye');
     }
 }

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Order\Enums;
 
+use Domain\Order\Models\Order;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 enum OrderStatuses: string implements HasColor, HasLabel
@@ -41,14 +43,14 @@ enum OrderStatuses: string implements HasColor, HasLabel
         return Str::headline($this->value);
     }
 
-    public function getCustomLabel(): string
+    public static function forOrderUpdate(Order $order)
     {
-        if ($this === OrderStatuses::FORPAYMENT) {
-            return 'For Payment';
-        } elseif ($this === OrderStatuses::FORAPPROVAL) {
-            return 'For Approval';
-        }
-
-        return $this->getLabel();
+        return collect(self::cases())
+            ->when(
+                ! $order->is_paid,
+                fn (Collection $cases) => $cases->reject(
+                    fn (self $case) => $case === self::FULFILLED
+                )
+            );
     }
 }
