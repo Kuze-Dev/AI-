@@ -6,7 +6,7 @@
     "require": {
         "php": "^8.2.11",
         "ext-pdo": "*",
-        "aws/aws-sdk-php": "^3.298.9",
+        "aws/aws-sdk-php": "^3.298.10",
         "bacon/bacon-qr-code": "^2.0.8",
         "barryvdh/laravel-dompdf": "^2.0.1",
         "fakerphp/faker": "^1.23.1",
@@ -50,8 +50,8 @@
         "vyuldashev/xml-to-array": "^1.1"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.10.2",
-        "barryvdh/laravel-ide-helper": "^2.14",
+        "barryvdh/laravel-debugbar": "^3.10.4",
+        "barryvdh/laravel-ide-helper": "^2.15",
         "beyondcode/helo-laravel": "^1.7",
         "canvural/larastan-strict-rules": "^2.1.10",
         "driftingly/rector-laravel": "^1.0",

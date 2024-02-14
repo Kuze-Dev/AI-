@@ -27,17 +27,12 @@ class ViewOrderDetails extends ViewRecord
 
     public function getHeading(): string|Htmlable
     {
-        return trans('Order #:order', ['order' => $this->record->reference]);
-    }
-
-    public function getRecordTitle(): string|Htmlable
-    {
-        return parent::getRecordTitle().' '.trans('Details');
+        return trans('Order Details #:order', ['order' => $this->record->reference]);
     }
 
     public function getBreadcrumb(): string
     {
-        return trans('Details');
+        return trans('View details');
     }
 
     public function getRelationManagers(): array
