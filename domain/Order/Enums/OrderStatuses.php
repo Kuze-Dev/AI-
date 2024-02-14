@@ -6,11 +6,12 @@ namespace Domain\Order\Enums;
 
 use Domain\Order\Models\Order;
 use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-enum OrderStatuses: string implements HasColor, HasLabel
+enum OrderStatuses: string implements HasColor, HasLabel //, HasIcon
 {
     case PROCESSING = 'processing';
     case PENDING = 'pending';
@@ -53,4 +54,20 @@ enum OrderStatuses: string implements HasColor, HasLabel
                 )
             );
     }
+
+    //    public function getIcon(): ?string
+    //    {
+    //        return match ($this) {
+    //            self::PROCESSING => 'icon-processing',
+    //            self::PENDING => 'icon-pending',
+    //            self::CANCELLED => 'icon-cancelled',
+    //            self::REFUNDED => 'icon-refunded',
+    //            self::PACKED => 'icon-packed',
+    //            self::SHIPPED => 'icon-shipped',
+    //            self::DELIVERED => 'icon-delivered',
+    //            self::FULFILLED => 'icon-fulfilled',
+    //            self::FORPAYMENT => 'icon-for-payment',
+    //            self::FORAPPROVAL => 'icon-for-approval',
+    //        };
+    //    }
 }

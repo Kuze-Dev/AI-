@@ -464,7 +464,7 @@ class OrderResource extends Resource
                                         }
 
                                         if ($payment->gateway === 'bank-transfer') {
-                                            return blank($payment->getFirstMediaUrl('image'));
+                                            return $payment->getFirstMedia('image') === null;
                                         }
 
                                         return true;
@@ -671,7 +671,7 @@ class OrderResource extends Resource
         return [
             'index' => OrderResource\Pages\ListOrders::route('/'),
             'view' => OrderResource\Pages\ViewOrder::route('/{record}'),
-            'details' => OrderResource\Pages\ViewOrderDetails::route('/details/{record}'),
+            'details' => OrderResource\Pages\ViewOrderDetails::route('/{record}/details'),
         ];
     }
 }

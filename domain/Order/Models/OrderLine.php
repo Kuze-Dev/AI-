@@ -133,6 +133,7 @@ class OrderLine extends Model implements HasMedia
         };
 
         $this->addMediaCollection('order_line_images')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
             ->onlyKeepLatest(5)
             ->registerMediaConversions($registerMediaConversions);
 
@@ -147,5 +148,10 @@ class OrderLine extends Model implements HasMedia
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    public function purchasable()
+    {
+        return $this->morphTo();
     }
 }
