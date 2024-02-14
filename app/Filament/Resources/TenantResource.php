@@ -90,6 +90,7 @@ class TenantResource extends Resource
                             ->relationship()
                             ->reorderable(false)
                             ->minItems(1)
+                            ->required()
                             ->simple(
                                 Forms\Components\TextInput::make('domain')
                                     ->required()
@@ -107,53 +108,72 @@ class TenantResource extends Resource
                     ->schema([
                         FeatureSelector::make('features')
                             ->options([
-                                Features\CMS\CMSBase::class => [
-                                    'label' => trans('CMS'),
-                                    'extras' => [
-                                        Features\CMS\Internationalization::class => app(Features\CMS\Internationalization::class)->label,
-                                        Features\CMS\SitesManagement::class => app(Features\CMS\SitesManagement::class)->label,
-                                    ],
-                                ],
-                                Features\Customer\CustomerBase::class => [
-                                    'label' => trans('Customer'),
-                                    'extras' => [
-                                        Features\Customer\TierBase::class => app(Features\Customer\TierBase::class)->label,
-                                        Features\Customer\AddressBase::class => app(Features\Customer\AddressBase::class)->label,
-                                    ],
-                                ],
-                                Features\ECommerce\ECommerceBase::class => [
-                                    'label' => trans('eCommerce'),
-                                    'extras' => [
-                                        Features\ECommerce\ColorPallete::class => 'Collor Pallete (Color Selector)',
-                                        Features\ECommerce\ProductBatchUpdate::class => 'Product Batch Update',
-                                        Features\ECommerce\AllowGuestOrder::class => 'Allow Guest Orders',
-                                        Features\ECommerce\RewardPoints::class => app(Features\ECommerce\RewardPoints::class)->label,
-                                    ],
-                                ],
-                                Features\Service\ServiceBase::class => [
-                                    'label' => trans('Service'),
-                                    'extras' => [],
-                                ],
-
-                                Features\Shopconfiguration\ShopconfigurationBase::class => [
-                                    'label' => trans('Shop Configuration'),
-                                    'extras' => [
-                                        Features\Shopconfiguration\TaxZone::class => app(Features\Shopconfiguration\TaxZone::class)->label,
-                                        'Payments' => [
-                                            Features\Shopconfiguration\PaymentGateway\PaypalGateway::class => app(Features\Shopconfiguration\PaymentGateway\PaypalGateway::class)->label,
-                                            Features\Shopconfiguration\PaymentGateway\StripeGateway::class => app(Features\Shopconfiguration\PaymentGateway\StripeGateway::class)->label,
-                                            Features\Shopconfiguration\PaymentGateway\OfflineGateway::class => app(Features\Shopconfiguration\PaymentGateway\OfflineGateway::class)->label,
-                                            Features\Shopconfiguration\PaymentGateway\BankTransfer::class => app(Features\Shopconfiguration\PaymentGateway\BankTransfer::class)->label,
-                                        ],
-                                        'shipping' => [
-                                            Features\Shopconfiguration\Shipping\ShippingStorePickup::class => app(Features\Shopconfiguration\Shipping\ShippingStorePickup::class)->label,
-                                            Features\Shopconfiguration\Shipping\ShippingUsps::class => app(Features\Shopconfiguration\Shipping\ShippingUsps::class)->label,
-                                            Features\Shopconfiguration\Shipping\ShippingUps::class => app(Features\Shopconfiguration\Shipping\ShippingUps::class)->label,
-                                            Features\Shopconfiguration\Shipping\ShippingAusPost::class => app(Features\Shopconfiguration\Shipping\ShippingAusPost::class)->label,
-                                        ],
-                                    ],
-                                ],
-
+                                new Features\GroupFeature(
+                                    base: Features\CMS\CMSBase::class,
+                                    extra: [
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\CMS\Internationalization::class,
+                                                Features\CMS\SitesManagement::class,
+                                            ],
+                                        ),
+                                    ]
+                                ),
+                                new Features\GroupFeature(
+                                    base: Features\Customer\CustomerBase::class,
+                                    extra: [
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\Customer\TierBase::class,
+                                                Features\Customer\AddressBase::class,
+                                            ],
+                                        ),
+                                    ]
+                                ),
+                                new Features\GroupFeature(
+                                    base: Features\ECommerce\ECommerceBase::class,
+                                    extra: [
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\ECommerce\ColorPallete::class,
+                                                Features\ECommerce\ProductBatchUpdate::class,
+                                                Features\ECommerce\AllowGuestOrder::class,
+                                                Features\ECommerce\RewardPoints::class,
+                                            ],
+                                        ),
+                                    ]
+                                ),
+                                new Features\GroupFeature(
+                                    base: Features\Service\ServiceBase::class,
+                                ),
+                                new Features\GroupFeature(
+                                    base: Features\Shopconfiguration\ShopconfigurationBase::class,
+                                    extra: [
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\Shopconfiguration\TaxZone::class,
+                                            ],
+                                        ),
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\Shopconfiguration\PaymentGateway\PaypalGateway::class,
+                                                Features\Shopconfiguration\PaymentGateway\StripeGateway::class,
+                                                Features\Shopconfiguration\PaymentGateway\OfflineGateway::class,
+                                                Features\Shopconfiguration\PaymentGateway\BankTransfer::class,
+                                            ],
+                                            groupLabel: trans('Payments'),
+                                        ),
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\Shopconfiguration\Shipping\ShippingStorePickup::class,
+                                                Features\Shopconfiguration\Shipping\ShippingUsps::class,
+                                                Features\Shopconfiguration\Shipping\ShippingUps::class,
+                                                Features\Shopconfiguration\Shipping\ShippingAusPost::class,
+                                            ],
+                                            groupLabel: trans('Shipping'),
+                                        ),
+                                    ]
+                                ),
                             ]),
                     ])
                     ->hidden(
@@ -182,7 +202,11 @@ class TenantResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('domains.domain')
-                    ->badge(),
+                    ->badge()
+                    ->url(
+                        fn (Tenant $record) => $record->domainFirstUrl(),
+                        shouldOpenInNewTab: true
+                    ),
                 Tables\Columns\TextColumn::make('total_api_request'),
                 Tables\Columns\IconColumn::make('is_suspended')
                     ->label(trans('Active'))

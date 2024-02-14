@@ -40,6 +40,7 @@ class TenantPanelProvider extends PanelProvider
             ->id('tenant')
             ->path('admin')
             ->authGuard('admin')
+            ->authPasswordBroker('admin')
             ->login(Login::class)
             ->profile(EditProfile::class)
             ->passwordReset()
@@ -64,12 +65,12 @@ class TenantPanelProvider extends PanelProvider
                 DeployStaticSite::class,
             ])
             ->navigationGroups([
-                NavigationGroup::make()->label(trans('Shop Configuration')),
-                NavigationGroup::make()->label(trans('Customer Management')),
-                NavigationGroup::make()->label(trans('CMS')),
-                NavigationGroup::make()->label(trans('eCommerce')),
-                NavigationGroup::make()->label(trans('Access')),
-                NavigationGroup::make()->label(trans('System')),
+                NavigationGroup::make()->label(fn () => trans('Shop Configuration')),
+                NavigationGroup::make()->label(fn () => trans('Customer Management')),
+                NavigationGroup::make()->label(fn () => trans('CMS')),
+                NavigationGroup::make()->label(fn () => trans('eCommerce')),
+                NavigationGroup::make()->label(fn () => trans('Access')),
+                NavigationGroup::make()->label(fn () => trans('System')),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
@@ -88,7 +89,7 @@ class TenantPanelProvider extends PanelProvider
             ])
             ->middleware(
                 [
-                    'universal',
+                    //                    'universal', // PreventAccessFromCentralDomains does not work properly
                     'tenant',
                 ],
                 isPersistent: true

@@ -40,6 +40,7 @@ class AdminPanelProvider extends PanelProvider
             ->domains(config('tenancy.central_domains'))
             ->path('admin')
             ->authGuard('admin')
+            ->authPasswordBroker('admin')
             ->login(Login::class)
             ->profile(EditProfile::class)
             ->passwordReset()
@@ -61,12 +62,12 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
             ])
             ->navigationGroups([
-                NavigationGroup::make()->label(trans('Access')),
-                NavigationGroup::make()->label(trans('System')),
+                NavigationGroup::make()->label(fn () => trans('Access')),
+                NavigationGroup::make()->label(fn () => trans('System')),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
-            ->unsavedChangesAlerts()
+            ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
             ->maxContentWidth(MaxWidth::Full)
             ->middleware([
                 EncryptCookies::class,

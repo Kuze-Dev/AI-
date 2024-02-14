@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources\OrderResource\Pages;
 
 use App\FilamentTenant\Resources\OrderResource;
 use App\FilamentTenant\Support;
+use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Forms;
@@ -14,13 +15,16 @@ use Illuminate\Contracts\Support\Htmlable;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
+/**
+ * @property-read Order $record
+ */
 class ViewOrderDetails extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
 
     public function getHeading(): string|Htmlable
     {
-        return trans('Order Details #').$this->record->reference;
+        return trans('Order #:order', ['order' => $this->record->reference]);
     }
 
     public function getRelationManagers(): array
@@ -52,22 +56,17 @@ class ViewOrderDetails extends ViewRecord
                     Forms\Components\Group::make()
                         ->schema([
                             Support\Carousel::make('order_line_carousel')
-                                ->value(function () use ($orderLine) {
-                                    return $orderLine?->getMedia('order_line_images')->toArray() ?? [];
-                                }),
+                                ->value(fn () => $orderLine?->getMedia('order_line_images')->toArray() ?? []),
                             Forms\Components\Group::make()
                                 ->schema([
                                     Forms\Components\FileUpload::make('image_'.$sectionIndex)
-                                        ->formatStateUsing(function () use ($orderLine) {
-
-                                            return $orderLine?->getMedia('order_line_images')
-                                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                                ->toArray() ?? [];
-                                        })
-                                        ->disableLabel()
-                                        ->hidden(function () use ($orderLine) {
-                                            return (bool) (empty($orderLine->getFirstMediaUrl('order_line_images')));
-                                        })
+                                        ->formatStateUsing(fn () => $orderLine?->getMedia('order_line_images')
+                                            ->mapWithKeys(
+                                                fn (Media $file) => [$file->uuid => $file->uuid])
+                                            ->toArray() ?? []
+                                        )
+                                        ->hiddenLabel()
+                                        ->hidden(fn () => empty($orderLine->getFirstMediaUrl('order_line_images')))
                                         ->image()
                                         ->imagePreviewHeight('120')
                                         ->getUploadedFileUrlUsing(static function (
@@ -122,9 +121,15 @@ class ViewOrderDetails extends ViewRecord
                                                         ->content($orderLine->quantity),
                                                     Forms\Components\Placeholder::make('amount_'.$sectionIndex)
                                                         ->label(trans('Amount'))
-                                                        ->content(function () use ($orderLine) {
-                                                            return $orderLine->order->currency_symbol.' '.number_format($orderLine->sub_total, 2, '.', '');
-                                                        }),
+                                                        ->content(
+                                                            fn () => $orderLine->order->currency_symbol.' '.
+                                                                number_format(
+                                                                    $orderLine->sub_total,
+                                                                    2,
+                                                                    '.',
+                                                                    ''
+                                                                )
+                                                        ),
                                                 ]),
                                         ]),
                                 ])
@@ -142,59 +147,55 @@ class ViewOrderDetails extends ViewRecord
     private function viewRemarksButton(OrderLine $orderLine, int $sectionIndex): Support\ButtonAction
     {
         return Support\ButtonAction::make('view_remarks_'.$sectionIndex)
-            ->disableLabel()
-            ->execute(function () use ($sectionIndex, $orderLine) {
-                return Forms\Components\Actions\Action::make('view_remarks_btn_'.$sectionIndex)
-                    ->color('gray')
-                    ->label(trans('View Remarks'))
-                    ->size('sm')
-                    ->action(function () {
-                    })
-                    ->modalActions([])
-                    ->modalHeading(trans('Customer Remarks'))
-                    ->modalWidth('lg')
-                    ->form([
-                        Forms\Components\Placeholder::make('remarks_'.$sectionIndex)
-                            ->label(trans('Remarks'))
-                            ->hidden(is_null($orderLine->remarks_data) ? true : false)
-                            ->content($orderLine->remarks_data['notes'] ?? ''),
-                        Forms\Components\FileUpload::make('customer_upload_'.$sectionIndex)
-                            ->label(trans('Customer Upload'))
-                            ->formatStateUsing(function () use ($orderLine) {
-                                return $orderLine->getMedia('order_line_notes')
-                                    ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                    ->toArray();
-                            })
-                            ->hidden(function () use ($orderLine) {
-                                return (bool) (empty($orderLine->getFirstMediaUrl('order_line_notes')));
-                            })
-                            ->disabled()
-                            ->multiple()
-                            ->image()
-                            ->getUploadedFileUrlUsing(static function (
-                                Forms\Components\FileUpload $component,
-                                string $file
-                            ): ?string {
-                                $mediaClass = config('media-library.media_model', Media::class);
+            ->hiddenLabel()
+            ->execute(fn () => Forms\Components\Actions\Action::make('view_remarks_btn_'.$sectionIndex)
+                ->color('gray')
+                ->label(trans('View Remarks'))
+                ->size('sm')
+                ->action(function () {
+                })
+                ->modalFooterActions([])
+                ->modalHeading(trans('Customer Remarks'))
+                ->modalWidth('lg')
+                ->form([
+                    Forms\Components\Placeholder::make('remarks_'.$sectionIndex)
+                        ->label(trans('Remarks'))
+                        ->hidden(is_null($orderLine->remarks_data))
+                        ->content($orderLine->remarks_data['notes'] ?? ''),
+                    Forms\Components\FileUpload::make('customer_upload_'.$sectionIndex)
+                        ->label(trans('Customer Upload'))
+                        ->formatStateUsing(fn () => $orderLine->getMedia('order_line_notes')
+                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                            ->toArray())
+                        ->hidden(fn () => empty($orderLine->getFirstMediaUrl('order_line_notes')))
+                        ->disabled()
+                        ->multiple()
+                        ->image()
+                        ->getUploadedFileUrlUsing(static function (
+                            Forms\Components\FileUpload $component,
+                            string $file
+                        ): ?string {
+                            $mediaClass = config('media-library.media_model', Media::class);
 
-                                /** @var ?Media $media */
-                                $media = $mediaClass::findByUuid($file);
+                            /** @var ?Media $media */
+                            $media = $mediaClass::findByUuid($file);
 
-                                if ($component->getVisibility() === 'private') {
-                                    try {
-                                        return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                    } catch (Throwable) {
-                                    }
+                            if ($component->getVisibility() === 'private') {
+                                try {
+                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                } catch (Throwable) {
                                 }
+                            }
 
-                                return $media?->getUrl();
-                            }),
-                    ])
-                    ->slideOver()
-                    ->icon('heroicon-o-document');
-            })
-            ->hidden(is_null($orderLine->remarks_data) &&
-                empty($orderLine->getFirstMediaUrl('order_line_notes')) ? true : false)
+                            return $media?->getUrl();
+                        }),
+                ])
+                ->slideOver()
+                ->icon('heroicon-o-document'))
+            ->hidden(
+                is_null($orderLine->remarks_data) &&
+                empty($orderLine->getFirstMediaUrl('order_line_notes'))
+            )
             ->fullWidth()
             ->size('md');
     }

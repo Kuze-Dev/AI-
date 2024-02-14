@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TenantResource\Pages;
 
-use App\Features;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\TenantResource;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Str;
 
 /**
  * @property-read \Domain\Tenant\Models\Tenant $record
@@ -18,6 +16,7 @@ use Illuminate\Support\Str;
 class EditTenant extends EditRecord
 {
     use LogsFormActivity;
+    use Support;
 
     protected static string $resource = TenantResource::class;
 
@@ -41,72 +40,11 @@ class EditTenant extends EditRecord
         ];
     }
 
-    //    public function beforeSave(): void
-    //    {
-    //    }
-
     public function afterSave(): void
     {
         $data = $this->form->getRawState();
 
-        $tenant = $this->record;
+        $this->record->syncFeature(self::getNormalizedFeatureNames($data['features']));
 
-        $features = self::getNormalizedFeatureNames($data['features']);
-
-        $activeFeatures = array_keys(array_filter($tenant->features()->all()));
-        $inactiveFeatures = array_diff($activeFeatures, $features);
-
-        foreach ($inactiveFeatures as $inactiveFeature) {
-            $tenant->features()->deactivate($inactiveFeature);
-        }
-
-        foreach ($features as $feature) {
-            $tenant->features()->activate($feature);
-        }
-    }
-
-    private static function getNormalizedFeatureNames(array $features): array
-    {
-        $bases = [
-            Features\CMS\CMSBase::class,
-            Features\Customer\CustomerBase::class,
-            Features\ECommerce\ECommerceBase::class,
-            Features\Service\ServiceBase::class,
-            Features\Shopconfiguration\ShopconfigurationBase::class,
-        ];
-
-        $bases = collect($bases)
-            ->mapWithKeys(fn (string $base) => [class_basename($base) => $base])
-            ->toArray();
-
-        $results = [];
-        foreach ($features as $k => $extra) {
-            if (is_bool($extra)) {
-                if ($extra) {
-                    $results[] = $bases[$k];
-                }
-
-                continue;
-            }
-
-            if (
-                $features[
-                (string) Str::of('CMSBase_extras')
-                    ->before('_extra')
-                ] === false
-            ) {
-                continue;
-            }
-
-            foreach ($extra as $v) {
-                $results[] = $v;
-            }
-        }
-
-        foreach ($results as $k => $r) {
-            $results[$k] = app($r)->name;
-        }
-
-        return $results;
     }
 }

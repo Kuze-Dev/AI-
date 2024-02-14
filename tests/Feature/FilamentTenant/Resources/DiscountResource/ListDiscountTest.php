@@ -6,9 +6,10 @@ use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
 use Domain\Discount\Database\Factories\DiscountConditionFactory;
 use Domain\Discount\Database\Factories\DiscountFactory;
 use Domain\Discount\Database\Factories\DiscountRequirementFactory;
-use Filament\Pages\Actions\DeleteAction;
-use Filament\Pages\Actions\ForceDeleteAction;
-use Filament\Pages\Actions\RestoreAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;
@@ -58,6 +59,7 @@ it('can restore discount', function () {
         ->createOne();
 
     livewire(ListDiscounts::class)
+        ->filterTable(TrashedFilter::class)
         ->callTableAction(RestoreAction::class, $discount)
         ->assertOk();
 
@@ -72,6 +74,7 @@ it('can force delete discount', function () {
         ->createOne();
 
     livewire(ListDiscounts::class)
+        ->filterTable(TrashedFilter::class)
         ->callTableAction(ForceDeleteAction::class, $discount)
         ->assertOk();
 

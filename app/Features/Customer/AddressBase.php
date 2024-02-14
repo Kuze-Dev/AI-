@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Features\Customer;
 
+use App\Features\FeatureContract;
 use Domain\Tenant\Models\Tenant;
 
-class AddressBase
+class AddressBase implements FeatureContract
 {
     public string $name = 'customer.address-base';
-
-    public string $label = 'Address';
 
     public function resolve(Tenant $scope): mixed
     {
         return false;
+    }
+
+    public function getLabel(): string
+    {
+        return trans('Address');
     }
 }

@@ -9,7 +9,6 @@ use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableCo
 use Domain\Auth\HasActiveState;
 use Domain\Auth\TwoFactorAuthenticatable;
 use Domain\Site\Models\Site;
-use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
@@ -166,14 +165,6 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
-    }
-
-    public function sendEmailVerificationNotification(): void
-    {
-        $notification = new \Filament\Notifications\Auth\VerifyEmail();
-        $notification->url = Filament::getVerifyEmailUrl($this);
-
-        $this->notify($notification);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Spatie\Activitylog\Models\Activity> */

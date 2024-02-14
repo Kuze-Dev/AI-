@@ -22,16 +22,16 @@ class GetAvailablePaymentDriverAction
 
         return array_filter([
             'paypal' => $tenant?->features()->active(app(PaypalGateway::class)->name)
-                ? app(PaypalGateway::class)->label
+                ? app(PaypalGateway::class)->getLabel()
                 : false,
             'stripe' => $tenant?->features()->active(app(StripeGateway::class)->name)
-                ? app(StripeGateway::class)->label
+                ? app(StripeGateway::class)->getLabel()
                 : false,
             'manual' => $tenant?->features()->active(app(OfflineGateway::class)->name)
-                ? app(OfflineGateway::class)->label
+                ? app(OfflineGateway::class)->getLabel()
                 : false,
             'bank-transfer' => $tenant?->features()->active(app(BankTransfer::class)->name)
-                ? app(BankTransfer::class)->label
+                ? app(BankTransfer::class)->getLabel()
                 : false,
         ], fn ($value) => $value !== false);
 

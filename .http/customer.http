@@ -1,0 +1,11 @@
+@username = aa@aa.aa
+
+### Customer Request password email link
+
+POST {{ host }}/account/password/email
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "{{ username }}"
+}

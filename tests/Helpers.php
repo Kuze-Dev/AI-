@@ -68,6 +68,10 @@ function assertActivityLogged(
 
 function testInTenantContext(array|string|null $features = null): Tenant
 {
+    config([
+        'tenancy.database.suffix' => '_'.Str::random(7),
+    ]);
+
     Filament::setCurrentPanel(Filament::getPanels()['tenant']);
 
     /** @var Tenant */
