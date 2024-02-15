@@ -96,6 +96,8 @@ class ViewOrderDetails extends ViewRecord
                                             ->modalHeading(trans('Customer Remarks'))
                                             ->size('sm')
                                             ->disabledForm()
+                                            ->modalSubmitAction(false)
+                                            ->modalCancelAction(false)
                                             ->infolist(fn (OrderLine $record) => [
 
                                                 Infolists\Components\TextEntry::make('remarks_data')

@@ -194,124 +194,7 @@ final class Schema
                         ->alignCenter()
                         ->columnSpanFull(),
 
-                    Infolists\Components\Actions::make([
-                        Infolists\Components\Actions\Action::make('view_proof_of_payment')
-                            ->translateLabel()
-                            ->button()
-                            ->outlined()
-                            ->icon('heroicon-o-eye')
-                            ->slideOver()
-                            ->modalHeading(trans('Proof of Payment'))
-                            ->size('sm')
-                            ->disabledForm(function (Order $record) {
-
-                                /** @var Payment $payment */
-                                $payment = $record->payments->first();
-
-                                return $payment->remarks !== null;
-                            })
-                            ->form(fn (Order $record) => [
-
-                                Forms\Components\Textarea::make('customer_message')
-                                    ->translateLabel()
-                                    ->model(fn () => $record->payments[0])
-                                    ->disabled()
-                                    ->default(fn (Payment $record) => $record->customer_message),
-                                Forms\Components\SpatieMediaLibraryFileUpload::make('customer_upload')
-                                    ->translateLabel()
-                                    ->model(fn () => $record->payments[0])
-                                    ->collection('image')
-                                    ->disabled()
-                                    ->formatStateUsing(
-                                        fn (Payment $record) => $record->getMedia('image')
-                                            ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
-                                            ->toArray()
-                                    ),
-                                Forms\Components\Select::make('remarks')
-                                    ->label('Status')
-                                    ->model(fn () => $record->payments[0])
-                                    ->options([
-                                        'approved' => 'Approved',
-                                        'declined' => 'Declined',
-                                    ])
-                                    ->required()
-                                    ->in([
-                                        'approved',
-                                        'declined',
-                                    ])
-                                    ->default(fn (Payment $record) => $record->remarks),
-                                Forms\Components\Textarea::make('admin_message')
-                                    ->translateLabel()
-                                    ->model(fn () => $record->payments[0])
-                                    ->maxLength(255)
-                                    ->default(fn (Payment $record) => $record->admin_message),
-
-                            ])
-                            ->action(function (array $data, Order $record) {
-                                /** @var Payment $payment */
-                                $payment = $record->payments->first();
-
-                                if ($payment->remarks !== null) {
-                                    Notification::make()
-                                        ->title(trans('Invalid action.'))
-                                        ->warning()
-                                        ->send();
-
-                                    return;
-                                }
-
-                                DB::transaction(function () use ($payment, $data, $record) {
-
-                                    $result = $payment->update($data);
-
-                                    if (! $result) {
-                                        return;
-                                    }
-
-                                    $isPaid = $data['remarks'] === 'approved';
-
-                                    $record->update([
-                                        'is_paid' => $isPaid,
-                                    ]);
-
-                                    if ($isPaid) {
-                                        $payment->update([
-                                            'status' => 'paid',
-                                        ]);
-
-                                        $record->update([
-                                            'status' => OrderStatuses::PROCESSING,
-                                        ]);
-
-                                    } else {
-                                        $payment->update([
-                                            'status' => 'cancelled',
-                                        ]);
-
-                                        $record->update([
-                                            'status' => OrderStatuses::CANCELLED,
-                                        ]);
-
-                                    }
-
-                                    $customer = $record->customer;
-
-                                    if ($customer) {
-                                        event(new AdminOrderBankPaymentEvent(
-                                            $customer,
-                                            $record,
-                                            $data['remarks'],
-                                        ));
-                                    }
-
-                                    Notification::make()
-                                        ->title(trans('Proof of payment updated successfully'))
-                                        ->success()
-                                        ->send();
-
-                                });
-                            }),
-                    ])
+                    Infolists\Components\Actions::make([])
                         ->hidden(function (Order $record) {
 
                             /** @var Payment|null $payment */
@@ -329,7 +212,125 @@ final class Schema
                         })
                         ->fullWidth()
                         ->alignCenter()
-                        ->columnSpanFull(),
+                        ->columnSpanFull()
+                        ->actions([
+                            Infolists\Components\Actions\Action::make('view_proof_of_payment')
+                                ->translateLabel()
+                                ->button()
+                                ->outlined()
+                                ->icon('heroicon-o-eye')
+                                ->slideOver()
+                                ->modalHeading(trans('Proof of Payment'))
+                                ->size('sm')
+                                ->disabledForm(function (Order $record) {
+
+                                    /** @var Payment $payment */
+                                    $payment = $record->payments->first();
+
+                                    return $payment->remarks !== null;
+                                })
+                                ->form(fn (Order $record) => [
+
+                                    Forms\Components\Textarea::make('customer_message')
+                                        ->translateLabel()
+                                        ->model(fn () => $record->payments[0])
+                                        ->disabled()
+                                        ->default(fn (Payment $record) => $record->customer_message),
+                                    Forms\Components\SpatieMediaLibraryFileUpload::make('customer_upload')
+                                        ->translateLabel()
+                                        ->model(fn () => $record->payments[0])
+                                        ->collection('image')
+                                        ->disabled()
+                                        ->formatStateUsing(
+                                            fn (Payment $record) => $record->getMedia('image')
+                                                ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
+                                                ->toArray()
+                                        ),
+                                    Forms\Components\Select::make('remarks')
+                                        ->label('Status')
+                                        ->model(fn () => $record->payments[0])
+                                        ->options([
+                                            'approved' => 'Approved',
+                                            'declined' => 'Declined',
+                                        ])
+                                        ->required()
+                                        ->in([
+                                            'approved',
+                                            'declined',
+                                        ])
+                                        ->default(fn (Payment $record) => $record->remarks),
+                                    Forms\Components\Textarea::make('admin_message')
+                                        ->translateLabel()
+                                        ->model(fn () => $record->payments[0])
+                                        ->maxLength(255)
+                                        ->default(fn (Payment $record) => $record->admin_message),
+
+                                ])
+                                ->action(function (array $data, Order $record) {
+                                    /** @var Payment $payment */
+                                    $payment = $record->payments->first();
+
+                                    if ($payment->remarks !== null) {
+                                        Notification::make()
+                                            ->title(trans('Invalid action.'))
+                                            ->warning()
+                                            ->send();
+
+                                        return;
+                                    }
+
+                                    DB::transaction(function () use ($payment, $data, $record) {
+
+                                        $result = $payment->update($data);
+
+                                        if (! $result) {
+                                            return;
+                                        }
+
+                                        $isPaid = $data['remarks'] === 'approved';
+
+                                        $record->update([
+                                            'is_paid' => $isPaid,
+                                        ]);
+
+                                        if ($isPaid) {
+                                            $payment->update([
+                                                'status' => 'paid',
+                                            ]);
+
+                                            $record->update([
+                                                'status' => OrderStatuses::PROCESSING,
+                                            ]);
+
+                                        } else {
+                                            $payment->update([
+                                                'status' => 'cancelled',
+                                            ]);
+
+                                            $record->update([
+                                                'status' => OrderStatuses::CANCELLED,
+                                            ]);
+
+                                        }
+
+                                        $customer = $record->customer;
+
+                                        if ($customer) {
+                                            event(new AdminOrderBankPaymentEvent(
+                                                $customer,
+                                                $record,
+                                                $data['remarks'],
+                                            ));
+                                        }
+
+                                        Notification::make()
+                                            ->title(trans('Proof of payment updated successfully'))
+                                            ->success()
+                                            ->send();
+
+                                    });
+                                }),
+                        ]),
 
                     Infolists\Components\TextEntry::make('sub_total')
                         ->translateLabel()
