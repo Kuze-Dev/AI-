@@ -13,11 +13,7 @@ use Domain\Payments\Models\Payment;
 use Filament\Forms;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Infolists\Components\Actions;
-use Filament\Infolists\Components\Actions\Action;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\TextEntry\TextEntrySize;
+use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -31,19 +27,19 @@ final class Schema
     public static function summarySchema(): array
     {
         return [
-            Section::make()
+            Infolists\Components\Section::make()
                 ->heading(trans('Summary'))
                 ->collapsible()
                 ->schema([
 
-                    TextEntry::make('status')
+                    Infolists\Components\TextEntry::make('status')
                         ->hiddenLabel()
                         ->badge()
                         ->tooltip(trans('Status'))
-                        ->size(TextEntrySize::Large),
+                        ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                    Actions::make([
-                        Action::make('edit')
+                    Infolists\Components\Actions::make([
+                        Infolists\Components\Actions\Action::make('edit')
                             ->translateLabel()
                             ->button()
                             ->size('sm')
@@ -142,14 +138,14 @@ final class Schema
                             ),
                     ]),
 
-                    TextEntry::make('created_at')
+                    Infolists\Components\TextEntry::make('created_at')
                         ->label(trans('Order Date'))
                         ->dateTime(format: 'F d, Y g:i A')
                         ->inlineLabel()
                         ->columnSpanFull(),
 
-                    Actions::make([
-                        Action::make('update_payment_status')
+                    Infolists\Components\Actions::make([
+                        Infolists\Components\Actions\Action::make('update_payment_status')
                             ->label(
                                 fn (Order $record) => $record->is_paid
                                     ? trans('Unmark as paid')
@@ -198,8 +194,8 @@ final class Schema
                         ->alignCenter()
                         ->columnSpanFull(),
 
-                    Actions::make([
-                        Action::make('view_proof_of_payment')
+                    Infolists\Components\Actions::make([
+                        Infolists\Components\Actions\Action::make('view_proof_of_payment')
                             ->translateLabel()
                             ->button()
                             ->outlined()
@@ -335,19 +331,19 @@ final class Schema
                         ->alignCenter()
                         ->columnSpanFull(),
 
-                    TextEntry::make('sub_total')
+                    Infolists\Components\TextEntry::make('sub_total')
                         ->translateLabel()
                         ->inlineLabel()
                         ->prefix(fn (Order $record) => $record->currency_symbol)
                         ->columnSpanFull(),
 
-                    TextEntry::make('shipping_total')
+                    Infolists\Components\TextEntry::make('shipping_total')
                         ->label(trans('Total Shipping Fee'))
                         ->inlineLabel()
                         ->prefix(fn (Order $record) => $record->currency_symbol)
                         ->columnSpanFull(),
 
-                    TextEntry::make('tax_total')
+                    Infolists\Components\TextEntry::make('tax_total')
                         ->label(fn (Order $record) => trans('Tax Total ( :percent% )', [
                             'percent' => $record->tax_percentage,
                         ]))
@@ -355,21 +351,21 @@ final class Schema
                         ->prefix(fn (Order $record) => $record->currency_symbol)
                         ->columnSpanFull(),
 
-                    TextEntry::make('discount_total')
+                    Infolists\Components\TextEntry::make('discount_total')
                         ->label(trans('Total Discount'))
                         ->inlineLabel()
                         ->prefix(fn (Order $record) => $record->currency_symbol)
                         ->columnSpanFull()
                         ->hidden(fn (Order $record) => $record->discount_total == 0),
 
-                    TextEntry::make('discount_code')
+                    Infolists\Components\TextEntry::make('discount_code')
                         ->translateLabel()
                         ->inlineLabel()
                         ->prefix(fn (Order $record) => $record->currency_symbol)
                         ->columnSpanFull()
                         ->hidden(fn (Order $record) => $record->discount_code === null),
 
-                    TextEntry::make('total')
+                    Infolists\Components\TextEntry::make('total')
                         ->label(trans('Grand Total'))
                         ->inlineLabel()
                         ->prefix(fn (Order $record) => $record->currency_symbol)

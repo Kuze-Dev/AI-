@@ -12,18 +12,12 @@ use Domain\Order\Enums\OrderUserType;
 use Domain\Order\Models\Order;
 use Domain\Tenant\TenantHelpers;
 use Filament\Forms;
-use Filament\Infolists\Components\Actions\Action;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\TextEntry\TextEntrySize;
-use Filament\Infolists\Infolist;
+use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 
 class OrderResource extends Resource
 {
@@ -43,15 +37,15 @@ class OrderResource extends Resource
         return (string) Order::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count();
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         return $infolist
             ->schema([
 
-                Group::make()
+                Infolists\Components\Group::make()
                     ->schema([
 
-                        Section::make()
+                        Infolists\Components\Section::make()
                             ->heading(function (Order $record) {
                                 if (TenantHelpers::isFeatureActive(AllowGuestOrder::class)) {
                                     return trans('Customer');
@@ -64,101 +58,101 @@ class OrderResource extends Resource
                             ->collapsible()
                             ->schema([
 
-                                TextEntry::make('customer_first_name')
+                                Infolists\Components\TextEntry::make('customer_first_name')
                                     ->label(trans('First Name'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('customer_last_name')
+                                Infolists\Components\TextEntry::make('customer_last_name')
                                     ->label(trans('Last Name'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('customer_email')
+                                Infolists\Components\TextEntry::make('customer_email')
                                     ->label(trans('Email'))
                                     ->icon('heroicon-m-envelope')
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('customer_mobile')
+                                Infolists\Components\TextEntry::make('customer_mobile')
                                     ->label(trans('Contact Number'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
                             ])
                             ->columns(),
 
-                        Section::make()
+                        Infolists\Components\Section::make()
                             ->heading(trans('Shipping Address'))
                             ->collapsible()
                             ->schema([
 
-                                TextEntry::make('shippingAddress.address_line_1')
+                                Infolists\Components\TextEntry::make('shippingAddress.address_line_1')
                                     ->label(trans('House/Unit/Flr #, Bldg Name, Blk or Lot #'))
-                                    ->size(TextEntrySize::Large)
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
                                     ->columnSpanFull(),
 
-                                TextEntry::make('shippingAddress.country')
+                                Infolists\Components\TextEntry::make('shippingAddress.country')
                                     ->label(trans('Country'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('shippingAddress.state')
+                                Infolists\Components\TextEntry::make('shippingAddress.state')
                                     ->label(trans('State'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('shippingAddress.city')
+                                Infolists\Components\TextEntry::make('shippingAddress.city')
                                     ->label(trans('City/Province'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('shippingAddress.zip_code')
+                                Infolists\Components\TextEntry::make('shippingAddress.zip_code')
                                     ->label(trans('Zip Code'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
                             ])
                             ->columns(),
 
-                        Section::make()
+                        Infolists\Components\Section::make()
                             ->heading(trans('Billing Address'))
                             ->collapsible()
                             ->schema([
 
-                                TextEntry::make('billingAddress.address_line_1')
+                                Infolists\Components\TextEntry::make('billingAddress.address_line_1')
                                     ->label(trans('House/Unit/Flr #, Bldg Name, Blk or Lot #'))
-                                    ->size(TextEntrySize::Large)
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
                                     ->columnSpanFull(),
 
-                                TextEntry::make('billingAddress.country')
+                                Infolists\Components\TextEntry::make('billingAddress.country')
                                     ->label(trans('Country'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('billingAddress.state')
+                                Infolists\Components\TextEntry::make('billingAddress.state')
                                     ->label(trans('State'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('billingAddress.city')
+                                Infolists\Components\TextEntry::make('billingAddress.city')
                                     ->label(trans('City/Province'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('billingAddress.zip_code')
+                                Infolists\Components\TextEntry::make('billingAddress.zip_code')
                                     ->label(trans('Zip Code'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
                             ])
                             ->columns(),
 
-                        Section::make()
+                        Infolists\Components\Section::make()
                             ->heading(trans('Others'))
                             ->collapsible()
                             ->schema([
 
-                                TextEntry::make('payments.paymentMethod.title')
+                                Infolists\Components\TextEntry::make('payments.paymentMethod.title')
                                     ->label(trans('Payment Method'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
 
-                                TextEntry::make('shippingMethod.title')
+                                Infolists\Components\TextEntry::make('shippingMethod.title')
                                     ->label(trans('Shipping Method'))
-                                    ->size(TextEntrySize::Large),
+                                    ->size(Infolists\Components\TextEntry\TextEntrySize::Large),
                             ])
                             ->columns(),
                     ])
                     ->columnSpan(2),
 
-                Group::make()
+                Infolists\Components\Group::make()
                     ->schema(Schema::summarySchema())
                     ->columnSpan(1),
 

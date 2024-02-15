@@ -11,8 +11,7 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\ProductVariant;
 use Filament\Forms;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Infolist;
+use Filament\Infolists;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -40,32 +39,20 @@ class ViewOrderDetails extends ViewRecord
         return [];
     }
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         return $infolist
             ->schema([
 
-                Group::make()
-                    ->schema([
-                    ])
+                Infolists\Components\Group::make()
+                    ->schema(function () {
+                        return [];
+                    })
                     ->columnSpan(2),
-                Group::make()
+                Infolists\Components\Group::make()
                     ->schema(Schema::summarySchema())
                     ->columnSpan(1),
             ])->columns(3);
-    }
-
-    protected function getFormSchema(): array
-    {
-        return [
-            Forms\Components\Group::make()
-                ->schema([
-                    Forms\Components\Group::make()
-                        ->schema($this->getSections())
-                        ->columnSpan(2),
-                    OrderResource::summaryCard(),
-                ])->columns(3),
-        ];
     }
 
     private function getSections(): array
