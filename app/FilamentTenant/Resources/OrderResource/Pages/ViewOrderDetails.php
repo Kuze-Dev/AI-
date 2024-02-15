@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\OrderResource\Pages;
 
+use App\Filament\Support\Infolists\SpatieMediaLibraryImageEntry;
 use App\FilamentTenant\Resources\OrderResource;
 use App\FilamentTenant\Resources\OrderResource\Schema;
 use Domain\Order\Models\Order;
@@ -12,7 +13,6 @@ use Domain\Product\Models\ProductVariant;
 use Filament\Infolists;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property-read Order $record
@@ -78,38 +78,36 @@ class ViewOrderDetails extends ViewRecord
                                     ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
                                     ->prefix(fn (OrderLine $record) => $record->order->currency_symbol),
 
-                                Infolists\Components\Actions::make([
-                                    Infolists\Components\Actions\Action::make('view_remarks')
-                                        ->translateLabel()
-                                        ->button()
-                                        ->outlined()
-                                        ->icon('heroicon-o-eye')
-                                        ->slideOver()
-                                        ->modalHeading(trans('Customer Remarks'))
-                                        ->size('sm')
-                                        ->disabledForm()
-                                        ->infolist(fn (OrderLine $record) => [
-                                            Infolists\Components\TextEntry::make('remarks_data')
-                                                ->label(trans('Remarks'))
-                                                ->state(fn () => $record->remarks_data['notes'] ?? ''),
-//                                            Infolists\Components\SpatieMediaLibraryImageEntry::make('order_line_notes')
-//                                                ->hiddenLabel()
-//                                                ->model(fn () => $record->payments[0])
-//                                                ->collection('order_line_notes')
-//                                                ->state(
-//                                                    fn () => $record->getMedia('order_line_notes')
-//                                                        ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
-//                                                        ->toArray()
-//                                                ),
-                                        ]),
-                                ])
+                                Infolists\Components\Actions::make([])
+                                    ->fullWidth()
+                                    ->alignCenter()
+                                    ->columnSpanFull()
                                     ->hidden(
                                         fn (OrderLine $record) => blank($record->remarks_data) &&
                                             $record->getFirstMedia('order_line_notes') === null
                                     )
-                                    ->fullWidth()
-                                    ->alignCenter()
-                                    ->columnSpanFull(),
+                                    ->actions([
+                                        Infolists\Components\Actions\Action::make('view_remarks')
+                                            ->translateLabel()
+                                            ->button()
+                                            ->outlined()
+                                            ->icon('heroicon-o-eye')
+                                            ->slideOver()
+                                            ->modalHeading(trans('Customer Remarks'))
+                                            ->size('sm')
+                                            ->disabledForm()
+                                            ->infolist(fn (OrderLine $record) => [
+
+                                                Infolists\Components\TextEntry::make('remarks_data')
+                                                    ->label(trans('Remarks'))
+                                                    ->state(fn () => $record->remarks_data['notes'] ?? ''),
+
+                                                SpatieMediaLibraryImageEntry::make('order_line_notes')
+                                                    ->label(trans('Customer Upload'))
+                                                    ->model(fn () => $record)
+                                                    ->collection('order_line_notes'),
+                                            ]),
+                                    ]),
                             ])
                             ->columns(),
                     ])
