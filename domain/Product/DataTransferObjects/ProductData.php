@@ -45,29 +45,19 @@ class ProductData
         return new self(
             name: $data['name'],
             meta_data: MetaDataData::fromArray($data['meta_data']),
-            taxonomy_terms: array_map(fn ($termData) => (int) $termData, $data['taxonomy_terms'] ?? []),
             sku: $data['sku'],
-            description: $data['description'],
             retail_price: $data['retail_price'],
             selling_price: $data['selling_price'],
-            length: $data['length'],
-            width: $data['width'],
-            height: $data['height'],
-            weight: $data['weight'],
-            status: $data['status'],
-            stock: $data['stock'] ?? null,
             minimum_order_quantity: $data['minimum_order_quantity'],
+            status: $data['status'],
             is_featured: $data['is_featured'],
             is_special_offer: $data['is_special_offer'],
             allow_customer_remarks: $data['allow_customer_remarks'],
             allow_stocks: $data['allow_stocks'],
+            taxonomy_terms: array_map(fn ($termData) => (int) $termData, $data['taxonomy_terms'] ?? []),
             allow_guest_purchase: $data['allow_guest_purchase'] ?? false,
-            images: $data['images'],
-            videos: $data['videos'],
-            media_collection: [
-                ['collection' => 'image', 'materials' => $data['images']],
-                ['collection' => 'video', 'materials' => Arr::wrap($data['videos'])],
-            ],
+            skip_media_sync: $data['skip_media_sync'] ?? false,
+            weight: $data['weight'],
             product_options: array_map(
                 fn ($option) => (ProductOptionData::fromArray($option)),
                 $data['product_options'][0] ?? []
@@ -77,7 +67,17 @@ class ProductData
                 'selling_price' => (float) $variant['selling_price'],
                 'retail_price' => (float) $variant['retail_price'],
             ])), $data['product_variants'] ?? []),
-            skip_media_sync: $data['skip_media_sync'] ?? false,
+            stock: $data['stock'] ?? null,
+            length: $data['length'],
+            width: $data['width'],
+            height: $data['height'],
+            description: $data['description'],
+            images: $data['images'],
+            videos: $data['videos'],
+            media_collection: [
+                ['collection' => 'image', 'materials' => $data['images']],
+                ['collection' => 'video', 'materials' => Arr::wrap($data['videos'])],
+            ],
         );
     }
 
