@@ -21,6 +21,7 @@ use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
@@ -28,7 +29,6 @@ use Filament\Tables\Table;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Support\Common\Rules\MinimumValueRule;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
@@ -57,7 +57,7 @@ class ProductResource extends Resource
             ->columns(3)
             ->schema([
                 Forms\Components\Group::make()->schema([
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         Forms\Components\TextInput::make('name')
                             ->label(trans('Product Name'))
                             ->unique(ignoreRecord: true)
@@ -169,8 +169,8 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->dehydrateStateUsing(fn ($state) => (int) $state)
-                                ->hidden(fn (\Filament\Forms\Get $get) => ! $get('allow_stocks'))
-                                ->required(fn (\Filament\Forms\Get $get) => $get('allow_stocks')),
+                                ->hidden(fn (Get $get) => ! $get('allow_stocks'))
+                                ->required(fn (Get $get) => $get('allow_stocks')),
                         ])->columns(2),
                     Forms\Components\Section::make('Pricing')
                         ->translateLabel()
@@ -183,16 +183,14 @@ class ProductResource extends Resource
                                     decimalPlaces: 2,
                                     isSigned: false
                                 ))
-                                ->rules([
-                                    function () {
-                                        return function (string $attribute, mixed $value, Closure $fail) {
-                                            if ($value <= 0) {
-                                                $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                                $fail("{$attributeName} must be above zero.");
-                                            }
-                                        };
+                                ->rule(
+                                    fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                        if ($value <= 0) {
+                                            $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                            $fail("{$attributeName} must be above zero.");
+                                        }
                                     },
-                                ])
+                                )
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->required(),
 
@@ -204,16 +202,14 @@ class ProductResource extends Resource
                                     decimalPlaces: 2,
                                     isSigned: false
                                 ))
-                                ->rules([
-                                    function () {
-                                        return function (string $attribute, mixed $value, Closure $fail) {
-                                            if ($value <= 0) {
-                                                $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                                $fail("{$attributeName} must be above zero.");
-                                            }
-                                        };
+                                ->rule(
+                                    fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                        if ($value <= 0) {
+                                            $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                            $fail("{$attributeName} must be above zero.");
+                                        }
                                     },
-                                ])
+                                )
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->required(),
                         ])->columns(2),
@@ -263,7 +259,7 @@ class ProductResource extends Resource
                                         )
                                         ->dehydrated(false),
                                     Forms\Components\Hidden::make('taxonomy_terms')
-                                        ->dehydrateStateUsing(fn (\Filament\Forms\Get $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
+                                        ->dehydrateStateUsing(fn (Get $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                                 ])
                                 ->when(fn () => ! empty($taxonomies->toArray())),
                         ]),
@@ -278,11 +274,6 @@ class ProductResource extends Resource
             ->columns([
                 SpatieMediaLibraryImageColumn::make('image')
                     ->collection('image')
-                    ->default(
-                        fn (Product $record) => $record->getFirstMedia('image') === null
-                            ? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
-                            : null
-                    )
                     ->extraImgAttributes(['class' => 'aspect-[5/3] object-fill']),
                 Tables\Columns\TextColumn::make('name')
                     ->translateLabel()
@@ -303,8 +294,9 @@ class ProductResource extends Resource
                     ->translateLabel()
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->translateLabel()
+                    ->badge()
                     ->formatStateUsing(fn ($state) => $state
                         ? ucfirst(STATUS::ACTIVE->value)
                         : ucfirst(STATUS::INACTIVE->value))
@@ -312,7 +304,7 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(trans('Last Modified'))
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([

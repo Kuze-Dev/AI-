@@ -264,6 +264,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')
@@ -271,6 +272,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
             });
 
         $this->addMediaCollection('video')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }

@@ -14,7 +14,7 @@ use App\FilamentTenant\Support\ProductOptionFormAction;
 use App\FilamentTenant\Support\ProductVariantFormAction;
 use Domain\Product\Actions\CreateProductAction;
 use Domain\Product\DataTransferObjects\ProductData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
