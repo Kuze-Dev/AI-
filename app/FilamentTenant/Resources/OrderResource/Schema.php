@@ -229,6 +229,20 @@ final class Schema
 
                                     return $payment->remarks !== null;
                                 })
+                                ->modalSubmitAction(function (Order $record): ?false {
+
+                                    /** @var Payment $payment */
+                                    $payment = $record->payments->first();
+
+                                    return $payment->remarks === null ? null : false;
+                                })
+                                ->modalCancelAction(function (Order $record): ?false {
+
+                                    /** @var Payment $payment */
+                                    $payment = $record->payments->first();
+
+                                    return $payment->remarks === null ? null : false;
+                                })
                                 ->form(fn (Order $record) => [
 
                                     Forms\Components\Textarea::make('customer_message')
