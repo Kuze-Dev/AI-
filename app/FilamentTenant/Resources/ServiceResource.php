@@ -120,7 +120,7 @@ class ServiceResource extends Resource
                 Forms\Components\Group::make()
                     ->schema([
                         self::statusSection(),
-                        MetaDataFormV2::make('Meta Data'),
+                        MetaDataFormV2::make(),
                     ])->columnSpan(1),
             ])
             ->columns(3);

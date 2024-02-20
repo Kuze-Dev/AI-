@@ -6,19 +6,19 @@ namespace App\FilamentTenant\Resources;
 
 use App\Features\ECommerce\AllowGuestOrder;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\FilamentTenant\Resources\ProductResource\RelationManagers\OptionsRelationManager;
+use App\FilamentTenant\Resources\ProductResource\RelationManagers\ProductOptionsRelationManager;
+use App\FilamentTenant\Resources\ProductResource\RelationManagers\ProductOptionValuesRelationManager;
+use App\FilamentTenant\Resources\ProductResource\RelationManagers\ProductVariantsRelationManager;
 use App\FilamentTenant\Resources\ProductResource\RelationManagers\TiersRelationManager;
-use App\FilamentTenant\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\FilamentTenant\Resources\ReviewResource\RelationManagers\ReviewRelationManager;
-use App\FilamentTenant\Support\MetaDataForm;
+use App\FilamentTenant\Support\MetaDataFormV2;
 use Closure;
-use Domain\Product\Actions\DeleteProductAction;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Models\Product;
 use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Tenant\TenantHelpers;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -28,9 +28,6 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
-use Support\Common\Rules\MinimumValueRule;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ProductResource extends Resource
 {
@@ -47,12 +44,6 @@ class ProductResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $taxonomies = Taxonomy::with('taxonomyTerms')
-            ->whereIn(
-                'slug',
-                [EnumsTaxonomy::BRAND->value, EnumsTaxonomy::CATEGORIES->value]
-            )->get();
-
         return $form
             ->columns(3)
             ->schema([
@@ -70,19 +61,20 @@ class ProductResource extends Resource
                     Forms\Components\Section::make('Media')
                         ->translateLabel()
                         ->schema([
-                            Forms\Components\FileUpload::make('images')
+                            Forms\Components\SpatieMediaLibraryFileUpload::make('images')
                                 ->translateLabel()
-                                ->mediaLibraryCollection('image')
+                                ->collection('images')
                                 ->image()
                                 ->multiple()
                                 ->required(),
-                            Forms\Components\FileUpload::make('videos')
+                            Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
                                 ->translateLabel()
-                                ->mediaLibraryCollection('video')
+                                ->collection('videos')
                                 ->acceptedFileTypes([
                                     'video/*',
                                 ])
-                                ->maxSize(25000),
+                                ->required()
+                                ->maxSize(25_000),
                         ]),
 
                     Forms\Components\Section::make('Customer Remarks')
@@ -106,44 +98,35 @@ class ProductResource extends Resource
                                 ->label(trans('Weight (lbs)'))
                                 ->numeric()
                                 ->required()
-                                ->rules([
-                                    new MinimumValueRule(0.01),
-                                ])
-                                ->dehydrateStateUsing(fn ($state) => (float) $state),
+                                ->minValue(0.01),
 
-                            Forms\Components\Fieldset::make('dimension')
+                            Forms\Components\KeyValue::make('dimension')
                                 ->label(trans('Dimension (cm)'))
+                                ->addable(false)
+                                ->deletable(false)
+                                ->editableKeys(false)
+                                ->keyLabel(trans('Fields'))
+                                ->required()
                                 ->schema([
                                     Forms\Components\TextInput::make('length')
                                         ->translateLabel()
                                         ->numeric()
                                         ->required()
-                                        ->rules([
-                                            new MinimumValueRule(0.01),
-                                        ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['length'] ?? 0))
-                                        ->dehydrateStateUsing(fn ($state) => (float) $state),
+                                        ->minValue(0.01),
 
                                     Forms\Components\TextInput::make('width')
                                         ->translateLabel()
                                         ->numeric()
                                         ->required()
-                                        ->rules([
-                                            new MinimumValueRule(0.01),
-                                        ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['width'] ?? 0))
-                                        ->dehydrateStateUsing(fn ($state) => (float) $state),
+                                        ->minValue(0.01),
 
                                     Forms\Components\TextInput::make('height')
                                         ->translateLabel()
                                         ->numeric()
                                         ->required()
-                                        ->rules([
-                                            new MinimumValueRule(0.01),
-                                        ])
-                                        ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Product $record, ?array $state) => ! $record ? $state : $component->state($record->dimension['height'] ?? 0))
-                                        ->dehydrateStateUsing(fn ($state) => (float) $state),
-                                ])->columns(3),
+                                        ->minValue(0.01),
+                                ])
+                                ->columns(3),
                         ]),
                     Forms\Components\Section::make('Inventory')
                         ->translateLabel()
@@ -153,8 +136,7 @@ class ProductResource extends Resource
                                 ->numeric()
                                 ->integer()
                                 ->required()
-                                ->default(1)
-                                ->dehydrateStateUsing(fn ($state) => (int) $state),
+                                ->default(1),
                             Forms\Components\TextInput::make('sku')
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(100)
@@ -168,21 +150,17 @@ class ProductResource extends Resource
                                 ->translateLabel()
                                 ->numeric()
                                 ->minValue(0)
-                                ->dehydrateStateUsing(fn ($state) => (int) $state)
                                 ->hidden(fn (Get $get) => ! $get('allow_stocks'))
                                 ->required(fn (Get $get) => $get('allow_stocks')),
-                        ])->columns(2),
+                        ])
+                        ->columns(2),
                     Forms\Components\Section::make('Pricing')
                         ->translateLabel()
                         ->schema([
                             Forms\Components\TextInput::make('retail_price')
                                 ->translateLabel()
-                                ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                    prefix: '$',
-                                    thousandsSeparator: ',',
-                                    decimalPlaces: 2,
-                                    isSigned: false
-                                ))
+                                ->numeric()
+                                ->prefix('$')
                                 ->rule(
                                     fn () => function (string $attribute, mixed $value, Closure $fail) {
                                         if ($value <= 0) {
@@ -196,12 +174,8 @@ class ProductResource extends Resource
 
                             Forms\Components\TextInput::make('selling_price')
                                 ->translateLabel()
-                                ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                    prefix: '$',
-                                    thousandsSeparator: ',',
-                                    decimalPlaces: 2,
-                                    isSigned: false
-                                ))
+                                ->numeric()
+                                ->prefix('$')
                                 ->rule(
                                     fn () => function (string $attribute, mixed $value, Closure $fail) {
                                         if ($value <= 0) {
@@ -213,66 +187,76 @@ class ProductResource extends Resource
                                 ->dehydrateStateUsing(fn ($state) => (float) $state)
                                 ->required(),
                         ])->columns(2),
-                ])->columnSpan(2),
-                Forms\Components\Group::make()->schema([
-                    Forms\Components\Section::make('Status')
-                        ->translateLabel()
-                        ->schema([
-                            Forms\Components\Toggle::make('status')
-                                ->label(
-                                    fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value))
-                                )
-                                ->reactive()
-                                ->helperText('This product will be hidden from all sales channels.'),
-                            Forms\Components\Toggle::make('allow_guest_purchase')
-                                ->helperText('Item can be purchased by guests.')
-                                ->default(false)
-                                ->columnSpan(2)
-                                ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class) ? true : false),
-                        ]),
-                    Forms\Components\Section::make('Associations')
-                        ->translateLabel()
-                        ->schema([
-                            Forms\Components\Group::make()
-                                ->schema([
-                                    Forms\Components\Group::make()
-                                        ->statePath('taxonomies')
-                                        ->schema(
-                                            fn () => $taxonomies->map(
-                                                fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
-                                                    ->statePath((string) $taxonomy->id)
-                                                    ->multiple(
-                                                        fn () => $taxonomy->slug === EnumsTaxonomy::BRAND->value ? false : true
-                                                    )
-                                                    ->options(
-                                                        $taxonomy->taxonomyTerms->sortBy('name')
-                                                            ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->id => $term->name])
-                                                            ->toArray()
-                                                    )
-                                                    ->formatStateUsing(
-                                                        fn (?Product $record) => $record?->taxonomyTerms->where('taxonomy_id', $taxonomy->id)
-                                                            ->pluck('id')
-                                                            ->toArray() ?? []
-                                                    )
-                                                    ->required()
-                                            )->toArray()
+                ])
+                    ->columnSpan(2),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Status')
+                            ->translateLabel()
+                            ->schema([
+                                Forms\Components\Toggle::make('status')
+                                    ->label(
+                                        fn (bool $state) => $state
+                                            ? Status::ACTIVE->getLabel()
+                                            : Status::INACTIVE->getLabel()
+                                    )
+                                    ->reactive()
+                                    ->helperText('This product will be hidden from all sales channels.'),
+                                Forms\Components\Toggle::make('allow_guest_purchase')
+                                    ->helperText('Item can be purchased by guests.')
+                                    ->default(false)
+                                    ->columnSpan(2)
+                                    ->visible(fn () => TenantHelpers::isFeatureActive(AllowGuestOrder::class)),
+                            ]),
+                        Forms\Components\Section::make('Associations')
+                            ->translateLabel()
+                            ->schema([
+                                Forms\Components\Select::make('taxonomyTermsBranch')
+                                    ->label(Taxonomy::whereSlug(EnumsTaxonomy::BRAND->value)->value('name'))
+                                    ->relationship(titleAttribute: 'name')
+                                    ->required()
+                                    // Add fillable property [taxonomyTermsBranch] to allow mass assignment on [Domain\Product\Models\Product].
+                                    ->multiple()
+                                    ->maxItems(1)
+                                    ->preload()
+                                    ->searchable()
+                                    ->visible(
+                                        fn () => Taxonomy::where(
+                                            'slug',
+                                            EnumsTaxonomy::BRAND->value
                                         )
-                                        ->dehydrated(false),
-                                    Forms\Components\Hidden::make('taxonomy_terms')
-                                        ->dehydrateStateUsing(fn (Get $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
-                                ])
-                                ->when(fn () => ! empty($taxonomies->toArray())),
-                        ]),
-                    MetaDataForm::make('Meta Data'),
-                ])->columnSpan(1),
+                                            ->exists()
+                                    ),
+                                Forms\Components\Select::make('taxonomyTermsCategory')
+                                    ->label(EnumsTaxonomy::CATEGORIES->getLabel())
+                                    ->relationship(titleAttribute: 'name')
+                                    ->required()
+                                    ->multiple()
+                                    ->preload()
+                                    ->searchable()
+                                    ->visible(
+                                        fn () => Taxonomy::where(
+                                            'slug',
+                                            EnumsTaxonomy::CATEGORIES->value
+                                        )
+                                            ->exists()
+                                    ),
+                            ]),
+                        MetaDataFormV2::make(),
+                    ])
+                    ->columnSpan(1),
             ]);
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 SpatieMediaLibraryImageColumn::make('image')
+                    ->translateLabel()
                     ->collection('image')
                     ->extraImgAttributes(['class' => 'aspect-[5/3] object-fill']),
                 Tables\Columns\TextColumn::make('name')
@@ -297,10 +281,21 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->translateLabel()
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state
-                        ? ucfirst(STATUS::ACTIVE->value)
-                        : ucfirst(STATUS::INACTIVE->value))
-                    ->color(fn (Product $record) => $record->status ? 'success' : 'secondary')
+                    ->formatStateUsing(
+                        fn (bool $state) => $state
+                            ? STATUS::ACTIVE->getLabel()
+                            : STATUS::INACTIVE->getLabel()
+                    )
+                    ->color(
+                        fn (bool $state) => $state
+                            ? STATUS::ACTIVE->getColor()
+                            : STATUS::INACTIVE->getColor()
+                    )
+                    ->icon(
+                        fn (bool $state) => $state
+                            ? STATUS::ACTIVE->getIcon()
+                            : STATUS::INACTIVE->getIcon()
+                    )
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(trans('Last Modified'))
@@ -310,7 +305,7 @@ class ProductResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->translateLabel()
-                    ->options(['1' => STATUS::ACTIVE->value, '0' => STATUS::INACTIVE->value])
+                    ->options(['1' => STATUS::ACTIVE->getLabel(), '0' => STATUS::INACTIVE->getLabel()])
                     ->query(function (Builder $query, array $data) {
                         $query->when(filled($data['value']), function (Builder $query) use ($data) {
                             $query->when(filled($data['value']), function (Builder $query) use ($data) {
@@ -326,19 +321,10 @@ class ProductResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->translateLabel()
-                    ->authorize('update'),
+                    ->translateLabel(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
-                        ->translateLabel()
-                        ->using(function (Product $record) {
-                            try {
-                                return app(DeleteProductAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        })
-                        ->authorize('delete'),
+                        ->translateLabel(),
                 ]),
             ])
             ->bulkActions([
@@ -410,8 +396,9 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            VariantsRelationManager::class,
-            OptionsRelationManager::class,
+            ProductVariantsRelationManager::class,
+            ProductOptionsRelationManager::class,
+            ProductOptionValuesRelationManager::class,
             TiersRelationManager::class,
             ReviewRelationManager::class,
             ActivitiesRelationManager::class,

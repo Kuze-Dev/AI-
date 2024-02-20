@@ -21,7 +21,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $name
  * @property string $slug
  * @property int $product_option_id
- * @property-read \Domain\Product\Models\ProductOption|null $productOption
+ * @property-read \Domain\Product\Models\ProductOption $productOption
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newQuery()
@@ -51,10 +51,6 @@ class ProductOptionValue extends Model implements HasMedia
         'media',
     ];
 
-    /**
-     * Columns that are converted
-     * to a specific data type.
-     */
     protected $casts = [
         'data' => 'array',
     ];
@@ -62,18 +58,6 @@ class ProductOptionValue extends Model implements HasMedia
     public function getRouteKeyName(): string
     {
         return 'slug';
-    }
-
-    /**
-     * Get the product option name
-     *
-     * @return Attribute<string, static>
-     */
-    protected function productOptionName(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->productOption ? $this->productOption->name : '',
-        );
     }
 
     /**

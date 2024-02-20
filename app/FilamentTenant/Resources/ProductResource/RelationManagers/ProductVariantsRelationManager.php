@@ -9,12 +9,13 @@ namespace App\FilamentTenant\Resources\ProductResource\RelationManagers;
 use Closure;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\ProductVariant;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class VariantsRelationManager extends RelationManager
+class ProductVariantsRelationManager extends RelationManager
 {
     protected static string $relationship = 'productVariants';
 
@@ -24,14 +25,14 @@ class VariantsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                \Filament\Forms\Components\Group::make()
+                Forms\Components\Group::make()
                     ->schema([
-                        \Filament\Forms\Components\Group::make()
+                        Forms\Components\Group::make()
                             ->schema(function ($state) {
                                 $schemaArray = [];
                                 foreach ($state['combination'] as $key => $combination) {
                                     $schemaArray[$key] =
-                                        \Filament\Forms\Components\TextInput::make("combination[{$key}].option_value")
+                                        Forms\Components\TextInput::make("combination[{$key}].option_value")
                                             ->formatStateUsing(fn () => ucfirst($combination['option_value']))
                                             ->label(trans(ucfirst($combination['option'])))
                                             ->disabled();
@@ -39,29 +40,29 @@ class VariantsRelationManager extends RelationManager
 
                                 return $schemaArray;
                             })->columns(2),
-                        \Filament\Forms\Components\Section::make('Inventory')
+                        Forms\Components\Section::make('Inventory')
                             ->translateLabel()
                             ->schema([
-                                \Filament\Forms\Components\TextInput::make('sku')
+                                Forms\Components\TextInput::make('sku')
                                     ->maxLength(100)
                                     // ->rule(function(EditProduct $livewire) {
                                     //     dump(func_get_args());
                                     // })
                                     // ->rule(fn (EditProduct $livewire) => new UniqueProductSkuRule($livewire)) // need to work on this
                                     ->required(),
-                                \Filament\Forms\Components\TextInput::make('stock')
+                                Forms\Components\TextInput::make('stock')
                                     ->translateLabel()
                                     ->numeric()
                                     ->minValue(0)
                                     ->dehydrateStateUsing(fn ($state) => (int) $state),
                             ])->columns(2),
-                        \Filament\Forms\Components\Section::make('Pricing')
+                        Forms\Components\Section::make('Pricing')
                             ->translateLabel()
                             ->schema([
-                                \Filament\Forms\Components\TextInput::make('retail_price')
+                                Forms\Components\TextInput::make('retail_price')
                                     ->translateLabel()
                                     // Put custom rule to validate minimum value
-                                    ->mask(fn (\Filament\Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                         prefix: '$',
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
@@ -79,10 +80,10 @@ class VariantsRelationManager extends RelationManager
                                     ->dehydrateStateUsing(fn ($state) => (float) $state)
                                     ->required(),
 
-                                \Filament\Forms\Components\TextInput::make('selling_price')
+                                Forms\Components\TextInput::make('selling_price')
                                     ->translateLabel()
                                     // Put custom rule to validate minimum value
-                                    ->mask(fn (\Filament\Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
                                         prefix: '$',
                                         thousandsSeparator: ',',
                                         decimalPlaces: 2,
@@ -101,10 +102,10 @@ class VariantsRelationManager extends RelationManager
                                     ->dehydrateStateUsing(fn ($state) => (float) $state)
                                     ->required(),
                             ])->columns(2),
-                        \Filament\Forms\Components\Section::make('Status')
+                        Forms\Components\Section::make('Status')
                             ->translateLabel()
                             ->schema([
-                                \Filament\Forms\Components\Toggle::make('status')
+                                Forms\Components\Toggle::make('status')
                                     ->label(
                                         fn ($state) => $state ? ucfirst(trans(STATUS::ACTIVE->value)) : ucfirst(trans(STATUS::INACTIVE->value))
                                     )

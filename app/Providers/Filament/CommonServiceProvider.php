@@ -139,10 +139,6 @@ class CommonServiceProvider extends ServiceProvider
             fn (Tables\Table $table) => $table
                 ->paginated([5, 10, 25, 50, 100])
         );
-        Forms\Components\TextInput::configureUsing(
-            fn (Forms\Components\TextInput $textInput) => $textInput
-                ->maxLength(255)
-        );
 
         $createActionConfiguration = fn (PageAction|TableAction $action) => $action
             ->withActivityLog(

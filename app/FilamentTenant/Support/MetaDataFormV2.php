@@ -16,6 +16,7 @@ class MetaDataFormV2 extends Section
         parent::setUp();
 
         $this
+            ->heading(trans('Meta Data'))
             ->relationship('metaData')
             ->schema([
                 Forms\Components\TextInput::make('title')
