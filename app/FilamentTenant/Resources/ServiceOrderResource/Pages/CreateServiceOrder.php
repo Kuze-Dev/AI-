@@ -8,7 +8,7 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
