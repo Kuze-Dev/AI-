@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\Internationalization;
+use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\MetaDataForm;
@@ -16,6 +18,7 @@ use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
@@ -62,7 +65,7 @@ class PageResource extends Resource
                                     ignoreRecord: true,
                                     modifyRuleUsing: function (Unique $rule, $state, $livewire) {
 
-                                        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                        if (TenantFeatureSupport::active(SitesManagement::class) || TenantFeatureSupport::active(Internationalization::class)) {
                                             return false;
                                         }
 
@@ -88,7 +91,7 @@ class PageResource extends Resource
                                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                                 ->default((string) Locale::where('is_default', true)->first()?->code)
                                 ->searchable()
-                                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                                ->hidden(TenantFeatureSupport::inactive(Internationalization::class))
                                 ->reactive()
                                 ->afterStateUpdated(function (Forms\Components\Select $component, \Filament\Forms\Get $get) {
                                     $component->getContainer()
@@ -121,7 +124,7 @@ class PageResource extends Resource
                         Forms\Components\Card::make([
                             Forms\Components\CheckboxList::make('sites')
                                 ->reactive()
-                                ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                                ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
                                 ->rule(fn (?Page $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                                 ->options(function () {
 
@@ -151,7 +154,7 @@ class PageResource extends Resource
                                     );
                                 }),
                         ])
-                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                            ->hidden((bool) TenantFeatureSupport::inactive(SitesManagement::class)),
                         Forms\Components\Repeater::make('block_contents')
                             ->afterStateHydrated(function (Forms\Components\Repeater $component, ?Page $record, ?array $state) {
                                 if ($record === null || $record->blockContents->isEmpty()) {
@@ -236,15 +239,15 @@ class PageResource extends Resource
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),
                 Tables\Columns\BadgeColumn::make('visibility')
                     ->formatStateUsing(fn (Visibility $state) => Str::headline($state->value))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                        return TenantFeatureSupport::active(SitesManagement::class);
                     }, isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
@@ -279,7 +282,7 @@ class PageResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->relationship('sites', 'name'),
                 Tables\Filters\TernaryFilter::make('published_at')
                     ->label(trans('Published'))
@@ -312,7 +315,7 @@ class PageResource extends Resource
             return static::getModel()::query();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

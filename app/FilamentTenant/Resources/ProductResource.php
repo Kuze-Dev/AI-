@@ -18,7 +18,7 @@ use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Models\Product;
 use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Tenant\TenantHelpers;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -206,7 +206,7 @@ class ProductResource extends Resource
                                     ->helperText('Item can be purchased by guests.')
                                     ->default(false)
                                     ->columnSpan(2)
-                                    ->visible(fn () => TenantHelpers::isFeatureActive(AllowGuestOrder::class)),
+                                    ->visible(fn () => TenantFeatureSupport::active(AllowGuestOrder::class)),
                             ]),
                         Forms\Components\Section::make('Associations')
                             ->translateLabel()

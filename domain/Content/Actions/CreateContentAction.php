@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
+use App\Features\CMS\SitesManagement;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Models\Content;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Facades\Auth;
 
 class CreateContentAction
@@ -25,7 +27,7 @@ class CreateContentAction
         $content->taxonomies()
             ->attach($contentData->taxonomies);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
         Auth::user()?->hasRole(config('domain.role.super_admin'))
         ) {
 

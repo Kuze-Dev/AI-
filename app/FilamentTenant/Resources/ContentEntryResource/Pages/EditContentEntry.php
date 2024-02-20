@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
+use App\Features\CMS\SitesManagement;
 use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentEntryResource;
@@ -17,6 +18,7 @@ use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Radio;
@@ -127,7 +129,7 @@ class EditContentEntry extends EditRecord
             'other_page_actions' => CustomPageActionGroup::make([
                 Action::make('preview')
                     ->color('gray')
-                    ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                    ->hidden(TenantFeatureSupport::active(SitesManagement::class))
                     ->label(trans('Preview Page'))
                     ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
                         $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
@@ -142,7 +144,7 @@ class EditContentEntry extends EditRecord
                     }, true),
                 Action::make('preview_microsite_action')
                     ->label('Preview Microsite')
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+                    ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
                     ->color('gray')
                     ->record($this->getRecord())
                     ->modalHeading('Preview Microsite')

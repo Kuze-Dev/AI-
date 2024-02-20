@@ -174,7 +174,7 @@ it('can register with wholesaler tier', function () {
 
 it('can register without address', function () {
 
-    tenancy()->tenant->features()->deactivate(AddressBase::class);
+    deactivateFeatures(AddressBase::class);
 
     Event::fake(Registered::class);
 
@@ -217,7 +217,7 @@ it('can register without address', function () {
 
 it('can register with default tier when tier feature is disabled', function () {
 
-    tenancy()->tenant->features()->deactivate(TierBase::class);
+    deactivateFeatures(TierBase::class);
 
     $state = StateFactory::new()->createOne();
     $data = CustomerRegistrationRequestFactory::new()

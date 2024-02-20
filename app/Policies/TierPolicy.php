@@ -6,6 +6,7 @@ namespace App\Policies;
 
 use App\Features\Customer\TierBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
+use Domain\Tenant\TenantFeatureSupport;
 use Domain\Tier\Models\Tier;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
@@ -16,7 +17,7 @@ class TierPolicy
 
     public function before(?User $user, string $ability, mixed $tier = null): Response|false|null
     {
-        if (! tenancy()->tenant?->features()->active(TierBase::class)) {
+        if (TenantFeatureSupport::inactive(TierBase::class)) {
             return Response::denyAsNotFound();
         }
 

@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Features\CMS\SitesManagement;
+use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
+use App\Features\ECommerce\ECommerceBase;
+use App\Features\Service\ServiceBase;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Domain\Role\Models\Role;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -233,11 +239,11 @@ class RoleResource extends Resource
             'product',
             'paymentMethod',
             'taxZone',
-            'site' => \App\Features\CMS\SitesManagement::class,
-            'ecommerceSettings' => \App\Features\ECommerce\ECommerceBase::class,
-            'customers' => \App\Features\Customer\CustomerBase::class,
-            'tier' => \App\Features\Customer\TierBase::class,
-            'service' => \App\Features\Service\ServiceBase::class,
+            'site' => SitesManagement::class,
+            'ecommerceSettings' => ECommerceBase::class,
+            'customers' => CustomerBase::class,
+            'tier' => TierBase::class,
+            'service' => ServiceBase::class,
             default => false
         };
 
@@ -245,7 +251,7 @@ class RoleResource extends Resource
             return false;
         }
 
-        return tenancy()->tenant?->features()->inactive($feature);
+        return TenantFeatureSupport::inactive($feature);
     }
 
     private static function refreshSelectAllState(Forms\Get $get, Forms\Set $set): void

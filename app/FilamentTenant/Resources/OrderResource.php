@@ -10,7 +10,7 @@ use App\FilamentTenant\Resources\OrderResource\Schema;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Enums\OrderUserType;
 use Domain\Order\Models\Order;
-use Domain\Tenant\TenantHelpers;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Resources\Resource;
@@ -47,7 +47,7 @@ class OrderResource extends Resource
 
                         Infolists\Components\Section::make()
                             ->heading(function (Order $record) {
-                                if (TenantHelpers::isFeatureActive(AllowGuestOrder::class)) {
+                                if (TenantFeatureSupport::active(AllowGuestOrder::class)) {
                                     return trans('Customer');
                                 }
 
@@ -169,7 +169,7 @@ class OrderResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer_id')
                     ->label(trans('Customer Type'))
-                    ->visible(fn () => tenancy()->tenant?->features()->active(AllowGuestOrder::class))
+                    ->visible(fn () => TenantFeatureSupport::active(AllowGuestOrder::class))
                     ->alignLeft()
                     ->default(false)
                     ->formatStateUsing(
@@ -263,7 +263,7 @@ class OrderResource extends Resource
                     ])
                     ->attribute('status'),
                 Tables\Filters\SelectFilter::make('customer_id')->label(trans('Customer Type'))
-                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(AllowGuestOrder::class))
+                    ->hidden(fn () => ! TenantFeatureSupport::active(AllowGuestOrder::class))
                     ->options([
                         OrderUserType::REGISTERED->value => trans('Registered'),
                         OrderUserType::GUEST->value => trans('Guest'),

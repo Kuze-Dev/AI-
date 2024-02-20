@@ -21,11 +21,9 @@ use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
 
-    testInTenantContext();
+    testInTenantContext(PaypalGateway::class);
 
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(PaypalGateway::class);
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Paypal', 'slug' => 'paypal']);
 

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Clusters\Settings\Pages;
 
+use App\Features\Shopconfiguration\PaymentGateway\PaypalGateway;
+use App\Features\Shopconfiguration\PaymentGateway\StripeGateway;
 use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\PaymentSettings as SettingsPaymentSettings;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Illuminate\Auth\Middleware\RequirePassword;
 
@@ -36,7 +39,7 @@ class PaymentSettings extends TenantBaseSettings
                             ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
                             ->reactive(),
                     ])
-                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\PaymentGateway\PaypalGateway::class)),
+                    ->hidden(fn () => ! TenantFeatureSupport::active(PaypalGateway::class)),
                 Forms\Components\Section::make(trans('Stripe'))
                     ->collapsible()
                     ->schema([
@@ -48,7 +51,7 @@ class PaymentSettings extends TenantBaseSettings
                             ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
                             ->reactive(),
                     ])
-                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\PaymentGateway\StripeGateway::class)),
+                    ->hidden(fn () => ! TenantFeatureSupport::active(StripeGateway::class)),
 
             ]),
 

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\FormResource\Pages\CreateForm;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Form\Database\Factories\FormFactory;
@@ -74,7 +75,7 @@ it('can create form', function () {
 
 it('can create form with same name', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $form = FormFactory::new()
         ->withDummyBlueprint()
@@ -101,7 +102,7 @@ it('can create form with same name', function () {
 
 it('cannot create form with same name in same microsite', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $form = FormFactory::new()
         ->withDummyBlueprint()

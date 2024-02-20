@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Database\Seeders\Auth\PermissionSeeder;
 use Database\Seeders\Auth\RoleSeeder;
 use Domain\Tenant\Models\Tenant;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Schema\Blueprint;
@@ -35,7 +36,7 @@ uses(
         }
 
         Event::listen(MigrationsEnded::class, function () {
-            if (! tenancy()->initialized) {
+            if (! TenantSupport::initialized()) {
                 seed([
                     PermissionSeeder::class,
                     RoleSeeder::class,

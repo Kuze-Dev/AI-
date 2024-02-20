@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\MenuResource\Pages\EditMenu;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Menu\Database\Factories\MenuFactory;
@@ -15,8 +16,7 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    testInTenantContext(SitesManagement::class);
     loginAsSuperAdmin();
 
     LocaleFactory::createDefault();

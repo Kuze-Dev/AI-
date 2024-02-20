@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\Internationalization;
+use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
@@ -14,6 +16,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Form\Models\Form as FormModel;
 use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -48,7 +51,7 @@ class FormResource extends Resource
                         ->unique(
                             callback: function ($livewire, Unique $rule) {
 
-                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                if (TenantFeatureSupport::active(SitesManagement::class)) {
                                     return false;
                                 }
 
@@ -70,12 +73,12 @@ class FormResource extends Resource
                         ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                         ->default((string) Locale::where('is_default', true)->first()?->code)
                         ->searchable()
-                        ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                        ->hidden(TenantFeatureSupport::inactive(Internationalization::class))
                         ->required(),
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
-                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
                             ->rules([
                                 function (?FormModel $record, \Filament\Forms\Get $get) {
 
@@ -128,7 +131,7 @@ class FormResource extends Resource
                                 );
                             }),
                     ])
-                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                        ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
                         ->helperText(
@@ -258,7 +261,7 @@ class FormResource extends Resource
                     ->truncate('max-w-xs 2xl:max-w-xl', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class)),
                 Tables\Columns\BadgeColumn::make('form_submissions_count')
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
@@ -266,7 +269,7 @@ class FormResource extends Resource
                     ->color(fn (FormModel $record) => $record->store_submission ? 'success' : 'secondary'),
                 Tables\Columns\TagsColumn::make('sites.name')
                     ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                        return TenantFeatureSupport::active(SitesManagement::class);
                     }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
@@ -275,7 +278,7 @@ class FormResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->relationship('sites', 'name'),
             ])
 
@@ -298,7 +301,7 @@ class FormResource extends Resource
             return static::getModel()::query();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

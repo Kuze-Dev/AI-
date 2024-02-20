@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Actions;
 
+use App\Features\CMS\SitesManagement;
 use Domain\Menu\DataTransferObjects\MenuData;
 use Domain\Menu\Models\Menu;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Facades\Auth;
 
 class CreateMenuAction
@@ -17,7 +19,7 @@ class CreateMenuAction
             'locale' => $menuData->locale,
         ]);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
         Auth::user()?->hasRole(config('domain.role.super_admin'))
         ) {
             $menu->sites()

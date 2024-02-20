@@ -15,6 +15,7 @@ use Domain\Customer\Enums\Status;
 use Domain\Customer\Exports\CustomerExporter;
 use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
+use Domain\Tenant\TenantFeatureSupport;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Exception;
 use Filament\Facades\Filament;
@@ -110,7 +111,7 @@ class CustomerResource extends Resource
                         ->timezone(null),
                     Forms\Components\Select::make('tier_id')
                         ->translateLabel()
-                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class))
+                        ->hidden(fn () => ! TenantFeatureSupport::active(TierBase::class))
                         ->relationship('tier', 'name')
                         ->searchable()
                         ->preload(),
@@ -172,7 +173,7 @@ class CustomerResource extends Resource
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
-                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class)),
+                        ->hidden(fn () => ! TenantFeatureSupport::active(RewardPoints::class)),
                 ])
                     ->columns(2)
                     ->disabled(fn ($record) => $record?->trashed()),
@@ -212,8 +213,8 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->badge()
                     ->sortable()
-                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class))
-                    ->toggleable(fn () => (bool) tenancy()->tenant?->features()->active(TierBase::class),
+                    ->hidden(fn () => ! TenantFeatureSupport::active(TierBase::class))
+                    ->toggleable(fn () => (bool) TenantFeatureSupport::active(TierBase::class),
                         isToggledHiddenByDefault: true
                     )
                     ->wrap(),
@@ -249,7 +250,7 @@ class CustomerResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->translateLabel(),
                 Tables\Filters\SelectFilter::make('tier')
-                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class))
+                    ->hidden(fn () => ! TenantFeatureSupport::active(TierBase::class))
                     ->translateLabel()
                     ->relationship('tier', 'name'),
                 Tables\Filters\SelectFilter::make('status')

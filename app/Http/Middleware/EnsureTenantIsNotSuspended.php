@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Domain\Tenant\Exceptions\SuspendTenantException;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,7 +17,7 @@ class EnsureTenantIsNotSuspended
      */
     public function handle(Request $request, Closure $next, ?string $redirectTo = null): Response
     {
-        if (tenancy()->tenant?->is_suspended) {
+        if (TenantSupport::model()->is_suspended) {
             throw new SuspendTenantException();
         }
 

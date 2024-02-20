@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
@@ -57,7 +58,7 @@ it('can create globals', function () {
 
 it('can create globals with same name on microsite', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     SiteFactory::new()->count(2)->create();
 
@@ -94,7 +95,7 @@ it('can create globals with same name on microsite', function () {
 
 it('cannot create globals with same name on microsite', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $siteFactory = SiteFactory::new()->create();
 

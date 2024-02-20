@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\MenuResource\Pages\CreateMenu;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Menu\Database\Factories\MenuFactory;
@@ -57,7 +58,7 @@ it('can create menu', function () {
 
 it('can create menu with sites', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $site = SiteFactory::new()->createOne();
 
@@ -81,7 +82,7 @@ it('can create menu with sites', function () {
 
 it('can create menu with same name on different sites', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $site = SiteFactory::new()->count(2)->create();
 
@@ -107,7 +108,7 @@ it('can create menu with same name on different sites', function () {
 
 it('cannot create menu with same name on same sites', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $site = SiteFactory::new()->create();
 

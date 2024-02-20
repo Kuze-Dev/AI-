@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
+use App\Features\CMS\SitesManagement;
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Models\Locale;
+use Domain\Tenant\TenantFeatureSupport;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
@@ -45,7 +47,7 @@ class UpdateContentEntryAction
 
         $this->createOrUpdateRouteUrl->execute($contentEntry, $contentEntryData->route_url_data);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (TenantFeatureSupport::active(SitesManagement::class)) {
 
             $contentEntry->sites()->sync($contentEntryData->sites);
         }

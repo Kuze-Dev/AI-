@@ -9,7 +9,7 @@ use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductOption;
 use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
-use Domain\Tenant\TenantHelpers;
+use Domain\Tenant\TenantFeatureSupport;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -48,7 +48,7 @@ class ProductOptionValuesRelationManager extends RelationManager
             // visible if enabled ang color pallet FEATURE flag
             // visible if true ang is_custom ng selected product_option
 
-            if (! TenantHelpers::isFeatureActive(ColorPallete::class)) {
+            if (! TenantFeatureSupport::active(ColorPallete::class)) {
                 return false;
             }
 
@@ -97,7 +97,7 @@ class ProductOptionValuesRelationManager extends RelationManager
                         ->default('text')
                         ->required()
                         ->options(
-                            fn () => TenantHelpers::isFeatureActive(ColorPallete::class)
+                            fn () => TenantFeatureSupport::active(ColorPallete::class)
                                 ? [
                                     'text' => 'Text',
                                     'color_palette' => 'Color Palette',

@@ -9,6 +9,7 @@ use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
 use Domain\Payments\Providers\StripeProvider;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
@@ -27,7 +28,7 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
 
     public function boot(): void
     {
-        if (tenancy()->initialized) {
+        if (TenantSupport::initialized()) {
 
             $paymentMethods = PaymentMethod::all();
 

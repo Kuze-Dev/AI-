@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Support\Concerns;
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -15,7 +16,7 @@ trait AuthorizeEcommerceSettings
 {
     protected static function authorizeAccess(): bool
     {
-        if (tenancy()->tenant?->features()->inactive(ECommerceBase::class)) {
+        if (TenantFeatureSupport::inactive(ECommerceBase::class)) {
             return false;
         }
 

@@ -12,6 +12,7 @@ use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Domain\Tenant\TenantFeatureSupport;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
@@ -49,7 +50,7 @@ final readonly class CustomerData
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
         unset($request);
 
-        if (! tenancy()->tenant?->features()->active(TierBase::class) || $defaultTier->is($customerTier)) {
+        if (TenantFeatureSupport::inactive(TierBase::class) || $defaultTier->is($customerTier)) {
             $tier = $defaultTier;
         }
 
@@ -176,7 +177,7 @@ final readonly class CustomerData
         ?Customer $customer = null
     ): RegisterStatus {
 
-        if (! tenancy()->tenant?->features()->active(TierBase::class)) {
+        if (TenantFeatureSupport::inactive(TierBase::class)) {
             return RegisterStatus::REGISTERED;
         }
 

@@ -23,13 +23,13 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
-    testInTenantContext();
-
-    tenancy()->tenant->features()->activate(CustomerBase::class);
-    tenancy()->tenant->features()->activate(TierBase::class);
-    tenancy()->tenant->features()->activate(AddressBase::class);
-    tenancy()->tenant->features()->activate(ECommerceBase::class);
-    tenancy()->tenant->features()->activate(ShippingStorePickup::class);
+    testInTenantContext([
+        CustomerBase::class,
+        TierBase::class,
+        AddressBase::class,
+        ECommerceBase::class,
+        ShippingStorePickup::class,
+    ]);
 
     $country = Country::create([
         'code' => 'US',

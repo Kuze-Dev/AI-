@@ -9,6 +9,7 @@ use App\Features\Shopconfiguration\Shipping\ShippingUps;
 use App\Features\Shopconfiguration\Shipping\ShippingUsps;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -18,7 +19,7 @@ class ShippingMethodPolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->someAreActive([
+        if (! TenantFeatureSupport::someAreActive([
             ShippingUsps::class,
             ShippingUps::class,
             ShippingStorePickup::class,

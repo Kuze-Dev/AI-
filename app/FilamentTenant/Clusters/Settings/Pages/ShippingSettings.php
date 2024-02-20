@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Clusters\Settings\Pages;
 
+use App\Features\Shopconfiguration\Shipping\ShippingAusPost;
+use App\Features\Shopconfiguration\Shipping\ShippingUps;
+use App\Features\Shopconfiguration\Shipping\ShippingUsps;
 use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\ShippingSettings as SettingsShippingSettings;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 
 class ShippingSettings extends TenantBaseSettings
@@ -40,7 +44,7 @@ class ShippingSettings extends TenantBaseSettings
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingUsps::class)
+                        fn () => ! TenantFeatureSupport::active(ShippingUsps::class)
                     ),
                 Forms\Components\Section::make(trans('Ups Shipping'))
                     ->collapsible()
@@ -62,7 +66,7 @@ class ShippingSettings extends TenantBaseSettings
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingUps::class)
+                        fn () => ! TenantFeatureSupport::active(ShippingUps::class)
                     ),
 
                 Forms\Components\Section::make(trans('AusPost Shipping'))
@@ -72,7 +76,7 @@ class ShippingSettings extends TenantBaseSettings
                             ->translateLabel(),
 
                     ])->hidden(
-                        fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\Shipping\ShippingAusPost::class)
+                        fn () => ! TenantFeatureSupport::active(ShippingAusPost::class)
                     ),
 
             ]),

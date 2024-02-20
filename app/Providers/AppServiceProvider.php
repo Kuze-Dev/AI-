@@ -54,6 +54,7 @@ use Domain\Taxation\Models\TaxZone;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\Models\TenantApiCall;
+use Domain\Tenant\TenantSupport;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
@@ -174,13 +175,13 @@ class AppServiceProvider extends ServiceProvider
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
 
         CaptchaManager::resolveProviderUsing(
-            fn () => tenancy()->initialized
+            fn () => TenantSupport::initialized()
                 ? app(FormSettings::class)->provider
                 : config('catpcha.provider')
         );
 
         CaptchaManager::resolveCredentialsUsing(
-            fn () => tenancy()->initialized
+            fn () => TenantSupport::initialized()
                 ? app(FormSettings::class)->getCredentials()
                 : config('catpcha.credentials')
         );

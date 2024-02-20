@@ -11,6 +11,7 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Customer\Enums\Gender;
+use Domain\Tenant\TenantFeatureSupport;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
@@ -32,7 +33,7 @@ class CustomerRegisterRequest extends FormRequest
             'gender' => ['required', Rule::enum(Gender::class)],
             'tier_id' => [
                 Rule::when(
-                    (bool) tenancy()->tenant?->features()->active(TierBase::class),
+                    TenantFeatureSupport::active(TierBase::class),
                     'required',
                     'nullable'
                 ),
@@ -44,7 +45,7 @@ class CustomerRegisterRequest extends FormRequest
         ];
 
         // Billing and shipping rules
-        if (tenancy()->tenant?->features()->active(AddressBase::class)) {
+        if (TenantFeatureSupport::active(AddressBase::class)) {
             $rules['billing.same_as_shipping'] = 'required|bool';
 
             $shippingRules = [

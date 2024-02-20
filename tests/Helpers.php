@@ -10,6 +10,7 @@ use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;
+use Domain\Tenant\TenantSupport;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
@@ -81,18 +82,17 @@ function testInTenantContext(array|string|null $features = null): Tenant
 
     $tenant->createDomain(['domain' => $domain]);
 
-    $tenant->features()->activate(CMSBase::class);
-    $tenant->features()->activate(ECommerceBase::class);
-
     URL::forceRootUrl(Request::getScheme().'://'.$domain);
 
-    if (filled($features)) {
-        foreach (Arr::wrap($features) as $feature) {
-            $tenant->features()->activate($feature);
-        }
-    }
-
     tenancy()->initialize($tenant);
+
+    activateFeatures(
+        collect($features ?? [])
+            ->merge([
+                CMSBase::class, ECommerceBase::class,
+            ])
+            ->toArray()
+    );
 
     seed([
         PermissionSeeder::class,
@@ -118,4 +118,31 @@ function csvFiles(callable $fakeRows, int $rowCount = 10): Illuminate\Http\Testi
             name: 'import-file.csv',
             content: $content->join("\n")
         );
+}
+
+function activateFeatures(string|array $features): void
+{
+    if (blank($features)) {
+        return;
+    }
+
+    $tenant = TenantSupport::model();
+
+    foreach (Arr::wrap($features) as $feature) {
+        $tenant->features()->activate($feature);
+    }
+
+}
+function deactivateFeatures(string|array $features): void
+{
+    if (blank($features)) {
+        return;
+    }
+
+    $tenant = TenantSupport::model();
+
+    foreach (Arr::wrap($features) as $feature) {
+        $tenant->features()->deactivate($feature);
+    }
+
 }

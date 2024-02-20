@@ -10,7 +10,7 @@ use App\Settings\SiteSettings;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Contracts\HasEmailVerificationOTP;
 use Domain\Customer\Models\Customer;
-use Domain\Tenant\Models\Tenant;
+use Domain\Tenant\TenantSupport;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
@@ -78,7 +78,7 @@ class AuthServiceProvider extends ServiceProvider
             if ($notifiable instanceof HasEmailVerificationOTP && $notifiable->isEmailVerificationUseOTP()) {
                 return (new MailMessage())
                     ->from(
-                        tenancy()->tenant ?
+                        TenantSupport::initialized() ?
                         (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
                         config('mail.from.address')
                     )
@@ -92,7 +92,7 @@ class AuthServiceProvider extends ServiceProvider
             // https://github.com/laravel/framework/blob/v10.16.1/src/Illuminate/Auth/Notifications/VerifyEmail.php#L62
             return (new MailMessage())
                 ->from(
-                    tenancy()->tenant ?
+                    TenantSupport::initialized() ?
                     (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
                     config('mail.from.address')
                 )
@@ -109,10 +109,8 @@ class AuthServiceProvider extends ServiceProvider
             }
 
             if ($notifiable instanceof Customer) {
-                /** @var Tenant $tenant */
-                $tenant = tenancy()->tenant;
 
-                $hostName = Request::getScheme().'://'.$tenant->domains->first()?->domain;
+                $hostName = Request::getScheme().'://'.TenantSupport::model()->domains->first()?->domain;
 
                 return $hostName.URL::temporarySignedRoute(
                     'tenant.api.customer.verification.verify',

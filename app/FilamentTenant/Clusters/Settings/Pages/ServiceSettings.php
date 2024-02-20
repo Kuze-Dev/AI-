@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Clusters\Settings\Pages;
 use App\Features\Service\ServiceBase;
 use App\Settings\ServiceSettings as ServiceCategorySettings;
 use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Section;
@@ -24,7 +25,7 @@ class ServiceSettings extends TenantBaseSettings
 
     public static function authorizeAccess(): bool
     {
-        return parent::authorizeAccess() && tenancy()->tenant?->features()->active(ServiceBase::class);
+        return parent::authorizeAccess() && TenantFeatureSupport::active(ServiceBase::class);
     }
 
     protected function getFormSchema(): array

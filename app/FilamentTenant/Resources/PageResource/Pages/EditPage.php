@@ -100,7 +100,7 @@ class EditPage extends EditRecord
             //     'other_page_actions' => CustomPageActionGroup::make([
             //         Action::make('preview')
             //             ->color('gray')
-            //             ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+            //             ->hidden((bool) TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
             //             ->label(trans('Preview Page'))
             //             ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
             //                 $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
@@ -115,7 +115,7 @@ class EditPage extends EditRecord
             //             }, true),
             //         Action::make('preview_microsite_action')
             //             ->label('Preview Microsite')
-            //             ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+            //             ->hidden((bool) TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class))
             //             ->color('gray')
             //             ->record($this->getRecord())
             //             ->modalHeading('Preview Microsite')

@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\CMS\CMSBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Page\Models\Page;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ class PagePolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (TenantFeatureSupport::inactive(CMSBase::class)) {
             return Response::denyAsNotFound();
         }
 

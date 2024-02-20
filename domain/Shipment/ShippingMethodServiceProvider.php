@@ -15,6 +15,7 @@ use Domain\Shipment\Drivers\UpsDriver;
 use Domain\Shipment\Drivers\UspsDriver;
 use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -82,7 +83,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
 
     public function boot(): void
     {
-        if (tenancy()->initialized) {
+        if (TenantSupport::initialized()) {
 
             $shippingMethods = ShippingMethod::whereActive(true);
 
