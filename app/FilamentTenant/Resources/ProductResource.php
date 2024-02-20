@@ -61,15 +61,15 @@ class ProductResource extends Resource
                     Forms\Components\Section::make('Media')
                         ->translateLabel()
                         ->schema([
-                            Forms\Components\SpatieMediaLibraryFileUpload::make('images')
+                            Forms\Components\SpatieMediaLibraryFileUpload::make('image')
                                 ->translateLabel()
-                                ->collection('images')
+                                ->collection('image')
                                 ->image()
                                 ->multiple()
                                 ->required(),
-                            Forms\Components\SpatieMediaLibraryFileUpload::make('videos')
+                            Forms\Components\SpatieMediaLibraryFileUpload::make('video')
                                 ->translateLabel()
-                                ->collection('videos')
+                                ->collection('video')
                                 ->acceptedFileTypes([
                                     'video/*',
                                 ])

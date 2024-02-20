@@ -21,6 +21,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\File;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -298,9 +299,11 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     {
         $this->addMediaCollection('image')
             ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
-            ->acceptsMimeTypes([
-                'image/*',
-            ])
+            ->acceptsFile(
+                fn (File $file): bool => Str::of($file->mimeType)
+                    ->before('/')
+                    ->value() === 'image'
+            )
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')
@@ -309,9 +312,11 @@ class Product extends Model implements HasMedia, HasMetaDataContract
 
         $this->addMediaCollection('video')
             ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
-            ->acceptsMimeTypes([
-                'video/*',
-            ])
+            ->acceptsFile(
+                fn (File $file): bool => Str::of($file->mimeType)
+                    ->before('/')
+                    ->value() === 'video'
+            )
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }
