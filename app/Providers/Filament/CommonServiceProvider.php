@@ -50,48 +50,6 @@ class CommonServiceProvider extends ServiceProvider
         Export::polymorphicUserRelationship();
     }
 
-    //    protected function registerRoutes(): void
-    //    {
-    //        Route::middleware(config('filament.middleware.base'))
-    //            ->domain(config('filament.domain'))
-    //            ->prefix('admin')
-    //            ->name('filament.auth.')
-    //            ->group(function () {
-    //                Route::get('two-factor', TwoFactorAuthentication::class)
-    //                    ->middleware('guest:admin')
-    //                    ->name('two-factor');
-    //
-    //                Route::prefix('password')
-    //                    ->name('password.')
-    //                    ->group(function () {
-    //                        Route::get('reset', RequestPasswordReset::class)
-    //                            ->middleware('guest:admin')
-    //                            ->name('request');
-    //                        Route::get('reset/{token}', ResetPassword::class)
-    //                            ->middleware('guest:admin')
-    //                            ->name('reset');
-    //                        Route::get('confirm', ConfirmPassword::class)
-    //                            ->middleware(\Filament\Http\Middleware\Authenticate::class)
-    //                            ->name('confirm');
-    //                    });
-    //
-    //                Route::middleware(\Filament\Http\Middleware\Authenticate::class)
-    //                    ->group(function () {
-    //                        Route::get('account-deactivated', AccountDeactivatedNotice::class)
-    //                            ->name('account-deactivated.notice');
-    //
-    //                        Route::prefix('verify')
-    //                            ->name('verification.')
-    //                            ->group(function () {
-    //                                Route::get('/', EmailVerificationNotice::class)
-    //                                    ->name('notice');
-    //                                Route::get('/{id}/{hash}', VerifyEmail::class)
-    //                                    ->name('verify');
-    //                            });
-    //                    });
-    //            });
-    //    }
-
     protected function registerMacros(): void
     {
         MountableAction::mixin(new FilamentMountableActionMixin());
