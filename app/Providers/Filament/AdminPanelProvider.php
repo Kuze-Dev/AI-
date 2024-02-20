@@ -19,6 +19,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -48,6 +49,9 @@ class AdminPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => MenuItem::make()
                     ->label(fn () => Filament::auth()->user()?->full_name),
+            ])
+            ->colors([
+                'primary' => Color::Blue,
             ])
             ->brandName(fn () => app(SiteSettings::class)->name)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
