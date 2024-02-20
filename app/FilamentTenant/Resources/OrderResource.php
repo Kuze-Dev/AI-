@@ -263,7 +263,7 @@ class OrderResource extends Resource
                     ])
                     ->attribute('status'),
                 Tables\Filters\SelectFilter::make('customer_id')->label(trans('Customer Type'))
-                    ->hidden(fn () => ! TenantFeatureSupport::active(AllowGuestOrder::class))
+                    ->hidden(fn () => TenantFeatureSupport::inactive(AllowGuestOrder::class))
                     ->options([
                         OrderUserType::REGISTERED->value => trans('Registered'),
                         OrderUserType::GUEST->value => trans('Guest'),

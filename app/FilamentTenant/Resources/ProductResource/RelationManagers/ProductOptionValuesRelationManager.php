@@ -48,7 +48,7 @@ class ProductOptionValuesRelationManager extends RelationManager
             // visible if enabled ang color pallet FEATURE flag
             // visible if true ang is_custom ng selected product_option
 
-            if (! TenantFeatureSupport::active(ColorPallete::class)) {
+            if (TenantFeatureSupport::inactive(ColorPallete::class)) {
                 return false;
             }
 

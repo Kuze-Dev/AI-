@@ -44,7 +44,7 @@ class ShippingSettings extends TenantBaseSettings
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! TenantFeatureSupport::active(ShippingUsps::class)
+                        fn () => TenantFeatureSupport::inactive(ShippingUsps::class)
                     ),
                 Forms\Components\Section::make(trans('Ups Shipping'))
                     ->collapsible()
@@ -66,7 +66,7 @@ class ShippingSettings extends TenantBaseSettings
                             )
                             ->reactive(),
                     ])->hidden(
-                        fn () => ! TenantFeatureSupport::active(ShippingUps::class)
+                        fn () => TenantFeatureSupport::inactive(ShippingUps::class)
                     ),
 
                 Forms\Components\Section::make(trans('AusPost Shipping'))
@@ -76,7 +76,7 @@ class ShippingSettings extends TenantBaseSettings
                             ->translateLabel(),
 
                     ])->hidden(
-                        fn () => ! TenantFeatureSupport::active(ShippingAusPost::class)
+                        fn () => TenantFeatureSupport::inactive(ShippingAusPost::class)
                     ),
 
             ]),

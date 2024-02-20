@@ -111,7 +111,7 @@ class CustomerResource extends Resource
                         ->timezone(null),
                     Forms\Components\Select::make('tier_id')
                         ->translateLabel()
-                        ->hidden(fn () => ! TenantFeatureSupport::active(TierBase::class))
+                        ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))
                         ->relationship('tier', 'name')
                         ->searchable()
                         ->preload(),
@@ -173,7 +173,7 @@ class CustomerResource extends Resource
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
-                        ->hidden(fn () => ! TenantFeatureSupport::active(RewardPoints::class)),
+                        ->hidden(fn () => TenantFeatureSupport::inactive(RewardPoints::class)),
                 ])
                     ->columns(2)
                     ->disabled(fn ($record) => $record?->trashed()),
@@ -213,7 +213,7 @@ class CustomerResource extends Resource
                     ->translateLabel()
                     ->badge()
                     ->sortable()
-                    ->hidden(fn () => ! TenantFeatureSupport::active(TierBase::class))
+                    ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))
                     ->toggleable(fn () => (bool) TenantFeatureSupport::active(TierBase::class),
                         isToggledHiddenByDefault: true
                     )
@@ -250,7 +250,7 @@ class CustomerResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->translateLabel(),
                 Tables\Filters\SelectFilter::make('tier')
-                    ->hidden(fn () => ! TenantFeatureSupport::active(TierBase::class))
+                    ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))
                     ->translateLabel()
                     ->relationship('tier', 'name'),
                 Tables\Filters\SelectFilter::make('status')

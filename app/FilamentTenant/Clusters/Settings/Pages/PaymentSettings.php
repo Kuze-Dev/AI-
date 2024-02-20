@@ -39,7 +39,7 @@ class PaymentSettings extends TenantBaseSettings
                             ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
                             ->reactive(),
                     ])
-                    ->hidden(fn () => ! TenantFeatureSupport::active(PaypalGateway::class)),
+                    ->hidden(fn () => TenantFeatureSupport::inactive(PaypalGateway::class)),
                 Forms\Components\Section::make(trans('Stripe'))
                     ->collapsible()
                     ->schema([
@@ -51,7 +51,7 @@ class PaymentSettings extends TenantBaseSettings
                             ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
                             ->reactive(),
                     ])
-                    ->hidden(fn () => ! TenantFeatureSupport::active(StripeGateway::class)),
+                    ->hidden(fn () => TenantFeatureSupport::inactive(StripeGateway::class)),
 
             ]),
 
