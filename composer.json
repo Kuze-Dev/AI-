@@ -6,6 +6,7 @@
     "require": {
         "php": "^8.2.11",
         "ext-pdo": "*",
+        "akaunting/laravel-money": "^5.1",
         "aws/aws-sdk-php": "^3.300.0",
         "bacon/bacon-qr-code": "^2.0.8",
         "barryvdh/laravel-dompdf": "^2.0.1",

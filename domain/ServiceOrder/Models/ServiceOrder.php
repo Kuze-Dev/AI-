@@ -14,6 +14,7 @@ use Domain\Payments\Models\Payment;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Enums\PaymentPlanType;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -194,6 +195,7 @@ class ServiceOrder extends Model implements PayableInterface
         'total_price' => MoneyCast::class,
         'status' => ServiceOrderStatus::class,
         'payment_plan' => 'json',
+        'payment_type' => PaymentPlanType::class,
     ];
 
     public function getRouteKeyName(): string
