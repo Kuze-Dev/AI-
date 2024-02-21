@@ -9,12 +9,15 @@ use Illuminate\Support\Str;
 
 class GenerateReferenceNumberAction
 {
-    public function execute(Model $model): string
+    /**
+     * @param  class-string<Model>  $model
+     */
+    public function execute(string $model): string
     {
         /** @var array|false $words */
         $words = preg_split(
             '/(?=[A-Z])/',
-            Str::of(get_class($model))
+            Str::of($model)
                 ->classBasename()
                 ->value(),
             -1,

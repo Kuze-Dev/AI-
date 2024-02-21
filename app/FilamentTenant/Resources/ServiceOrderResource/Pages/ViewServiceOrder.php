@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources\ServiceOrderResource\Pages;
 use Akaunting\Money\Money;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
+use App\FilamentTenant\Resources\ServiceOrderResource\Support as ServiceOrderSupport;
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\ButtonAction;
@@ -70,7 +71,7 @@ class ViewServiceOrder extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
         ];
@@ -198,7 +199,7 @@ class ViewServiceOrder extends EditRecord
                                             TextLabel::make('')
                                                 ->label(
                                                     fn (Closure $get) => money(
-                                                        ServiceOrderResource::getSubtotal(0, $get('additional_charges')) * 100,
+                                                        ServiceOrderSupport::getSubtotal(0, $get('additional_charges')) * 100,
                                                         $get('currency_code')
                                                     )
                                                 )
@@ -646,7 +647,7 @@ class ViewServiceOrder extends EditRecord
     private static function calculateTaxInfo(ServiceOrder $record, array $additionalCharges): ServiceOrderTaxData
     {
         return app(GetTaxableInfoAction::class)->computeTotalPriceWithTax(
-            ServiceOrderResource::getSubtotal($record->service_price, $additionalCharges),
+            ServiceOrderSupport::getSubtotal($record->service_price, $additionalCharges),
             $record
         );
     }

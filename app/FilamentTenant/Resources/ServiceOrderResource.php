@@ -11,21 +11,14 @@ use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBi
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\Rules\PaymentPlanAmountRule;
 use App\FilamentTenant\Resources\ServiceOrderResource\Schema;
+use App\FilamentTenant\Resources\ServiceOrderResource\Support;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use App\FilamentTenant\Support\TextLabel;
 use Domain\Address\Models\Address;
-use Domain\Currency\Models\Currency;
-use Domain\Customer\Models\Customer;
 use Domain\Service\Models\Service;
-use Domain\ServiceOrder\Actions\CalculateServiceOrderTotalPriceAction;
-use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\Enums\PaymentPlanType;
 use Domain\ServiceOrder\Enums\PaymentPlanValue;
-use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Models\ServiceOrder;
-use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
@@ -41,7 +34,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 
 class ServiceOrderResource extends Resource
 {
@@ -67,9 +59,9 @@ class ServiceOrderResource extends Resource
                         Section::make(trans('Customer'))
                             ->schema([
 
-                                Forms\Components\Select::make('customer')
+                                Forms\Components\Select::make('customer_id')
                                     ->translateLabel()
-                                    ->relationship(titleAttribute: 'email')
+                                    ->relationship(name: 'customer', titleAttribute: 'email')
                                     ->required()
                                     ->preload()
                                     ->searchable()
@@ -77,37 +69,49 @@ class ServiceOrderResource extends Resource
 
                                 Forms\Components\Group::make()
                                     ->columns()
-                                    ->visible(fn (Get $get) => $get('customer') !== null)
+                                    ->visible(fn (Get $get) => $get('customer_id') !== null)
                                     ->schema([
 
-                                        Placeholder::make('first_name')
-                                            ->translateLabel()
-                                            ->content(fn (Get $get) => self::customer($get)->first_name),
+                                        Placeholder::make('first_name_placeholder')
+                                            ->label(trans('First name'))
+                                            ->content(fn (Get $get) => Support::customer($get)->first_name),
 
-                                        Placeholder::make('last_name')
-                                            ->translateLabel()
-                                            ->content(fn (Get $get) => self::customer($get)->last_name),
+                                        Placeholder::make('last_name_placeholder')
+                                            ->label(trans('Last name'))
+                                            ->content(fn (Get $get) => Support::customer($get)->last_name),
 
-                                        Placeholder::make('email')
-                                            ->translateLabel()
-                                            ->content(fn (Get $get) => self::customer($get)->email),
+                                        Placeholder::make('email_placeholder')
+                                            ->label(trans('Email'))
+                                            ->content(fn (Get $get) => Support::customer($get)->email),
 
-                                        Placeholder::make('mobile')
-                                            ->translateLabel()
-                                            ->content(fn (Get $get) => self::customer($get)->mobile),
+                                        Placeholder::make('mobile_placeholder')
+                                            ->label(trans('Mobile'))
+                                            ->content(fn (Get $get) => Support::customer($get)->mobile),
+
+                                        Forms\Components\Hidden::make('customer_first_name')
+                                            ->dehydrateStateUsing(fn (Get $get) => Support::customer($get)->first_name),
+
+                                        Forms\Components\Hidden::make('customer_last_name')
+                                            ->dehydrateStateUsing(fn (Get $get) => Support::customer($get)->last_name),
+
+                                        Forms\Components\Hidden::make('customer_email')
+                                            ->dehydrateStateUsing(fn (Get $get) => Support::customer($get)->email),
+
+                                        Forms\Components\Hidden::make('customer_mobile')
+                                            ->dehydrateStateUsing(fn (Get $get) => Support::customer($get)->mobile),
                                     ]),
 
                             ]),
 
                         Section::make(trans('Service Address'))
-                            ->visible(fn (Get $get) => $get('customer') !== null)
+                            ->visible(fn (Get $get) => $get('customer_id') !== null)
                             ->schema([
 
                                 Forms\Components\Select::make('service_address')
                                     ->label(trans('Select Address'))
                                     ->required()
                                     ->options(
-                                        fn (Get $get) => Address::where('customer_id', $get('customer'))
+                                        fn (Get $get) => Address::where('customer_id', $get('customer_id'))
                                             ->pluck('address_line_1', 'id')
                                     )
                                     ->searchable()
@@ -120,19 +124,25 @@ class ServiceOrderResource extends Resource
                                     ->visible(fn (Get $get) => $get('service_address') !== null)
                                     ->schema([
 
-                                        ...Schema::address('service_address'),
+                                        Forms\Components\Fieldset::make()
+                                            ->relationship('serviceOrderServiceAddress')
+                                            ->schema(Schema::address(
+                                                '../service_address',
+                                                ServiceOrderAddressType::SERVICE_ADDRESS
+                                            )),
 
                                         Checkbox::make('is_same_as_billing')
                                             ->label(trans('Same as Billing Address'))
                                             ->reactive()
-                                            ->default(true),
+                                            ->default(true)
+                                            ->dehydrated(false),
                                     ]),
 
                             ]),
 
                         Section::make(trans('Billing Address'))
                             ->visible(
-                                fn (Get $get) => $get('customer') !== null &&
+                                fn (Get $get) => $get('customer_id') !== null &&
                                     $get('is_same_as_billing') === false
                             )
                             ->schema([
@@ -141,7 +151,7 @@ class ServiceOrderResource extends Resource
                                     ->label(trans('Select Address'))
                                     ->required()
                                     ->options(
-                                        fn (Get $get) => Address::where('customer_id', $get('customer'))
+                                        fn (Get $get) => Address::where('customer_id', $get('customer_id'))
                                             ->pluck('address_line_1', 'id')
                                     )
                                     ->searchable()
@@ -152,7 +162,14 @@ class ServiceOrderResource extends Resource
                                 Forms\Components\Group::make()
                                     ->columns()
                                     ->visible(fn (Get $get) => $get('billing_address') !== null)
-                                    ->schema(Schema::address('billing_address')),
+                                    ->schema([
+                                        Forms\Components\Fieldset::make()
+                                            ->relationship('serviceOrderBillingAddress')
+                                            ->schema(Schema::address(
+                                                '../billing_address',
+                                                ServiceOrderAddressType::BILLING_ADDRESS
+                                            )),
+                                    ]),
 
                             ]),
 
@@ -161,9 +178,10 @@ class ServiceOrderResource extends Resource
                                 Forms\Components\Group::make()
                                     ->columns(2)
                                     ->schema([
-                                        Forms\Components\Select::make('service')
+                                        Forms\Components\Select::make('service_id')
                                             ->translateLabel()
                                             ->relationship(
+                                                name: 'service',
                                                 titleAttribute: 'name',
                                                 modifyQueryUsing: fn (Builder $query) => $query->where('status', true)
                                             )
@@ -176,55 +194,58 @@ class ServiceOrderResource extends Resource
                                         DateTimePicker::make('schedule')
                                             ->columnSpan(2)
                                             ->minDate(now())
-                                            ->seconds(false)
+//                                            ->seconds(false)
                                             ->default(now())
                                             ->visible(
                                                 function (Get $get): bool {
-                                                    if ($get('service') === null) {
+                                                    if ($get('service_id') === null) {
                                                         return true;
                                                     }
 
-                                                    return ! self::service($get)->is_subscription;
+                                                    return ! Support::service($get)?->is_subscription;
                                                 }
                                             ),
 
                                         Forms\Components\Group::make()
                                             ->columnSpan(2)
-                                            ->visible(fn (Get $get) => $get('service') !== null)
+                                            ->visible(fn (Get $get) => $get('service_id') !== null)
                                             ->schema([
                                                 Forms\Components\Fieldset::make()
                                                     ->schema([
 
-                                                        Placeholder::make('Service')
-                                                            ->content(fn (Get $get) => self::service($get)->name),
+                                                        Placeholder::make('service_placeholder')
+                                                            ->label(trans('Service'))
+                                                            ->content(fn (Get $get) => Support::service($get)?->name),
 
-                                                        Placeholder::make('Service Price')
-                                                            ->content(fn (Get $get) => self::currencyFormat($get, 'servicePrice')),
+                                                        Placeholder::make('service_price_placeholder')
+                                                            ->label(trans('Service Price'))
+                                                            ->content(fn (Get $get) => Support::currencyFormat($get, 'servicePrice')),
 
                                                         Forms\Components\Group::make()
                                                             ->columnSpan(2)
                                                             ->columns()
                                                             ->visible(
                                                                 function (Get $get): bool {
-                                                                    if ($get('service') === null) {
+                                                                    if ($get('service_id') === null) {
                                                                         return false;
                                                                     }
 
-                                                                    return self::service($get)->is_subscription;
+                                                                    return Support::service($get)?->is_subscription;
                                                                 }
                                                             )
                                                             ->schema([
 
-                                                                Placeholder::make('Billing Schedule')
+                                                                Placeholder::make('billing_schedule_placeholder')
+                                                                    ->label(trans('Billing Schedule'))
                                                                     ->content(
-                                                                        fn (Get $get) => ucfirst(self::service($get)->billing_cycle->value ?? '')
-
+                                                                        fn (Get $get) => ucfirst(Support::service($get)?->billing_cycle->value ?? '')
                                                                     ),
 
-                                                                Placeholder::make('Due Date every')
+                                                                Placeholder::make('due_date_every_placeholder')
+                                                                    ->label(trans('Due Date every'))
                                                                     ->content(
                                                                         fn (Get $get) => trans(':day days after billing date', [
-                                                                            'day' => self::ordinalNumber(self::service($get)->due_date_every ?? 0),
+                                                                            'day' => Support::ordinalNumber(Support::service($get)?->due_date_every ?? 0),
                                                                         ])
                                                                     ),
                                                             ]),
@@ -234,15 +255,8 @@ class ServiceOrderResource extends Resource
 
                                         Forms\Components\Group::make()
                                             ->schema([
-                                                Forms\Components\Fieldset::make()
+                                                Forms\Components\Fieldset::make(trans('Payment Plan'))
                                                     ->schema([
-                                                        //                                                    TextLabel::make('')
-                                                        //                                                        ->label(trans('Payment Plan'))
-                                                        //                                                        ->alignLeft()
-                                                        //                                                        ->size('xl')
-                                                        //                                                        ->weight('bold')
-                                                        //                                                        ->inline()
-                                                        //                                                        ->readOnly(),
 
                                                         Radio::make('payment_type')
                                                             ->label(trans('Pay in'))
@@ -269,22 +283,22 @@ class ServiceOrderResource extends Resource
                                                             ->addActionLabel(trans('Add Milestone'))
                                                             ->columnSpan(2)
                                                             ->defaultItems(1)
-                                                            ->reactive()
-                                                            ->rule(fn (Get $get) => new PaymentPlanAmountRule(
-                                                                floatval(self::currencyFormat($get, 'totalPriceFloat')), $get('payment_value'))
+                                                            ->rule(
+                                                                fn (Get $get) => new PaymentPlanAmountRule(
+                                                                    floatval(Support::currencyFormat($get, 'totalPriceFloat')),
+                                                                    $get('payment_value')
+                                                                )
                                                             )
+                                                            ->columns()
+                                                            ->visible(
+                                                                fn (Get $get) => $get('payment_type') === PaymentPlanType::MILESTONE
+                                                            )
+                                                            ->reactive()
                                                             ->schema([
                                                                 TextInput::make('description')
                                                                     ->required()
                                                                     ->translateLabel()
-                                                                    ->afterStateUpdated(function ($component, $state, $livewire) {
-                                                                        $items = $component->getContainer()->getParentComponent()->getOldState();
-                                                                        $livewire->resetErrorBag($component->getStatePath());
-
-                                                                        if (in_array([$component->getName() => $state]['description'], array_column($items, 'description'))) {
-                                                                            $livewire->addError($component->getStatePath(), 'duplicated');
-                                                                        }
-                                                                    }),
+                                                                    ->distinct(),
 
                                                                 TextInput::make('amount')
                                                                     ->required(),
@@ -294,18 +308,14 @@ class ServiceOrderResource extends Resource
                                                                     ->translateLabel()
                                                                     ->visible(false)
                                                                     ->default(false),
-                                                            ])
-                                                            ->columns()
-                                                            ->visible(
-                                                                fn (Get $get) => $get('payment_type') === PaymentPlanType::MILESTONE
-                                                            ),
+                                                            ]),
                                                     ]),
 
                                             ])
                                             ->columnSpan(2)
                                             ->visible(
-                                                fn (Get $get) => $get('service') &&
-                                                    ! Service::whereId($get('service'))
+                                                fn (Get $get) => $get('service_id') &&
+                                                    ! Service::whereId($get('service_id'))
                                                         ->first()?->is_subscription
                                             ),
 
@@ -345,12 +355,18 @@ class ServiceOrderResource extends Resource
                             ]),
 
                         Forms\Components\Section::make(trans('Form Title'))
+                            ->visible(fn (Get $get) => $get('service_id') !== null)
                             ->schema([
 
-                                SchemaFormBuilder::make('form', fn (?Service $record) => $record?->blueprint?->schema)
-                                    ->schemaData(fn (Get $get) => Service::whereId($get('service'))->first()?->blueprint?->schema),
+                                SchemaFormBuilder::make(
+                                    'customer_form',
+                                    fn (?Service $record) => $record?->blueprint?->schema
+                                )
+                                    ->schemaData(
+                                        fn (Get $get) => Support::service($get)?->blueprint?->schema
+                                    ),
+
                             ])
-                            ->hidden(fn (Get $get) => $get('service') === null)
                             ->columnSpan(2),
 
                     ])
@@ -362,63 +378,39 @@ class ServiceOrderResource extends Resource
                             ->columns(2)
                             ->translateLabel()
                             ->schema([
-                                //                                TextLabel::make('')
-                                //                                    ->label(trans('Service Price'))
-                                //                                    ->alignLeft()
-                                //                                    ->size('md')
-                                //                                    ->inline()
-                                //                                    ->readOnly(),
-                                //                                TextLabel::make('')
-                                //                                    ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'servicePrice'))
-                                //                                    ->alignRight()
-                                //                                    ->size('md')
-                                //                                    ->inline()
-                                //                                    ->readOnly(),
-                                //                                TextLabel::make('')
-                                //                                    ->label(trans('Additional Charges'))
-                                //                                    ->alignLeft()
-                                //                                    ->size('md')
-                                //                                    ->inline()
-                                //                                    ->readOnly(),
-                                //                                TextLabel::make('')
-                                //                                    ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'additionalCharges'))
-                                //                                    ->alignRight()
-                                //                                    ->size('md')
-                                //                                    ->inline()
-                                //                                    ->readOnly(),
+
+                                Placeholder::make('service_price_placeholder')
+                                    ->label(trans('Service Price'))
+                                    ->inlineLabel()
+                                    ->columnSpanFull()
+                                    ->content(fn (Get $get) => Support::currencyFormat($get, 'servicePrice')),
+
+                                Placeholder::make('additional_charges_placeholder')
+                                    ->label(trans('Additional Charges'))
+                                    ->inlineLabel()
+                                    ->columnSpanFull()
+                                    ->content(fn (Get $get) => Support::currencyFormat($get, 'additionalCharges')),
+
                                 Forms\Components\Group::make()
                                     ->columns()
                                     ->columnSpan(2)
                                     ->schema([
 
-                                        //                                    TextLabel::make('')
-                                        //                                        ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'taxPercentage'))
-                                        //                                        ->alignLeft()
-                                        //                                        ->size('md')
-                                        //                                        ->inline()
-                                        //                                        ->readOnly(),
-                                        //                                    TextLabel::make('')
-                                        //                                        ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'taxTotal'))
-                                        //                                        ->alignRight()
-                                        //                                        ->size('md')
-                                        //                                        ->inline()
-                                        //                                        ->readOnly(),
+                                        Placeholder::make('tax_percentage_placeholder')
+                                            ->hiddenLabel()
+                                            ->content(fn (Get $get) => Support::currencyFormat($get, 'taxPercentage')),
+
+                                        Placeholder::make('tax_total_placeholder')
+                                            ->hiddenLabel()
+                                            ->content(fn (Get $get) => Support::currencyFormat($get, 'taxTotal')),
                                     ])
-                                    ->visible(fn (array $state) => self::showTax($state)),
-                                //                                TextLabel::make('')
-                                //                                    ->label(trans('Total Price'))
-                                //                                    ->alignLeft()
-                                //                                    ->size('md')
-                                //                                    ->inline()
-                                //                                    ->readOnly()
-                                //                                    ->color('primary'),
-                                //                                TextLabel::make('')
-                                //                                    ->label(fn (\Filament\Forms\Get $get) => self::currencyFormat($get, 'totalPrice'))
-                                //                                    ->alignRight()
-                                //                                    ->size('md')
-                                //                                    ->inline()
-                                //                                    ->readOnly()
-                                //                                    ->color('primary'),
+                                    ->visible(fn (array $state) => Support::showTax($state)),
+
+                                Placeholder::make('total_price_placeholder')
+                                    ->label(trans('Total Price'))
+                                    ->inlineLabel()
+                                    ->columnSpanFull()
+                                    ->content(fn (Get $get) => Support::currencyFormat($get, 'totalPrice')),
                             ]),
 
                     ])
@@ -435,203 +427,31 @@ class ServiceOrderResource extends Resource
                     ->label(trans('Order ID'))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customer_name')
+
+                Tables\Columns\TextColumn::make('customer_full_name')
                     ->label(trans('Customer'))
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query
-                            ->orderBy('customer_first_name', $direction);
-                    })
-                    ->formatStateUsing(function ($record) {
-                        return Str::limit($record->customer_first_name.' '.$record->customer_last_name, 30);
-                    })
-                    ->searchable(query: function (Builder $query, string $search) {
-                        $query->where('customer_first_name', 'like', "%{$search}%")
-                            ->orWhere('customer_last_name', 'like', "%{$search}%");
-                    })->wrap(),
-                Tables\Columns\TextColumn::make('total')
-                    ->formatStateUsing(function (ServiceOrder $record) {
-                        return $record->currency_symbol.' '.number_format((float) $record->total_price, 2, '.', ',');
-                    })
-                    ->alignRight()
+                    ->limit(30)
+                    ->sortable(['customer_first_name', 'customer_last_name'])
+                    ->searchable(['customer_first_name', 'customer_last_name'])
+                    ->wrap(),
+
+                Tables\Columns\TextColumn::make('total_price')
                     ->label(trans('Total'))
+                    ->money(currency: fn (ServiceOrder $record) => $record->currency_code)
+                    ->alignRight()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
-                    ->label(trans('Status'))
+                Tables\Columns\TextColumn::make('status')
+                    ->translateLabel()
                     ->alignRight()
-                    ->formatStateUsing(function (string $state): string {
-                        if ($state == ServiceOrderStatus::FORPAYMENT->value) {
-                            return trans('For Payment');
-                        }
-                        if ($state == ServiceOrderStatus::INPROGRESS->value) {
-                            return trans('In Progress');
-                        }
-
-                        return ucfirst($state);
-                    })
-                    ->color(function ($state) {
-                        $newState = str_replace(' ', '_', strtolower($state));
-
-                        return match ($newState) {
-                            ServiceOrderStatus::PENDING->value, ServiceOrderStatus::INPROGRESS->value => 'warning',
-                            ServiceOrderStatus::CLOSED->value, ServiceOrderStatus::INACTIVE->value, ServiceOrderStatus::CLOSED->value => 'danger',
-                            ServiceOrderStatus::COMPLETED->value, ServiceOrderStatus::ACTIVE->value => 'success',
-                            default => 'secondary',
-                        };
-                    })->inline()
                     ->alignLeft(),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->sortable()
                     ->label(trans('Order Date'))
+                    ->sortable()
                     ->dateTime(),
             ])
-            ->filters([])
-            ->actions([])
-            ->bulkActions([])
             ->defaultSort('updated_at', 'desc');
-    }
-
-    private static function customer(Get $get): Customer
-    {
-        return once(fn () => Customer::whereKey($get('customer'))->sole());
-    }
-
-    private static function service(Get $get): Service
-    {
-        return once(fn () => Service::whereKey($get('service'))->sole());
-    }
-
-    private static function ordinalNumber(int $number): string
-    {
-        if ($number % 100 >= 11 && $number % 100 <= 13) {
-            $ordinal = $number.'th';
-        } else {
-            switch ($number % 10) {
-                case 1:
-                    $ordinal = $number.'st';
-                    break;
-                case 2:
-                    $ordinal = $number.'nd';
-                    break;
-                case 3:
-                    $ordinal = $number.'rd';
-                    break;
-                default:
-                    $ordinal = $number.'th';
-                    break;
-            }
-        }
-
-        return $ordinal;
-    }
-
-    public static function getSubtotal(float $selling_price, array $additionalCharges): float
-    {
-        $subTotal = app(CalculateServiceOrderTotalPriceAction::class)
-            ->execute(
-                $selling_price,
-                array_filter(
-                    array_map(
-                        function ($additionalCharge) {
-                            if (
-                                isset($additionalCharge['price']) &&
-                                is_numeric($additionalCharge['price']) &&
-                                isset($additionalCharge['quantity']) &&
-                                is_numeric($additionalCharge['quantity'])
-                            ) {
-                                return new ServiceOrderAdditionalChargeData(
-                                    (float) $additionalCharge['price'],
-                                    (int) $additionalCharge['quantity']
-                                );
-                            }
-                        },
-                        $additionalCharges
-                    )
-                )
-            )
-            ->getAmount();
-
-        return $subTotal;
-    }
-
-    public static function getTax(float $selling_price, array $additionalCharges, ?int $billing_address_id): ServiceOrderTaxData
-    {
-        $subTotal = self::getSubtotal($selling_price, $additionalCharges);
-
-        if (is_null($billing_address_id) || $billing_address_id === 0) {
-            return new ServiceOrderTaxData(
-                sub_total: $subTotal,
-                tax_display: null,
-                tax_percentage: 0,
-                tax_total: 0,
-                total_price: $subTotal
-            );
-        }
-
-        $billingAddressData = Address::whereId($billing_address_id)
-            ->firstOrFail();
-
-        return app(GetTaxableInfoAction::class)
-            ->execute($subTotal, $billingAddressData);
-    }
-
-    private static function currencyFormat(Get $get, string $type): string|float
-    {
-        $currencySymbol = Currency::whereEnabled(true)->firstOrFail()->symbol;
-        $servicePrice = self::service($get)->selling_price ?? 0;
-        $additionalCharges = array_reduce($get('additional_charges'), function ($carry, $data) {
-            if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
-                return $carry + ($data['price'] * $data['quantity']);
-            }
-
-            return $carry;
-        }, 0);
-
-        $taxInfo = (self::getTax(
-            $servicePrice,
-            $get('additional_charges'),
-            (int) ($get('is_same_as_billing') ? $get('service_address') :
-                $get('billing_address'))
-        ));
-
-        if ($taxInfo->tax_display == PriceDisplay::INCLUSIVE) {
-            return PriceDisplay::INCLUSIVE->value;
-        }
-
-        $currency = 0.0;
-
-        if ($type == 'servicePrice') {
-            $currency = $servicePrice;
-        } elseif ($type == 'additionalCharges') {
-            $currency = $additionalCharges;
-        } elseif ($type == 'taxPercentage') {
-            return 'Tax ('.$taxInfo->tax_percentage.'%)';
-        } elseif ($type == 'totalPrice') {
-            $currency = $taxInfo->total_price;
-        } elseif ($type == 'taxTotal') {
-            $currency = $taxInfo->tax_total;
-        } elseif ($type == 'totalPriceFloat') {
-            return floatval($taxInfo->total_price);
-        }
-
-        return $currencySymbol.' '.number_format($currency, 2, '.', ',');
-    }
-
-    private static function showTax(array $state): bool
-    {
-        $sellingPrice = Service::whereId($state['service'])->first()?->selling_price ?? 0;
-
-        $taxDisplay = self::getTax(
-            $sellingPrice,
-            $state['additional_charges'],
-            (int) ($state['is_same_as_billing'] ? $state['service_address'] : $state['billing_address'])
-        )->tax_display;
-
-        if (isset($taxDisplay)) {
-            return true;
-        }
-
-        return false;
     }
 
     public static function getRelations(): array

@@ -11,8 +11,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 class PaymentPlanAmountRule implements ValidationRule
 {
     public function __construct(
-        protected readonly float $totalPrice,
-        protected readonly string $payment_value,
+        protected readonly float $total_price,
+        protected readonly PaymentPlanValue $payment_value,
     ) {
     }
 
@@ -21,14 +21,12 @@ class PaymentPlanAmountRule implements ValidationRule
         $amounts = array_column($value, 'amount');
         $sum = array_sum(array_map('floatval', $amounts));
 
-        if ($this->payment_value === PaymentPlanValue::FIXED->value) {
-            if ($this->totalPrice !== $sum) {
+        if ($this->payment_value === PaymentPlanValue::FIXED) {
+            if ($this->total_price !== $sum) {
                 $fail('The payment_plan amount must be equal to total price.');
 
             }
-        }
-
-        if ($this->payment_value === PaymentPlanValue::PERCENT->value) {
+        } elseif ($this->payment_value === PaymentPlanValue::PERCENT) {
             if ($sum !== floatval(100)) {
                 $fail('The payment_plan amount must be equal to 100.');
             }

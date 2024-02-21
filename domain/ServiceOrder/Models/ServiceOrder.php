@@ -180,7 +180,7 @@ class ServiceOrder extends Model implements PayableInterface
         'schema' => 'json',
         'customer_form' => 'json',
         'service_price' => MoneyCast::class,
-        'additional_charges' => 'json',
+        'additional_charges' => 'array',
         'billing_cycle' => BillingCycleEnum::class,
         'pay_upfront' => 'boolean',
         'is_subscription' => 'boolean',

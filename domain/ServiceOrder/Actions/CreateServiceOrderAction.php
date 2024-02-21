@@ -75,7 +75,7 @@ class CreateServiceOrderAction
             'service_id' => $serviceOrderData->service_id,
             'customer_id' => $serviceOrderData->customer_id,
             'reference' => $this->generateReferenceNumberAction
-                ->execute(new ServiceOrder()),
+                ->execute(ServiceOrder::class),
             'customer_first_name' => $customer->first_name,
             'customer_last_name' => $customer->last_name,
             'customer_email' => $customer->email,
