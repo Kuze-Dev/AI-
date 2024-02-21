@@ -22,11 +22,9 @@ use Domain\ServiceOrder\Actions\GenerateMilestonePipelineAction;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
 use Domain\ServiceOrder\Actions\ServiceOrderBankTransferAction;
 use Domain\ServiceOrder\Actions\UpdateServiceBillAction;
-use Domain\ServiceOrder\Actions\UpdateServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceBillData;
-use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderData;
 use Domain\ServiceOrder\Enums\PaymentPlanType;
 use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -49,7 +47,6 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -58,6 +55,9 @@ use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
+/**
+ * @property-read \Domain\ServiceOrder\Models\ServiceOrder $record
+ */
 class ViewServiceOrder extends EditRecord
 {
     use LogsFormActivity;
@@ -65,50 +65,6 @@ class ViewServiceOrder extends EditRecord
     protected static string $resource = ServiceOrderResource::class;
 
     protected static ?string $recordTitleAttribute = 'reference';
-
-    public function getHeading(): string|Htmlable
-    {
-        $reference = '';
-
-        if ($this->record instanceof ServiceOrder) {
-            $reference = $this->record->reference;
-        }
-
-        return trans('Service Order Details #').$reference;
-    }
-
-    /**
-     * @param  \Domain\ServiceOrder\Models\ServiceOrder  $record
-     *
-     * @throws Throwable
-     */
-    protected function handleRecordUpdate(Model $record, array $data): Model
-    {
-        $amountInfo = self::calculateTaxInfo($record, $data['additional_charges']);
-
-        $serviceOrder = app(UpdateServiceOrderAction::class)->execute(
-            $record,
-            new UpdateServiceOrderData(
-                sub_total: $amountInfo->sub_total,
-                tax_total: $amountInfo->tax_total,
-                total_price: $amountInfo->total_price,
-                additional_charges: $data['additional_charges'],
-                customer_form: $data['customer_form'],
-            ));
-
-        $serviceBill = $serviceOrder->serviceBills()->first();
-
-        if ($serviceOrder instanceof ServiceOrder && $serviceBill && ! $record->is_subscription) {
-            app(UpdateServiceBillAction::class)->execute($serviceBill, new UpdateServiceBillData(
-                sub_total: $serviceOrder->sub_total,
-                tax_total: $serviceOrder->tax_total,
-                total_amount: $serviceOrder->total_price,
-                additional_charges: $serviceOrder->additional_charges,
-            ));
-        }
-
-        return DB::transaction(fn () => $serviceOrder);
-    }
 
     protected function getHeaderActions(): array
     {
@@ -118,6 +74,40 @@ class ViewServiceOrder extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
         ];
+    }
+
+    public function getHeading(): string|Htmlable
+    {
+        return trans('Service Order Details #:service-order', ['service-order' => $this->record->reference]);
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $amountInfo = self::calculateTaxInfo($this->record, $data['additional_charges']);
+
+        /**
+         * 'additional_charges' => $data['additional_charges'],
+         * 'customer_form' => $data['customer_form'],
+         */
+        return $data + [
+            'sub_total' => $amountInfo->sub_total,
+            'tax_total' => $amountInfo->tax_total,
+            'total_price' => $amountInfo->total_price,
+        ];
+    }
+
+    protected function afterSave(): void
+    {
+        $serviceBill = $this->record->serviceBills()->first();
+
+        if ($serviceBill && ! $this->record->is_subscription) {
+            app(UpdateServiceBillAction::class)->execute($serviceBill, new UpdateServiceBillData(
+                sub_total: $this->record->sub_total,
+                tax_total: $this->record->tax_total,
+                total_amount: $this->record->total_price,
+                additional_charges: $this->record->additional_charges,
+            ));
+        }
     }
 
     protected function getFormSchema(): array
@@ -653,7 +643,7 @@ class ViewServiceOrder extends EditRecord
             });
     }
 
-    public static function calculateTaxInfo(ServiceOrder $record, array $additionalCharges): ServiceOrderTaxData
+    private static function calculateTaxInfo(ServiceOrder $record, array $additionalCharges): ServiceOrderTaxData
     {
         return app(GetTaxableInfoAction::class)->computeTotalPriceWithTax(
             ServiceOrderResource::getSubtotal($record->service_price, $additionalCharges),

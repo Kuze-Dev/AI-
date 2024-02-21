@@ -10,6 +10,7 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\Rules\PaymentPlanAmountRule;
+use App\FilamentTenant\Resources\ServiceOrderResource\Schema;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use Domain\Address\Models\Address;
@@ -102,50 +103,24 @@ class ServiceOrderResource extends Resource
                             ->visible(fn (Get $get) => $get('customer') !== null)
                             ->schema([
 
-                                Forms\Components\Select::make('service_address_id')
+                                Forms\Components\Select::make('service_address')
                                     ->label(trans('Select Address'))
-                                    ->placeholder(trans('Select Address'))
                                     ->required()
-                                    ->preload()
-                                    ->optionsFromModel(
-                                        Address::class,
-                                        'address_line_1',
-                                        fn (Builder $query, Get $get) => $query->where('customer_id', $get('customer'))
+                                    ->options(
+                                        fn (Get $get) => Address::where('customer_id', $get('customer'))
+                                            ->pluck('address_line_1', 'id')
                                     )
-                                    ->reactive(),
+                                    ->searchable()
+                                    ->preload()
+                                    ->reactive()
+                                    ->dehydrated(false),
 
                                 Forms\Components\Group::make()
                                     ->columns()
-                                    ->visible(fn (Get $get) => $get('service_address_id') !== null)
+                                    ->visible(fn (Get $get) => $get('service_address') !== null)
                                     ->schema([
 
-                                        Placeholder::make('country')
-                                            ->content(
-                                                fn (Get $get) => ($addressId = $get('service_address_id'))
-                                                ? Address::whereId($addressId)->first()?->state->country->name
-                                                : ''
-
-                                            ),
-
-                                        Placeholder::make('state')
-                                            ->content(
-                                                fn (Get $get) => ($addressId = $get('service_address_id'))
-                                                ? Address::whereId($addressId)->first()?->state->name
-                                                : ''
-                                            ),
-
-                                        Placeholder::make('City/Province')
-                                            ->content(
-                                                fn (Get $get) => ($addressId = $get('service_address_id'))
-                                                ? Address::whereId($addressId)->first()?->city
-                                                : ''
-                                            ),
-
-                                        Placeholder::make('Zip')
-                                            ->content(fn (Get $get) => ($addressId = $get('service_address_id'))
-                                                ? Address::whereId($addressId)->first()?->zip_code
-                                                : ''
-                                            ),
+                                        ...Schema::address('service_address'),
 
                                         Checkbox::make('is_same_as_billing')
                                             ->label(trans('Same as Billing Address'))
@@ -156,54 +131,30 @@ class ServiceOrderResource extends Resource
                             ]),
 
                         Section::make(trans('Billing Address'))
+                            ->visible(
+                                fn (Get $get) => $get('customer') !== null &&
+                                    $get('is_same_as_billing') === false
+                            )
                             ->schema([
-                                Forms\Components\Select::make('billing_address_id')
+
+                                Forms\Components\Select::make('billing_address')
                                     ->label(trans('Select Address'))
-                                    ->placeholder(trans('Select Address'))
                                     ->required()
-                                    ->preload()
-                                    ->optionsFromModel(
-                                        Address::class,
-                                        'address_line_1',
-                                        fn (Builder $query, Get $get) => $query->where('customer_id', $get('customer'))
+                                    ->options(
+                                        fn (Get $get) => Address::where('customer_id', $get('customer'))
+                                            ->pluck('address_line_1', 'id')
                                     )
-                                    ->reactive(),
+                                    ->searchable()
+                                    ->preload()
+                                    ->reactive()
+                                    ->dehydrated(false),
 
                                 Forms\Components\Group::make()
-                                    ->columns(2)
-                                    ->schema([
-                                        Placeholder::make('country')
-                                            ->content(
-                                                fn (Get $get) => ($addressId = $get('billing_address_id'))
-                                                ? Address::whereId($addressId)->first()?->state->country->name
-                                                : ''
-                                            ),
+                                    ->columns()
+                                    ->visible(fn (Get $get) => $get('billing_address') !== null)
+                                    ->schema(Schema::address('billing_address')),
 
-                                        Placeholder::make('state')
-                                            ->content(
-                                                fn (Get $get) => ($addressId = $get('billing_address_id'))
-                                                ? Address::whereId($addressId)->first()?->state->name
-                                                : ''
-                                            ),
-
-                                        Placeholder::make('City/Province')
-                                            ->content(
-                                                fn (Get $get) => ($addressId = $get('billing_address_id'))
-                                                ? Address::whereId($addressId)->first()?->city
-                                                : ''
-                                            ),
-
-                                        Placeholder::make('Zip')
-                                            ->content(
-                                                fn (Get $get) => ($addressId = $get('billing_address_id'))
-                                                ? Address::whereId($addressId)->first()?->zip_code
-                                                : ''
-                                            ),
-                                    ])
-                                    ->visible(fn (array $state) => isset($state['billing_address_id'])),
-
-                            ])
-                            ->visible(fn (array $state) => ! $state['is_same_as_billing'] && isset($state['customer'])),
+                            ]),
 
                         Section::make(trans('Service'))
                             ->schema([
@@ -639,8 +590,8 @@ class ServiceOrderResource extends Resource
         $taxInfo = (self::getTax(
             $servicePrice,
             $get('additional_charges'),
-            (int) ($get('is_same_as_billing') ? $get('service_address_id') :
-                $get('billing_address_id'))
+            (int) ($get('is_same_as_billing') ? $get('service_address') :
+                $get('billing_address'))
         ));
 
         if ($taxInfo->tax_display == PriceDisplay::INCLUSIVE) {
@@ -673,7 +624,7 @@ class ServiceOrderResource extends Resource
         $taxDisplay = self::getTax(
             $sellingPrice,
             $state['additional_charges'],
-            (int) ($state['is_same_as_billing'] ? $state['service_address_id'] : $state['billing_address_id'])
+            (int) ($state['is_same_as_billing'] ? $state['service_address'] : $state['billing_address'])
         )->tax_display;
 
         if (isset($taxDisplay)) {
