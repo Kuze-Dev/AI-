@@ -39,6 +39,6 @@ class EditRole extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateRoleAction::class)->execute($record, new RoleData(...$data)));
+        return DB::transaction(fn () => app(UpdateRoleAction::class)->execute($record, RoleData::fromArray($data)));
     }
 }
