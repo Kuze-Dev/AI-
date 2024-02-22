@@ -11,12 +11,10 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Support as ServiceOrderSup
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\ButtonAction;
-use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use App\Settings\ServiceSettings;
 use Closure;
-use DateTimeZone;
 use Domain\Admin\Models\Admin;
 use Domain\Payments\Enums\PaymentRemark;
 use Domain\ServiceOrder\Actions\GenerateMilestonePipelineAction;
@@ -27,7 +25,6 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceBillData;
 use Domain\ServiceOrder\Enums\PaymentPlanType;
-use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
@@ -35,17 +32,12 @@ use Domain\ServiceOrder\Exceptions\MissingServiceSettingsConfigurationException;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceOrderAddress;
 use Domain\Taxation\Enums\PriceDisplay;
-use ErrorException;
 use Exception;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Components\Actions\Action as ComponentsAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -111,209 +103,212 @@ class EditServiceOrder extends EditRecord
         }
     }
 
-    protected function getFormSchema(): array
+    public function form(Forms\Form $form): Forms\Form
     {
-        return [
+        return $form->schema([
+            Forms\Components\Group::make()
+                ->schema($this->getSection())
+                ->columnSpan(2),
+
             Forms\Components\Group::make()
                 ->schema([
-                    Forms\Components\Group::make()
-                        ->schema($this->getSection())
-                        ->columnSpan(2),
-                    Group::make()
+                    Forms\Components\Section::make(trans('Service Order Summary'))
                         ->schema([
-                            Section::make(trans('Service Order Summary'))
+                            Forms\Components\Group::make()
                                 ->schema([
-                                    Forms\Components\Group::make()
-                                        ->schema([
-                                            BadgeLabel::make(trans('status'))
-                                                ->formatStateUsing(fn (ServiceOrder $record) => $record->format_status_for_display)
-                                                ->color(fn (ServiceOrder $record) => $record->badge_color_for_status_display)
-                                                ->inline()
-                                                ->alignLeft(),
-                                            self::summaryEditButton(),
-                                        ])
-                                        ->columns(2),
-                                    Forms\Components\Group::make()
-                                        ->schema([
-                                            TextLabel::make('')
-                                                ->label(trans('Created By'))
-                                                ->alignLeft()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            TextLabel::make('')
-                                                ->label(fn (ServiceOrder $record) => $record->admin?->full_name)
-                                                ->alignRight()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                        ])
-                                        ->columns(2),
-                                    Forms\Components\Grid::make(2)
-                                        ->schema([
-                                            TextLabel::make('')
-                                                ->label(trans('Order Date'))
-                                                ->alignLeft()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            TextLabel::make('created_at')
-                                                ->alignRight()
-                                                ->size('md')
-                                                ->inline()
-                                                ->formatStateUsing(
-                                                    function (string $state) {
-                                                        /** @var string */
-                                                        $timeZone = Auth::user()?->timezone;
-
-                                                        $formattedState = Carbon::parse($state)
-                                                            ->setTimezone($timeZone)
-                                                            ->translatedFormat('F d, Y g:i A');
-
-                                                        return $formattedState;
-                                                    }
-                                                ),
-                                        ]),
-                                    self::summaryProofOfPaymentButton(),
-                                    Divider::make(''),
-                                    Forms\Components\Group::make()
-                                        ->schema([
-                                            TextLabel::make('')
-                                                ->label(trans('Service Price'))
-                                                ->alignLeft()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            TextLabel::make('')
-                                                ->label(fn (ServiceOrder $record) => $record->format_service_price_for_display)
-                                                ->alignRight()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            TextLabel::make('')
-                                                ->label(trans('Additional Charges'))
-                                                ->alignLeft()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            TextLabel::make('')
-                                                ->label(
-                                                    fn (Closure $get) => money(
-                                                        ServiceOrderSupport::getSubtotal(0, $get('additional_charges')) * 100,
-                                                        $get('currency_code')
-                                                    )
-                                                )
-                                                ->alignRight()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            Group::make()
-                                                ->schema([
-                                                    TextLabel::make('')
-                                                        ->label(fn (ServiceOrder $record) => trans($record->format_tax_percentage_for_display))
-                                                        ->alignLeft()
-                                                        ->size('md')
-                                                        ->inline()
-                                                        ->readOnly(),
-                                                    TextLabel::make('')
-                                                        ->label(
-                                                            function (ServiceOrder $record, Closure $get): Money|string {
-                                                                return $record->tax_display == PriceDisplay::INCLUSIVE
-                                                                    ? $record->format_tax_for_display
-                                                                    : money(
-                                                                        self::calculateTaxInfo($record, $get('additional_charges'))
-                                                                            ->tax_total * 100,
-                                                                        $record->currency_code
-                                                                    );
-                                                            }
-                                                        )
-                                                        ->alignRight()
-                                                        ->size('md')
-                                                        ->inline()
-                                                        ->readOnly(),
-                                                ])
-                                                ->visible(
-                                                    fn (ServiceOrder $record): bool => filled($record->tax_display) &&
-                                                        $record->tax_display == PriceDisplay::EXCLUSIVE
-                                                )
-                                                ->columns(2)
-                                                ->columnSpan(2),
-                                            TextLabel::make('')
-                                                ->label(trans('Total Price'))
-                                                ->alignLeft()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly()
-                                                ->color('primary'),
-                                            TextLabel::make('')
-                                                ->label(
-                                                    fn (ServiceOrder $record, Closure $get): Money => money(
-                                                        self::calculateTaxInfo($record, $get('additional_charges'))
-                                                            ->total_price * 100,
-                                                        $record->currency_code
-                                                    )
-                                                )
-                                                ->alignRight()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly()
-                                                ->color('primary'),
-                                        ])
-                                        ->columns(2),
+                                    //                                            BadgeLabel::make(trans('status'))
+                                    //                                                ->formatStateUsing(fn (ServiceOrder $record) => $record->format_status_for_display)
+                                    //                                                ->color(fn (ServiceOrder $record) => $record->badge_color_for_status_display)
+                                    //                                                ->inline()
+                                    //                                                ->alignLeft(),
+                                    //                                            self::summaryEditButton(),
                                 ])
-                                ->columnSpan(1),
-                            Section::make(trans('Bills Summary'))
+                                ->columns(2),
+                            Forms\Components\Group::make()
                                 ->schema([
-                                    Group::make()
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(trans('Created By'))
+                                    //                                                ->alignLeft()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(fn (ServiceOrder $record) => $record->admin?->full_name)
+                                    //                                                ->alignRight()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                ])
+                                ->columns(2),
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(trans('Order Date'))
+                                    //                                                ->alignLeft()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    //                                            TextLabel::make('created_at')
+                                    //                                                ->alignRight()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->formatStateUsing(
+                                    //                                                    function (string $state) {
+                                    //                                                        /** @var string */
+                                    //                                                        $timeZone = Auth::user()?->timezone;
+                                    //
+                                    //                                                        $formattedState = Carbon::parse($state)
+                                    //                                                            ->setTimezone($timeZone)
+                                    //                                                            ->translatedFormat('F d, Y g:i A');
+                                    //
+                                    //                                                        return $formattedState;
+                                    //                                                    }
+                                    //                                                ),
+                                ]),
+                            //                                    self::summaryProofOfPaymentButton(),
+                            //                                    Divider::make(''),
+                            Forms\Components\Group::make()
+                                ->schema([
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(trans('Service Price'))
+                                    //                                                ->alignLeft()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(fn (ServiceOrder $record) => $record->format_service_price_for_display)
+                                    //                                                ->alignRight()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(trans('Additional Charges'))
+                                    //                                                ->alignLeft()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(
+                                    //                                                    fn (Closure $get) => money(
+                                    //                                                        ServiceOrderSupport::getSubtotal(0, $get('additional_charges')) * 100,
+                                    //                                                        $get('currency_code')
+                                    //                                                    )
+                                    //                                                )
+                                    //                                                ->alignRight()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    Forms\Components\Group::make()
                                         ->schema([
-                                            TextLabel::make('')
-                                                ->label(trans('Unpaid Bills'))
-                                                ->alignLeft()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            TextLabel::make('')
-                                                ->label(fn (ServiceOrder $record) => $record->totalUnpaidBills())
-                                                ->alignRight()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            TextLabel::make('')
-                                                ->label(trans('Unpaid Amount'))
-                                                ->alignLeft()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                            TextLabel::make('')
-                                                ->label(fn (ServiceOrder $record) => $record->totalBalance())
-                                                ->alignRight()
-                                                ->size('md')
-                                                ->inline()
-                                                ->readOnly(),
-                                        ])->columns(2),
-                                ])->columnSpan(1),
+                                            //                                                    TextLabel::make('')
+                                            //                                                        ->label(fn (ServiceOrder $record) => trans($record->format_tax_percentage_for_display))
+                                            //                                                        ->alignLeft()
+                                            //                                                        ->size('md')
+                                            //                                                        ->inline()
+                                            //                                                        ->readOnly(),
+                                            //                                                    TextLabel::make('')
+                                            //                                                        ->label(
+                                            //                                                            function (ServiceOrder $record, Closure $get): Money|string {
+                                            //                                                                return $record->tax_display == PriceDisplay::INCLUSIVE
+                                            //                                                                    ? $record->format_tax_for_display
+                                            //                                                                    : money(
+                                            //                                                                        self::calculateTaxInfo($record, $get('additional_charges'))
+                                            //                                                                            ->tax_total * 100,
+                                            //                                                                        $record->currency_code
+                                            //                                                                    );
+                                            //                                                            }
+                                            //                                                        )
+                                            //                                                        ->alignRight()
+                                            //                                                        ->size('md')
+                                            //                                                        ->inline()
+                                            //                                                        ->readOnly(),
+                                        ])
+                                        ->visible(
+                                            fn (ServiceOrder $record): bool => filled($record->tax_display) &&
+                                                $record->tax_display == PriceDisplay::EXCLUSIVE
+                                        )
+                                        ->columns(2)
+                                        ->columnSpan(2),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(trans('Total Price'))
+                                    //                                                ->alignLeft()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly()
+                                    //                                                ->color('primary'),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(
+                                    //                                                    fn (ServiceOrder $record, Closure $get): Money => money(
+                                    //                                                        self::calculateTaxInfo($record, $get('additional_charges'))
+                                    //                                                            ->total_price * 100,
+                                    //                                                        $record->currency_code
+                                    //                                                    )
+                                    //                                                )
+                                    //                                                ->alignRight()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly()
+                                    //                                                ->color('primary'),
+                                ])
+                                ->columns(2),
+                        ])
+                        ->columnSpan(1),
+                    Forms\Components\Section::make(trans('Bills Summary'))
+                        ->schema([
+                            Forms\Components\Group::make()
+                                ->schema([
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(trans('Unpaid Bills'))
+                                    //                                                ->alignLeft()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(fn (ServiceOrder $record) => $record->totalUnpaidBills())
+                                    //                                                ->alignRight()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(trans('Unpaid Amount'))
+                                    //                                                ->alignLeft()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                    //                                            TextLabel::make('')
+                                    //                                                ->label(fn (ServiceOrder $record) => $record->totalBalance())
+                                    //                                                ->alignRight()
+                                    //                                                ->size('md')
+                                    //                                                ->inline()
+                                    //                                                ->readOnly(),
+                                ])->columns(2),
                         ])->columnSpan(1),
                 ])
-                ->columns(3),
-        ];
+                ->columnSpan(1),
+
+        ])->columns(3);
     }
 
     private function getSection(): array
     {
-        $admin = Admin::first();
+        /** @var Admin $adminLoggedIn */
+        $adminLoggedIn = Filament::auth()->user();
 
         return [
-            Section::make(trans('Service'))
+            Forms\Components\Section::make(trans('Service'))
                 ->schema([
-                    Placeholder::make('service')
+                    Forms\Components\Placeholder::make(trans('Service'))
                         ->content(fn (ServiceOrder $record) => $record->service_name),
-                    Placeholder::make('service Price')
+
+                    Forms\Components\Placeholder::make(trans('Service price'))
                         ->content(fn (ServiceOrder $record) => $record->format_service_price_for_display),
-                    Group::make()
+
+                    Forms\Components\Group::make()
                         ->schema([
-                            Placeholder::make('BillingCycle')
-                                ->content(fn (ServiceOrder $record) => ucfirst((string) $record->billing_cycle?->value)),
-                            Placeholder::make('Due date every')
+                            Forms\Components\Placeholder::make(trans('Billing cycle'))
+                                ->content(fn (ServiceOrder $record) => $record->billing_cycle?->getLabel()),
+
+                            Forms\Components\Placeholder::make(trans('Due date every'))
                                 ->content(
                                     fn (ServiceOrder $record) => Str::of('? ? after billing date')
                                         ->replaceArray('?', [
@@ -325,31 +320,33 @@ class EditServiceOrder extends EditRecord
                         ->visible(fn (ServiceOrder $record) => $record->service?->is_subscription)
                         ->columns(2)
                         ->columnSpan(2),
-                    Placeholder::make('schedule')
+
+                    Forms\Components\Placeholder::make(trans('Schedule'))
                         ->columnSpan(2)
                         ->content(
-                            fn (ServiceOrder $record) => $admin
-                                ? Carbon::parse($record->schedule)
-                                    ->timezone(new DateTimeZone($admin->timezone))
-                                    ->format('F j Y g:i A')
-                                : trans('No admin information available')
+                            fn (ServiceOrder $record) => $record->schedule
+                                ->timezone($adminLoggedIn->timezone)
+                                ->format('F j Y g:i A')
                         )
-                        ->visible(fn ($record) => ! $record->service->is_subscription),
-                    Group::make()->columnSpan(2)
+                        ->visible(fn (ServiceOrder $record) => ! $record->service->is_subscription),
+
+                    Forms\Components\Group::make()
+                        ->columnSpan(2)
+                        ->visible(fn (ServiceOrder $record) => $record->payment_type === PaymentPlanType::MILESTONE)
                         ->schema([
-                            TextLabel::make('')
-                                ->label(trans('Payment Plan'))
-                                ->alignLeft()
-                                ->size('xl')
-                                ->weight('bold')
-                                ->inline()
-                                ->readOnly()
-                                ->columnSpan(2),
+                            //                            TextLabel::make('')
+                            //                                ->label(trans('Payment Plan'))
+                            //                                ->alignLeft()
+                            //                                ->size('xl')
+                            //                                ->weight('bold')
+                            //                                ->inline()
+                            //                                ->readOnly()
+                            //                                ->columnSpan(2),
 
-                            Divider::make('')->columnSpan(2),
+                            //                            Divider::make('')->columnSpan(2),
 
-                            Repeater::make('payment_plan')
-                                ->label('Payment')
+                            Forms\Components\Repeater::make('payment_plan')
+                                ->label(trans('Payment'))
                                 ->columnSpan(2)
                                 ->reactive()
                                 ->itemLabel(function ($uuid, $component) {
@@ -359,79 +356,90 @@ class EditServiceOrder extends EditRecord
                                     return $index + 1;
                                 })
                                 ->schema([
-                                    TextInput::make('description')->required()->translateLabel(),
-                                    TextInput::make('amount')->required()->label(fn (ServiceOrder $record) => match ($record->payment_value) {
-                                        PaymentPlanValue::FIXED->value => 'Fixed',
-                                        PaymentPlanValue::PERCENT->value => 'Percent',
-                                        default => throw new ErrorException('Invalid payment_value.'),
-                                    }),
-                                    Support\ButtonAction::make('Generate')
-                                        ->execute(function (ServiceOrder $record, Closure $get, Closure $set, $component) {
-                                            return Forms\Components\Actions\Action::make(trans('generate'))
-                                                ->color('secondary')
-                                                ->label('Generate')
-                                                ->size('lg')
-                                                ->action(function () use ($record, $component) {
-                                                    $state = $component->getContainer()->getState();
+                                    Forms\Components\TextInput::make('description')
+                                        ->translateLabel()
+                                        ->required(),
 
-                                                    app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
-                                                })
-                                                ->modalHeading(trans('Edit Status'))
-                                                ->disabled(function () use ($record, $component) {
-                                                    $state = $component->getContainer()->getState();
-
-                                                    if (is_null($record->payment_plan)) {
-                                                        return true;
-                                                    }
-
-                                                    $key = array_search($state['description'], array_column($record->payment_plan, 'description'));
-
-                                                    if ($key !== false) {
-                                                        return $record->payment_plan[$key]['is_generated'];
-
-                                                    }
-
-                                                    return true;
-                                                })
-                                                ->modalWidth('xl');
-                                        })->columnSpan(1),
-                                ])->columns(4)
+                                    Forms\Components\TextInput::make('amount')
+                                        ->label(fn (ServiceOrder $record) => $record->payment_value?->getLabel())
+                                        ->required(),
+                                    //                                    Support\ButtonAction::make('Generate')
+                                    //                                        ->execute(function (ServiceOrder $record, Closure $get, Closure $set, $component) {
+                                    //                                            return Forms\Components\Actions\Action::make(trans('generate'))
+                                    //                                                ->color('secondary')
+                                    //                                                ->label('Generate')
+                                    //                                                ->size('lg')
+                                    //                                                ->action(function () use ($record, $component) {
+                                    //                                                    $state = $component->getContainer()->getState();
+                                    //
+                                    //                                                    app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
+                                    //                                                })
+                                    //                                                ->modalHeading(trans('Edit Status'))
+                                    //                                                ->disabled(function () use ($record, $component) {
+                                    //                                                    $state = $component->getContainer()->getState();
+                                    //
+                                    //                                                    if (is_null($record->payment_plan)) {
+                                    //                                                        return true;
+                                    //                                                    }
+                                    //
+                                    //                                                    $key = array_search($state['description'], array_column($record->payment_plan, 'description'));
+                                    //
+                                    //                                                    if ($key !== false) {
+                                    //                                                        return $record->payment_plan[$key]['is_generated'];
+                                    //
+                                    //                                                    }
+                                    //
+                                    //                                                    return true;
+                                    //                                                })
+                                    //                                                ->modalWidth('xl');
+                                    //                                        })
+                                    //                                        ->columnSpan(1),
+                                ])
+                                ->columns(4)
                                 ->disabled(),
 
-                        ])
-                        ->visible(fn (ServiceOrder $record) => $record->payment_type === PaymentPlanType::MILESTONE->value),
+                        ]),
                 ])
                 ->columns(2),
-            Section::make(trans('Customer'))
+
+            Forms\Components\Section::make(trans('Customer'))
                 ->schema([
-                    Placeholder::make('first_name')
+                    Forms\Components\Placeholder::make('first_name')
                         ->content(fn (ServiceOrder $record) => $record->customer_first_name),
-                    Placeholder::make('last_name')
+
+                    Forms\Components\Placeholder::make('last_name')
                         ->content(fn (ServiceOrder $record) => $record->customer_last_name),
-                    Placeholder::make('email')
+
+                    Forms\Components\Placeholder::make('email')
                         ->content(fn (ServiceOrder $record) => $record->customer_email),
-                    Placeholder::make('mobile')
+
+                    Forms\Components\Placeholder::make('mobile')
                         ->content(fn (ServiceOrder $record) => $record->customer_mobile),
                 ])
                 ->columns(2),
-            Section::make(trans('Service Address'))
+
+            Forms\Components\Section::make(trans('Service Address'))
                 ->relationship('serviceOrderServiceAddress')
                 ->schema([
                     Forms\Components\Group::make()
                         ->schema([
-                            Placeholder::make('address_line_1')
+                            Forms\Components\Placeholder::make('address_line_1')
                                 ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
                                 ->translateLabel()
                                 ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
-                            Placeholder::make('country')
+
+                            Forms\Components\Placeholder::make('country')
                                 ->content(fn (ServiceOrderAddress $record) => $record->country),
-                            Placeholder::make('state')
+
+                            Forms\Components\Placeholder::make('state')
                                 ->content(fn (ServiceOrderAddress $record) => $record->state),
-                            Placeholder::make('city')
+
+                            Forms\Components\Placeholder::make('city')
                                 ->label('City/Province')
                                 ->translateLabel()
                                 ->content(fn (ServiceOrderAddress $record) => $record->city),
-                            Placeholder::make('zip_code')
+
+                            Forms\Components\Placeholder::make('zip_code')
                                 ->label('Zip Code')
                                 ->translateLabel()
                                 ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
@@ -440,24 +448,29 @@ class EditServiceOrder extends EditRecord
                         ->columnSpan(2),
                 ])
                 ->columns(2),
-            Section::make(trans('Billing Address'))
+
+            Forms\Components\Section::make(trans('Billing Address'))
                 ->relationship('serviceOrderBillingAddress')
                 ->schema([
                     Forms\Components\Group::make()
                         ->schema([
-                            Placeholder::make('address_line_1')
+                            Forms\Components\Placeholder::make('address_line_1')
                                 ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
                                 ->translateLabel()
                                 ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
-                            Placeholder::make('country')
+
+                            Forms\Components\Placeholder::make('country')
                                 ->content(fn (ServiceOrderAddress $record) => $record->country),
-                            Placeholder::make('state')
+
+                            Forms\Components\Placeholder::make('state')
                                 ->content(fn (ServiceOrderAddress $record) => $record->state),
-                            Placeholder::make('city')
+
+                            Forms\Components\Placeholder::make('city')
                                 ->label('City/Province')
                                 ->translateLabel()
                                 ->content(fn (ServiceOrderAddress $record) => $record->city),
-                            Placeholder::make('zip_code')
+
+                            Forms\Components\Placeholder::make('zip_code')
                                 ->label('Zip Code')
                                 ->translateLabel()
                                 ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
@@ -466,41 +479,43 @@ class EditServiceOrder extends EditRecord
                         ->columnSpan(2),
                 ])
                 ->columns(2),
-            Group::make()
+
+            Forms\Components\Group::make()
                 ->schema([
-                    TextLabel::make('')
-                        ->label(trans('Additional Charges'))
-                        ->alignLeft()
-                        ->size('xl')
-                        ->weight('bold')
-                        ->inline()
-                        ->readOnly(),
-                    Repeater::make('additional_charges')
-                        ->label('')
-                        ->createItemButtonLabel('Additional Charges')
+                    //                    TextLabel::make('')
+                    //                        ->label(trans('Additional Charges'))
+                    //                        ->alignLeft()
+                    //                        ->size('xl')
+                    //                        ->weight('bold')
+                    //                        ->inline()
+                    //                        ->readOnly(),
+                    Forms\Components\Repeater::make('additional_charges')
+                        ->hiddenLabel()
+                        ->addActionLabel(trans('Additional Charges'))
                         ->columnSpan(2)
                         ->defaultItems(0)
                         ->schema([
-                            TextInput::make('name')->required(),
-                            TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
-                            DateTimePicker::make('date')
+                            Forms\Components\TextInput::make('name')->required(),
+                            Forms\Components\TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
+                            Forms\Components\DateTimePicker::make('date')
                                 ->minDate(now())
-                                ->withoutSeconds()
+                                ->seconds(false)
                                 ->default(now())
                                 ->disabled()
                                 ->hidden()
                                 ->timezone(Auth::user()?->timezone),
-                            TextInput::make('price')->required()->numeric()->reactive(),
+                            Forms\Components\TextInput::make('price')->required()->numeric()->reactive(),
                         ])
                         ->columns(3),
                 ])
                 ->columns(2),
-            Section::make(trans('Service Fill-up Form'))
+
+            Forms\Components\Section::make(trans('Service Fill-up Form'))
                 ->schema([
                     SchemaFormBuilder::make('customer_form', fn ($record) => $record->service->blueprint->schema)
                         ->schemaData(fn ($record) => $record->service->blueprint->schema),
                 ])
-                ->hidden(fn (\Filament\Forms\Get $get) => $get('service_id') === null)
+                ->hidden(fn (Get $get) => $get('service_id') === null)
                 ->columns(2),
         ];
     }
@@ -508,132 +523,130 @@ class EditServiceOrder extends EditRecord
     private static function summaryEditButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make('Edit')
-            ->execute(function (ServiceOrder $record, \Filament\Forms\Get $get, \Filament\Forms\Set $set) {
-                return Forms\Components\Actions\Action::make(trans('edit'))
-                    ->color('primary')
-                    ->label('Edit')
-                    ->size('sm')
-                    ->modalHeading(trans('Edit Status'))
-                    ->modalWidth('xl')
-                    ->form([
-                        Forms\Components\Select::make('status_options')
-                            ->label('')
-                            ->options(function () use ($record) {
+            ->execute(fn(ServiceOrder $record, Get $get, Set $set) => Forms\Components\Actions\Action::make(trans('edit'))
+                ->color('primary')
+                ->label('Edit')
+                ->size('sm')
+                ->modalHeading(trans('Edit Status'))
+                ->modalWidth('xl')
+                ->form([
+                    Forms\Components\Select::make('status_options')
+                        ->label('')
+                        ->options(function () use ($record) {
+                            $options = [
+                                ServiceOrderStatus::PENDING->value => trans('Pending'),
+                                ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
+                                ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
+                                ServiceOrderStatus::COMPLETED->value => trans('Completed'),
+                            ];
+                            if (isset($record->billing_cycle)) {
                                 $options = [
                                     ServiceOrderStatus::PENDING->value => trans('Pending'),
                                     ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
-                                    ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
-                                    ServiceOrderStatus::COMPLETED->value => trans('Completed'),
+                                    ServiceOrderStatus::ACTIVE->value => trans('Active'),
+                                    ServiceOrderStatus::CLOSED->value => trans('Closed'),
                                 ];
-                                if (isset($record->billing_cycle)) {
-                                    $options = [
-                                        ServiceOrderStatus::PENDING->value => trans('Pending'),
-                                        ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
-                                        ServiceOrderStatus::ACTIVE->value => trans('Active'),
-                                        ServiceOrderStatus::CLOSED->value => trans('Closed'),
-                                    ];
-                                }
-
-                                return $options;
-                            })
-                            ->disablePlaceholderSelection()
-                            ->formatStateUsing(function () use ($record) {
-                                return $record->status;
-                            }),
-                        Forms\Components\Toggle::make('send_email')
-                            ->label(trans('Send email notification'))
-                            ->default(false)
-                            ->reactive(),
-                    ])
-                    ->action(
-                        function (
-                            array $data,
-                            self $livewire,
-                            ComponentsAction $action
-                        ) use (
-                            $record,
-                            $set
-                        ) {
-                            try {
-                                DB::transaction(
-                                    function (
-                                    ) use (
-                                        $data,
-                                        $livewire,
-                                        $action,
-                                        $record,
-                                        $set
-                                    ) {
-                                        $shouldNotifyCustomer = $livewire
-                                            ->mountedFormComponentActionData['send_email'];
-
-                                        if (
-                                            $shouldNotifyCustomer &&
-                                            empty(app(ServiceSettings::class)->email_sender_name)
-                                        ) {
-                                            throw new MissingServiceSettingsConfigurationException(
-                                                'Email sender not found, please update your service settings'
-                                            );
-                                        }
-
-                                        $shouldSendEmailToAdmin = app(ServiceSettings::class)
-                                            ->admin_should_receive;
-
-                                        $adminEmailReceiver = app(ServiceSettings::class)
-                                            ->admin_main_receiver;
-
-                                        if (
-                                            $shouldSendEmailToAdmin &&
-                                            empty($adminEmailReceiver)
-                                        ) {
-                                            throw new MissingServiceSettingsConfigurationException(
-                                                'Email receiver not found, please update your service settings'
-                                            );
-                                        }
-
-                                        $status = $data['status_options'];
-
-                                        $updateData = ['status' => $status];
-
-                                        if ($record->update($updateData)) {
-                                            event(new AdminServiceOrderStatusUpdatedEvent(
-                                                serviceOrder: $record,
-                                                shouldNotifyCustomer: $shouldNotifyCustomer
-                                            ));
-
-                                            $set('status', ucfirst(str_replace('-', ' ', $status)));
-
-                                            $action->successNotificationTitle(
-                                                trans('Service Order updated successfully')
-                                            )->success();
-                                        }
-                                    }
-                                );
-                            } catch (MissingServiceSettingsConfigurationException $m) {
-                                $action->failureNotificationTitle(trans($m->getMessage()))
-                                    ->failure();
-
-                                report($m);
-                            } catch (InvalidServiceBillException $i) {
-                                $action->failureNotificationTitle(trans('No service bill found'))
-                                    ->failure();
-
-                                report($i);
-                            } catch (ModelNotFoundException $m) {
-                                $action->failureNotificationTitle(trans($m->getMessage()))
-                                    ->failure();
-
-                                report($m);
-                            } catch (Exception $e) {
-                                $action->failureNotificationTitle(trans('Something went wrong!'))
-                                    ->failure();
-
-                                report($e);
                             }
+
+                            return $options;
+                        })
+                        ->disablePlaceholderSelection()
+                        ->formatStateUsing(function () use ($record) {
+                            return $record->status;
+                        }),
+                    Forms\Components\Toggle::make('send_email')
+                        ->label(trans('Send email notification'))
+                        ->default(false)
+                        ->reactive(),
+                ])
+                ->action(
+                    function (
+                        array $data,
+                        self $livewire,
+                        Forms\Components\Actions\Action $action
+                    ) use (
+                        $record,
+                        $set
+                    ) {
+                        try {
+                            DB::transaction(
+                                function (
+                                ) use (
+                                    $data,
+                                    $livewire,
+                                    $action,
+                                    $record,
+                                    $set
+                                ) {
+                                    $shouldNotifyCustomer = $livewire
+                                        ->mountedFormComponentActionData['send_email'];
+
+                                    if (
+                                        $shouldNotifyCustomer &&
+                                        empty(app(ServiceSettings::class)->email_sender_name)
+                                    ) {
+                                        throw new MissingServiceSettingsConfigurationException(
+                                            'Email sender not found, please update your service settings'
+                                        );
+                                    }
+
+                                    $shouldSendEmailToAdmin = app(ServiceSettings::class)
+                                        ->admin_should_receive;
+
+                                    $adminEmailReceiver = app(ServiceSettings::class)
+                                        ->admin_main_receiver;
+
+                                    if (
+                                        $shouldSendEmailToAdmin &&
+                                        empty($adminEmailReceiver)
+                                    ) {
+                                        throw new MissingServiceSettingsConfigurationException(
+                                            'Email receiver not found, please update your service settings'
+                                        );
+                                    }
+
+                                    $status = $data['status_options'];
+
+                                    $updateData = ['status' => $status];
+
+                                    if ($record->update($updateData)) {
+                                        event(new AdminServiceOrderStatusUpdatedEvent(
+                                            serviceOrder: $record,
+                                            shouldNotifyCustomer: $shouldNotifyCustomer
+                                        ));
+
+                                        $set('status', ucfirst(str_replace('-', ' ', $status)));
+
+                                        $action->successNotificationTitle(
+                                            trans('Service Order updated successfully')
+                                        )->success();
+                                    }
+                                }
+                            );
+                        } catch (MissingServiceSettingsConfigurationException $m) {
+                            $action->failureNotificationTitle(trans($m->getMessage()))
+                                ->failure();
+
+                            report($m);
+                        } catch (InvalidServiceBillException $i) {
+                            $action->failureNotificationTitle(trans('No service bill found'))
+                                ->failure();
+
+                            report($i);
+                        } catch (ModelNotFoundException $m) {
+                            $action->failureNotificationTitle(trans($m->getMessage()))
+                                ->failure();
+
+                            report($m);
+                        } catch (Exception $e) {
+                            $action->failureNotificationTitle(trans('Something went wrong!'))
+                                ->failure();
+
+                            report($e);
                         }
-                    )
-                    ->withActivityLog();
-            })
+                    }
+                )
+                ->withActivityLog())
             ->disableLabel()
             ->columnSpan(1)
             ->alignRight()
@@ -656,7 +669,7 @@ class EditServiceOrder extends EditRecord
     {
         return ButtonAction::make('proof_of_payment')
             ->disableLabel()
-            ->execute(function (ServiceOrder $record, \Filament\Forms\Set $set) {
+            ->execute(function (ServiceOrder $record, Set $set) {
                 $footerActions = self::showProofOfPaymentActions($record, $set);
 
                 return $footerActions;
@@ -673,11 +686,11 @@ class EditServiceOrder extends EditRecord
             });
     }
 
-    private static function showProofOfPaymentActions(ServiceOrder $record, Closure $set): ComponentsAction
+    private static function showProofOfPaymentActions(ServiceOrder $record, Closure $set): Forms\Components\Actions\Action
     {
         $order = $record;
 
-        return ComponentsAction::make('proof_of_payment')
+        return Forms\Components\Actions\Action::make('proof_of_payment')
             ->color('gray')
             ->label(trans('View Proof of payment'))
             ->size('sm')
