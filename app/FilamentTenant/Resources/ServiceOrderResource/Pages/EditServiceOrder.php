@@ -59,7 +59,7 @@ use Throwable;
 /**
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder $record
  */
-class ViewServiceOrder extends EditRecord
+class EditServiceOrder extends EditRecord
 {
     use LogsFormActivity;
 

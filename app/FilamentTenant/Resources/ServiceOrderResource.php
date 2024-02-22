@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
-use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ViewServiceOrder;
+use App\FilamentTenant\Resources\ServiceOrderResource\Pages\EditServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\Rules\PaymentPlanAmountRule;
@@ -473,7 +473,7 @@ class ServiceOrderResource extends Resource
         return [
             'index' => ListServiceOrder::route('/'),
             'create' => CreateServiceOrder::route('/create'),
-            'view' => ViewServiceOrder::route('/{record}'),
+            'edit' => EditServiceOrder::route('/{record}/edit'),
         ];
     }
 }
