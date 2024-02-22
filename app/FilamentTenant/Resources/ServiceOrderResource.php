@@ -450,6 +450,12 @@ class ServiceOrderResource extends Resource
                     ->label(trans('Order Date'))
                     ->sortable()
                     ->dateTime(),
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
+                    ->sortable()
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('updated_at', 'desc');
     }
