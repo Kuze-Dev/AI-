@@ -482,15 +482,8 @@ class EditServiceOrder extends EditRecord
 
             Forms\Components\Group::make()
                 ->schema([
-                    //                    TextLabel::make('')
-                    //                        ->label(trans('Additional Charges'))
-                    //                        ->alignLeft()
-                    //                        ->size('xl')
-                    //                        ->weight('bold')
-                    //                        ->inline()
-                    //                        ->readOnly(),
                     Forms\Components\Repeater::make('additional_charges')
-                        ->hiddenLabel()
+                        ->translateLabel()
                         ->addActionLabel(trans('Additional Charges'))
                         ->columnSpan(2)
                         ->defaultItems(0)
