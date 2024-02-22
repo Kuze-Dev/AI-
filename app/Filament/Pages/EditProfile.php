@@ -9,6 +9,7 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
+use Lloricode\Timezone\Timezone;
 
 class EditProfile extends \Filament\Pages\Auth\EditProfile
 {
@@ -51,11 +52,7 @@ class EditProfile extends \Filament\Pages\Auth\EditProfile
                             ),
                         $this->getPasswordConfirmationFormComponent(),
                         Forms\Components\Select::make('timezone')
-                            ->options(
-                                collect(timezone_identifiers_list())
-                                    ->mapWithKeys(fn (string $timezone) => [$timezone => $timezone])
-                                    ->toArray()
-                            )
+                            ->options(Timezone::generateList())
                             ->rules(['nullable', 'timezone'])
                             ->searchable(),
                     ])

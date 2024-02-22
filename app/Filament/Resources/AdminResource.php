@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Lloricode\Timezone\Timezone;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class AdminResource extends Resource
@@ -83,11 +84,8 @@ class AdminResource extends Resource
                         ->rule(Password::default())
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\Select::make('timezone')
-                        ->options(
-                            collect(timezone_identifiers_list())
-                                ->mapWithKeys(fn (string $timezone) => [$timezone => $timezone])
-                                ->toArray()
-                        )
+                        ->options(Timezone::generateList())
+                        ->rule('timezone')
                         ->searchable()
                         ->default(config('domain.admin.default_timezone')),
                 ])
