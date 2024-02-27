@@ -450,7 +450,17 @@ class EditServiceOrder extends EditRecord
                 ->columns(2),
 
             Forms\Components\Section::make(trans('Billing Address'))
+                ->visible(fn (ServiceOrder $record) => $record->serviceOrderBillingAddress === null)
+                ->schema([
+                    Forms\Components\Placeholder::make('same_as_billing_address')
+                        ->hiddenLabel()
+                        ->content(fn () => trans('Same as Service Address')),
+                ])
+                ->columns(2),
+
+            Forms\Components\Section::make(trans('Billing Address'))
                 ->relationship('serviceOrderBillingAddress')
+                ->visible(fn (ServiceOrder $record) => $record->serviceOrderBillingAddress !== null)
                 ->schema([
                     Forms\Components\Group::make()
                         ->schema([
@@ -516,7 +526,7 @@ class EditServiceOrder extends EditRecord
     private static function summaryEditButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make('Edit')
-            ->execute(fn(ServiceOrder $record, Get $get, Set $set) => Forms\Components\Actions\Action::make(trans('edit'))
+            ->execute(fn (ServiceOrder $record, Get $get, Set $set) => Forms\Components\Actions\Action::make(trans('edit'))
                 ->color('primary')
                 ->label('Edit')
                 ->size('sm')
