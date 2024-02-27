@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Filament\Livewire\Auth\AccountDeactivatedNotice;
+use App\Filament\Pages\AccountDeactivatedNotice;
 use Domain\Admin\Database\Factories\AdminFactory;
 
 use function Pest\Livewire\livewire;

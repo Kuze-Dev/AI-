@@ -19,7 +19,7 @@ class CreateServiceBillAction
         return ServiceBill::create([
             'service_order_id' => $serviceBillData->service_order_id,
             'reference' => $this->generateReferenceNumberAction
-                ->execute(new ServiceBill()),
+                ->execute(ServiceBill::class),
             'bill_date' => $serviceBillData->bill_date,
             'due_date' => $serviceBillData->due_date,
             'currency' => $serviceBillData->currency,

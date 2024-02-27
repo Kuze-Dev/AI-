@@ -8,20 +8,20 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\ServiceResource\Pages\CreateService;
 use App\FilamentTenant\Resources\ServiceResource\Pages\EditService;
 use App\FilamentTenant\Resources\ServiceResource\Pages\ListServices;
-use App\FilamentTenant\Support\MetaDataForm;
+use App\FilamentTenant\Support\MetaDataFormV2;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\Settings\ServiceSettings;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Currency\Models\Currency;
-use Domain\Service\Actions\DeleteServiceAction;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Enums\Status;
 use Domain\Service\Models\Service;
-use Domain\Taxonomy\Models\TaxonomyTerm;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
@@ -29,7 +29,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Arr;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ServiceResource extends Resource
 {
@@ -55,7 +54,7 @@ class ServiceResource extends Resource
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-                        Forms\Components\Card::make([
+                        Forms\Components\Section::make([
                             Forms\Components\TextInput::make('name')
                                 ->label(trans('Service Name'))
                                 ->unique(ignoreRecord: true)
@@ -66,35 +65,29 @@ class ServiceResource extends Resource
                                 ->maxLength(255),
                             Forms\Components\Select::make('taxonomyTerms')
                                 ->label(trans('Service Category'))
-                                ->options(function () {
-                                    $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)
-                                        ->service_category)->get();
 
-                                    return $categories->sortBy('order')
-                                        ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
-                                        ->toArray();
-                                })
-                                ->statePath('taxonomy_term_id')
-                                ->formatStateUsing(function ($record, $state) {
-                                    $oldRecord = $record?->taxonomyTerms->first()->id ?? null;
-                                    $categories = TaxonomyTerm::whereTaxonomyId(app(ServiceSettings::class)
-                                        ->service_category)->get()->sortBy('order')
-                                        ->mapWithKeys(fn ($categories) => [$categories->id => $categories->name])
-                                        ->toArray();
-
-                                    return Arr::exists($categories, $oldRecord) ? $oldRecord : $state;
-                                })
-                                ->required(),
-                            Forms\Components\FileUpload::make('media')
-                                ->statePath('media')
-                                ->translateLabel()
-                                ->mediaLibraryCollection('media')
-                                ->acceptedFileTypes([
-                                    'video/*',
-                                    'image/*',
-                                ])
+                                // Add fillable property [taxonomyTerms] to allow mass assignment on [Domain\Service\Models\Service].
                                 ->multiple()
+                                ->maxItems(1)
+
+                                ->relationship(
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query
+                                        ->where(
+                                            'taxonomy_id',
+                                            app(ServiceSettings::class)
+                                                ->service_category
+                                        )
+                                )
+                                ->searchable()
+                                ->preload()
                                 ->required(),
+                            Forms\Components\SpatieMediaLibraryFileUpload::make('media')
+                                ->translateLabel()
+                                ->collection('media')
+                                ->multiple()
+                                ->required()
+                                ->preserveFilenames(),
                         ]),
                         self::servicePriceSection(),
                         Forms\Components\Section::make('Section Display')
@@ -109,16 +102,16 @@ class ServiceResource extends Resource
                         Forms\Components\Section::make('Dynamic Form Builder')
                             ->schema([
                                 Forms\Components\Select::make('blueprint_id')
-                                    ->label(trans('Blueprint'))
                                     ->required()
+                                    ->relationship('blueprint', 'name')
                                     ->preload()
-                                    ->optionsFromModel(Blueprint::class, 'name')
+                                    ->searchable()
                                     ->disabled(fn ($record) => $record !== null)
                                     ->reactive(),
                                 SchemaFormBuilder::make('data')
-                                    ->schemaData(fn (\Filament\Forms\Get $get) => Blueprint::query()
+                                    ->schemaData(fn (Get $get) => Blueprint::query()
                                         ->firstWhere('id', $get('blueprint_id'))?->schema)
-                                    ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') === null)
+                                    ->hidden(fn (Get $get) => $get('blueprint_id') === null)
                                     ->dehydrated(false)
                                     ->disabled(),
                             ])
@@ -127,7 +120,7 @@ class ServiceResource extends Resource
                 Forms\Components\Group::make()
                     ->schema([
                         self::statusSection(),
-                        MetaDataForm::make('Meta Data'),
+                        MetaDataFormV2::make(),
                     ])->columnSpan(1),
             ])
             ->columns(3);
@@ -141,9 +134,6 @@ class ServiceResource extends Resource
                 SpatieMediaLibraryImageColumn::make('media')
                     ->label('Image')
                     ->collection('media')
-                    ->default(
-                        fn ($record) => $record->getFirstMedia('media') ?? 'https://via.placeholder.com/500x300/333333/fff?text=No+preview+available'
-                    )
                     ->extraImgAttributes(['class' => 'aspect-[5/3] object-fill']),
                 Tables\Columns\TextColumn::make('name')
                     ->translateLabel()
@@ -151,7 +141,7 @@ class ServiceResource extends Resource
                     ->limit(50)
                     ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
                         $state = $column->getState();
-                        if (strlen($state) <= $column->getLimit()) {
+                        if (strlen($state) <= $column->getCharacterLimit()) {
                             return null;
                         }
 
@@ -167,8 +157,9 @@ class ServiceResource extends Resource
                     ->translateLabel()
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->translateLabel()
+                    ->badge()
                     ->formatStateUsing(fn ($state) => $state ? ucfirst(STATUS::ACTIVE->value) : ucfirst(STATUS::INACTIVE->value))
                     ->color(fn ($record) => $record->status ? 'success' : 'secondary')
                     ->sortable(),
@@ -198,13 +189,6 @@ class ServiceResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->translateLabel()
-                        ->using(function ($record) {
-                            try {
-                                return app(DeleteServiceAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        })
                         ->authorize('delete'),
                     Tables\Actions\RestoreAction::make()
                         ->translateLabel()
@@ -244,55 +228,42 @@ class ServiceResource extends Resource
             ]);
     }
 
-    public static function servicePriceSection(): Forms\Components\Section
+    private static function servicePriceSection(): Forms\Components\Section
     {
         return Forms\Components\Section::make('Service Price')
             ->translateLabel()
             ->schema([
                 Forms\Components\Toggle::make('pay_upfront')
                     ->reactive()
-                    ->disabled(fn (\Filament\Forms\Get $get) => $get('is_subscription') === true),
+                    ->disabled(fn (Get $get) => $get('is_subscription') === true),
                 Forms\Components\TextInput::make('retail_price')
                     ->translateLabel()
-                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                        prefix: Currency::whereEnabled(true)->firstOrFail()->symbol,
-                        isSigned: false
-                    ))
-                    ->rules([
-                        function () {
-                            return function (string $attribute, mixed $value, Closure $fail) {
-                                if ($value <= 0) {
-                                    $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                    $fail("$attributeName must be above zero.");
-                                }
-                            };
+                    ->prefix(Currency::whereEnabled(true)->firstOrFail()->symbol)
+                    ->rule(
+                        fn () => function (string $attribute, mixed $value, Closure $fail) {
+                            if ($value <= 0) {
+                                $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                $fail("$attributeName must be above zero.");
+                            }
                         },
-                    ])
-                    ->dehydrateStateUsing(fn ($state) => (float) $state)
+                    )
                     ->required(),
                 Forms\Components\TextInput::make('selling_price')
                     ->translateLabel()
-                    // Put custom rule to validate minimum value
-                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                        prefix: Currency::whereEnabled(true)->firstOrFail()->symbol,
-                        isSigned: false
-                    ))
-                    ->rules([
-                        function () {
-                            return function (string $attribute, mixed $value, Closure $fail) {
-                                if ($value <= 0) {
-                                    $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                    $fail("$attributeName must be above zero.");
-                                }
-                            };
+                    ->prefix(Currency::whereEnabled(true)->firstOrFail()->symbol)
+                    ->rule(
+                        fn () => function (string $attribute, mixed $value, Closure $fail) {
+                            if ($value <= 0) {
+                                $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                $fail("$attributeName must be above zero.");
+                            }
                         },
-                    ])
-                    ->dehydrateStateUsing(fn ($state) => (float) $state)
+                    )
                     ->required(),
             ]);
     }
 
-    public static function statusSection(): Forms\Components\Section
+    private static function statusSection(): Forms\Components\Section
     {
         return Forms\Components\Section::make('Status')
             ->translateLabel()
@@ -305,10 +276,10 @@ class ServiceResource extends Resource
                         fn (Forms\Components\Toggle $component) => $component->dispatchEvent('status::update')
                     ),
                 Forms\Components\Toggle::make('is_subscription')
-                    ->afterStateUpdated(fn (\Filament\Forms\Set $set, $state) => $set('pay_upfront', $state))
+                    ->afterStateUpdated(fn (Set $set, $state) => $set('pay_upfront', $state))
                     ->label(trans('Subscription Based'))
                     ->reactive()
-                    ->helperText(fn (\Filament\Forms\Get $get) => $get('is_subscription') === true
+                    ->helperText(fn (Get $get) => $get('is_subscription') === true
                         ? "Please provide values on 'billing cycle' and 'due date every' fields" : ''),
                 Forms\Components\Select::make('billing_cycle')
                     ->options(function () {
@@ -320,11 +291,11 @@ class ServiceResource extends Resource
                         return $billing;
                     })
                     ->reactive()
-                    ->hidden(fn (\Filament\Forms\Get $get) => $get('is_subscription') === false)
-                    ->required(fn (\Filament\Forms\Get $get) => $get('is_subscription') === true),
+                    ->hidden(fn (Get $get) => $get('is_subscription') === false)
+                    ->required(fn (Get $get) => $get('is_subscription') === true),
                 Forms\Components\Select::make('due_date_every')
                     ->reactive()
-                    ->options(function (\Filament\Forms\Get $get) {
+                    ->options(function (Get $get) {
                         if ($get('billing_cycle') !== BillingCycleEnum::DAILY->value) {
                             return Arr::except(range(0, 31), 0);
                         }
@@ -332,7 +303,7 @@ class ServiceResource extends Resource
                         return null;
                     })
                     ->hidden(
-                        fn (\Filament\Forms\Get $get) => ($get('is_subscription') === false
+                        fn (Get $get) => ($get('is_subscription') === false
                         || $get('billing_cycle') === BillingCycleEnum::DAILY->value)
                     )
                     ->required(),
@@ -349,7 +320,7 @@ class ServiceResource extends Resource
             ->registerListeners([
                 'status::update' => [
                     function (Forms\Components\Section $component): void {
-                        $component->evaluate(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set) {
+                        $component->evaluate(function (Get $get, Set $set) {
                             if ($get('status')) {
                                 $set('status')
                                     ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)));

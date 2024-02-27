@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Features\Shopconfiguration;
 
+use App\Features\FeatureContract;
 use Domain\Tenant\Models\Tenant;
 
-class TaxZone
+class TaxZone implements FeatureContract
 {
     public string $name = 'shopconfiguration.taxzone';
-
-    public string $label = 'TaxZone';
 
     public function resolve(Tenant $scope): mixed
     {
         return false;
+    }
+
+    public function getLabel(): string
+    {
+        return trans('TaxZone');
     }
 }

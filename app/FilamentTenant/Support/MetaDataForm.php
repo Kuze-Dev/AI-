@@ -9,6 +9,9 @@ use Filament\Forms\Components\Section;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
+/**
+ * @deprecated use MetaDataFormV2
+ */
 class MetaDataForm extends Section
 {
     public function setUp(): void

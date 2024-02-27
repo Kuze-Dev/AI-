@@ -7,19 +7,17 @@ namespace Domain\ServiceOrder\Actions;
 use App\Settings\ServiceSettings;
 use Domain\ServiceOrder\Jobs\NotifyCustomerServiceBillDueDateJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\Tenant\TenantSupport;
 
 class NotifyCustomerServiceBillDueDateAction
 {
-    public function __construct(private ServiceSettings $serviceSettings)
+    public function __construct(private readonly ServiceSettings $serviceSettings)
     {
     }
 
     public function execute(): void
     {
-        /** @var \Stancl\Tenancy\Contracts\Tenant $tenant */
-        $tenant = tenancy()->tenant;
-
-        $tenant->run(function () {
+        TenantSupport::model()->run(function () {
             $serviceOrders = ServiceOrder::query()
                 ->whereActive()
                 ->whereSubscriptionBased()

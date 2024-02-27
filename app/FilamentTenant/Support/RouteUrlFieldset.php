@@ -8,6 +8,7 @@ use App\Features\CMS\Internationalization;
 use App\Features\CMS\SitesManagement;
 use Closure;
 use Domain\Internationalization\Models\Locale;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Components\Group;
 use Illuminate\Database\Eloquent\Model;
@@ -44,7 +45,7 @@ class RouteUrlFieldset extends Group
                                 Str::contains($inputUrl, "/$locale") ? Str::replace("/$locale", '', $inputUrl) : $inputUrl
                                 : '/'.$inputUrl;
 
-                            $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ?
+                            $newUrl = $locale !== $defaultLocale && TenantFeatureSupport::active(Internationalization::class) ?
                                 "/$locale$inputUrl" : $inputUrl;
 
                             $set('route_url.url', $newUrl);
@@ -53,7 +54,7 @@ class RouteUrlFieldset extends Group
                         }
 
                         $newUrl = $model::generateRouteUrl($this->getModelForRouteUrl(), $get('data', true));
-                        $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ? "/$locale$newUrl" : $newUrl;
+                        $newUrl = $locale !== $defaultLocale && TenantFeatureSupport::active(Internationalization::class) ? "/$locale$newUrl" : $newUrl;
 
                         $set('route_url.url', $newUrl);
                     });
@@ -80,7 +81,7 @@ class RouteUrlFieldset extends Group
                 ->maxLength(255)
                 ->startsWith('/')
                 ->rule(
-                    fn (?HasRouteUrl $record) => tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
+                    fn (?HasRouteUrl $record) => TenantFeatureSupport::inactive(SitesManagement::class) ?
                         new UniqueActiveRouteUrlRule($record) : null
                     // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
                 )

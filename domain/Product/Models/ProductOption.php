@@ -21,7 +21,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Product\Models\Product|null $product
+ * @property-read \Domain\Product\Models\Product $product
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Product\Models\ProductOptionValue> $productOptionValues
  * @property-read int|null $product_option_values_count
  *

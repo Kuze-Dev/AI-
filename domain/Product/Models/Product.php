@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Domain\Product\Models;
 
 use Domain\Favorite\Models\Favorite;
+use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Models\Builders\ProductBuilder;
 use Domain\Review\Models\Review;
+use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +21,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\File;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -33,10 +36,10 @@ use Support\MetaData\HasMetaData;
  * @property string $name
  * @property string $slug
  * @property string $sku
- * @property string $retail_price
- * @property string $selling_price
+ * @property float $retail_price
+ * @property float $selling_price
  * @property array|null $dimension
- * @property string|null $weight
+ * @property float|null $weight
  * @property int|null $stock
  * @property string|null $description
  * @property bool $status
@@ -133,6 +136,11 @@ class Product extends Model implements HasMedia, HasMetaDataContract
         'allow_customer_remarks' => 'boolean',
         'allow_stocks' => 'boolean',
         'allow_guest_purchase' => 'boolean',
+        'retail_price' => 'float',
+        'selling_price' => 'float',
+        'weight' => 'float',
+        'minimum_order_quantity' => 'int',
+        'stock' => 'int',
     ];
 
     /**
@@ -174,6 +182,32 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     */
+    public function taxonomyTermsBranch(): BelongsToMany
+    {
+        return $this->taxonomyTerms()
+            ->where(
+                'taxonomy_id',
+                Taxonomy::whereSlug(EnumsTaxonomy::BRAND->value)
+                    ->value('id')
+            );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     */
+    public function taxonomyTermsCategory(): BelongsToMany
+    {
+        return $this->taxonomyTerms()
+            ->where(
+                'taxonomy_id',
+                Taxonomy::whereSlug(EnumsTaxonomy::CATEGORIES->value)
+                    ->value('id')
+            );
     }
 
     /**
@@ -264,6 +298,12 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+            ->acceptsFile(
+                fn (File $file): bool => Str::of($file->mimeType)
+                    ->before('/')
+                    ->value() === 'image'
+            )
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')
@@ -271,6 +311,12 @@ class Product extends Model implements HasMedia, HasMetaDataContract
             });
 
         $this->addMediaCollection('video')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+            ->acceptsFile(
+                fn (File $file): bool => Str::of($file->mimeType)
+                    ->before('/')
+                    ->value() === 'video'
+            )
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }

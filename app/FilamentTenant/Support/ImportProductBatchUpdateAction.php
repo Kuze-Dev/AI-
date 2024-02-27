@@ -13,6 +13,7 @@ use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Domain\Tenant\TenantFeatureSupport;
 use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
@@ -24,7 +25,7 @@ class ImportProductBatchUpdateAction
     {
         return ImportAction::make('Batch Update Import')
             ->uniqueBy('sku')
-            ->hidden(fn () => ! tenancy()->tenant?->features()->active(ProductBatchUpdate::class) ? true : false)
+            ->hidden(fn () => TenantFeatureSupport::inactive(ProductBatchUpdate::class))
             ->translateLabel()
             ->processRowsUsing(fn (array $row) => self::processBatchUpdate($row))
             ->withValidation(

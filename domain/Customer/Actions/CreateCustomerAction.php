@@ -19,7 +19,6 @@ class CreateCustomerAction
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
         private readonly CreateAddressAction $createAddress,
-        private readonly GenerateCustomerIDAction $generateCustomerID
     ) {
     }
 
@@ -74,7 +73,6 @@ class CreateCustomerAction
 
         return Customer::create([
             'tier_id' => $customerData->tier_id,
-            'cuid' => $this->generateCustomerID->execute(),
             'email' => $customerData->email,
             'first_name' => $customerData->first_name,
             'last_name' => $customerData->last_name,

@@ -8,8 +8,8 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\RoleResource;
 use Domain\Role\Actions\UpdateRoleAction;
 use Domain\Role\DataTransferObjects\RoleData;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +25,7 @@ class EditRole extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -39,6 +39,6 @@ class EditRole extends EditRecord
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateRoleAction::class)->execute($record, new RoleData(...$data)));
+        return DB::transaction(fn () => app(UpdateRoleAction::class)->execute($record, RoleData::fromArray($data)));
     }
 }

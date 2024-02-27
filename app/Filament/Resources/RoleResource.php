@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Features\CMS\SitesManagement;
+use App\Features\Customer\CustomerBase;
+use App\Features\Customer\TierBase;
+use App\Features\ECommerce\ECommerceBase;
+use App\Features\Service\ServiceBase;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
-use Closure;
-use Domain\Role\Actions\DeleteRoleAction;
-use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Role\Models\Role;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class RoleResource extends Resource
 {
@@ -34,7 +35,7 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
+    protected static string|array $routeMiddleware = RequirePassword::class.':filament.admin.password.confirm';
 
     public static function getNavigationGroup(): ?string
     {
@@ -50,10 +51,9 @@ class RoleResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
-                        ->string()
                         ->maxLength(255),
                     Forms\Components\Select::make('guard_name')
                         ->default(config('auth.defaults.guard'))
@@ -75,60 +75,32 @@ class RoleResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->formatStateUsing(fn ($state): string => Str::headline($state))
                     ->searchable(),
-                Tables\Columns\BadgeColumn::make('guard_name'),
-                Tables\Columns\BadgeColumn::make('permissions_count')
+                Tables\Columns\TextColumn::make('guard_name')
+                    ->badge(),
+                Tables\Columns\TextColumn::make('permissions_count')
+                    ->badge()
                     ->counts('permissions')
                     ->colors(['success']),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('guard_name')
                     ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName])),
             ])
-
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->authorize('update'),
+                Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()
-                        ->using(function (Role $record) {
-                            try {
-                                return app(DeleteRoleAction::class)->execute($record);
-                            } catch (\Exception $e) {
-
-                                if ($e instanceof DeleteRestrictedException) {
-
-                                    Notification::make()
-                                        ->danger()
-                                        ->title('Delete of this Record is Restricted')
-                                        ->body($e->getMessage())
-                                        ->send();
-
-                                    return $e->getMessage();
-                                }
-
-                                if ($e instanceof CantDeleteRoleWithAssociatedUsersException) {
-
-                                    Notification::make()
-                                        ->danger()
-                                        ->title('Cannot Delete this Record')
-                                        ->body('Cannot Delete Role with Associated Users!')
-                                        ->send();
-
-                                    return false;
-
-                                }
-
-                                return false;
-                            }
-                        })
-                        ->authorize('delete'),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getPages(): array
@@ -149,15 +121,21 @@ class RoleResource extends Resource
     }
 
     /** @return array<\Filament\Forms\Components\Component> */
-    private static function generatePermissionGroupsFormSchema(Closure $get): array
+    private static function generatePermissionGroupsFormSchema(Forms\Get $get): array
     {
         $guard = $get('guard_name');
+
+        if (blank($guard)) {
+            return [
+                Forms\Components\Placeholder::make(trans('Please select a guard')),
+            ];
+        }
+
         self::$permissionGroups = PermissionGroupCollection::make(['guard_name' => $guard]);
 
         if (self::$permissionGroups->isEmpty()) {
             return [
-                Forms\Components\View::make('filament.roles.empty-permissions')
-                    ->viewData(['guard' => $guard]),
+                Forms\Components\Placeholder::make(trans('No Available Permissions for the selected guard')),
             ];
         }
 
@@ -165,7 +143,7 @@ class RoleResource extends Resource
             Forms\Components\Hidden::make('permissions')
                 ->reactive()
                 ->formatStateUsing(fn (?Role $record) => $record ? $record->permissions->pluck('id') : [])
-                ->dehydrateStateUsing(function (\Filament\Forms\Get $get): array {
+                ->dehydrateStateUsing(function (Forms\Get $get): array {
                     return self::$permissionGroups->reduce(
                         function (array $permissions, PermissionGroup $permissionGroup, string $groupName) use ($get): array {
                             if ($get($groupName) ?? false) {
@@ -185,7 +163,7 @@ class RoleResource extends Resource
                 ->helperText(trans('Enable all Permissions for this role'))
                 ->reactive()
                 ->formatStateUsing(fn (?Role $record) => self::$permissionGroups->every(fn (PermissionGroup $permissionGroup): bool => $record?->hasPermissionTo($permissionGroup->main) ?? false))
-                ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set, bool $state): void {
+                ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, bool $state): void {
                     self::$permissionGroups->each(function (PermissionGroup $permissionGroup, string $groupName) use ($get, $set, $state): void {
                         $set($groupName, $state);
 
@@ -196,7 +174,7 @@ class RoleResource extends Resource
             Forms\Components\Grid::make(['sm' => 2])
                 ->schema(
                     self::$permissionGroups->map(
-                        fn (PermissionGroup $permissionGroup, string $groupName) => Forms\Components\Card::make()
+                        fn (PermissionGroup $permissionGroup, string $groupName) => Forms\Components\Section::make()
                             ->schema([
                                 Forms\Components\Toggle::make($groupName)
                                     ->label(Str::headline($groupName))
@@ -205,7 +183,7 @@ class RoleResource extends Resource
                                     ->offIcon('heroicon-s-lock-closed')
                                     ->reactive()
                                     ->formatStateUsing(fn (?Role $record) => $record?->hasPermissionTo($permissionGroup->main))
-                                    ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set) use ($groupName, $permissionGroup): void {
+                                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) use ($groupName, $permissionGroup): void {
                                         self::refreshPermissionGroupAbilitiesState($groupName, $permissionGroup, $get, $set);
                                         self::refreshSelectAllState($get, $set);
                                     })
@@ -213,10 +191,12 @@ class RoleResource extends Resource
                                 Forms\Components\Fieldset::make('Abilities')
                                     ->schema([
                                         Forms\Components\CheckboxList::make("{$groupName}_abilities")
-                                            ->disableLabel()
-                                            ->options($permissionGroup->abilities->mapWithKeys(fn (Permission $permission) => [
-                                                $permission->id => Str::headline(explode('.', $permission->name, 2)[1]),
-                                            ]))
+                                            ->label('')
+                                            ->options($permissionGroup->abilities->mapWithKeys(
+                                                fn (Permission $permission) => [
+                                                    $permission->id => Str::headline(explode('.', $permission->name, 2)[1]),
+                                                ]
+                                            ))
                                             ->columns(2)
                                             ->reactive()
                                             ->formatStateUsing(function (Forms\Components\CheckboxList $component, ?Role $record) use ($permissionGroup): array {
@@ -233,7 +213,7 @@ class RoleResource extends Resource
                                                     ->values()
                                                     ->toArray();
                                             })
-                                            ->afterStateUpdated(function (\Filament\Forms\Get $get, \Filament\Forms\Set $set) use ($groupName, $permissionGroup): void {
+                                            ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) use ($groupName, $permissionGroup): void {
                                                 self::refreshPermissionGroupState($groupName, $permissionGroup, $get, $set);
                                                 self::refreshSelectAllState($get, $set);
                                             })
@@ -250,37 +230,41 @@ class RoleResource extends Resource
 
     private static function hideFeaturePermission(string $groupName): bool
     {
-
-        /** @var bool */
-        return match ($groupName) {
-            'site' => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class),
-            'country' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'currency' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'discount' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'order' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'product' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'paymentMethod' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'shippingMethod' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'taxZone' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'ecommerceSettings' => tenancy()->tenant?->features()->inactive(\App\Features\ECommerce\ECommerceBase::class),
-            'customers' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class),
-            'tier' => tenancy()->tenant?->features()->inactive(\App\Features\Customer\TierBase::class),
-            'service' => tenancy()->tenant?->features()->inactive(\App\Features\Service\ServiceBase::class),
+        $feature = match ($groupName) {
+            'country',
+            'shippingMethod',
+            'currency',
+            'discount',
+            'order',
+            'product',
+            'paymentMethod',
+            'taxZone',
+            'site' => SitesManagement::class,
+            'ecommerceSettings' => ECommerceBase::class,
+            'customers' => CustomerBase::class,
+            'tier' => TierBase::class,
+            'service' => ServiceBase::class,
             default => false
         };
+
+        if ($feature === false) {
+            return false;
+        }
+
+        return TenantFeatureSupport::inactive($feature);
     }
 
-    private static function refreshSelectAllState(Closure $get, Closure $set): void
+    private static function refreshSelectAllState(Forms\Get $get, Forms\Set $set): void
     {
         $set('select_all', self::$permissionGroups->every(fn (PermissionGroup $permissionGroup, string $groupName) => $get($groupName)));
     }
 
-    private static function refreshPermissionGroupState(string $groupName, PermissionGroup $permissionGroup, Closure $get, Closure $set): void
+    private static function refreshPermissionGroupState(string $groupName, PermissionGroup $permissionGroup, Forms\Get $get, Forms\Set $set): void
     {
         $set($groupName, $permissionGroup->abilities->pluck('id')->every(fn (int $id) => in_array($id, $get("{$groupName}_abilities"))));
     }
 
-    private static function refreshPermissionGroupAbilitiesState(string $groupName, PermissionGroup $permissionGroup, Closure $get, Closure $set): void
+    private static function refreshPermissionGroupAbilitiesState(string $groupName, PermissionGroup $permissionGroup, Forms\Get $get, Forms\Set $set): void
     {
         $set("{$groupName}_abilities", $get($groupName) ? $permissionGroup->abilities->pluck('id')->toArray() : []);
     }

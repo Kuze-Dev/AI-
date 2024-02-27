@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
@@ -9,7 +10,6 @@ use Domain\Globals\Database\Factories\GlobalsFactory;
 use Domain\Globals\Models\Globals;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Site\Database\Factories\SiteFactory;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -17,7 +17,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
     LocaleFactory::createDefault();
@@ -59,7 +58,7 @@ it('can create globals', function () {
 
 it('can create globals with same name on microsite', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     SiteFactory::new()->count(2)->create();
 
@@ -96,7 +95,7 @@ it('can create globals with same name on microsite', function () {
 
 it('cannot create globals with same name on microsite', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $siteFactory = SiteFactory::new()->create();
 

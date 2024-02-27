@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Support\RouteUrl\Actions;
 
 use App\Features\CMS\Internationalization;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Support\RouteUrl\Contracts\HasRouteUrl;
@@ -16,7 +17,7 @@ class CreateOrUpdateRouteUrlAction
     public function execute(Model&HasRouteUrl $model, RouteUrlData $routeUrlData): RouteUrl
     {
 
-        $url = $routeUrlData->is_override || tenancy()->tenant?->features()->active(Internationalization::class) ?
+        $url = $routeUrlData->is_override || TenantFeatureSupport::active(Internationalization::class) ?
             $routeUrlData->url :
             $model::generateRouteUrl($model, $model->getAttributes());
 

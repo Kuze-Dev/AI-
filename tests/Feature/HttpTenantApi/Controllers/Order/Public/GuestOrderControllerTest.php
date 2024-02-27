@@ -34,11 +34,9 @@ use function Pest\Laravel\withHeader;
 use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext(AllowGuestOrder::class);
 
-    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
-
-    app(OrderSettings::class)->fill(['email_sender_name' => fake()->safeEmail()])->save();
+    OrderSettings::fake(['email_sender_name' => fake()->safeEmail()]);
 
     CurrencyFactory::new()->createOne([
         'code' => 'USD',

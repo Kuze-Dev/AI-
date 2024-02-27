@@ -57,9 +57,4 @@ class CountryResource extends Resource
             'index' => Pages\ListCountry::route('/'),
         ];
     }
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
 }

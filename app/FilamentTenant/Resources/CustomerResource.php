@@ -9,17 +9,14 @@ use App\Features\ECommerce\RewardPoints;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
 use Closure;
-use Domain\Customer\Actions\DeleteCustomerAction;
-use Domain\Customer\Actions\ForceDeleteCustomerAction;
-use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Exports\CustomerExporter;
 use Domain\Customer\Models\Customer;
 use Domain\RewardPoint\Models\PointEarning;
+use Domain\Tenant\TenantFeatureSupport;
 use Domain\Tier\Enums\TierApprovalStatus;
-use Domain\Tier\Models\Tier;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -30,11 +27,9 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class CustomerResource extends Resource
 {
@@ -64,10 +59,11 @@ class CustomerResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\SpatieMediaLibraryFileUpload::make('image')
                         ->label(trans('Profile image'))
                         ->collection('image')
+                        ->preserveFilenames()
                         ->nullable()
                         ->image()
                         ->columnSpanFull(),
@@ -75,24 +71,24 @@ class CustomerResource extends Resource
                         ->translateLabel()
                         ->required()
                         ->string()
-                        ->rules([
+                        ->rule(
                             fn () => function (string $attribute, mixed $value, Closure $fail) {
                                 if (preg_match('/[^a-zA-Z\s]/', $value)) {
                                     $fail('Input must not contain numerical characters.');
                                 }
                             },
-                        ])
+                        )
                         ->maxLength(255),
                     Forms\Components\TextInput::make('last_name')
                         ->translateLabel()
                         ->required()
-                        ->rules([
+                        ->rule(
                             fn () => function (string $attribute, mixed $value, Closure $fail) {
                                 if (preg_match('/[^a-zA-Z\s]/', $value)) {
                                     $fail('Input must not contain numerical characters.');
                                 }
                             },
-                        ])
+                        )
                         ->string()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('email')
@@ -103,27 +99,26 @@ class CustomerResource extends Resource
                         ->rule(Rule::email())
                         ->maxLength(255),
                     Forms\Components\TextInput::make('mobile')
-                        ->unique(ignoreRecord: true)
                         ->label(trans('Mobile Number'))
+                        ->unique(ignoreRecord: true)
                         ->nullable()
                         ->numeric()
                         ->maxLength(255),
                     Forms\Components\DatePicker::make('birth_date')
                         ->translateLabel()
                         ->nullable()
-                        ->before(fn () => now()),
+                        ->before(fn () => now())
+                        ->timezone(null),
                     Forms\Components\Select::make('tier_id')
-                        ->label(trans('Tier'))
-                        ->preload()
-                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class))
-                        ->optionsFromModel(Tier::class, 'name'),
+                        ->translateLabel()
+                        ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))
+                        ->relationship('tier', 'name')
+                        ->searchable()
+                        ->preload(),
 
                     Forms\Components\Select::make('tier_approval_status')
-//                        ->options(TierApprovalStatus::class)
-                        ->options([
-                            TierApprovalStatus::APPROVED->value => Str::headline(TierApprovalStatus::APPROVED->value),
-                            TierApprovalStatus::REJECTED->value => Str::headline(TierApprovalStatus::REJECTED->value),
-                        ])
+                        ->options(TierApprovalStatus::class)
+                        ->enum(TierApprovalStatus::class)
                         ->visibleOn('edit')
                         ->hidden(function (?Customer $record): bool {
 
@@ -147,6 +142,7 @@ class CustomerResource extends Resource
                     Forms\Components\TextInput::make('password')
                         ->translateLabel()
                         ->password()
+                        ->revealable()
                         ->rules(Password::sometimes())
                         ->helperText(
                             app()->environment('local', 'testing')
@@ -157,6 +153,7 @@ class CustomerResource extends Resource
                     Forms\Components\TextInput::make('password_confirmation')
                         ->translateLabel()
                         ->password()
+                        ->revealable()
                         ->same('password')
                         ->dehydrated(false)
                         ->rules(Password::sometimes())
@@ -164,27 +161,19 @@ class CustomerResource extends Resource
                     Forms\Components\Select::make('gender')
                         ->translateLabel()
                         ->nullable()
-                        ->options(
-                            collect(Gender::cases())
-                                ->mapWithKeys(fn (Gender $target) => [$target->value => Str::headline($target->value)])
-                                ->toArray()
-                        )
+                        ->options(Gender::class)
                         ->enum(Gender::class),
                     Forms\Components\Select::make('status')
                         ->reactive()
                         ->translateLabel()
                         ->nullable()
-                        ->options(
-                            collect(Status::cases())
-                                ->mapWithKeys(fn (Status $target) => [$target->value => Str::headline($target->value)])
-                                ->toArray()
-                        )
+                        ->options(Status::class)
                         ->enum(Status::class)
                         ->visibleOn('edit'),
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
                         ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
-                        ->hidden(fn () => ! tenancy()->tenant?->features()->active(RewardPoints::class)),
+                        ->hidden(fn () => TenantFeatureSupport::inactive(RewardPoints::class)),
                 ])
                     ->columns(2)
                     ->disabled(fn ($record) => $record?->trashed()),
@@ -220,11 +209,14 @@ class CustomerResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->wrap(),
-                Tables\Columns\BadgeColumn::make('tier.name')
+                Tables\Columns\TextColumn::make('tier.name')
                     ->translateLabel()
+                    ->badge()
                     ->sortable()
-                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
-                    ->toggleable(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? false : true, isToggledHiddenByDefault: true)
+                    ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))
+                    ->toggleable(fn () => (bool) TenantFeatureSupport::active(TierBase::class),
+                        isToggledHiddenByDefault: true
+                    )
                     ->wrap(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->translateLabel()
@@ -234,8 +226,9 @@ class CustomerResource extends Resource
                         'warning' => Status::INACTIVE->value,
                         'danger' => Status::BANNED->value,
                     ]),
-                Tables\Columns\BadgeColumn::make('register_status')
+                Tables\Columns\TextColumn::make('register_status')
                     ->translateLabel()
+                    ->badge()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->colors([
@@ -257,7 +250,7 @@ class CustomerResource extends Resource
                 Tables\Filters\TrashedFilter::make()
                     ->translateLabel(),
                 Tables\Filters\SelectFilter::make('tier')
-                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(TierBase::class) ? true : false)
+                    ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))
                     ->translateLabel()
                     ->relationship('tier', 'name'),
                 Tables\Filters\SelectFilter::make('status')
@@ -284,34 +277,14 @@ class CustomerResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->translateLabel()
-                    ->hidden(fn (?Customer $record) => $record?->tier_approval_status == TierApprovalStatus::REJECTED ? true : false),
+                    ->hidden(fn (?Customer $record) => $record?->tier_approval_status === TierApprovalStatus::REJECTED),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
-                        ->translateLabel()
-                        ->using(function (Customer $record) {
-                            try {
-                                return app(DeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
+                        ->translateLabel(),
                     Tables\Actions\RestoreAction::make()
-                        ->translateLabel()
-                        ->using(
-                            fn (Customer $record) => DB::transaction(
-                                fn () => app(RestoreCustomerAction::class)
-                                    ->execute($record)
-                            )
-                        ),
+                        ->translateLabel(),
                     Tables\Actions\ForceDeleteAction::make()
-                        ->translateLabel()
-                        ->using(function (Customer $record) {
-                            try {
-                                return app(ForceDeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
+                        ->translateLabel(),
                 ]),
             ])
             ->bulkActions([

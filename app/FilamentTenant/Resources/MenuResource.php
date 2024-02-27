@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\Internationalization;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
@@ -17,6 +18,7 @@ use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -77,10 +79,10 @@ class MenuResource extends Resource
                         ->required()
                         ->unique(
                             callback: function ($livewire, Unique $rule, $state, \Filament\Forms\Get $get, $record) {
-                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
                                     return false;
                                 }
-                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                if (TenantFeatureSupport::active(Internationalization::class)) {
                                     $exist = Menu::whereName($state)->whereLocale($get('locale'))->whereNot('id', $record?->id)->count();
                                     if (! $exist) {
                                         return false;
@@ -96,7 +98,7 @@ class MenuResource extends Resource
                 ]),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
-                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->required(fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
                             function (?Menu $record, \Filament\Forms\Get $get) {
 
@@ -136,12 +138,12 @@ class MenuResource extends Resource
                         ->formatStateUsing(fn (?Menu $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                 ])
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                    ->hidden((bool) ! (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class))
                     ->required(),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
@@ -242,10 +244,10 @@ class MenuResource extends Resource
                     ->truncate('max-w-xs lg:max-w-md 2xl:max-w-3xl', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
                     ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                        return TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class);
                     }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
@@ -254,7 +256,7 @@ class MenuResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name'),
             ])
 
@@ -276,7 +278,7 @@ class MenuResource extends Resource
             return static::getModel()::query();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

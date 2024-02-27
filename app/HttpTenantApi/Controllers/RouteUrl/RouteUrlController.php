@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\RouteUrl;
 
 use App\Features\CMS\CMSBase;
+use App\Features\CMS\SitesManagement;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Spatie\RouteAttributes\Attributes\Get;
@@ -30,7 +32,7 @@ class RouteUrlController
             ->with('model');
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            TenantFeatureSupport::active(SitesManagement::class) &&
             request('site')
         ) {
 

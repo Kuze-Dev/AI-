@@ -23,7 +23,7 @@ class AdminExporter extends Exporter
             ExportColumn::make('last_name'),
             ExportColumn::make('active')
                 ->state(
-                    fn (Admin $record): string => $record->active ? 'Yes' : 'No'
+                    fn (Admin $record): string => $record->active ? 'yes' : 'no'
                 ),
             ExportColumn::make('roles')
                 ->state(

@@ -62,9 +62,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             ->dontSubmitEmptyLogs();
     }
 
-    protected $fillable = [
-        'name',
-        'is_suspended',
+    protected $casts = [
+        'is_suspended' => 'boolean',
     ];
 
     public static function getCustomColumns(): array
@@ -89,5 +88,12 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function domainFirstUrl(): string
     {
         return RequestFacade::getScheme().'://'.$this->domains[0]?->domain;
+    }
+
+    public function syncFeature(array $features): void
+    {
+        $feature = $this->features();
+        $feature->deactivate(collect($feature->all())->keys());
+        $feature->activate($features);
     }
 }

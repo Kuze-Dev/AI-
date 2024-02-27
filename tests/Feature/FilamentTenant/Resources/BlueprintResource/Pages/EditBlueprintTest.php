@@ -6,16 +6,12 @@ use App\FilamentTenant\Resources\BlueprintResource\Pages\EditBlueprint;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Models\Blueprint;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    // Filament::setContext('filament-tenant');
-     // v3 upgrade set context to panels
-     Filament::setCurrentPanel(Filament::getPanel('tenant'));
     loginAsSuperAdmin();
 });
 
@@ -37,7 +33,7 @@ it('can render page', function () {
 });
 
 it('can edit blueprint', function () {
-    
+
     $blueprint = BlueprintFactory::new()
         ->addSchemaSection(['title' => 'Main'])
         ->addSchemaField([

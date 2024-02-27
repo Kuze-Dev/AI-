@@ -9,7 +9,6 @@ use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\Database\Factories\PaymentFactory;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
-use Filament\Facades\Filament;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +16,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
     ShippingMethodFactory::new()->createOne();

@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-use Filament\Facades\Filament;
+use Domain\Tenant\TenantSupport;
 
 use function Pest\Laravel\get;
 
 it('tenant Can be Suspended test', function () {
 
     testInTenantContext();
-    Filament::setContext('filament-tenant');
 
-    $tenant = tenancy()->tenant;
+    $tenant = TenantSupport::model();
 
     $tenant->is_suspended = true;
 

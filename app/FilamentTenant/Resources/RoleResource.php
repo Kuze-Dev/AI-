@@ -6,10 +6,11 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\RoleResource as BaseRoleResource;
 use App\FilamentTenant\Resources\RoleResource\Pages;
+use Illuminate\Auth\Middleware\RequirePassword;
 
 class RoleResource extends BaseRoleResource
 {
-    protected static string|array $middlewares = ['password.confirm:filament-tenant.auth.password.confirm'];
+    protected static string|array $routeMiddleware = RequirePassword::class.':filament.tenant.password.confirm';
 
     public static function getPages(): array
     {

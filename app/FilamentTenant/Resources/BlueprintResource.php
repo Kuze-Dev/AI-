@@ -142,8 +142,8 @@ class BlueprintResource extends Resource
                 }
 
                 $label = $state['title'];
-                
-                if (array_key_exists('type',$state) && filled($state['type'])) {
+
+                if (array_key_exists('type', $state) && filled($state['type'])) {
                     $type = $state['type'] instanceof FieldType
                         ? $state['type']->value
                         : $state['type'];
@@ -218,16 +218,16 @@ class BlueprintResource extends Resource
                     ->columns(['sm' => 2])
                     ->schema(function (array $state) {
 
-                        if (! array_key_exists('type',$state)) {
+                        if (! array_key_exists('type', $state)) {
                             return [];
                         }
 
                         return self::getFieldOptionSchema(
-                                $state['type'] instanceof FieldType 
-                                    ? $state['type']
-                                    : FieldType::tryFrom($state['type'] ?? ''));
+                            $state['type'] instanceof FieldType
+                                ? $state['type']
+                                : FieldType::tryFrom($state['type'] ?? ''));
                     }),
-                    
+
             ]);
     }
 

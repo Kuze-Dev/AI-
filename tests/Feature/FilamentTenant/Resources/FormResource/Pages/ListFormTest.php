@@ -6,7 +6,6 @@ use App\FilamentTenant\Resources\FormResource\Pages\ListForms;
 use Domain\Form\Database\Factories\FormEmailNotificationFactory;
 use Domain\Form\Database\Factories\FormFactory;
 use Domain\Form\Database\Factories\FormSubmissionFactory;
-use Filament\Facades\Filament;
 use Filament\Tables\Actions\DeleteAction;
 
 use function Pest\Laravel\assertModelMissing;
@@ -14,7 +13,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 it('can render page', function () {

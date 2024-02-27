@@ -9,7 +9,7 @@ it('can generate', function () {
     testInTenantContext();
 
     $reference = app(GenerateReferenceNumberAction::class)
-        ->execute(new ServiceOrder());
+        ->execute(ServiceOrder::class);
 
     expect($reference)->toBe('SO'.now()->format('ymd').'0001');
 });

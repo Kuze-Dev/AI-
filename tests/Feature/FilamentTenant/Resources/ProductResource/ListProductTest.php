@@ -7,7 +7,6 @@ use Domain\Product\Database\Factories\ProductFactory;
 use Domain\Product\Database\Factories\ProductOptionFactory;
 use Domain\Product\Database\Factories\ProductOptionValueFactory;
 use Domain\Product\Database\Factories\ProductVariantFactory;
-use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 
@@ -16,7 +15,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 

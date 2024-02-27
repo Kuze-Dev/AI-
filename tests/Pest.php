@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Database\Seeders\Auth\PermissionSeeder;
 use Database\Seeders\Auth\RoleSeeder;
 use Domain\Tenant\Models\Tenant;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Schema\Blueprint;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Once\Cache;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Fixtures\User;
 
@@ -25,6 +27,7 @@ uses(
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
+        Cache::getInstance()->disable();
         Http::preventStrayRequests();
         Mail::fake();
 
@@ -33,7 +36,7 @@ uses(
         }
 
         Event::listen(MigrationsEnded::class, function () {
-            if (! tenancy()->initialized) {
+            if (! TenantSupport::initialized()) {
                 seed([
                     PermissionSeeder::class,
                     RoleSeeder::class,
@@ -63,6 +66,7 @@ uses(
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
+        Cache::getInstance()->disable();
         Http::preventStrayRequests();
         Mail::fake();
 

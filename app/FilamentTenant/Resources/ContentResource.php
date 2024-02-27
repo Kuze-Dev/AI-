@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use Closure;
@@ -13,6 +14,7 @@ use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Content;
 use Domain\Site\Models\Site;
 use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -133,7 +135,7 @@ class ContentResource extends Resource
 
                     Forms\Components\Card::make([
                         Forms\Components\CheckboxList::make('sites')
-                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
                             ->rules([
                                 function (?Content $record, \Filament\Forms\Get $get) {
 
@@ -174,7 +176,7 @@ class ContentResource extends Resource
                             ->formatStateUsing(fn (?Content $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                     ])
-                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                        ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 ]),
             ]);
     }
@@ -188,9 +190,9 @@ class ContentResource extends Resource
                     ->searchable()
                     ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                        return TenantFeatureSupport::active(SitesManagement::class);
                     }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
@@ -199,7 +201,7 @@ class ContentResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->relationship('sites', 'name'),
                 Tables\Filters\SelectFilter::make('blueprint')
                     ->relationship('blueprint', 'name')
@@ -245,7 +247,7 @@ class ContentResource extends Resource
             return static::getModel()::query();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

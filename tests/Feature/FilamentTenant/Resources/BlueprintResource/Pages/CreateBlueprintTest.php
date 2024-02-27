@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\BlueprintResource\Pages\CreateBlueprint;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Models\Blueprint;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\Field;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -13,8 +12,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    // v3 upgrade set context to panels
-    Filament::setCurrentPanel(Filament::getPanel('tenant'));
     loginAsSuperAdmin();
 });
 

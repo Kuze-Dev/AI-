@@ -14,6 +14,8 @@ use Domain\Payments\Models\Payment;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Enums\PaymentPlanType;
+use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -64,6 +66,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_price
+ * @property PaymentPlanType|null $payment_type
+ * @property PaymentPlanValue|null $payment_value
+ * @property array|null $payment_plan
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
@@ -167,13 +172,16 @@ class ServiceOrder extends Model implements PayableInterface
         'total_price',
         'retail_price',
         'schema',
+        'payment_value',
+        'payment_plan',
+        'payment_type',
     ];
 
     protected $casts = [
         'schema' => 'json',
         'customer_form' => 'json',
         'service_price' => MoneyCast::class,
-        'additional_charges' => 'json',
+        'additional_charges' => 'array',
         'billing_cycle' => BillingCycleEnum::class,
         'pay_upfront' => 'boolean',
         'is_subscription' => 'boolean',
@@ -187,6 +195,9 @@ class ServiceOrder extends Model implements PayableInterface
         'tax_total' => MoneyCast::class,
         'total_price' => MoneyCast::class,
         'status' => ServiceOrderStatus::class,
+        'payment_plan' => 'json',
+        'payment_type' => PaymentPlanType::class,
+        'payment_value' => PaymentPlanValue::class,
     ];
 
     public function getRouteKeyName(): string
@@ -266,6 +277,11 @@ class ServiceOrder extends Model implements PayableInterface
         return money($this->serviceBills()
             ->where('status', 'pending')
             ->sum('total_balance'));
+    }
+
+    public function totalUnpaidBills(): int
+    {
+        return $this->serviceBills()->where('total_balance', '>', 0)->count();
     }
 
     public function totalBalanceTax(): Money

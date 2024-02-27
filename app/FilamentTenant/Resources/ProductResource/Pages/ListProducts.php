@@ -10,7 +10,7 @@ use App\FilamentTenant\Support\ImportProductVariantAction;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use HalcyonAgile\FilamentExport\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,7 +21,7 @@ class ListProducts extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        // TODO: excel import export
+        // TODO: import export
         return [
             Actions\CreateAction::make(),
         ];

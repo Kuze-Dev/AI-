@@ -10,8 +10,11 @@ use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;
+use Domain\Tenant\TenantSupport;
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -64,8 +67,13 @@ function assertActivityLogged(
     );
 }
 
-function testInTenantContext(): Tenant
+function testInTenantContext(array|string|null $features = null): Tenant
 {
+    config([
+        'tenancy.database.suffix' => '_'.Str::random(7),
+    ]);
+
+    Filament::setCurrentPanel(Filament::getPanels()['tenant']);
 
     /** @var Tenant */
     $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
@@ -74,12 +82,17 @@ function testInTenantContext(): Tenant
 
     $tenant->createDomain(['domain' => $domain]);
 
-    $tenant->features()->activate(CMSBase::class);
-    $tenant->features()->activate(ECommerceBase::class);
-
     URL::forceRootUrl(Request::getScheme().'://'.$domain);
 
     tenancy()->initialize($tenant);
+
+    activateFeatures(
+        collect($features ?? [])
+            ->merge([
+                CMSBase::class, ECommerceBase::class,
+            ])
+            ->toArray()
+    );
 
     seed([
         PermissionSeeder::class,
@@ -105,4 +118,31 @@ function csvFiles(callable $fakeRows, int $rowCount = 10): Illuminate\Http\Testi
             name: 'import-file.csv',
             content: $content->join("\n")
         );
+}
+
+function activateFeatures(string|array $features): void
+{
+    if (blank($features)) {
+        return;
+    }
+
+    $tenant = TenantSupport::model();
+
+    foreach (Arr::wrap($features) as $feature) {
+        $tenant->features()->activate($feature);
+    }
+
+}
+function deactivateFeatures(string|array $features): void
+{
+    if (blank($features)) {
+        return;
+    }
+
+    $tenant = TenantSupport::model();
+
+    foreach (Arr::wrap($features) as $feature) {
+        $tenant->features()->deactivate($feature);
+    }
+
 }

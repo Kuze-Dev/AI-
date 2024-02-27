@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
-use App\FilamentTenant\Resources\ShippingmethodResource;
+use App\FilamentTenant\Resources\ShippingMethodResource;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Filament\Facades\Filament;
 
 beforeEach(function () {
-    testInTenantContext();
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: [
+        ECommerceBase::class,
+        ShippingStorePickup::class,
+    ]);
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(ECommerceBase::class);
-    tenancy()->tenant->features()->activate(ShippingStorePickup::class);
 });
 
 it('can globally search', function () {
@@ -24,5 +23,5 @@ it('can globally search', function () {
         ->getResults($record->title);
 
     expect($results->getCategories()['shipping methods']->first()->url)
-        ->toEqual(ShippingmethodResource::getUrl('edit', [$record]));
+        ->toEqual(ShippingMethodResource::getUrl('edit', [$record]));
 });

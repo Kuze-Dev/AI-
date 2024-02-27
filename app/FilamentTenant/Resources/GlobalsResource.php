@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\Internationalization;
+use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
@@ -14,6 +16,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Globals\Models\Globals;
 use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -46,7 +49,7 @@ class GlobalsResource extends Resource
                     ->unique(
                         callback: function ($livewire, Unique $rule) {
 
-                            if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                            if (TenantFeatureSupport::active(SitesManagement::class)) {
                                 return false;
                             }
 
@@ -68,11 +71,11 @@ class GlobalsResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden(TenantFeatureSupport::inactive(Internationalization::class))
                     ->required(),
                 Forms\Components\Card::make([
                     Forms\Components\CheckboxList::make('sites')
-                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
                         ->rules([
                             function (?Globals $record, \Filament\Forms\Get $get) {
 
@@ -113,7 +116,7 @@ class GlobalsResource extends Resource
                         ->formatStateUsing(fn (?Globals $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                 ])
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
@@ -131,11 +134,11 @@ class GlobalsResource extends Resource
                     ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
                     ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
+                        return TenantFeatureSupport::active(SitesManagement::class);
                     }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
@@ -144,7 +147,7 @@ class GlobalsResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->relationship('sites', 'name'),
                 Tables\Filters\SelectFilter::make('blueprint')
                     ->relationship('blueprint', 'name')
@@ -173,7 +176,7 @@ class GlobalsResource extends Resource
             return static::getModel()::query();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {

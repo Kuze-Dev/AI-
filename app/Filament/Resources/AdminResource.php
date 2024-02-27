@@ -18,11 +18,12 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
+use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Lloricode\Timezone\Timezone;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class AdminResource extends Resource
@@ -31,7 +32,7 @@ class AdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    //    protected static string|array $routeMiddleware = ['password.confirm:filament.auth.password.confirm'];
+    protected static string|array $routeMiddleware = RequirePassword::class.':filament.admin.password.confirm';
 
     protected static ?string $recordTitleAttribute = 'full_name';
 
@@ -53,7 +54,7 @@ class AdminResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('first_name')
                         ->required(),
                     Forms\Components\TextInput::make('last_name')
@@ -83,11 +84,8 @@ class AdminResource extends Resource
                         ->rule(Password::default())
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\Select::make('timezone')
-                        ->options(
-                            collect(timezone_identifiers_list())
-                                ->mapWithKeys(fn (string $timezone) => [$timezone => $timezone])
-                                ->toArray()
-                        )
+                        ->options(Timezone::generateList())
+                        ->rule('timezone')
                         ->searchable()
                         ->default(config('domain.admin.default_timezone')),
                 ])
@@ -103,28 +101,18 @@ class AdminResource extends Resource
                             Forms\Components\Select::make('roles')
                                 ->multiple()
                                 ->preload()
-                                ->optionsFromModel(
-                                    config('permission.models.role'),
-                                    'name',
-                                    function (Builder $query) {
-
-                                        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
-                                            return $query->where('guard_name', 'admin');
-                                        }
-
-                                        return $query->where('guard_name', 'admin')->where('name', '!=', config('domain.role.super_admin'));
-                                    }
-                                )
-                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->roles->pluck('id')->toArray() : []),
+                                ->relationship(
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
+                                        ->where('name', '!=', config('domain.role.super_admin'))
+                                ),
                             Forms\Components\Select::make('permissions')
                                 ->multiple()
                                 ->preload()
-                                ->optionsFromModel(
-                                    config('permission.models.permission'),
-                                    'name',
-                                    fn (Builder $query) => $query->where('guard_name', 'admin')
-                                )
-                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->permissions->pluck('id')->toArray() : []),
+                                ->relationship(
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
+                                ),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
@@ -147,10 +135,19 @@ class AdminResource extends Resource
                     ->boolean(),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TagsColumn::make('roles.name'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->badge(),
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
+                    ->dateTime()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->dateTime(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -207,6 +204,7 @@ class AdminResource extends Resource
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
+                        ->icon('heroicon-o-envelope')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             try {
                                 $record->sendEmailVerificationNotification();
@@ -224,7 +222,7 @@ class AdminResource extends Resource
                         ->icon('heroicon-o-lock-open')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             $result = app(ForgotPasswordAction::class)
-                                ->execute($record->email, 'admin');
+                                ->execute($record->email, Filament::getAuthPasswordBroker());
 
                             if ($result->failed()) {
                                 $action->failureNotificationTitle($result->getMessage())
@@ -243,13 +241,15 @@ class AdminResource extends Resource
                             description: fn (Admin $record) => $record->full_name.' password reset sent'
                         ),
                     Impersonate::make()
-                        ->guard('admin')
+                        ->translateLabel()
+                        ->grouped()
+                        ->guard(Filament::getAuthGuard())
                         ->redirectTo(Filament::getUrl() ?? '/')
                         ->authorize('impersonate')
                         ->withActivityLog(
                             event: 'impersonated',
                             description: fn (Admin $record) => $record->full_name.' impersonated',
-                            causedBy: Auth::user()
+                            causedBy: Filament::auth()->user()
                         ),
                 ]),
             ])

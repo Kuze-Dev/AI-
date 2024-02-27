@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\FilamentTenant\Resources\SiteResource\Pages;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -169,7 +171,7 @@ class SiteResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) ?: false;
+        return TenantFeatureSupport::active(SitesManagement::class);
     }
 
     /** @return Builder<Site> */

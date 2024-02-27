@@ -28,8 +28,6 @@ class TiersRelationManager extends RelationManager
     /** @throws Exception */
     public function table(Table $table): Table
     {
-        $tiers = Tier::all();
-
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')

@@ -9,21 +9,19 @@ use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Models\ServiceTransaction;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Support\Carbon;
 
 class CreateServiceBillingsAction
 {
     public function __construct(
-        private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
+        private readonly ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
     ) {
     }
 
     public function execute(): void
     {
-        /** @var \Stancl\Tenancy\Contracts\Tenant $tenant */
-        $tenant = tenancy()->tenant;
-
-        $tenant->run(function () {
+        TenantSupport::model()->run(function () {
             $serviceOrders = ServiceOrder::query()
                 ->whereShouldAutoGenerateBill()
                 ->with(['serviceBills.serviceTransactions'])

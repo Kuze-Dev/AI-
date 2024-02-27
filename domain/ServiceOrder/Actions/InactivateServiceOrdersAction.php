@@ -7,16 +7,14 @@ namespace Domain\ServiceOrder\Actions;
 use Domain\ServiceOrder\Jobs\InactivateServiceOrderStatusJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Support\Facades\Log;
 
 class InactivateServiceOrdersAction
 {
     public function execute(): void
     {
-        /** @var \Stancl\Tenancy\Contracts\Tenant $tenant */
-        $tenant = tenancy()->tenant;
-
-        $tenant->run(function () {
+        TenantSupport::model()->run(function () {
             $serviceOrders = ServiceOrder::query()
                 ->whereCanBeInactivated()
                 ->with(['serviceBills' => fn ($query) => $query->whereNotifiable()])

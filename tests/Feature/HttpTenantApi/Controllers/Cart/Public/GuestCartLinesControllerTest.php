@@ -14,9 +14,7 @@ use function Pest\Laravel\postJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
-    testInTenantContext();
-
-    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
+    testInTenantContext(AllowGuestOrder::class);
 
     $product = ProductFactory::new()
         ->createOne([

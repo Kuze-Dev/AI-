@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Models;
 
-use Domain\Admin\Notifications\ResetPassword;
-use Domain\Admin\Notifications\VerifyEmail;
 use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
 use Domain\Auth\HasActiveState;
@@ -167,16 +165,6 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
-    }
-
-    public function sendEmailVerificationNotification(): void
-    {
-        $this->notify(new VerifyEmail());
-    }
-
-    public function sendPasswordResetNotification($token): void
-    {
-        $this->notify(new ResetPassword($token));
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Spatie\Activitylog\Models\Activity> */

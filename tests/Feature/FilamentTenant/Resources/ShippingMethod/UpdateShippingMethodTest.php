@@ -4,29 +4,27 @@ declare(strict_types=1);
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
-use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingmethod;
+use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingMethod;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: [
+        ECommerceBase::class,
+        ShippingStorePickup::class,
+    ]);
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(ECommerceBase::class);
-    tenancy()->tenant->features()->activate(ShippingStorePickup::class);
 });
 
 it('can render edit shipping method', function () {
 
     $record = ShippingMethodFactory::new()->createOne();
 
-    livewire(EditShippingmethod::class, ['record' => $record->getRouteKey()])
+    livewire(EditShippingMethod::class, ['record' => $record->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful();
 });
@@ -40,7 +38,7 @@ it('can edit shipping method', function () {
         'shipper_state_id' => $state->id,
     ]);
 
-    livewire(EditShippingmethod::class, ['record' => $record->getRouteKey()])
+    livewire(EditShippingMethod::class, ['record' => $record->getRouteKey()])
         ->fillForm([
             'title' => 'Store Pickup',
             'subtitle' => 'InStore Pickup',
@@ -70,7 +68,7 @@ it('can edit update shipping method status', function () {
 
     $record = ShippingMethodFactory::new()->createOne();
 
-    livewire(EditShippingmethod::class, ['record' => $record->getRouteKey()])
+    livewire(EditShippingMethod::class, ['record' => $record->getRouteKey()])
         ->fillForm([
             'title' => 'Store Pickup',
             'subtitle' => 'InStore Pickup',

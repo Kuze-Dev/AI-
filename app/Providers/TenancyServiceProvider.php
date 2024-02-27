@@ -94,7 +94,7 @@ class TenancyServiceProvider extends ServiceProvider
             Events\TenancyEnded::class => [
                 Listeners\RevertToCentralContext::class,
                 function (Events\TenancyEnded $event) {
-                    \Spatie\Permission\PermissionRegistrar::$cacheKey = 'spatie.permission.cache';
+                    config(['permission.cache.key' => 'spatie.permission.cache']);
                 },
             ],
 
@@ -102,7 +102,7 @@ class TenancyServiceProvider extends ServiceProvider
             Events\TenancyBootstrapped::class => [
                 function (Events\TenancyBootstrapped $event) {
                     if ($event->tenancy->tenant) {
-                        \Spatie\Permission\PermissionRegistrar::$cacheKey = 'spatie.permission.cache.tenant.'.$event->tenancy->tenant->getAttribute('id');
+                        config(['permission.cache.key' => 'spatie.permission.cache.tenant.'.$event->tenancy->tenant->getAttribute('id')]);
                     }
                 },
             ],

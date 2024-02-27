@@ -13,7 +13,10 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderAdditionalChargeData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderCreatedPipelineData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
+use Domain\ServiceOrder\Enums\PaymentPlanType;
+use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Exceptions\InvalidPaymentPlan;
 use Domain\ServiceOrder\Exceptions\ServiceStatusMustBeActive;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +27,8 @@ class CreateServiceOrderAction
         private GenerateReferenceNumberAction $generateReferenceNumberAction,
         private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
         private GetTaxableInfoAction $getTaxableInfoAction,
-        private ServiceOrderCreatedPipelineAction $serviceOrderCreatedPipelineAction
+        private ServiceOrderCreatedPipelineAction $serviceOrderCreatedPipelineAction,
+        private ServiceOrderMilestoneCreatedPipelineAction $serviceOrderMilestoneCreatedPipelineAction
     ) {
     }
 
@@ -47,6 +51,23 @@ class CreateServiceOrderAction
 
         $taxableInfo = $this->getTax($serviceOrderData, $subTotalPrice);
 
+        $paymentPlan = $serviceOrderData->payment_plan;
+        $sum = null;
+        if ($paymentPlan) {
+            $amounts = array_column($paymentPlan, 'amount');
+            $sum = array_sum(array_map('floatval', $amounts));
+        }
+
+        if ($serviceOrderData->payment_value === PaymentPlanValue::FIXED->value) {
+            if ($sum !== $taxableInfo->total_price) {
+                throw new InvalidPaymentPlan('The payment plan must be equal to total price');
+            }
+        } elseif ($serviceOrderData->payment_value === PaymentPlanValue::PERCENT->value) {
+            if ($sum !== floatval(100)) {
+                throw new InvalidPaymentPlan('The payment plan amount must be equal to 100');
+            }
+        }
+
         $serviceOrder = ServiceOrder::create([
             'admin_id' => Auth::user() instanceof Admin && Auth::user()->hasRole(config('domain.role.super_admin'))
                 ? Auth::id()
@@ -54,11 +75,12 @@ class CreateServiceOrderAction
             'service_id' => $serviceOrderData->service_id,
             'customer_id' => $serviceOrderData->customer_id,
             'reference' => $this->generateReferenceNumberAction
-                ->execute(new ServiceOrder()),
+                ->execute(ServiceOrder::class),
             'customer_first_name' => $customer->first_name,
             'customer_last_name' => $customer->last_name,
             'customer_email' => $customer->email,
             'customer_mobile' => $customer->mobile,
+
             'schema' => $service->blueprint?->schema,
             'customer_form' => $serviceOrderData->form,
             'currency_code' => $currency->code,
@@ -82,16 +104,30 @@ class CreateServiceOrderAction
             'tax_percentage' => $taxableInfo->tax_percentage,
             'tax_total' => $taxableInfo->tax_total,
             'total_price' => $taxableInfo->total_price,
+            'payment_type' => $serviceOrderData->payment_type,
+            'payment_value' => $serviceOrderData->payment_value,
+            'payment_plan' => $serviceOrderData->payment_plan,
         ]);
 
-        $this->serviceOrderCreatedPipelineAction->execute(
-            new ServiceOrderCreatedPipelineData(
-                serviceOrder: $serviceOrder,
-                service_address_id: $serviceOrderData->service_address_id,
-                billing_address_id: $serviceOrderData->billing_address_id,
-                is_same_as_billing: $serviceOrderData->is_same_as_billing
-            )
-        );
+        if ($serviceOrderData->payment_type === PaymentPlanType::MILESTONE->value) {
+            $this->serviceOrderMilestoneCreatedPipelineAction->execute(
+                new ServiceOrderCreatedPipelineData(
+                    serviceOrder: $serviceOrder,
+                    service_address_id: $serviceOrderData->service_address_id,
+                    billing_address_id: $serviceOrderData->billing_address_id,
+                    is_same_as_billing: $serviceOrderData->is_same_as_billing
+                )
+            );
+        } else {
+            $this->serviceOrderCreatedPipelineAction->execute(
+                new ServiceOrderCreatedPipelineData(
+                    serviceOrder: $serviceOrder,
+                    service_address_id: $serviceOrderData->service_address_id,
+                    billing_address_id: $serviceOrderData->billing_address_id,
+                    is_same_as_billing: $serviceOrderData->is_same_as_billing
+                )
+            );
+        }
 
         return $serviceOrder;
     }

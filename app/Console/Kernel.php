@@ -9,8 +9,6 @@ use App\Console\Commands\InactivateServiceOrderCommand;
 use App\Console\Commands\NotifyCustomerServiceBillDueDateCommand;
 use App\Console\Commands\TenancyAwareScheduler\ClearResetsTenancyAwareSchedulerCommand;
 use App\Console\Commands\TenancyAwareScheduler\SanctumPruneExpiredTenancyAwareScheduler;
-use HalcyonAgile\FilamentExport\Commands\PruneExportCommand;
-use HalcyonAgile\FilamentImport\Commands\PruneImportCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -20,11 +18,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         self::tenantsSchedules($schedule);
-
-        $schedule->command(PruneExportCommand::class)
-            ->daily();
-        $schedule->command(PruneImportCommand::class)
-            ->daily();
 
         // $schedule->command(DispatchQueueCheckJobsCommand::class)->everyMinute();
 
