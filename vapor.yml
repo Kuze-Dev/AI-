@@ -42,6 +42,7 @@ environments:
     build:
       - 'COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev'
       - "php artisan event:cache"
+      - 'apt-get update && apt-get install -y libwebp-dev'
       # - 'npm ci && npm run build && rm -rf node_modules'
     firewall:
       rate-limit: 1500
