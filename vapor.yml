@@ -33,9 +33,6 @@ environments:
     domain:
       - haspcms-1.com
       - "*.haspcms-1.com"
-    layers:
-      - vapor:php-8.2
-      - vapor:php-8.2:imagick
     cache: hasp-cache
     memory: 2048
     cli-memory: 512
