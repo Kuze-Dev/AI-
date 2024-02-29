@@ -55,8 +55,8 @@ class FeatureSelector extends Field
 
                                     foreach ($data->extra as $extra) {
                                         $fields[] = $extra->groupLabel === null
-                                            ? static::nonLabeledGroup($data, $extra)
-                                            : static::labeledGroup($data, $extra);
+                                            ? self::nonLabeledGroup($data, $extra)
+                                            : self::labeledGroup($data, $extra);
                                     }
 
                                     return $fields;
@@ -81,7 +81,7 @@ class FeatureSelector extends Field
             ->formatStateUsing(
                 fn (CheckboxList $component, ?Tenant $record): array => collect($component->getOptions())
                     ->keys()
-                    ->filter(fn (string $feature) => $record->features()->active($feature))
+                    ->filter(fn (string $feature) => $record?->features()->active($feature))
                     ->values()
                     ->toArray()
             );

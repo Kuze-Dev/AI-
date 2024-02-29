@@ -44,21 +44,21 @@ class ViewServiceBill extends ViewRecord
         return trans('Service Bill Details #').$this->record->reference;
     }
 
-    public function getBreadcrumbs(): array
-    {
-        $resource = static::getResource();
-
-        $breadcrumb = $this->getBreadcrumb();
-
-        return array_merge(
-            [
-                ServiceOrderResource::getUrl('index') => ServiceOrderResource::getBreadcrumb(),
-                ServiceOrderResource::getUrl('view', [$this->ownerRecord]) => $this->ownerRecord,
-                $resource::getUrl('view', [$this->ownerRecord, $this->record->reference]) => $this->record->reference,
-            ],
-            (filled($breadcrumb) ? [$breadcrumb] : []),
-        );
-    }
+    //    public function getBreadcrumbs(): array
+    //    {
+    //        $resource = static::getResource();
+    //
+    //        $breadcrumb = $this->getBreadcrumb();
+    //
+    //        return array_merge(
+    //            [
+    //                ServiceOrderResource::getUrl('index') => ServiceOrderResource::getBreadcrumb(),
+    //                ServiceOrderResource::getUrl('view', [$this->ownerRecord]) => $this->ownerRecord,
+    //                $resource::getUrl('view', [$this->ownerRecord, $this->record->reference]) => $this->record->reference,
+    //            ],
+    //            (filled($breadcrumb) ? [$breadcrumb] : []),
+    //        );
+    //    }
 
     protected function getFormSchema(): array
     {

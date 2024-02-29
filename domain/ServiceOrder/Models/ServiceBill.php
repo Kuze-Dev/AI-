@@ -155,21 +155,6 @@ class ServiceBill extends Model implements HasMedia, PayableInterface
         );
     }
 
-    public function getStatusColor(): string
-    {
-        return match (
-            str_replace(
-                ' ',
-                '_',
-                strtolower($this->status->value)
-            )
-        ) {
-            ServiceBillStatus::PAID->value => 'success',
-            ServiceBillStatus::PENDING->value => 'warning',
-            default => 'secondary',
-        };
-    }
-
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceBill> */
     public function serviceOrder(): BelongsTo
     {
