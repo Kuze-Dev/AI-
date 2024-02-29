@@ -55,8 +55,8 @@ class FeatureSelector extends Field
 
                                     foreach ($data->extra as $extra) {
                                         $fields[] = $extra->groupLabel === null
-                                            ? static::nonLabeledGroup($data, $extra)
-                                            : static::labeledGroup($data, $extra);
+                                            ? self::nonLabeledGroup($data, $extra)
+                                            : self::labeledGroup($data, $extra);
                                     }
 
                                     return $fields;
