@@ -35,11 +35,12 @@ class RouteUrlFieldset extends Group
                         if ((bool) $get('is_override')) {
                             return;
                         }
-
+                        /** @var string */
                         $locale = $get('locale');
                         $defaultLocale = Locale::where('is_default', true)->first()?->code;
 
                         if ($eventParameters && $eventParameters[0] === 'input') {
+                            /** @var string */
                             $inputUrl = $get('route_url.url');
                             $inputUrl = Str::startsWith($inputUrl, '/') ?
                                 Str::contains($inputUrl, "/$locale") ? Str::replace("/$locale", '', $inputUrl) : $inputUrl
