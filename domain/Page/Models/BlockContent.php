@@ -45,6 +45,7 @@ class BlockContent extends Model implements Sortable
 
     protected $fillable = [
         'block_id',
+        'page_id',
         'data',
         'order',
     ];

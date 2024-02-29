@@ -378,7 +378,7 @@ class ServiceOrder extends Model implements PayableInterface
         return Attribute::make(
             get: function (mixed $value) {
                 $value = Str::replace('_', ' ', $this->status->value);
-                $value = Str::ucfirst(is_array($value) ? implode(' ', $value) : $value);
+                $value = Str::ucfirst($value);
 
                 return $value;
             },
