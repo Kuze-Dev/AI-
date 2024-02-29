@@ -81,7 +81,7 @@ class FeatureSelector extends Field
             ->formatStateUsing(
                 fn (CheckboxList $component, ?Tenant $record): array => collect($component->getOptions())
                     ->keys()
-                    ->filter(fn (string $feature) => $record->features()->active($feature))
+                    ->filter(fn (string $feature) => $record?->features()->active($feature))
                     ->values()
                     ->toArray()
             );
