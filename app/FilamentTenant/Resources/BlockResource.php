@@ -12,6 +12,7 @@ use Domain\Page\Actions\DeleteBlockAction;
 use Domain\Page\Models\Block;
 use Exception;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -55,39 +56,46 @@ class BlockResource extends Resource
                     ->optionsFromModel(Blueprint::class, 'name')
                     ->disabled(fn (?Block $record) => $record !== null)
                     ->reactive(),
-                Forms\Components\FileUpload::make('image')
-                    ->formatStateUsing(function ($record) {
-                        return $record?->getMedia('image')
-                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                            ->toArray() ?? [];
-                    })
+                SpatieMediaLibraryFileUpload::make('image')
                     ->image()
-                    ->beforeStateDehydrated(null)
-                    ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                    ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
-                        $mediaClass = config('media-library.media_model', Media::class);
+                    ->collection('image')
+                    ->preserveFilenames()
+                    ->customProperties(fn (Forms\Get $get) => [
+                        'alt_text' => $get('name'),
+                    ]),
+                // Forms\Components\FileUpload::make('image')
+                //     ->formatStateUsing(function ($record) {
+                //         return $record?->getMedia('image')
+                //             ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                //             ->toArray() ?? [];
+                //     })
+                //     ->image()
+                //     ->beforeStateDehydrated(null)
+                //     ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
+                //     ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
+                //         $mediaClass = config('media-library.media_model', Media::class);
 
-                        /** @var ?Media $media */
-                        $media = $mediaClass::findByUuid($file);
+                //         /** @var ?Media $media */
+                //         $media = $mediaClass::findByUuid($file);
 
-                        if ($component->getVisibility() === 'private') {
-                            try {
-                                return $media?->getTemporaryUrl(now()->addMinutes(5));
-                            } catch (Throwable) {
-                                // This driver does not support creating temporary URLs.
-                            }
-                        }
+                //         if ($component->getVisibility() === 'private') {
+                //             try {
+                //                 return $media?->getTemporaryUrl(now()->addMinutes(5));
+                //             } catch (Throwable) {
+                //                 // This driver does not support creating temporary URLs.
+                //             }
+                //         }
 
-                        $url = $media?->getUrl();
+                //         $url = $media?->getUrl();
 
-                        return [
-                            'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
-                            'size' => $media->getAttributeValue('size'),
-                            'type' => $media->getAttributeValue('mime_type'),
-                            'url' => $url,
-                        ];
+                //         return [
+                //             'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                //             'size' => $media->getAttributeValue('size'),
+                //             'type' => $media->getAttributeValue('mime_type'),
+                //             'url' => $url,
+                //         ];
 
-                    }),
+                //     }),
                 Forms\Components\Toggle::make('is_fixed_content')
                     ->inline(false)
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') ? false : true)
@@ -95,7 +103,7 @@ class BlockResource extends Resource
                     ->reactive(),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
-                    ->hidden(fn (\Filament\Forms\Get $get) => $get('is_fixed_content') ? false : true)
+                    ->hidden(fn (?Block $record, \Filament\Forms\Get $get) => $get('is_fixed_content') && $record ? false : true)
                     ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
