@@ -165,7 +165,7 @@ class BlueprintResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('state_name')
                     ->columnSpan(['sm' => 2])
-                    ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
+                    ->readOnly(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
                         $record->schema->sections,
                         fn (SectionData $section) => Arr::first(
                             $section->fields,
@@ -181,12 +181,12 @@ class BlueprintResource extends Resource
                             ->toArray()
                     )
                     ->required()
-                    ->disabled(fn (?Blueprint $record, \Filament\Forms\Get $get) => (bool) ($record && Arr::first(
+                    ->disableOptionWhen(fn (?Blueprint $record, \Filament\Forms\Get $get) => (bool) ($record && Arr::first(
                         $record->schema->sections,
-                        fn (SectionData $section) => Arr::first(
-                            $section->fields,
-                            fn (FieldData $field) => $field->state_name === $get('state_name'),
-                        )
+                            fn (SectionData $section) => Arr::first(
+                                $section->fields,
+                                fn (FieldData $field) => $field->state_name === $get('state_name'),
+                                )
                     )))
                     ->afterStateUpdated(
                         fn (Forms\Components\Select $component) => $component->getContainer()
