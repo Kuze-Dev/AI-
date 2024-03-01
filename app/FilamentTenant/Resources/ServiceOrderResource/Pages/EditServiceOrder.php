@@ -22,7 +22,6 @@ use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
 use Domain\ServiceOrder\Actions\ServiceOrderBankTransferAction;
 use Domain\ServiceOrder\Actions\UpdateServiceBillAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
-use Domain\ServiceOrder\DataTransferObjects\ServiceOrderTaxData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceBillData;
 use Domain\ServiceOrder\Enums\PaymentPlanType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -76,7 +75,11 @@ class EditServiceOrder extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $amountInfo = self::calculateTaxInfo($this->record, $data['additional_charges']);
+        $amountInfo = app(GetTaxableInfoAction::class)
+            ->computeTotalPriceWithTax(
+                ServiceOrderSupport::getSubtotal($this->record->service_price, $data['additional_charges']),
+                $this->record
+            );
 
         /**
          * 'additional_charges' => $data['additional_charges'],
@@ -657,14 +660,6 @@ class EditServiceOrder extends EditRecord
                 return $record->status == ServiceOrderStatus::FORPAYMENT ||
                     $record->status == ServiceOrderStatus::COMPLETED;
             });
-    }
-
-    private static function calculateTaxInfo(ServiceOrder $record, array $additionalCharges): ServiceOrderTaxData
-    {
-        return app(GetTaxableInfoAction::class)->computeTotalPriceWithTax(
-            ServiceOrderSupport::getSubtotal($record->service_price, $additionalCharges),
-            $record
-        );
     }
 
     private static function ProofOfPaymentButton(): ButtonAction
