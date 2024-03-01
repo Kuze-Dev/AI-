@@ -476,32 +476,25 @@ class EditServiceOrder extends EditRecord
                                     $record->currency_code
                                 )),
 
-                            Forms\Components\Group::make()
+                            Forms\Components\Placeholder::make('format_tax_percentage_for_display')
+                                ->label(fn (ServiceOrder $record) => trans($record->format_tax_percentage_for_display))
                                 ->visible(
                                     fn (ServiceOrder $record): bool => $record->tax_display === PriceDisplay::EXCLUSIVE
                                 )
-                                ->columns(2)
-                                ->columnSpan(2)
-                                ->schema([
+                                ->inlineLabel()
+                                ->content(function (ServiceOrder $record) {
 
-                                    Forms\Components\Placeholder::make('format_tax_percentage_for_display')
-                                        ->label(fn (ServiceOrder $record) => trans($record->format_tax_percentage_for_display))
-                                        ->inlineLabel()
-                                        ->content(function (ServiceOrder $record) {
+                                    if ($record->tax_display == PriceDisplay::INCLUSIVE) {
+                                        return $record->format_tax_for_display;
+                                    }
 
-                                            if ($record->tax_display == PriceDisplay::INCLUSIVE) {
-                                                return $record->format_tax_for_display;
-                                            }
+                                    $result = app(GetTaxableInfoAction::class)->computeTotalPriceWithTax(
+                                        ServiceOrderSupport::getSubtotal($record->service_price, $record->additional_charges),
+                                        $record
+                                    );
 
-                                            $result = app(GetTaxableInfoAction::class)->computeTotalPriceWithTax(
-                                                ServiceOrderSupport::getSubtotal($record->service_price, $record->additional_charges),
-                                                $record
-                                            );
-
-                                            return money($result->tax_total * 100, $record->currency_code);
-                                        }),
-
-                                ]),
+                                    return money($result->tax_total * 100, $record->currency_code);
+                                }),
 
                             Forms\Components\Placeholder::make(trans('Total Price'))
                                 ->inlineLabel()
