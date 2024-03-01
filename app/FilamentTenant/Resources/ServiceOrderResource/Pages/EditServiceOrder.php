@@ -446,13 +446,9 @@ class EditServiceOrder extends EditRecord
                                 ])
                                 ->columns(2),
 
-                            Forms\Components\Group::make()
-                                ->schema([
-                                    Forms\Components\Placeholder::make(trans('Created By'))
-                                        ->inlineLabel()
-                                        ->content(fn (ServiceOrder $record) => $record->admin?->full_name),
-
-                                ]),
+                            Forms\Components\Placeholder::make(trans('Created By'))
+                                ->inlineLabel()
+                                ->content(fn (ServiceOrder $record) => $record->admin?->full_name),
 
                             Forms\Components\Placeholder::make(trans('Order Date'))
                                 ->inlineLabel()
