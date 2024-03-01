@@ -107,7 +107,235 @@ class EditServiceOrder extends EditRecord
     {
         return $form->schema([
             Forms\Components\Group::make()
-                ->schema($this->getSection())
+                ->schema([
+
+                    Forms\Components\Section::make(trans('Service'))
+                        ->schema([
+                            Forms\Components\Placeholder::make(trans('Service'))
+                                ->content(fn (ServiceOrder $record) => $record->service_name),
+
+                            Forms\Components\Placeholder::make(trans('Service price'))
+                                ->content(fn (ServiceOrder $record) => $record->format_service_price_for_display),
+
+                            Forms\Components\Group::make()
+                                ->schema([
+                                    Forms\Components\Placeholder::make(trans('Billing cycle'))
+                                        ->content(fn (ServiceOrder $record) => $record->billing_cycle?->getLabel()),
+
+                                    Forms\Components\Placeholder::make(trans('Due date every'))
+                                        ->content(
+                                            fn (ServiceOrder $record) => Str::of('? ? after billing date')
+                                                ->replaceArray('?', [
+                                                    (string) $record->due_date_every,
+                                                    $record->due_date_every > 1 ? 'days' : 'day',
+                                                ])
+                                        ),
+                                ])
+                                ->visible(fn (ServiceOrder $record) => $record->service?->is_subscription)
+                                ->columns(2)
+                                ->columnSpan(2),
+
+                            Forms\Components\Placeholder::make(trans('Schedule'))
+                                ->columnSpan(2)
+                                ->content(
+                                    fn (ServiceOrder $record) => $record->schedule
+                                        ->timezone(Filament::auth()->user()->timezone)
+                                        ->format('F j Y g:i A')
+                                )
+                                ->visible(fn (ServiceOrder $record) => ! $record->service->is_subscription),
+
+                            Forms\Components\Group::make()
+                                ->columnSpan(2)
+                                ->visible(fn (ServiceOrder $record) => $record->payment_type === PaymentPlanType::MILESTONE)
+                                ->schema([
+                                    //                            TextLabel::make('')
+                                    //                                ->label(trans('Payment Plan'))
+                                    //                                ->alignLeft()
+                                    //                                ->size('xl')
+                                    //                                ->weight('bold')
+                                    //                                ->inline()
+                                    //                                ->readOnly()
+                                    //                                ->columnSpan(2),
+
+                                    //                            Divider::make('')->columnSpan(2),
+
+                                    Forms\Components\Repeater::make('payment_plan')
+                                        ->label(trans('Payment'))
+                                        ->columnSpan(2)
+                                        ->reactive()
+                                        ->itemLabel(function ($uuid, $component) {
+                                            $keys = array_keys($component->getState());
+                                            $index = array_search($uuid, $keys);
+
+                                            return $index + 1;
+                                        })
+                                        ->schema([
+                                            Forms\Components\TextInput::make('description')
+                                                ->translateLabel()
+                                                ->required(),
+
+                                            Forms\Components\TextInput::make('amount')
+                                                ->label(fn (ServiceOrder $record) => $record->payment_value?->getLabel())
+                                                ->required(),
+                                            //                                    Support\ButtonAction::make('Generate')
+                                            //                                        ->execute(function (ServiceOrder $record, Closure $get, Closure $set, $component) {
+                                            //                                            return Forms\Components\Actions\Action::make(trans('generate'))
+                                            //                                                ->color('secondary')
+                                            //                                                ->label('Generate')
+                                            //                                                ->size('lg')
+                                            //                                                ->action(function () use ($record, $component) {
+                                            //                                                    $state = $component->getContainer()->getState();
+                                            //
+                                            //                                                    app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
+                                            //                                                })
+                                            //                                                ->modalHeading(trans('Edit Status'))
+                                            //                                                ->disabled(function () use ($record, $component) {
+                                            //                                                    $state = $component->getContainer()->getState();
+                                            //
+                                            //                                                    if (is_null($record->payment_plan)) {
+                                            //                                                        return true;
+                                            //                                                    }
+                                            //
+                                            //                                                    $key = array_search($state['description'], array_column($record->payment_plan, 'description'));
+                                            //
+                                            //                                                    if ($key !== false) {
+                                            //                                                        return $record->payment_plan[$key]['is_generated'];
+                                            //
+                                            //                                                    }
+                                            //
+                                            //                                                    return true;
+                                            //                                                })
+                                            //                                                ->modalWidth('xl');
+                                            //                                        })
+                                            //                                        ->columnSpan(1),
+                                        ])
+                                        ->columns(4)
+                                        ->disabled(),
+
+                                ]),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Section::make(trans('Customer'))
+                        ->schema([
+                            Forms\Components\Placeholder::make('first_name')
+                                ->content(fn (ServiceOrder $record) => $record->customer_first_name),
+
+                            Forms\Components\Placeholder::make('last_name')
+                                ->content(fn (ServiceOrder $record) => $record->customer_last_name),
+
+                            Forms\Components\Placeholder::make('email')
+                                ->content(fn (ServiceOrder $record) => $record->customer_email),
+
+                            Forms\Components\Placeholder::make('mobile')
+                                ->content(fn (ServiceOrder $record) => $record->customer_mobile),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Section::make(trans('Service Address'))
+                        ->relationship('serviceOrderServiceAddress')
+                        ->schema([
+                            Forms\Components\Group::make()
+                                ->schema([
+                                    Forms\Components\Placeholder::make('address_line_1')
+                                        ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
+                                        ->translateLabel()
+                                        ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
+
+                                    Forms\Components\Placeholder::make('country')
+                                        ->content(fn (ServiceOrderAddress $record) => $record->country),
+
+                                    Forms\Components\Placeholder::make('state')
+                                        ->content(fn (ServiceOrderAddress $record) => $record->state),
+
+                                    Forms\Components\Placeholder::make('city')
+                                        ->label('City/Province')
+                                        ->translateLabel()
+                                        ->content(fn (ServiceOrderAddress $record) => $record->city),
+
+                                    Forms\Components\Placeholder::make('zip_code')
+                                        ->label('Zip Code')
+                                        ->translateLabel()
+                                        ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
+                                ])
+                                ->columns(2)
+                                ->columnSpan(2),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Section::make(trans('Billing Address'))
+                        ->visible(fn (ServiceOrder $record) => $record->serviceOrderBillingAddress === null)
+                        ->schema([
+                            Forms\Components\Placeholder::make('same_as_billing_address')
+                                ->hiddenLabel()
+                                ->content(fn () => trans('Same as Service Address')),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Section::make(trans('Billing Address'))
+                        ->relationship('serviceOrderBillingAddress')
+                        ->visible(fn (ServiceOrder $record) => $record->serviceOrderBillingAddress !== null)
+                        ->schema([
+                            Forms\Components\Group::make()
+                                ->schema([
+                                    Forms\Components\Placeholder::make('address_line_1')
+                                        ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
+                                        ->translateLabel()
+                                        ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
+
+                                    Forms\Components\Placeholder::make('country')
+                                        ->content(fn (ServiceOrderAddress $record) => $record->country),
+
+                                    Forms\Components\Placeholder::make('state')
+                                        ->content(fn (ServiceOrderAddress $record) => $record->state),
+
+                                    Forms\Components\Placeholder::make('city')
+                                        ->label('City/Province')
+                                        ->translateLabel()
+                                        ->content(fn (ServiceOrderAddress $record) => $record->city),
+
+                                    Forms\Components\Placeholder::make('zip_code')
+                                        ->label('Zip Code')
+                                        ->translateLabel()
+                                        ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
+                                ])
+                                ->columns(2)
+                                ->columnSpan(2),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Group::make()
+                        ->schema([
+                            Forms\Components\Repeater::make('additional_charges')
+                                ->translateLabel()
+                                ->addActionLabel(trans('Additional Charges'))
+                                ->columnSpan(2)
+                                ->defaultItems(0)
+                                ->schema([
+                                    Forms\Components\TextInput::make('name')->required(),
+                                    Forms\Components\TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
+                                    Forms\Components\DateTimePicker::make('date')
+                                        ->minDate(now())
+                                        ->seconds(false)
+                                        ->default(now())
+                                        ->disabled()
+                                        ->hidden()
+                                        ->timezone(Auth::user()?->timezone),
+                                    Forms\Components\TextInput::make('price')->required()->numeric()->reactive(),
+                                ])
+                                ->columns(3),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Section::make(trans('Service Fill-up Form'))
+                        ->schema([
+                            SchemaFormBuilder::make('customer_form', fn ($record) => $record->service->blueprint->schema)
+                                ->schemaData(fn ($record) => $record->service->blueprint->schema),
+                        ])
+                        ->hidden(fn (Get $get) => $get('service_id') === null)
+                        ->columns(2),
+
+                ])
                 ->columnSpan(2),
 
             Forms\Components\Group::make()
@@ -287,240 +515,6 @@ class EditServiceOrder extends EditRecord
                 ->columnSpan(1),
 
         ])->columns(3);
-    }
-
-    private function getSection(): array
-    {
-        /** @var Admin $adminLoggedIn */
-        $adminLoggedIn = Filament::auth()->user();
-
-        return [
-            Forms\Components\Section::make(trans('Service'))
-                ->schema([
-                    Forms\Components\Placeholder::make(trans('Service'))
-                        ->content(fn (ServiceOrder $record) => $record->service_name),
-
-                    Forms\Components\Placeholder::make(trans('Service price'))
-                        ->content(fn (ServiceOrder $record) => $record->format_service_price_for_display),
-
-                    Forms\Components\Group::make()
-                        ->schema([
-                            Forms\Components\Placeholder::make(trans('Billing cycle'))
-                                ->content(fn (ServiceOrder $record) => $record->billing_cycle?->getLabel()),
-
-                            Forms\Components\Placeholder::make(trans('Due date every'))
-                                ->content(
-                                    fn (ServiceOrder $record) => Str::of('? ? after billing date')
-                                        ->replaceArray('?', [
-                                            (string) $record->due_date_every,
-                                            $record->due_date_every > 1 ? 'days' : 'day',
-                                        ])
-                                ),
-                        ])
-                        ->visible(fn (ServiceOrder $record) => $record->service?->is_subscription)
-                        ->columns(2)
-                        ->columnSpan(2),
-
-                    Forms\Components\Placeholder::make(trans('Schedule'))
-                        ->columnSpan(2)
-                        ->content(
-                            fn (ServiceOrder $record) => $record->schedule
-                                ->timezone($adminLoggedIn->timezone)
-                                ->format('F j Y g:i A')
-                        )
-                        ->visible(fn (ServiceOrder $record) => ! $record->service->is_subscription),
-
-                    Forms\Components\Group::make()
-                        ->columnSpan(2)
-                        ->visible(fn (ServiceOrder $record) => $record->payment_type === PaymentPlanType::MILESTONE)
-                        ->schema([
-                            //                            TextLabel::make('')
-                            //                                ->label(trans('Payment Plan'))
-                            //                                ->alignLeft()
-                            //                                ->size('xl')
-                            //                                ->weight('bold')
-                            //                                ->inline()
-                            //                                ->readOnly()
-                            //                                ->columnSpan(2),
-
-                            //                            Divider::make('')->columnSpan(2),
-
-                            Forms\Components\Repeater::make('payment_plan')
-                                ->label(trans('Payment'))
-                                ->columnSpan(2)
-                                ->reactive()
-                                ->itemLabel(function ($uuid, $component) {
-                                    $keys = array_keys($component->getState());
-                                    $index = array_search($uuid, $keys);
-
-                                    return $index + 1;
-                                })
-                                ->schema([
-                                    Forms\Components\TextInput::make('description')
-                                        ->translateLabel()
-                                        ->required(),
-
-                                    Forms\Components\TextInput::make('amount')
-                                        ->label(fn (ServiceOrder $record) => $record->payment_value?->getLabel())
-                                        ->required(),
-                                    //                                    Support\ButtonAction::make('Generate')
-                                    //                                        ->execute(function (ServiceOrder $record, Closure $get, Closure $set, $component) {
-                                    //                                            return Forms\Components\Actions\Action::make(trans('generate'))
-                                    //                                                ->color('secondary')
-                                    //                                                ->label('Generate')
-                                    //                                                ->size('lg')
-                                    //                                                ->action(function () use ($record, $component) {
-                                    //                                                    $state = $component->getContainer()->getState();
-                                    //
-                                    //                                                    app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
-                                    //                                                })
-                                    //                                                ->modalHeading(trans('Edit Status'))
-                                    //                                                ->disabled(function () use ($record, $component) {
-                                    //                                                    $state = $component->getContainer()->getState();
-                                    //
-                                    //                                                    if (is_null($record->payment_plan)) {
-                                    //                                                        return true;
-                                    //                                                    }
-                                    //
-                                    //                                                    $key = array_search($state['description'], array_column($record->payment_plan, 'description'));
-                                    //
-                                    //                                                    if ($key !== false) {
-                                    //                                                        return $record->payment_plan[$key]['is_generated'];
-                                    //
-                                    //                                                    }
-                                    //
-                                    //                                                    return true;
-                                    //                                                })
-                                    //                                                ->modalWidth('xl');
-                                    //                                        })
-                                    //                                        ->columnSpan(1),
-                                ])
-                                ->columns(4)
-                                ->disabled(),
-
-                        ]),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make(trans('Customer'))
-                ->schema([
-                    Forms\Components\Placeholder::make('first_name')
-                        ->content(fn (ServiceOrder $record) => $record->customer_first_name),
-
-                    Forms\Components\Placeholder::make('last_name')
-                        ->content(fn (ServiceOrder $record) => $record->customer_last_name),
-
-                    Forms\Components\Placeholder::make('email')
-                        ->content(fn (ServiceOrder $record) => $record->customer_email),
-
-                    Forms\Components\Placeholder::make('mobile')
-                        ->content(fn (ServiceOrder $record) => $record->customer_mobile),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make(trans('Service Address'))
-                ->relationship('serviceOrderServiceAddress')
-                ->schema([
-                    Forms\Components\Group::make()
-                        ->schema([
-                            Forms\Components\Placeholder::make('address_line_1')
-                                ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
-                                ->translateLabel()
-                                ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
-
-                            Forms\Components\Placeholder::make('country')
-                                ->content(fn (ServiceOrderAddress $record) => $record->country),
-
-                            Forms\Components\Placeholder::make('state')
-                                ->content(fn (ServiceOrderAddress $record) => $record->state),
-
-                            Forms\Components\Placeholder::make('city')
-                                ->label('City/Province')
-                                ->translateLabel()
-                                ->content(fn (ServiceOrderAddress $record) => $record->city),
-
-                            Forms\Components\Placeholder::make('zip_code')
-                                ->label('Zip Code')
-                                ->translateLabel()
-                                ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
-                        ])
-                        ->columns(2)
-                        ->columnSpan(2),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make(trans('Billing Address'))
-                ->visible(fn (ServiceOrder $record) => $record->serviceOrderBillingAddress === null)
-                ->schema([
-                    Forms\Components\Placeholder::make('same_as_billing_address')
-                        ->hiddenLabel()
-                        ->content(fn () => trans('Same as Service Address')),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make(trans('Billing Address'))
-                ->relationship('serviceOrderBillingAddress')
-                ->visible(fn (ServiceOrder $record) => $record->serviceOrderBillingAddress !== null)
-                ->schema([
-                    Forms\Components\Group::make()
-                        ->schema([
-                            Forms\Components\Placeholder::make('address_line_1')
-                                ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
-                                ->translateLabel()
-                                ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
-
-                            Forms\Components\Placeholder::make('country')
-                                ->content(fn (ServiceOrderAddress $record) => $record->country),
-
-                            Forms\Components\Placeholder::make('state')
-                                ->content(fn (ServiceOrderAddress $record) => $record->state),
-
-                            Forms\Components\Placeholder::make('city')
-                                ->label('City/Province')
-                                ->translateLabel()
-                                ->content(fn (ServiceOrderAddress $record) => $record->city),
-
-                            Forms\Components\Placeholder::make('zip_code')
-                                ->label('Zip Code')
-                                ->translateLabel()
-                                ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
-                        ])
-                        ->columns(2)
-                        ->columnSpan(2),
-                ])
-                ->columns(2),
-
-            Forms\Components\Group::make()
-                ->schema([
-                    Forms\Components\Repeater::make('additional_charges')
-                        ->translateLabel()
-                        ->addActionLabel(trans('Additional Charges'))
-                        ->columnSpan(2)
-                        ->defaultItems(0)
-                        ->schema([
-                            Forms\Components\TextInput::make('name')->required(),
-                            Forms\Components\TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
-                            Forms\Components\DateTimePicker::make('date')
-                                ->minDate(now())
-                                ->seconds(false)
-                                ->default(now())
-                                ->disabled()
-                                ->hidden()
-                                ->timezone(Auth::user()?->timezone),
-                            Forms\Components\TextInput::make('price')->required()->numeric()->reactive(),
-                        ])
-                        ->columns(3),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make(trans('Service Fill-up Form'))
-                ->schema([
-                    SchemaFormBuilder::make('customer_form', fn ($record) => $record->service->blueprint->schema)
-                        ->schemaData(fn ($record) => $record->service->blueprint->schema),
-                ])
-                ->hidden(fn (Get $get) => $get('service_id') === null)
-                ->columns(2),
-        ];
     }
 
     private static function summaryEditButton(): Support\ButtonAction
