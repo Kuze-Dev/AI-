@@ -433,7 +433,7 @@ class EditServiceOrder extends EditRecord
 
                                                     report($e);
                                                 } catch (ModelNotFoundException $e) {
-                                                    $action->failureNotificationTitle(trans($m->getMessage()))
+                                                    $action->failureNotificationTitle(trans($e->getMessage()))
                                                         ->failure();
 
                                                     report($e);
