@@ -106,6 +106,7 @@ class EditServiceOrder extends EditRecord
     public function form(Forms\Form $form): Forms\Form
     {
         return $form->schema([
+
             Forms\Components\Group::make()
                 ->schema([
 
@@ -235,31 +236,27 @@ class EditServiceOrder extends EditRecord
                     Forms\Components\Section::make(trans('Service Address'))
                         ->relationship('serviceOrderServiceAddress')
                         ->schema([
-                            Forms\Components\Group::make()
-                                ->schema([
-                                    Forms\Components\Placeholder::make('address_line_1')
-                                        ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
-                                        ->translateLabel()
-                                        ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
+                            Forms\Components\Placeholder::make('address_line_1')
+                                ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
+                                ->translateLabel()
+                                ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
 
-                                    Forms\Components\Placeholder::make('country')
-                                        ->content(fn (ServiceOrderAddress $record) => $record->country),
+                            Forms\Components\Placeholder::make('country')
+                                ->content(fn (ServiceOrderAddress $record) => $record->country),
 
-                                    Forms\Components\Placeholder::make('state')
-                                        ->content(fn (ServiceOrderAddress $record) => $record->state),
+                            Forms\Components\Placeholder::make('state')
+                                ->content(fn (ServiceOrderAddress $record) => $record->state),
 
-                                    Forms\Components\Placeholder::make('city')
-                                        ->label('City/Province')
-                                        ->translateLabel()
-                                        ->content(fn (ServiceOrderAddress $record) => $record->city),
+                            Forms\Components\Placeholder::make('city')
+                                ->label('City/Province')
+                                ->translateLabel()
+                                ->content(fn (ServiceOrderAddress $record) => $record->city),
 
-                                    Forms\Components\Placeholder::make('zip_code')
-                                        ->label('Zip Code')
-                                        ->translateLabel()
-                                        ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
-                                ])
-                                ->columns(2)
-                                ->columnSpan(2),
+                            Forms\Components\Placeholder::make('zip_code')
+                                ->label('Zip Code')
+                                ->translateLabel()
+                                ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
+
                         ])
                         ->columns(2),
 
@@ -276,52 +273,57 @@ class EditServiceOrder extends EditRecord
                         ->relationship('serviceOrderBillingAddress')
                         ->visible(fn (ServiceOrder $record) => $record->serviceOrderBillingAddress !== null)
                         ->schema([
-                            Forms\Components\Group::make()
-                                ->schema([
-                                    Forms\Components\Placeholder::make('address_line_1')
-                                        ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
-                                        ->translateLabel()
-                                        ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
 
-                                    Forms\Components\Placeholder::make('country')
-                                        ->content(fn (ServiceOrderAddress $record) => $record->country),
+                            Forms\Components\Placeholder::make('address_line_1')
+                                ->label('House/Unit/Flr #, Bldg Name, Blk or Lot #')
+                                ->translateLabel()
+                                ->content(fn (ServiceOrderAddress $record) => $record->address_line_1),
 
-                                    Forms\Components\Placeholder::make('state')
-                                        ->content(fn (ServiceOrderAddress $record) => $record->state),
+                            Forms\Components\Placeholder::make('country')
+                                ->content(fn (ServiceOrderAddress $record) => $record->country),
 
-                                    Forms\Components\Placeholder::make('city')
-                                        ->label('City/Province')
-                                        ->translateLabel()
-                                        ->content(fn (ServiceOrderAddress $record) => $record->city),
+                            Forms\Components\Placeholder::make('state')
+                                ->content(fn (ServiceOrderAddress $record) => $record->state),
 
-                                    Forms\Components\Placeholder::make('zip_code')
-                                        ->label('Zip Code')
-                                        ->translateLabel()
-                                        ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
-                                ])
-                                ->columns(2)
-                                ->columnSpan(2),
+                            Forms\Components\Placeholder::make('city')
+                                ->label('City/Province')
+                                ->translateLabel()
+                                ->content(fn (ServiceOrderAddress $record) => $record->city),
+
+                            Forms\Components\Placeholder::make('zip_code')
+                                ->label('Zip Code')
+                                ->translateLabel()
+                                ->content(fn (ServiceOrderAddress $record) => $record->zip_code),
+
                         ])
                         ->columns(2),
 
-                    Forms\Components\Group::make()
+                    Forms\Components\Section::make(trans('Additional Charges'))
                         ->schema([
                             Forms\Components\Repeater::make('additional_charges')
-                                ->translateLabel()
-                                ->addActionLabel(trans('Additional Charges'))
+                                ->hiddenLabel()
                                 ->columnSpan(2)
                                 ->defaultItems(0)
                                 ->schema([
-                                    Forms\Components\TextInput::make('name')->required(),
-                                    Forms\Components\TextInput::make('quantity')->required()->numeric()->reactive()->default(1),
+                                    Forms\Components\TextInput::make('name')
+                                        ->required(),
+                                    Forms\Components\TextInput::make('quantity')
+                                        ->required()
+                                        ->numeric()
+                                        ->reactive()
+                                        ->default(1),
+
                                     Forms\Components\DateTimePicker::make('date')
                                         ->minDate(now())
                                         ->seconds(false)
                                         ->default(now())
                                         ->disabled()
-                                        ->hidden()
-                                        ->timezone(Auth::user()?->timezone),
-                                    Forms\Components\TextInput::make('price')->required()->numeric()->reactive(),
+                                        ->hidden(),
+
+                                    Forms\Components\TextInput::make('price')
+                                        ->required()
+                                        ->numeric()
+                                        ->reactive(),
                                 ])
                                 ->columns(3),
                         ])
@@ -340,7 +342,7 @@ class EditServiceOrder extends EditRecord
 
             Forms\Components\Group::make()
                 ->schema([
-                    Forms\Components\Section::make(trans('Service Order Summary'))
+                    Forms\Components\Section::make(trans('Service Order '))
                         ->schema([
                             Forms\Components\Group::make()
                                 ->schema([
@@ -349,7 +351,7 @@ class EditServiceOrder extends EditRecord
                                     //                                                ->color(fn (ServiceOrder $record) => $record->badge_color_for_status_display)
                                     //                                                ->inline()
                                     //                                                ->alignLeft(),
-                                    //                                            self::summaryEditButton(),
+                                    //                                            self::EditButton(),
                                 ])
                                 ->columns(2),
                             Forms\Components\Group::make()
@@ -393,7 +395,7 @@ class EditServiceOrder extends EditRecord
                                     //                                                    }
                                     //                                                ),
                                 ]),
-                            //                                    self::summaryProofOfPaymentButton(),
+                            //                                    self::ProofOfPaymentButton(),
                             //                                    Divider::make(''),
                             Forms\Components\Group::make()
                                 ->schema([
@@ -481,7 +483,8 @@ class EditServiceOrder extends EditRecord
                                 ->columns(2),
                         ])
                         ->columnSpan(1),
-                    Forms\Components\Section::make(trans('Bills Summary'))
+
+                    Forms\Components\Section::make(trans('Bills '))
                         ->schema([
                             Forms\Components\Group::make()
                                 ->schema([
@@ -510,14 +513,16 @@ class EditServiceOrder extends EditRecord
                                     //                                                ->inline()
                                     //                                                ->readOnly(),
                                 ])->columns(2),
-                        ])->columnSpan(1),
+                        ])
+                        ->columnSpan(1),
                 ])
                 ->columnSpan(1),
 
-        ])->columns(3);
+        ])
+            ->columns(3);
     }
 
-    private static function summaryEditButton(): Support\ButtonAction
+    private static function EditButton(): Support\ButtonAction
     {
         return Support\ButtonAction::make('Edit')
             ->execute(fn (ServiceOrder $record, Get $get, Set $set) => Forms\Components\Actions\Action::make(trans('edit'))
@@ -662,7 +667,7 @@ class EditServiceOrder extends EditRecord
         );
     }
 
-    private static function summaryProofOfPaymentButton(): ButtonAction
+    private static function ProofOfPaymentButton(): ButtonAction
     {
         return ButtonAction::make('proof_of_payment')
             ->disableLabel()
