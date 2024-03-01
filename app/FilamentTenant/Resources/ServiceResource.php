@@ -89,7 +89,37 @@ class ServiceResource extends Resource
                                 ->required()
                                 ->preserveFilenames(),
                         ]),
-                        self::servicePriceSection(),
+                        Forms\Components\Section::make('Service Price')
+                            ->translateLabel()
+                            ->schema([
+                                Forms\Components\Toggle::make('pay_upfront')
+                                    ->reactive()
+                                    ->disabled(fn (Get $get) => $get('is_subscription') === true),
+                                Forms\Components\TextInput::make('retail_price')
+                                    ->translateLabel()
+                                    ->prefix(Currency::whereEnabled(true)->firstOrFail()->symbol)
+                                    ->rule(
+                                        fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                            if ($value <= 0) {
+                                                $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                                $fail("$attributeName must be above zero.");
+                                            }
+                                        },
+                                    )
+                                    ->required(),
+                                Forms\Components\TextInput::make('selling_price')
+                                    ->translateLabel()
+                                    ->prefix(Currency::whereEnabled(true)->firstOrFail()->symbol)
+                                    ->rule(
+                                        fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                            if ($value <= 0) {
+                                                $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                                $fail("$attributeName must be above zero.");
+                                            }
+                                        },
+                                    )
+                                    ->required(),
+                            ]),
                         Forms\Components\Section::make('Section Display')
                             ->translateLabel()
                             ->schema([
@@ -119,7 +149,70 @@ class ServiceResource extends Resource
                     ])->columnSpan(2),
                 Forms\Components\Group::make()
                     ->schema([
-                        self::statusSection(),
+                        Forms\Components\Section::make('Status')
+                            ->translateLabel()
+                            ->schema([
+                                Forms\Components\Toggle::make('status')
+                                    ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)))
+                                    ->reactive()
+                                    ->lazy()
+                                    ->afterStateUpdated(
+                                        fn (Forms\Components\Toggle $component) => $component->dispatchEvent('status::update')
+                                    ),
+                                Forms\Components\Toggle::make('is_subscription')
+                                    ->afterStateUpdated(fn (Set $set, $state) => $set('pay_upfront', $state))
+                                    ->label(trans('Subscription Based'))
+                                    ->reactive()
+                                    ->helperText(fn (Get $get) => $get('is_subscription') === true
+                                        ? "Please provide values on 'billing cycle' and 'due date every' fields" : ''),
+                                Forms\Components\Select::make('billing_cycle')
+                                    ->options(function () {
+                                        $billing = [];
+                                        foreach (BillingCycleEnum::cases() as $billingCycle) {
+                                            $billing[$billingCycle->value] = $billingCycle->name;
+                                        }
+
+                                        return $billing;
+                                    })
+                                    ->reactive()
+                                    ->hidden(fn (Get $get) => $get('is_subscription') === false)
+                                    ->required(fn (Get $get) => $get('is_subscription') === true),
+                                Forms\Components\Select::make('due_date_every')
+                                    ->reactive()
+                                    ->options(function (Get $get) {
+                                        if ($get('billing_cycle') !== BillingCycleEnum::DAILY->value) {
+                                            return Arr::except(range(0, 31), 0);
+                                        }
+
+                                        return null;
+                                    })
+                                    ->hidden(
+                                        fn (Get $get) => ($get('is_subscription') === false
+                                            || $get('billing_cycle') === BillingCycleEnum::DAILY->value)
+                                    )
+                                    ->required(),
+                                Forms\Components\Toggle::make('is_auto_generated_bill')
+                                    ->label(trans('Auto Generate Bill'))
+                                    ->reactive(),
+                                Forms\Components\Toggle::make('needs_approval')
+                                    ->label(trans('Needs Approval')),
+                                Forms\Components\Toggle::make('is_partial_payment')
+                                    ->label(trans('Partial Payment')),
+                                //                Forms\Components\Toggle::make('is_installment')
+                                //                    ->label(trans('Installment')),
+                            ])
+                            ->registerListeners([
+                                'status::update' => [
+                                    function (Forms\Components\Section $component): void {
+                                        $component->evaluate(function (Get $get, Set $set) {
+                                            if ($get('status')) {
+                                                $set('status')
+                                                    ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)));
+                                            }
+                                        });
+                                    },
+                                ],
+                            ]),
                         MetaDataFormV2::make(),
                     ])->columnSpan(1),
             ])
@@ -225,109 +318,6 @@ class ServiceResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
-    }
-
-    private static function servicePriceSection(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make('Service Price')
-            ->translateLabel()
-            ->schema([
-                Forms\Components\Toggle::make('pay_upfront')
-                    ->reactive()
-                    ->disabled(fn (Get $get) => $get('is_subscription') === true),
-                Forms\Components\TextInput::make('retail_price')
-                    ->translateLabel()
-                    ->prefix(Currency::whereEnabled(true)->firstOrFail()->symbol)
-                    ->rule(
-                        fn () => function (string $attribute, mixed $value, Closure $fail) {
-                            if ($value <= 0) {
-                                $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                $fail("$attributeName must be above zero.");
-                            }
-                        },
-                    )
-                    ->required(),
-                Forms\Components\TextInput::make('selling_price')
-                    ->translateLabel()
-                    ->prefix(Currency::whereEnabled(true)->firstOrFail()->symbol)
-                    ->rule(
-                        fn () => function (string $attribute, mixed $value, Closure $fail) {
-                            if ($value <= 0) {
-                                $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                $fail("$attributeName must be above zero.");
-                            }
-                        },
-                    )
-                    ->required(),
-            ]);
-    }
-
-    private static function statusSection(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make('Status')
-            ->translateLabel()
-            ->schema([
-                Forms\Components\Toggle::make('status')
-                    ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)))
-                    ->reactive()
-                    ->lazy()
-                    ->afterStateUpdated(
-                        fn (Forms\Components\Toggle $component) => $component->dispatchEvent('status::update')
-                    ),
-                Forms\Components\Toggle::make('is_subscription')
-                    ->afterStateUpdated(fn (Set $set, $state) => $set('pay_upfront', $state))
-                    ->label(trans('Subscription Based'))
-                    ->reactive()
-                    ->helperText(fn (Get $get) => $get('is_subscription') === true
-                        ? "Please provide values on 'billing cycle' and 'due date every' fields" : ''),
-                Forms\Components\Select::make('billing_cycle')
-                    ->options(function () {
-                        $billing = [];
-                        foreach (BillingCycleEnum::cases() as $billingCycle) {
-                            $billing[$billingCycle->value] = $billingCycle->name;
-                        }
-
-                        return $billing;
-                    })
-                    ->reactive()
-                    ->hidden(fn (Get $get) => $get('is_subscription') === false)
-                    ->required(fn (Get $get) => $get('is_subscription') === true),
-                Forms\Components\Select::make('due_date_every')
-                    ->reactive()
-                    ->options(function (Get $get) {
-                        if ($get('billing_cycle') !== BillingCycleEnum::DAILY->value) {
-                            return Arr::except(range(0, 31), 0);
-                        }
-
-                        return null;
-                    })
-                    ->hidden(
-                        fn (Get $get) => ($get('is_subscription') === false
-                        || $get('billing_cycle') === BillingCycleEnum::DAILY->value)
-                    )
-                    ->required(),
-                Forms\Components\Toggle::make('is_auto_generated_bill')
-                    ->label(trans('Auto Generate Bill'))
-                    ->reactive(),
-                Forms\Components\Toggle::make('needs_approval')
-                    ->label(trans('Needs Approval')),
-                Forms\Components\Toggle::make('is_partial_payment')
-                    ->label(trans('Partial Payment')),
-                //                Forms\Components\Toggle::make('is_installment')
-                //                    ->label(trans('Installment')),
-            ])
-            ->registerListeners([
-                'status::update' => [
-                    function (Forms\Components\Section $component): void {
-                        $component->evaluate(function (Get $get, Set $set) {
-                            if ($get('status')) {
-                                $set('status')
-                                    ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)));
-                            }
-                        });
-                    },
-                ],
             ]);
     }
 }
