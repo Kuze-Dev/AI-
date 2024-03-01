@@ -9,7 +9,6 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
 use App\FilamentTenant\Resources\ServiceOrderResource\Support as ServiceOrderSupport;
 use App\FilamentTenant\Support;
-use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\ButtonAction;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
@@ -345,16 +344,107 @@ class EditServiceOrder extends EditRecord
 
             Forms\Components\Group::make()
                 ->schema([
-                    Forms\Components\Section::make(trans('Service Order '))
+                    Forms\Components\Section::make(trans('Service order summary'))
                         ->schema([
                             Forms\Components\Group::make()
                                 ->schema([
-                                    //                                            BadgeLabel::make(trans('status'))
-                                    //                                                ->formatStateUsing(fn (ServiceOrder $record) => $record->format_status_for_display)
-                                    //                                                ->color(fn (ServiceOrder $record) => $record->badge_color_for_status_display)
-                                    //                                                ->inline()
-                                    //                                                ->alignLeft(),
-                                    //                                            self::EditButton(),
+
+                                    Forms\Components\Placeholder::make(trans('Status'))
+                                        ->hiddenLabel()
+//                                       ->color(fn (ServiceOrder $record) => $record->format_status_for_display)
+                                        ->content(fn (ServiceOrder $record) => $record->format_status_for_display),
+
+                                    Forms\Components\Actions::make([
+                                        Forms\Components\Actions\Action::make('edit_status')
+                                            ->label(trans('Edit'))
+                                            ->modalHeading(trans('Edit Status'))
+                                            ->modalWidth('xl')
+                                            ->hidden(function (ServiceOrder $record) {
+                                                return $record->status === ServiceOrderStatus::FORPAYMENT ||
+                                                    $record->status === ServiceOrderStatus::COMPLETED;
+                                            })
+                                            ->withActivityLog()
+                                            ->form([
+
+                                                Forms\Components\Select::make('status')
+                                                    ->hiddenLabel()
+                                                    ->options(fn (ServiceOrder $record) => ServiceOrderStatus::casesForServiceOrder($record))
+                                                    ->selectablePlaceholder(false)
+                                                    ->required()
+                                                    ->default(function (ServiceOrder $record) {
+                                                        return $record->status;
+                                                    }),
+
+                                                Forms\Components\Toggle::make('is_send_email')
+                                                    ->label(trans('Send email notification'))
+                                                    ->default(false)
+                                                    ->reactive(),
+                                            ])
+                                            ->action(function (Forms\Components\Actions\Action $action, array $data, ServiceOrder $record) {
+
+                                                $setting = app(ServiceSettings::class);
+
+                                                if (
+                                                    $data['is_send_email'] &&
+                                                    empty($setting->email_sender_name)
+                                                ) {
+                                                    $action->failureNotificationTitle(
+                                                        trans('Email sender not found, please update your service settings')
+                                                    )
+                                                        ->failure();
+                                                    $action->halt();
+                                                }
+
+                                                if ($setting->admin_should_receive && empty($setting->admin_main_receiver)) {
+                                                    $action->failureNotificationTitle(
+                                                        trans('Email receiver not found, please update your service settings')
+                                                    )
+                                                        ->failure();
+                                                    $action->halt();
+                                                }
+
+                                                try {
+                                                    DB::transaction(function () use ($data, $action, $record) {
+
+                                                        if (
+                                                            $record->update([
+                                                                'status' => $data['status'],
+                                                            ])
+                                                        ) {
+                                                            event(new AdminServiceOrderStatusUpdatedEvent(
+                                                                serviceOrder: $record,
+                                                                shouldNotifyCustomer: $data['is_send_email']
+                                                            ));
+
+                                                            $action->successNotificationTitle(
+                                                                trans('Service order updated successfully')
+                                                            )
+                                                                ->success();
+                                                        }
+                                                    });
+                                                } catch (MissingServiceSettingsConfigurationException $e) {
+                                                    $action->failureNotificationTitle(trans($e->getMessage()))
+                                                        ->failure();
+
+                                                    report($e);
+                                                } catch (InvalidServiceBillException $e) {
+                                                    $action->failureNotificationTitle(trans('No service bill found'))
+                                                        ->failure();
+
+                                                    report($e);
+                                                } catch (ModelNotFoundException $e) {
+                                                    $action->failureNotificationTitle(trans($m->getMessage()))
+                                                        ->failure();
+
+                                                    report($e);
+                                                } catch (Exception $e) {
+                                                    $action->failureNotificationTitle(trans('Something went wrong!'))
+                                                        ->failure();
+
+                                                    report($e);
+                                                }
+                                            }),
+                                    ]),
                                 ])
                                 ->columns(2),
                             Forms\Components\Group::make()
@@ -487,7 +577,7 @@ class EditServiceOrder extends EditRecord
                         ])
                         ->columnSpan(1),
 
-                    Forms\Components\Section::make(trans('Bills '))
+                    Forms\Components\Section::make(trans('Bills summary'))
                         ->schema([
                             Forms\Components\Group::make()
                                 ->schema([
@@ -523,143 +613,6 @@ class EditServiceOrder extends EditRecord
 
         ])
             ->columns(3);
-    }
-
-    private static function EditButton(): Support\ButtonAction
-    {
-        return Support\ButtonAction::make('Edit')
-            ->execute(fn (ServiceOrder $record, Get $get, Set $set) => Forms\Components\Actions\Action::make(trans('edit'))
-                ->color('primary')
-                ->label('Edit')
-                ->size('sm')
-                ->modalHeading(trans('Edit Status'))
-                ->modalWidth('xl')
-                ->form([
-                    Forms\Components\Select::make('status_options')
-                        ->label('')
-                        ->options(function () use ($record) {
-                            $options = [
-                                ServiceOrderStatus::PENDING->value => trans('Pending'),
-                                ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
-                                ServiceOrderStatus::INPROGRESS->value => trans('In progress'),
-                                ServiceOrderStatus::COMPLETED->value => trans('Completed'),
-                            ];
-                            if (isset($record->billing_cycle)) {
-                                $options = [
-                                    ServiceOrderStatus::PENDING->value => trans('Pending'),
-                                    ServiceOrderStatus::FORPAYMENT->value => trans('For payment'),
-                                    ServiceOrderStatus::ACTIVE->value => trans('Active'),
-                                    ServiceOrderStatus::CLOSED->value => trans('Closed'),
-                                ];
-                            }
-
-                            return $options;
-                        })
-                        ->disablePlaceholderSelection()
-                        ->formatStateUsing(function () use ($record) {
-                            return $record->status;
-                        }),
-                    Forms\Components\Toggle::make('send_email')
-                        ->label(trans('Send email notification'))
-                        ->default(false)
-                        ->reactive(),
-                ])
-                ->action(
-                    function (
-                        array $data,
-                        self $livewire,
-                        Forms\Components\Actions\Action $action
-                    ) use (
-                        $record,
-                        $set
-                    ) {
-                        try {
-                            DB::transaction(
-                                function (
-                                ) use (
-                                    $data,
-                                    $livewire,
-                                    $action,
-                                    $record,
-                                    $set
-                                ) {
-                                    $shouldNotifyCustomer = $livewire
-                                        ->mountedFormComponentActionData['send_email'];
-
-                                    if (
-                                        $shouldNotifyCustomer &&
-                                        empty(app(ServiceSettings::class)->email_sender_name)
-                                    ) {
-                                        throw new MissingServiceSettingsConfigurationException(
-                                            'Email sender not found, please update your service settings'
-                                        );
-                                    }
-
-                                    $shouldSendEmailToAdmin = app(ServiceSettings::class)
-                                        ->admin_should_receive;
-
-                                    $adminEmailReceiver = app(ServiceSettings::class)
-                                        ->admin_main_receiver;
-
-                                    if (
-                                        $shouldSendEmailToAdmin &&
-                                        empty($adminEmailReceiver)
-                                    ) {
-                                        throw new MissingServiceSettingsConfigurationException(
-                                            'Email receiver not found, please update your service settings'
-                                        );
-                                    }
-
-                                    $status = $data['status_options'];
-
-                                    $updateData = ['status' => $status];
-
-                                    if ($record->update($updateData)) {
-                                        event(new AdminServiceOrderStatusUpdatedEvent(
-                                            serviceOrder: $record,
-                                            shouldNotifyCustomer: $shouldNotifyCustomer
-                                        ));
-
-                                        $set('status', ucfirst(str_replace('-', ' ', $status)));
-
-                                        $action->successNotificationTitle(
-                                            trans('Service Order updated successfully')
-                                        )->success();
-                                    }
-                                }
-                            );
-                        } catch (MissingServiceSettingsConfigurationException $m) {
-                            $action->failureNotificationTitle(trans($m->getMessage()))
-                                ->failure();
-
-                            report($m);
-                        } catch (InvalidServiceBillException $i) {
-                            $action->failureNotificationTitle(trans('No service bill found'))
-                                ->failure();
-
-                            report($i);
-                        } catch (ModelNotFoundException $m) {
-                            $action->failureNotificationTitle(trans($m->getMessage()))
-                                ->failure();
-
-                            report($m);
-                        } catch (Exception $e) {
-                            $action->failureNotificationTitle(trans('Something went wrong!'))
-                                ->failure();
-
-                            report($e);
-                        }
-                    }
-                )
-                ->withActivityLog())
-            ->disableLabel()
-            ->columnSpan(1)
-            ->alignRight()
-            ->size('sm')
-            ->hidden(function (ServiceOrder $record) {
-                return $record->status == ServiceOrderStatus::FORPAYMENT ||
-                    $record->status == ServiceOrderStatus::COMPLETED;
-            });
     }
 
     private static function ProofOfPaymentButton(): ButtonAction
