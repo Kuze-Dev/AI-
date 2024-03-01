@@ -14,7 +14,6 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\TextLabel;
 use App\Settings\ServiceSettings;
 use Closure;
-use Domain\Admin\Models\Admin;
 use Domain\Payments\Enums\PaymentRemark;
 use Domain\ServiceOrder\Actions\GenerateMilestonePipelineAction;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
@@ -39,7 +38,6 @@ use Filament\Forms\Set;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -447,167 +445,91 @@ class EditServiceOrder extends EditRecord
                                     ]),
                                 ])
                                 ->columns(2),
+
                             Forms\Components\Group::make()
                                 ->schema([
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(trans('Created By'))
-                                    //                                                ->alignLeft()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(fn (ServiceOrder $record) => $record->admin?->full_name)
-                                    //                                                ->alignRight()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                ])
-                                ->columns(2),
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(trans('Order Date'))
-                                    //                                                ->alignLeft()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    //                                            TextLabel::make('created_at')
-                                    //                                                ->alignRight()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->formatStateUsing(
-                                    //                                                    function (string $state) {
-                                    //                                                        /** @var string */
-                                    //                                                        $timeZone = Auth::user()?->timezone;
-                                    //
-                                    //                                                        $formattedState = Carbon::parse($state)
-                                    //                                                            ->setTimezone($timeZone)
-                                    //                                                            ->translatedFormat('F d, Y g:i A');
-                                    //
-                                    //                                                        return $formattedState;
-                                    //                                                    }
-                                    //                                                ),
+                                    Forms\Components\Placeholder::make(trans('Created By'))
+                                        ->inlineLabel()
+                                        ->content(fn (ServiceOrder $record) => $record->admin?->full_name),
+
                                 ]),
+
+                            Forms\Components\Placeholder::make(trans('Order Date'))
+                                ->inlineLabel()
+                                ->content(
+                                    fn (ServiceOrder $record) => $record->created_at
+                                        ?->timezone(Auth::user()?->timezone ?? config('domain.admin.default_timezone'))
+                                        ->translatedFormat('F d, Y g:i A')
+                                ),
+
                             //                                    self::ProofOfPaymentButton(),
                             //                                    Divider::make(''),
+
+                            Forms\Components\Placeholder::make(trans('Service Price'))
+                                ->inlineLabel()
+                                ->content(fn (ServiceOrder $record) => $record->format_service_price_for_display),
+
+                            Forms\Components\Placeholder::make(trans('Additional Charges'))
+                                ->inlineLabel()
+                                ->content(fn (ServiceOrder $record) => money(
+                                    ServiceOrderSupport::getSubtotal(0, $record->additional_charges) * 100,
+                                    $record->currency_code
+                                )),
+
                             Forms\Components\Group::make()
+                                ->visible(
+                                    fn (ServiceOrder $record): bool => $record->tax_display === PriceDisplay::EXCLUSIVE
+                                )
+                                ->columns(2)
+                                ->columnSpan(2)
                                 ->schema([
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(trans('Service Price'))
-                                    //                                                ->alignLeft()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(fn (ServiceOrder $record) => $record->format_service_price_for_display)
-                                    //                                                ->alignRight()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(trans('Additional Charges'))
-                                    //                                                ->alignLeft()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(
-                                    //                                                    fn (Closure $get) => money(
-                                    //                                                        ServiceOrderSupport::getSubtotal(0, $get('additional_charges')) * 100,
-                                    //                                                        $get('currency_code')
-                                    //                                                    )
-                                    //                                                )
-                                    //                                                ->alignRight()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    Forms\Components\Group::make()
-                                        ->schema([
-                                            //                                                    TextLabel::make('')
-                                            //                                                        ->label(fn (ServiceOrder $record) => trans($record->format_tax_percentage_for_display))
-                                            //                                                        ->alignLeft()
-                                            //                                                        ->size('md')
-                                            //                                                        ->inline()
-                                            //                                                        ->readOnly(),
-                                            //                                                    TextLabel::make('')
-                                            //                                                        ->label(
-                                            //                                                            function (ServiceOrder $record, Closure $get): Money|string {
-                                            //                                                                return $record->tax_display == PriceDisplay::INCLUSIVE
-                                            //                                                                    ? $record->format_tax_for_display
-                                            //                                                                    : money(
-                                            //                                                                        self::calculateTaxInfo($record, $get('additional_charges'))
-                                            //                                                                            ->tax_total * 100,
-                                            //                                                                        $record->currency_code
-                                            //                                                                    );
-                                            //                                                            }
-                                            //                                                        )
-                                            //                                                        ->alignRight()
-                                            //                                                        ->size('md')
-                                            //                                                        ->inline()
-                                            //                                                        ->readOnly(),
-                                        ])
-                                        ->visible(
-                                            fn (ServiceOrder $record): bool => filled($record->tax_display) &&
-                                                $record->tax_display == PriceDisplay::EXCLUSIVE
-                                        )
-                                        ->columns(2)
-                                        ->columnSpan(2),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(trans('Total Price'))
-                                    //                                                ->alignLeft()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly()
-                                    //                                                ->color('primary'),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(
-                                    //                                                    fn (ServiceOrder $record, Closure $get): Money => money(
-                                    //                                                        self::calculateTaxInfo($record, $get('additional_charges'))
-                                    //                                                            ->total_price * 100,
-                                    //                                                        $record->currency_code
-                                    //                                                    )
-                                    //                                                )
-                                    //                                                ->alignRight()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly()
-                                    //                                                ->color('primary'),
-                                ])
-                                ->columns(2),
-                        ])
-                        ->columnSpan(1),
+
+                                    Forms\Components\Placeholder::make('format_tax_percentage_for_display')
+                                        ->label(fn (ServiceOrder $record) => trans($record->format_tax_percentage_for_display))
+                                        ->inlineLabel()
+                                        ->content(function (ServiceOrder $record) {
+
+                                            if ($record->tax_display == PriceDisplay::INCLUSIVE) {
+                                                return $record->format_tax_for_display;
+                                            }
+
+                                            $result = app(GetTaxableInfoAction::class)->computeTotalPriceWithTax(
+                                                ServiceOrderSupport::getSubtotal($record->service_price, $record->additional_charges),
+                                                $record
+                                            );
+
+                                            return money($result->tax_total * 100, $record->currency_code);
+                                        }),
+
+                                ]),
+
+                            Forms\Components\Placeholder::make(trans('Total Price'))
+                                ->inlineLabel()
+                                ->content(function (ServiceOrder $record): Money {
+                                    $result = app(GetTaxableInfoAction::class)->computeTotalPriceWithTax(
+                                        ServiceOrderSupport::getSubtotal($record->service_price, $record->additional_charges),
+                                        $record
+                                    );
+
+                                    return money($result->total_price * 100,
+                                        $record->currency_code
+                                    );
+                                }),
+
+                        ]),
 
                     Forms\Components\Section::make(trans('Bills summary'))
                         ->schema([
-                            Forms\Components\Group::make()
-                                ->schema([
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(trans('Unpaid Bills'))
-                                    //                                                ->alignLeft()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(fn (ServiceOrder $record) => $record->totalUnpaidBills())
-                                    //                                                ->alignRight()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(trans('Unpaid Amount'))
-                                    //                                                ->alignLeft()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                    //                                            TextLabel::make('')
-                                    //                                                ->label(fn (ServiceOrder $record) => $record->totalBalance())
-                                    //                                                ->alignRight()
-                                    //                                                ->size('md')
-                                    //                                                ->inline()
-                                    //                                                ->readOnly(),
-                                ])->columns(2),
-                        ])
-                        ->columnSpan(1),
+
+                            Forms\Components\Placeholder::make(trans('Unpaid Bills'))
+                                ->inlineLabel()
+                                ->content(fn (ServiceOrder $record) => $record->totalUnpaidBills()),
+
+                            Forms\Components\Placeholder::make(trans('Unpaid Amount'))
+                                ->inlineLabel()
+                                ->content(fn (ServiceOrder $record) => $record->totalBalance()),
+
+                        ]),
                 ])
                 ->columnSpan(1),
 
