@@ -45,10 +45,10 @@ class ContentEntryResource extends Resource
 
     protected static ?string $slug = 'entries';
 
-    public static function getRouteBaseName(?string $panel = null): string
-    {
-        return Filament::currentContext().'.resources.contents.entries';
-    }
+    // public static function getRouteBaseName(?string $panel = null): string
+    // {
+    //     return Filament::currentContext().'.resources.contents.entries';
+    // }
 
     public static function getRoutes(): Closure
     {
