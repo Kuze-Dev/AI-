@@ -160,8 +160,11 @@ class ServiceResource extends Resource
                                     ->afterStateUpdated(fn (Set $set, $state) => $set('pay_upfront', $state))
                                     ->label(trans('Subscription Based'))
                                     ->reactive()
-                                    ->helperText(fn (Get $get) => $get('is_subscription') === true
-                                        ? "Please provide values on 'billing cycle' and 'due date every' fields" : ''),
+                                    ->helperText(
+                                        fn (bool $state) => $state
+                                            ? trans("Please provide values on 'billing cycle' and 'due date every' fields")
+                                            : null
+                                    ),
                                 Forms\Components\Select::make('billing_cycle')
                                     ->options(function () {
                                         $billing = [];
