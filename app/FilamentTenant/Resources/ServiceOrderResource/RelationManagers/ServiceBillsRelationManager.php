@@ -13,6 +13,7 @@ use Filament\Infolists;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
 
 /**
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder $ownerRecord
@@ -31,15 +32,14 @@ class ServiceBillsRelationManager extends RelationManager
                 ->schema([
 
                     Infolists\Components\Section::make(trans('Service'))
+                        ->columns()
                         ->schema([
-                            Infolists\Components\Grid::make(2)->schema([
 
-                                Infolists\Components\TextEntry::make('service')
-                                    ->formatStateUsing(fn () => $this->ownerRecord->service_name),
+                            Infolists\Components\TextEntry::make('service')
+                                ->state(fn () => $this->ownerRecord->service_name),
 
-                                Infolists\Components\TextEntry::make('service Price')
-                                    ->formatStateUsing(fn ($record) => $this->ownerRecord->currency_symbol.' '.number_format($this->ownerRecord->service_price, 2, '.', ',')),
-                            ]),
+                            Infolists\Components\TextEntry::make('service Price')
+                                ->state(fn () => Number::currency($this->ownerRecord->service_price, $this->ownerRecord->currency_code)),
 
                         ]),
 
