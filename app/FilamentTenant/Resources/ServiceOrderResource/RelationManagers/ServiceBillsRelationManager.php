@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers;
 
-use App\FilamentTenant\Support\BadgeLabel;
 use App\FilamentTenant\Support\TextLabel;
-use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Infolists;
@@ -72,49 +70,22 @@ class ServiceBillsRelationManager extends RelationManager
                     Infolists\Components\Section::make(trans('Summary'))
                         ->schema([
 
-                            Infolists\Components\Group::make()
-                                ->columns(2)
-                                ->schema([
-                                    //                                TextLabel::make('')
-                                    //                                    ->label(trans('Status'))
-                                    //                                    ->alignLeft()
-                                    //                                    ->size('md')
-                                    //                                    ->inline()
-                                    //                                    ->readOnly(),
-                                    //                                BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
-                                    //                                    $newState = str_replace('_', ' ', strtolower($state));
-                                    //
-                                    //                                    return ucfirst($newState);
-                                    //                                })
-                                    //                                    ->color(function ($state) {
-                                    //                                        $newState = str_replace(' ', '_', strtolower($state));
-                                    //
-                                    //                                        return match ($newState) {
-                                    //                                            ServiceBillStatus::PENDING->value => 'warning',
-                                    //                                            ServiceBillStatus::PAID->value => 'success',
-                                    //                                            default => 'secondary',
-                                    //                                        };
-                                    //                                    })->inline()
-                                    //                                    ->alignRight(),
-                                ]),
+                            Infolists\Components\TextEntry::make('status')
+                                ->translateLabel()
+                                ->inlineLabel()
+                                ->badge(),
 
                             //                        self::summaryProofOfPaymentButton(),
 
+                            Infolists\Components\TextEntry::make('service_price')
+                                ->translateLabel()
+                                ->inlineLabel()
+                                ->money($this->ownerRecord->currency_code),
+
                             Infolists\Components\Group::make()
                                 ->columns(2)
                                 ->schema([
-                                    //                            TextLabel::make('')
-                                    //                                ->label(trans('Service Price'))
-                                    //                                ->alignLeft()
-                                    //                                ->size('md')
-                                    //                                ->inline()
-                                    //                                ->readOnly(),
-                                    //                            TextLabel::make('')
-                                    //                                ->label(fn ($record) => $record->serviceOrder->currency_symbol.' '.number_format($record->service_price, 2, '.', ','))
-                                    //                                ->alignRight()
-                                    //                                ->size('md')
-                                    //                                ->inline()
-                                    //                                ->readOnly(),
+
                                     //                            TextLabel::make('')
                                     //                                ->label(trans('Additional Charges'))
                                     //                                ->alignLeft()
