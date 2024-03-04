@@ -153,12 +153,9 @@ class ServiceResource extends Resource
                             ->translateLabel()
                             ->schema([
                                 Forms\Components\Toggle::make('status')
-                                    ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)))
+                                    ->label(fn (bool $state) => $state ? Status::ACTIVE->getLabel() : Status::INACTIVE->getLabel())
                                     ->reactive()
-                                    ->lazy()
-                                    ->afterStateUpdated(
-                                        fn (Forms\Components\Toggle $component) => $component->dispatchEvent('status::update')
-                                    ),
+                                    ->lazy(),
                                 Forms\Components\Toggle::make('is_subscription')
                                     ->afterStateUpdated(fn (Set $set, $state) => $set('pay_upfront', $state))
                                     ->label(trans('Subscription Based'))
@@ -200,18 +197,6 @@ class ServiceResource extends Resource
                                     ->label(trans('Partial Payment')),
                                 //                Forms\Components\Toggle::make('is_installment')
                                 //                    ->label(trans('Installment')),
-                            ])
-                            ->registerListeners([
-                                'status::update' => [
-                                    function (Forms\Components\Section $component): void {
-                                        $component->evaluate(function (Get $get, Set $set) {
-                                            if ($get('status')) {
-                                                $set('status')
-                                                    ->label(fn ($state) => $state ? ucfirst(trans(Status::ACTIVE->value)) : ucfirst(trans(Status::INACTIVE->value)));
-                                            }
-                                        });
-                                    },
-                                ],
                             ]),
                         MetaDataFormV2::make(),
                     ])->columnSpan(1),
