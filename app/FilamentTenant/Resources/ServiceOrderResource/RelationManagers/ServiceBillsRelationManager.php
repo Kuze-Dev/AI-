@@ -17,7 +17,7 @@ use Filament\Tables\Table;
 /**
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder $ownerRecord
  */
-class ServiceBillRelationManager extends RelationManager
+class ServiceBillsRelationManager extends RelationManager
 {
     protected static string $relationship = 'serviceBills';
 
