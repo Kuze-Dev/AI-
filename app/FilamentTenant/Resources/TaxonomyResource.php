@@ -68,7 +68,7 @@ class TaxonomyResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make()->schema([
+                Forms\Components\Section::make()->schema([
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->string()
@@ -79,7 +79,7 @@ class TaxonomyResource extends Resource
                         ->required()
                         ->preload()
                         ->optionsFromModel(Blueprint::class, 'name')
-                        ->disabled(fn (?Taxonomy $record) => $record !== null),
+                        ->disableOptionWhen(fn (?Taxonomy $record) => $record !== null),
                 ]),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())

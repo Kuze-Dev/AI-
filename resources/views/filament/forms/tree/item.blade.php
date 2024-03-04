@@ -28,9 +28,15 @@
             <span class="sr-only">
                 {{ __('forms::components.repeater.buttons.move_item.label') }}
             </span>
-
-            <x-heroicon-o-dots-vertical class="w-4 h-4 -mr-2"/>
-            <x-heroicon-o-dots-vertical class="w-4 h-4"/>
+            <x-filament::icon
+            alias="panels::topbar.global-search.field"
+            icon="heroicon-o-arrows-up-down"
+            {{-- icon="heroicon-m-magnifying-glass" --}}
+            class="w-4 h-4"
+        />
+        
+            {{-- <x-filament::icon icon="ellipsis-vertical" class="w-4 h-4 -mr-2"/> --}}
+            {{-- <x-heroicon-o-dots-vertical class="w-4 h-4"/> --}}
         </button>
 
         <p @class([
@@ -56,7 +62,13 @@
                         'dark:text-primary-500 dark:hover:text-primary-400' => config('forms.dark_mode'),
                     ])
                 >
-                    <x-heroicon-s-pencil-alt class="w-4 h-4"/>
+                <x-filament::icon
+                alias="panels::topbar.global-search.field"
+                icon="heroicon-s-pencil-square"
+                {{-- icon="heroicon-m-magnifying-glass" --}}
+                class="w-4 h-4"
+            />
+                    {{-- <x-filament::icon icon="heroicon-s-pencil-alt" class="w-4 h-4"/> --}}
                 </button>
                 <button
                     title="{{ __('forms::components.repeater.buttons.delete_item.label') }}"
@@ -67,7 +79,13 @@
                         'dark:text-danger-500 dark:hover:text-danger-400' => config('forms.dark_mode'),
                     ])
                 >
-                    <x-heroicon-s-trash class="w-4 h-4"/>
+
+                <x-filament::icon
+                alias="panels::topbar.global-search.field"
+                icon="heroicon-o-trash"
+                class="w-4 h-4"
+                />
+                    {{-- <x-heroicon-s-trash class="w-4 h-4"/> --}}
                 </button>
                 <button
                     x-show="hasItems"

@@ -37,7 +37,7 @@ class BlockResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Card::make([
+            Forms\Components\Section::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
                     ->string()
