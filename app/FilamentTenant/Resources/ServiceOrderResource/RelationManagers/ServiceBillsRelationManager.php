@@ -26,7 +26,8 @@ class ServiceBillsRelationManager extends RelationManager
     public function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         return $infolist->schema([
-            Infolists\Components\Group::make()->columnSpan(2)
+            Infolists\Components\Group::make()
+                ->columnSpan(2)
                 ->schema([
 
                     Infolists\Components\Section::make(trans('Service'))
@@ -45,14 +46,17 @@ class ServiceBillsRelationManager extends RelationManager
                     Infolists\Components\Section::make(trans('Additional Charges'))
                         ->visible(fn (ServiceBill $record) => filled($record->additional_charges))
                         ->schema([
+
                             Infolists\Components\RepeatableEntry::make('additional_charges')
                                 ->columns(3)
                                 ->hiddenLabel()
                                 ->schema([
                                     Infolists\Components\TextEntry::make('name')
                                         ->translateLabel(),
+
                                     Infolists\Components\TextEntry::make('quantity')
                                         ->translateLabel(),
+
                                     Infolists\Components\TextEntry::make('price')
                                         ->translateLabel(),
                                 ]),
@@ -61,111 +65,115 @@ class ServiceBillsRelationManager extends RelationManager
 
                 ]),
 
-            Infolists\Components\Section::make(trans('Summary'))
+            Infolists\Components\Group::make()
                 ->columnSpan(1)
                 ->schema([
 
-                    Infolists\Components\Group::make()
-                        ->columns(2)
+                    Infolists\Components\Section::make(trans('Summary'))
                         ->schema([
-                            //                                TextLabel::make('')
-                            //                                    ->label(trans('Status'))
-                            //                                    ->alignLeft()
-                            //                                    ->size('md')
-                            //                                    ->inline()
-                            //                                    ->readOnly(),
-                            //                                BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
-                            //                                    $newState = str_replace('_', ' ', strtolower($state));
-                            //
-                            //                                    return ucfirst($newState);
-                            //                                })
-                            //                                    ->color(function ($state) {
-                            //                                        $newState = str_replace(' ', '_', strtolower($state));
-                            //
-                            //                                        return match ($newState) {
-                            //                                            ServiceBillStatus::PENDING->value => 'warning',
-                            //                                            ServiceBillStatus::PAID->value => 'success',
-                            //                                            default => 'secondary',
-                            //                                        };
-                            //                                    })->inline()
-                            //                                    ->alignRight(),
-                        ]),
 
-                    //                        self::summaryProofOfPaymentButton(),
-
-                    Infolists\Components\Group::make()
-                        ->columns(2)
-                        ->schema([
-                            //                            TextLabel::make('')
-                            //                                ->label(trans('Service Price'))
-                            //                                ->alignLeft()
-                            //                                ->size('md')
-                            //                                ->inline()
-                            //                                ->readOnly(),
-                            //                            TextLabel::make('')
-                            //                                ->label(fn ($record) => $record->serviceOrder->currency_symbol.' '.number_format($record->service_price, 2, '.', ','))
-                            //                                ->alignRight()
-                            //                                ->size('md')
-                            //                                ->inline()
-                            //                                ->readOnly(),
-                            //                            TextLabel::make('')
-                            //                                ->label(trans('Additional Charges'))
-                            //                                ->alignLeft()
-                            //                                ->size('md')
-                            //                                ->inline()
-                            //                                ->readOnly(),
-                            //                            TextLabel::make('')
-                            //                                ->label(fn ($record, \Filament\Forms\Get $get) => $record->serviceOrder->currency_symbol.' '.number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
-                            //                                        if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
-                            //                                            return $carry + ($data['price'] * $data['quantity']);
-                            //                                        }
-                            //
-                            //                                        return $carry;
-                            //                                    }, 0), 2, '.', ','))
-                            //                                ->alignRight()
-                            //                                ->size('md')
-                            //                                ->inline()
-                            //                                ->readOnly(),
                             Infolists\Components\Group::make()
                                 ->columns(2)
-                                ->columnSpan(2)
                                 ->schema([
-                                    //                                        TextLabel::make('')
-                                    //                                            ->label(fn ($record) => trans('Tax (').$record->tax_percentage.'%)')
-                                    //                                            ->alignLeft()
-                                    //                                            ->size('md')
-                                    //                                            ->inline()
-                                    //                                            ->readOnly(),
-                                    //                                        TextLabel::make('')
-                                    //                                            ->label(fn (ServiceBill $record, \Filament\Forms\Get $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
-                                    //                                                :
-                                    //                                                $record->serviceOrder?->currency_symbol.' '.number_format($record->tax_total, 2, '.', '.'))
-                                    //                                            ->alignRight()
-                                    //                                            ->size('md')
-                                    //                                            ->inline()
-                                    //                                            ->readOnly(),
-                                ])
-                                ->visible(
-                                    fn (ServiceBill $record) => $record->tax_display !== null
-                                ),
-                            //                                    TextLabel::make('')
-                            //                                        ->label(trans('Total Price'))
-                            //                                        ->alignLeft()
-                            //                                        ->size('md')
-                            //                                        ->inline()
-                            //                                        ->readOnly()
-                            //                                        ->color('primary'),
-                            //                                    TextLabel::make('')
-                            //                                        ->label(fn (ServiceBill $record, \Filament\Forms\Get $get) => $record->serviceOrder?->currency_symbol.' '.number_format($record->total_amount, 2, '.', '.'))
-                            //                                        ->alignRight()
-                            //                                        ->size('md')
-                            //                                        ->inline()
-                            //                                        ->readOnly()
-                            //                                        ->color('primary'),
+                                    //                                TextLabel::make('')
+                                    //                                    ->label(trans('Status'))
+                                    //                                    ->alignLeft()
+                                    //                                    ->size('md')
+                                    //                                    ->inline()
+                                    //                                    ->readOnly(),
+                                    //                                BadgeLabel::make(trans('status'))->formatStateUsing(function (string $state): string {
+                                    //                                    $newState = str_replace('_', ' ', strtolower($state));
+                                    //
+                                    //                                    return ucfirst($newState);
+                                    //                                })
+                                    //                                    ->color(function ($state) {
+                                    //                                        $newState = str_replace(' ', '_', strtolower($state));
+                                    //
+                                    //                                        return match ($newState) {
+                                    //                                            ServiceBillStatus::PENDING->value => 'warning',
+                                    //                                            ServiceBillStatus::PAID->value => 'success',
+                                    //                                            default => 'secondary',
+                                    //                                        };
+                                    //                                    })->inline()
+                                    //                                    ->alignRight(),
+                                ]),
+
+                            //                        self::summaryProofOfPaymentButton(),
+
+                            Infolists\Components\Group::make()
+                                ->columns(2)
+                                ->schema([
+                                    //                            TextLabel::make('')
+                                    //                                ->label(trans('Service Price'))
+                                    //                                ->alignLeft()
+                                    //                                ->size('md')
+                                    //                                ->inline()
+                                    //                                ->readOnly(),
+                                    //                            TextLabel::make('')
+                                    //                                ->label(fn ($record) => $record->serviceOrder->currency_symbol.' '.number_format($record->service_price, 2, '.', ','))
+                                    //                                ->alignRight()
+                                    //                                ->size('md')
+                                    //                                ->inline()
+                                    //                                ->readOnly(),
+                                    //                            TextLabel::make('')
+                                    //                                ->label(trans('Additional Charges'))
+                                    //                                ->alignLeft()
+                                    //                                ->size('md')
+                                    //                                ->inline()
+                                    //                                ->readOnly(),
+                                    //                            TextLabel::make('')
+                                    //                                ->label(fn ($record, \Filament\Forms\Get $get) => $record->serviceOrder->currency_symbol.' '.number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
+                                    //                                        if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
+                                    //                                            return $carry + ($data['price'] * $data['quantity']);
+                                    //                                        }
+                                    //
+                                    //                                        return $carry;
+                                    //                                    }, 0), 2, '.', ','))
+                                    //                                ->alignRight()
+                                    //                                ->size('md')
+                                    //                                ->inline()
+                                    //                                ->readOnly(),
+                                    Infolists\Components\Group::make()
+                                        ->columns(2)
+                                        ->columnSpan(2)
+                                        ->schema([
+                                            //                                        TextLabel::make('')
+                                            //                                            ->label(fn ($record) => trans('Tax (').$record->tax_percentage.'%)')
+                                            //                                            ->alignLeft()
+                                            //                                            ->size('md')
+                                            //                                            ->inline()
+                                            //                                            ->readOnly(),
+                                            //                                        TextLabel::make('')
+                                            //                                            ->label(fn (ServiceBill $record, \Filament\Forms\Get $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
+                                            //                                                :
+                                            //                                                $record->serviceOrder?->currency_symbol.' '.number_format($record->tax_total, 2, '.', '.'))
+                                            //                                            ->alignRight()
+                                            //                                            ->size('md')
+                                            //                                            ->inline()
+                                            //                                            ->readOnly(),
+                                        ])
+                                        ->visible(
+                                            fn (ServiceBill $record) => $record->tax_display !== null
+                                        ),
+                                    //                                    TextLabel::make('')
+                                    //                                        ->label(trans('Total Price'))
+                                    //                                        ->alignLeft()
+                                    //                                        ->size('md')
+                                    //                                        ->inline()
+                                    //                                        ->readOnly()
+                                    //                                        ->color('primary'),
+                                    //                                    TextLabel::make('')
+                                    //                                        ->label(fn (ServiceBill $record, \Filament\Forms\Get $get) => $record->serviceOrder?->currency_symbol.' '.number_format($record->total_amount, 2, '.', '.'))
+                                    //                                        ->alignRight()
+                                    //                                        ->size('md')
+                                    //                                        ->inline()
+                                    //                                        ->readOnly()
+                                    //                                        ->color('primary'),
+                                ]),
+
                         ]),
 
                 ]),
-
         ])
             ->columns(3);
     }
