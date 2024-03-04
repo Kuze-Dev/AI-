@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers;
 
-use App\FilamentTenant\Support\TextLabel;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\Taxation\Enums\PriceDisplay;
 use Filament\Infolists;
@@ -82,65 +81,42 @@ class ServiceBillsRelationManager extends RelationManager
                                 ->inlineLabel()
                                 ->money($this->ownerRecord->currency_code),
 
-                            Infolists\Components\Group::make()
-                                ->columns(2)
-                                ->schema([
+                            Infolists\Components\TextEntry::make('additional_charges')
+                                ->translateLabel()
+                                ->inlineLabel()
+                                ->state(function (ServiceBill $record) {
+                                    $sum = 0;
 
-                                    //                            TextLabel::make('')
-                                    //                                ->label(trans('Additional Charges'))
-                                    //                                ->alignLeft()
-                                    //                                ->size('md')
-                                    //                                ->inline()
-                                    //                                ->readOnly(),
-                                    //                            TextLabel::make('')
-                                    //                                ->label(fn ($record, \Filament\Forms\Get $get) => $record->serviceOrder->currency_symbol.' '.number_format(array_reduce($get('additional_charges'), function ($carry, $data) {
-                                    //                                        if (isset($data['price']) && is_numeric($data['price']) && isset($data['quantity']) && is_numeric($data['quantity'])) {
-                                    //                                            return $carry + ($data['price'] * $data['quantity']);
-                                    //                                        }
-                                    //
-                                    //                                        return $carry;
-                                    //                                    }, 0), 2, '.', ','))
-                                    //                                ->alignRight()
-                                    //                                ->size('md')
-                                    //                                ->inline()
-                                    //                                ->readOnly(),
-                                    Infolists\Components\Group::make()
-                                        ->columns(2)
-                                        ->columnSpan(2)
-                                        ->schema([
-                                            //                                        TextLabel::make('')
-                                            //                                            ->label(fn ($record) => trans('Tax (').$record->tax_percentage.'%)')
-                                            //                                            ->alignLeft()
-                                            //                                            ->size('md')
-                                            //                                            ->inline()
-                                            //                                            ->readOnly(),
-                                            //                                        TextLabel::make('')
-                                            //                                            ->label(fn (ServiceBill $record, \Filament\Forms\Get $get) => $record->tax_display == PriceDisplay::INCLUSIVE->value ? 'Inclusive'
-                                            //                                                :
-                                            //                                                $record->serviceOrder?->currency_symbol.' '.number_format($record->tax_total, 2, '.', '.'))
-                                            //                                            ->alignRight()
-                                            //                                            ->size('md')
-                                            //                                            ->inline()
-                                            //                                            ->readOnly(),
-                                        ])
-                                        ->visible(
-                                            fn (ServiceBill $record) => $record->tax_display !== null
-                                        ),
-                                    //                                    TextLabel::make('')
-                                    //                                        ->label(trans('Total Price'))
-                                    //                                        ->alignLeft()
-                                    //                                        ->size('md')
-                                    //                                        ->inline()
-                                    //                                        ->readOnly()
-                                    //                                        ->color('primary'),
-                                    //                                    TextLabel::make('')
-                                    //                                        ->label(fn (ServiceBill $record, \Filament\Forms\Get $get) => $record->serviceOrder?->currency_symbol.' '.number_format($record->total_amount, 2, '.', '.'))
-                                    //                                        ->alignRight()
-                                    //                                        ->size('md')
-                                    //                                        ->inline()
-                                    //                                        ->readOnly()
-                                    //                                        ->color('primary'),
-                                ]),
+                                    foreach ($record->additional_charges as $charge) {
+
+                                        if (isset($charge['price']) && isset($charge['quantity'])) {
+                                            $sum += $charge['price'] * $charge['quantity'];
+                                        }
+
+                                    }
+
+                                    return $sum;
+                                })
+                                ->money($this->ownerRecord->currency_code),
+
+                            Infolists\Components\TextEntry::make('tax_percentage')
+                                ->label(fn (ServiceBill $record) => trans('Tax (:tax_percentage%)', ['tax_percentage' => $record->tax_percentage]))
+                                ->inlineLabel()
+                                ->visible(
+                                    fn (ServiceBill $record) => $record->tax_display !== null
+                                )
+                                ->state(function (ServiceBill $record) {
+                                    if ($record->tax_display == PriceDisplay::INCLUSIVE->value) {
+                                        return 'Inclusive';
+                                    }
+
+                                    return Number::currency($record->tax_total, $this->ownerRecord->currency_code);
+                                }),
+
+                            Infolists\Components\TextEntry::make('total_amount')
+                                ->label(trans('Total Price'))
+                                ->inlineLabel()
+                                ->money($this->ownerRecord->currency_code),
 
                         ]),
 
