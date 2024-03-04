@@ -274,9 +274,12 @@ class ServiceOrder extends Model implements PayableInterface
 
     public function totalBalance(): Money
     {
-        return money($this->serviceBills()
-            ->where('status', 'pending')
-            ->sum('total_balance'));
+        return money(
+            $this->serviceBills()
+                ->where('status', 'pending')
+                ->sum('total_balance'),
+            $this->currency_code,
+        );
     }
 
     public function totalUnpaidBills(): int
