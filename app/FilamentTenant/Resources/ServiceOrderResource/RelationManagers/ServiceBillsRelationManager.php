@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers;
 
+use Domain\Payments\Enums\PaymentRemark;
+use Domain\Payments\Enums\PaymentStatus;
+use Domain\ServiceOrder\Enums\ServiceBillStatus;
+use Domain\ServiceOrder\Events\AdminServiceBillBankPaymentEvent;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\Taxation\Enums\PriceDisplay;
+use Filament\Forms;
 use Filament\Infolists;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Number;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder $ownerRecord
@@ -73,8 +81,6 @@ class ServiceBillsRelationManager extends RelationManager
                                 ->translateLabel()
                                 ->inlineLabel()
                                 ->badge(),
-
-                            //                        self::summaryProofOfPaymentButton(),
 
                             Infolists\Components\TextEntry::make('service_price')
                                 ->translateLabel()
@@ -159,6 +165,111 @@ class ServiceBillsRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->actions([
+                Tables\Actions\Action::make('proof_of_payment')
+                    ->label(trans('View proof of payment'))
+                    ->icon('heroicon-m-eye')
+                    ->color('gray')
+                    ->slideOver()
+                    ->visible(fn (ServiceBill $record) => $record->status === ServiceBillStatus::FOR_APPROVAL)
+                    ->form([
+                        Forms\Components\Textarea::make('customer_message')
+                            ->label(trans('Customer Message'))
+                            ->formatStateUsing(function (ServiceBill $record) {
+                                return $record->payments->value('customer_message');
+                            })
+                            ->disabled()
+                            ->dehydrated(false),
+                        //                                    Forms\Components\FileUpload::make('bank_proof_image')
+                        //                                        ->label(trans('Customer Upload'))
+                        //                                        ->formatStateUsing(function (ServiceBill $record) {
+                        //                                            return $record->latestPayment()?->getMedia('image')
+                        //                                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                        //                                                ->toArray() ?? [];
+                        //                                        })
+                        //                                        ->hidden(function () use ($record) {
+                        //                                            return (bool) (empty($record->latestPayment()?->getFirstMediaUrl('image')));
+                        //                                        })
+                        //                                        ->image()
+                        //                                        ->getUploadedFileUrlUsing(static function (
+                        //                                            Forms\Components\FileUpload $component,
+                        //                                            string $file
+                        //                                        ): ?string {
+                        //                                            $mediaClass = config('media-library.media_model', Media::class);
+                        //
+                        //                                            /** @var ?Media $media */
+                        //                                            $media = $mediaClass::findByUuid($file);
+                        //
+                        //                                            if ($component->getVisibility() === 'private') {
+                        //                                                try {
+                        //                                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                        //                                                } catch (Throwable) {
+                        //                                                }
+                        //                                            }
+                        //
+                        //                                            return $media?->getUrl();
+                        //                                        })->disabled(),
+                        Forms\Components\Select::make('payment_remark')
+                            ->label('Status')
+                            ->required()
+                            ->options(PaymentRemark::class)
+                            ->enum(PaymentRemark::class)
+                            ->required(),
+                        Forms\Components\Textarea::make('admin_message')
+                            ->translateLabel()
+                            ->maxLength(255)
+                            ->formatStateUsing(function (ServiceBill $record) {
+                                return $record->payments->value('admin_message');
+                            }),
+                    ])
+                    ->action(function (Tables\Actions\Action $action, ServiceBill $record, array $data) {
+
+                        DB::transaction(function () use ($action, $data, $record) {
+
+                            $paymentRemarks = PaymentRemark::tryFrom($data['payment_remark']);
+
+                            $payment = $record->latestPayment();
+
+                            if ($paymentRemarks === PaymentRemark::APPROVED) {
+                                $payment->update([
+                                    'remarks' => $paymentRemarks->value,
+                                    'admin_message' => $data['admin_message'],
+                                    'status' => PaymentStatus::PAID,
+                                ]);
+
+                                $record->update([
+                                    'status' => ServiceBillStatus::PAID,
+                                ]);
+
+                            } else {
+                                $payment->update([
+                                    'remarks' => $paymentRemarks->value,
+                                    'admin_message' => $data['admin_message'],
+                                    'status' => 'pending',
+                                ]);
+
+                                $record->update([
+                                    'status' => ServiceBillStatus::PENDING,
+                                ]);
+                            }
+
+                            $action->successNotificationTitle(trans('Proof of payment updated successfully'))
+                                ->success();
+
+                            if ($paymentRemarks === PaymentRemark::APPROVED) {
+                                try {
+                                    event(new AdminServiceBillBankPaymentEvent(
+                                        $record,
+                                        $paymentRemarks->value,
+                                    ));
+                                } catch (ModelNotFoundException $e) {
+                                    $action->failureNotificationTitle($e->getMessage())
+                                        ->failure();
+                                    $action->halt();
+                                }
+                            }
+
+                        });
+                    }),
                 Tables\Actions\ViewAction::make()
                     ->label(trans('View Details')),
             ])
