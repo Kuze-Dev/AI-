@@ -286,12 +286,12 @@ class ServiceOrderResource extends Resource
                                                             ->rule(
                                                                 fn (Get $get) => new PaymentPlanAmountRule(
                                                                     floatval(Support::currencyFormat($get, 'totalPriceFloat')),
-                                                                    $get('payment_value')
+                                                                    PaymentPlanValue::tryFrom($get('payment_value'))
                                                                 )
                                                             )
                                                             ->columns()
                                                             ->visible(
-                                                                fn (Get $get) => $get('payment_type') === PaymentPlanType::MILESTONE
+                                                                fn (Get $get) => $get('payment_value') && $get('payment_type') === PaymentPlanType::MILESTONE
                                                             )
                                                             ->reactive()
                                                             ->schema([
