@@ -13,7 +13,6 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @property-read TaxZone $record
@@ -38,6 +37,6 @@ class EditTaxZone extends EditRecord
     /** @param  TaxZone  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateTaxZoneAction::class)->execute($record, TaxZoneData::formArray($data)));
+        return app(UpdateTaxZoneAction::class)->execute($record, TaxZoneData::formArray($data));
     }
 }

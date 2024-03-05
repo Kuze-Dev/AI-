@@ -76,6 +76,7 @@ class TenantPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
             ->maxContentWidth(MaxWidth::Full)
+            ->databaseTransactions()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

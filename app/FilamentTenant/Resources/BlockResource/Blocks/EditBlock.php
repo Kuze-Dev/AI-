@@ -13,8 +13,6 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class EditBlock extends EditRecord
 {
@@ -36,24 +34,20 @@ class EditBlock extends EditRecord
 
     /**
      * @param  \Domain\Page\Models\Block  $record
-     *
-     * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateBlockAction::class)
-                ->execute(
-                    $record,
-                    new BlockData(
-                        name: $data['name'],
-                        component: $data['component'],
-                        image: $data['image'],
-                        blueprint_id: $data['blueprint_id'] ?? $record->blueprint_id,
-                        is_fixed_content: $data['is_fixed_content'],
-                        data: $data['data'] ?? null,
-                    )
+        return app(UpdateBlockAction::class)
+            ->execute(
+                $record,
+                new BlockData(
+                    name: $data['name'],
+                    component: $data['component'],
+                    image: $data['image'],
+                    blueprint_id: $data['blueprint_id'] ?? $record->blueprint_id,
+                    is_fixed_content: $data['is_fixed_content'],
+                    data: $data['data'] ?? null,
                 )
-        );
+            );
     }
 }

@@ -12,7 +12,6 @@ use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class EditTaxonomy extends EditRecord
 {
@@ -34,7 +33,7 @@ class EditTaxonomy extends EditRecord
     /** @param  \Domain\Taxonomy\Models\Taxonomy  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data)));
+        return app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data));
     }
 
     protected function getRedirectUrl(): ?string

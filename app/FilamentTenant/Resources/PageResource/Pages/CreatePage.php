@@ -12,7 +12,6 @@ use Domain\Page\Models\Page;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Throwable;
 
@@ -66,6 +65,6 @@ class CreatePage extends CreateRecord
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreatePageAction::class)->execute(PageData::fromArray($data)));
+        return app(CreatePageAction::class)->execute(PageData::fromArray($data));
     }
 }

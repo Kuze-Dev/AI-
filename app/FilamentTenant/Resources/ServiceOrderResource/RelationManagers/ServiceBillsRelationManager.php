@@ -17,7 +17,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Number;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -213,52 +212,49 @@ class ServiceBillsRelationManager extends RelationManager
                     ])
                     ->action(function (Tables\Actions\Action $action, ServiceBill $record, array $data) {
 
-                        DB::transaction(function () use ($action, $data, $record) {
+                        $paymentRemarks = PaymentRemark::tryFrom($data['payment_remark']);
 
-                            $paymentRemarks = PaymentRemark::tryFrom($data['payment_remark']);
+                        $payment = $record->latestPayment();
 
-                            $payment = $record->latestPayment();
+                        if ($paymentRemarks === PaymentRemark::APPROVED) {
+                            $payment->update([
+                                'remarks' => $paymentRemarks->value,
+                                'admin_message' => $data['admin_message'],
+                                'status' => PaymentStatus::PAID,
+                            ]);
 
-                            if ($paymentRemarks === PaymentRemark::APPROVED) {
-                                $payment->update([
-                                    'remarks' => $paymentRemarks->value,
-                                    'admin_message' => $data['admin_message'],
-                                    'status' => PaymentStatus::PAID,
-                                ]);
+                            $record->update([
+                                'status' => ServiceBillStatus::PAID,
+                            ]);
 
-                                $record->update([
-                                    'status' => ServiceBillStatus::PAID,
-                                ]);
+                        } else {
+                            $payment->update([
+                                'remarks' => $paymentRemarks->value,
+                                'admin_message' => $data['admin_message'],
+                                'status' => 'pending',
+                            ]);
 
-                            } else {
-                                $payment->update([
-                                    'remarks' => $paymentRemarks->value,
-                                    'admin_message' => $data['admin_message'],
-                                    'status' => 'pending',
-                                ]);
+                            $record->update([
+                                'status' => ServiceBillStatus::PENDING,
+                            ]);
+                        }
 
-                                $record->update([
-                                    'status' => ServiceBillStatus::PENDING,
-                                ]);
+                        $action->successNotificationTitle(trans('Proof of payment updated successfully'))
+                            ->success();
+
+                        if ($paymentRemarks === PaymentRemark::APPROVED) {
+                            try {
+                                event(new AdminServiceBillBankPaymentEvent(
+                                    $record,
+                                    $paymentRemarks->value,
+                                ));
+                            } catch (ModelNotFoundException $e) {
+                                $action->failureNotificationTitle($e->getMessage())
+                                    ->failure();
+                                $action->halt();
                             }
+                        }
 
-                            $action->successNotificationTitle(trans('Proof of payment updated successfully'))
-                                ->success();
-
-                            if ($paymentRemarks === PaymentRemark::APPROVED) {
-                                try {
-                                    event(new AdminServiceBillBankPaymentEvent(
-                                        $record,
-                                        $paymentRemarks->value,
-                                    ));
-                                } catch (ModelNotFoundException $e) {
-                                    $action->failureNotificationTitle($e->getMessage())
-                                        ->failure();
-                                    $action->halt();
-                                }
-                            }
-
-                        });
                     }),
                 Tables\Actions\ViewAction::make()
                     ->label(trans('View Details')),

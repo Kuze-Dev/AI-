@@ -12,7 +12,6 @@ use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class EditMenu extends EditRecord
 {
@@ -34,7 +33,7 @@ class EditMenu extends EditRecord
     /** @param  \Domain\Menu\Models\Menu  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateMenuAction::class)->execute($record, MenuData::fromArray($data)));
+        return app(UpdateMenuAction::class)->execute($record, MenuData::fromArray($data));
     }
 
     protected function getRedirectUrl(): ?string

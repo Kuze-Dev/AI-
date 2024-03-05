@@ -11,7 +11,6 @@ use Domain\Taxonomy\DataTransferObjects\TaxonomyData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateTaxonomy extends CreateRecord
 {
@@ -31,6 +30,6 @@ class CreateTaxonomy extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateTaxonomyAction::class)->execute(TaxonomyData::fromArray($data)));
+        return app(CreateTaxonomyAction::class)->execute(TaxonomyData::fromArray($data));
     }
 }

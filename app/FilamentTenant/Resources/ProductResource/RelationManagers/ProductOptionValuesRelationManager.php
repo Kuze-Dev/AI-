@@ -18,7 +18,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Unique;
 use Throwable;
 
@@ -207,7 +206,7 @@ class ProductOptionValuesRelationManager extends RelationManager
 
     private function create(array $data, Tables\Actions\CreateAction $action): ProductOptionValue
     {
-        return DB::transaction(function () use ($data, $action) {
+        return
             /** @var ProductOptionValue $productOptionValue */
             $productOptionValue = ProductOptionValue::create([
                 'product_option_id' => $data['productOption'],
@@ -223,18 +222,62 @@ class ProductOptionValuesRelationManager extends RelationManager
                     ],
             ]);
 
-            /** @var ProductOption $ownerRecordProductOption */
-            $ownerRecordProductOption = $this->ownerRecord
-                ->productOptions
-                ->firstWhere('id', '!=', $data['productOption']);
+        /** @var ProductOption $ownerRecordProductOption */
+        $ownerRecordProductOption = $this->ownerRecord
+            ->productOptions
+            ->firstWhere('id', '!=', $data['productOption']);
 
-            if (
-                $ownerRecordProductOption === null ||
-                $ownerRecordProductOption->productOptionValues->isEmpty()
-            ) {
+        if (
+            $ownerRecordProductOption === null ||
+            $ownerRecordProductOption->productOptionValues->isEmpty()
+        ) {
+            ProductVariant::create([
+                'product_id' => $this->ownerRecord->id,
+                'sku' => $this->ownerRecord->sku.$productOptionValue->id,
+                'combination' => [
+                    [
+                        'option' => $productOptionValue->productOption->name,
+                        'option_id' => $productOptionValue->productOption->id,
+                        'option_value' => $productOptionValue->name,
+                        'option_value_id' => $productOptionValue->id,
+                    ],
+                ],
+                'retail_price' => $this->ownerRecord->retail_price,
+                'selling_price' => $this->ownerRecord->selling_price,
+                'stock' => $this->ownerRecord->stock,
+                'status' => $this->ownerRecord->status,
+            ]);
+
+            return $productOptionValue;
+        }
+
+        // Remove variants with combination having only one array element
+        ProductVariant::whereBelongsTo($this->ownerRecord)
+            ->where(function (Builder $query) use ($productOptionValue, $ownerRecordProductOption) {
+                $query->whereJsonContains('combination', [['option_id' => $productOptionValue->product_option_id]])
+                    ->orWhereJsonContains('combination', [['option_id' => $ownerRecordProductOption->id]]);
+            })
+            ->get()
+            ->each(function (ProductVariant $productVariant) use ($action) {
+                try {
+                    if (count($productVariant->combination) === 1) {
+                        $productVariant->delete();
+                    }
+                } catch (Throwable $e) {
+
+                    $action->failureNotificationTitle($e->getMessage())->failure();
+                    $action->halt();
+                }
+            });
+
+        /**
+         * Sync product variants connected to this option value
+         */
+        foreach ($ownerRecordProductOption->productOptionValues as $pairOptionValue) {
+            try {
                 ProductVariant::create([
                     'product_id' => $this->ownerRecord->id,
-                    'sku' => $this->ownerRecord->sku.$productOptionValue->id,
+                    'sku' => $this->ownerRecord->sku.$productOptionValue->id.$pairOptionValue->id,
                     'combination' => [
                         [
                             'option' => $productOptionValue->productOption->name,
@@ -242,117 +285,70 @@ class ProductOptionValuesRelationManager extends RelationManager
                             'option_value' => $productOptionValue->name,
                             'option_value_id' => $productOptionValue->id,
                         ],
+                        [
+                            'option' => $ownerRecordProductOption->name,
+                            'option_id' => $ownerRecordProductOption->id,
+                            'option_value' => $pairOptionValue->name,
+                            'option_value_id' => $pairOptionValue->id,
+                        ],
                     ],
                     'retail_price' => $this->ownerRecord->retail_price,
                     'selling_price' => $this->ownerRecord->selling_price,
                     'stock' => $this->ownerRecord->stock,
                     'status' => $this->ownerRecord->status,
                 ]);
+            } catch (Throwable $e) {
 
-                return $productOptionValue;
+                $action->failureNotificationTitle($e->getMessage())->failure();
+                $action->halt();
             }
+        }
 
-            // Remove variants with combination having only one array element
-            ProductVariant::whereBelongsTo($this->ownerRecord)
-                ->where(function (Builder $query) use ($productOptionValue, $ownerRecordProductOption) {
-                    $query->whereJsonContains('combination', [['option_id' => $productOptionValue->product_option_id]])
-                        ->orWhereJsonContains('combination', [['option_id' => $ownerRecordProductOption->id]]);
-                })
-                ->get()
-                ->each(function (ProductVariant $productVariant) use ($action) {
-                    try {
-                        if (count($productVariant->combination) === 1) {
-                            $productVariant->delete();
-                        }
-                    } catch (Throwable $e) {
+        return $productOptionValue;
 
-                        $action->failureNotificationTitle($e->getMessage())->failure();
-                        $action->halt();
-                    }
-                });
-
-            /**
-             * Sync product variants connected to this option value
-             */
-            foreach ($ownerRecordProductOption->productOptionValues as $pairOptionValue) {
-                try {
-                    ProductVariant::create([
-                        'product_id' => $this->ownerRecord->id,
-                        'sku' => $this->ownerRecord->sku.$productOptionValue->id.$pairOptionValue->id,
-                        'combination' => [
-                            [
-                                'option' => $productOptionValue->productOption->name,
-                                'option_id' => $productOptionValue->productOption->id,
-                                'option_value' => $productOptionValue->name,
-                                'option_value_id' => $productOptionValue->id,
-                            ],
-                            [
-                                'option' => $ownerRecordProductOption->name,
-                                'option_id' => $ownerRecordProductOption->id,
-                                'option_value' => $pairOptionValue->name,
-                                'option_value_id' => $pairOptionValue->id,
-                            ],
-                        ],
-                        'retail_price' => $this->ownerRecord->retail_price,
-                        'selling_price' => $this->ownerRecord->selling_price,
-                        'stock' => $this->ownerRecord->stock,
-                        'status' => $this->ownerRecord->status,
-                    ]);
-                } catch (Throwable $e) {
-
-                    $action->failureNotificationTitle($e->getMessage())->failure();
-                    $action->halt();
-                }
-            }
-
-            return $productOptionValue;
-        });
     }
 
     private function update(ProductOptionValue $record, array $data, Tables\Actions\EditAction $action): void
     {
-        DB::transaction(function () use ($record, $data, $action) {
+        $record->update([
+            'name' => $data['name'],
+            'data' => isset($data['icon_type'])
+                ? [
+                    'icon_type' => $data['icon_type'],
+                    'icon_value' => $data['icon_value'] ?? '',
+                ]
+                : [
+                    'icon_type' => 'text',
+                    'icon_value' => '',
+                ],
+        ]);
 
-            $record->update([
-                'name' => $data['name'],
-                'data' => isset($data['icon_type'])
-                    ? [
-                        'icon_type' => $data['icon_type'],
-                        'icon_value' => $data['icon_value'] ?? '',
-                    ]
-                    : [
-                        'icon_type' => 'text',
-                        'icon_value' => '',
-                    ],
-            ]);
-
-            // Sync product variants connected to this option value
-            foreach (
-                ProductVariant::whereBelongsTo($record->productOption->product)
-                    ->where(fn (Builder $query) => $query
-                        ->whereJsonContains('combination', [
-                            ['option_value_id' => $record->id],
-                        ]))
-                    ->get() as $productVariant
-            ) {
-                try {
-                    $combinations = [];
-                    foreach ($productVariant->combination as $key => $item) {
-                        if ($item['option_value_id'] === $record->id) {
-                            $item['option_value'] = $data['name'];
-                        }
-                        $combinations[$key] = $item;
+        // Sync product variants connected to this option value
+        foreach (
+            ProductVariant::whereBelongsTo($record->productOption->product)
+                ->where(fn (Builder $query) => $query
+                    ->whereJsonContains('combination', [
+                        ['option_value_id' => $record->id],
+                    ]))
+                ->get() as $productVariant
+        ) {
+            try {
+                $combinations = [];
+                foreach ($productVariant->combination as $key => $item) {
+                    if ($item['option_value_id'] === $record->id) {
+                        $item['option_value'] = $data['name'];
                     }
-
-                    $productVariant->combination = $combinations;
-                    $productVariant->save();
-                } catch (Throwable $e) {
-                    $action->failureNotificationTitle($e->getMessage())
-                        ->failure();
-                    $action->halt();
+                    $combinations[$key] = $item;
                 }
-            }
 
-        });
+                $productVariant->combination = $combinations;
+                $productVariant->save();
+            } catch (Throwable $e) {
+                $action->failureNotificationTitle($e->getMessage())
+                    ->failure();
+                $action->halt();
+            }
+        }
+
     }
 }

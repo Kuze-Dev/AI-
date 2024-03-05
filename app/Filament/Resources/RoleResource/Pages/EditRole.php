@@ -12,8 +12,6 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class EditRole extends EditRecord
 {
@@ -34,11 +32,9 @@ class EditRole extends EditRecord
 
     /**
      * @param  \Domain\Role\Models\Role  $record
-     *
-     * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateRoleAction::class)->execute($record, RoleData::fromArray($data)));
+        return app(UpdateRoleAction::class)->execute($record, RoleData::fromArray($data));
     }
 }

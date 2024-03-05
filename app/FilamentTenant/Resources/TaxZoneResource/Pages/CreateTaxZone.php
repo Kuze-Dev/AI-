@@ -11,7 +11,6 @@ use Domain\Taxation\DataTransferObjects\TaxZoneData;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateTaxZone extends CreateRecord
 {
@@ -31,6 +30,6 @@ class CreateTaxZone extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateTaxZoneAction::class)->execute(TaxZoneData::formArray($data)));
+        return app(CreateTaxZoneAction::class)->execute(TaxZoneData::formArray($data));
     }
 }

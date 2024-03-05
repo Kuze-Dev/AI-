@@ -11,7 +11,6 @@ use Domain\Globals\DataTransferObjects\GlobalsData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateGlobals extends CreateRecord
 {
@@ -31,6 +30,6 @@ class CreateGlobals extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateGlobalsAction::class)->execute(GlobalsData::fromArray($data)));
+        return app(CreateGlobalsAction::class)->execute(GlobalsData::fromArray($data));
     }
 }

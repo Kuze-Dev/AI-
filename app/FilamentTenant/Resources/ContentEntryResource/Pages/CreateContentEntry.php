@@ -14,7 +14,6 @@ use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\DB;
 
 class CreateContentEntry extends CreateRecord
 {
@@ -75,10 +74,8 @@ class CreateContentEntry extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(
-            fn () => app(CreateContentEntryAction::class)
-                ->execute($this->ownerRecord, ContentEntryData::fromArray($data))
-        );
+        return app(CreateContentEntryAction::class)
+            ->execute($this->ownerRecord, ContentEntryData::fromArray($data));
     }
 
     protected function getRedirectUrl(): string

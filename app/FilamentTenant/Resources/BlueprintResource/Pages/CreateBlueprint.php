@@ -12,7 +12,6 @@ use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateBlueprint extends CreateRecord
 {
@@ -32,10 +31,10 @@ class CreateBlueprint extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateBlueprintAction::class)
+        return app(CreateBlueprintAction::class)
             ->execute(new BlueprintData(
                 name: $data['name'],
                 schema: SchemaData::fromArray($data['schema']),
-            )));
+            ));
     }
 }

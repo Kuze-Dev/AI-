@@ -11,8 +11,6 @@ use Domain\Form\DataTransferObjects\FormData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class CreateForm extends CreateRecord
 {
@@ -30,9 +28,8 @@ class CreateForm extends CreateRecord
         ];
     }
 
-    /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateFormAction::class)->execute(FormData::fromArray($data)));
+        return app(CreateFormAction::class)->execute(FormData::fromArray($data));
     }
 }

@@ -39,7 +39,6 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
@@ -402,44 +401,45 @@ class EditServiceOrder extends EditRecord
                                                 }
 
                                                 try {
-                                                    DB::transaction(function () use ($data, $action, $record) {
+                                                    if (
+                                                        $record->update([
+                                                            'status' => $data['status'],
+                                                        ])
+                                                    ) {
+                                                        event(new AdminServiceOrderStatusUpdatedEvent(
+                                                            serviceOrder: $record,
+                                                            shouldNotifyCustomer: $data['is_send_email']
+                                                        ));
 
-                                                        if (
-                                                            $record->update([
-                                                                'status' => $data['status'],
-                                                            ])
-                                                        ) {
-                                                            event(new AdminServiceOrderStatusUpdatedEvent(
-                                                                serviceOrder: $record,
-                                                                shouldNotifyCustomer: $data['is_send_email']
-                                                            ));
-
-                                                            $action->successNotificationTitle(
-                                                                trans('Service order updated successfully')
-                                                            )
-                                                                ->success();
-                                                        }
-                                                    });
+                                                        $action->successNotificationTitle(
+                                                            trans('Service order updated successfully')
+                                                        )
+                                                            ->success();
+                                                    }
                                                 } catch (MissingServiceSettingsConfigurationException $e) {
                                                     $action->failureNotificationTitle(trans($e->getMessage()))
                                                         ->failure();
 
                                                     report($e);
+                                                    $action->halt(shouldRollBackDatabaseTransaction: true);
                                                 } catch (InvalidServiceBillException $e) {
                                                     $action->failureNotificationTitle(trans('No service bill found'))
                                                         ->failure();
 
                                                     report($e);
+                                                    $action->halt(shouldRollBackDatabaseTransaction: true);
                                                 } catch (ModelNotFoundException $e) {
                                                     $action->failureNotificationTitle(trans($e->getMessage()))
                                                         ->failure();
 
                                                     report($e);
+                                                    $action->halt(shouldRollBackDatabaseTransaction: true);
                                                 } catch (Exception $e) {
                                                     $action->failureNotificationTitle(trans('Something went wrong!'))
                                                         ->failure();
 
                                                     report($e);
+                                                    $action->halt(shouldRollBackDatabaseTransaction: true);
                                                 }
                                             }),
                                     ]),
