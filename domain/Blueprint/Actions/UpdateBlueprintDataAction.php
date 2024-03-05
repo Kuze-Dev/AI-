@@ -16,12 +16,14 @@ class UpdateBlueprintDataAction
 {
     public function __construct(
         protected ExtractDataAction $extractDataAction,
+        protected CreateBlueprintDataAction $createBlueprintData,
     ) {
     }
 
     public function execute(Model $model): void
     {
         $blueprintfieldtype = null;
+        $blueprintDataArray = [];
 
         if ($model instanceof ContentEntry) {
             $blueprintfieldtype = $model->content->blueprint->schema;
@@ -51,22 +53,26 @@ class UpdateBlueprintDataAction
         }
 
         $flattenData = $this->extractDataAction->flattenArray($data);
+
         foreach ($flattenData as $arrayData) {
-            $this->updateBlueprintData(BlueprintDataData::fromArray($model, $arrayData));
+            $blueprintDataArray[] = $this->updateBlueprintData($model, BlueprintDataData::fromArray($model, $arrayData));
         }
 
     }
 
-    private function updateBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
+    private function updateBlueprintData(Model $model, BlueprintDataData $blueprintDataData): BlueprintData
     {
 
         $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first();
+
         if (! $blueprintData) {
-            return new BlueprintData();
+
+            $this->createBlueprintData->execute($model);
+
+            return $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first() ?: new BlueprintData();
         }
 
         if ($blueprintData->type == FieldType::MEDIA->value) {
-
             if (! $blueprintDataData->value) {
                 return $blueprintData;
             }
@@ -83,7 +89,6 @@ class UpdateBlueprintDataAction
                         return $value;
                     }
                 });
-
                 // filter $blueprintDataData->value array with value that has no filename extension
 
                 $currentMedia = array_filter($currentUploaded, function ($value) {
@@ -116,6 +121,7 @@ class UpdateBlueprintDataAction
             }
 
         } else {
+
             $blueprintData->update([
                 'model_id' => $blueprintDataData->model_id,
                 'value' => $blueprintDataData->value,
