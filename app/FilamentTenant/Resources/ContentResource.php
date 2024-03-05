@@ -123,7 +123,7 @@ class ContentResource extends Resource
                                     ->searchable()
                                     ->columnSpan(['sm' => 1])
                                     ->required(),
-                            ])->hidden(fn (\Filament\Forms\Get $get) => !$get('display_publish_dates')),
+                            ])->hidden(fn (\Filament\Forms\Get $get) => ! $get('display_publish_dates')),
                     ]),
 
                     Forms\Components\Section::make([

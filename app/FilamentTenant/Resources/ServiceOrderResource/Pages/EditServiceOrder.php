@@ -389,7 +389,7 @@ class EditServiceOrder extends EditRecord
                                                         trans('Email sender not found, please update your service settings')
                                                     )
                                                         ->failure();
-                                                    $action->halt();
+                                                    $action->halt(shouldRollBackDatabaseTransaction: true);
                                                 }
 
                                                 if ($setting->admin_should_receive && empty($setting->admin_main_receiver)) {
@@ -397,7 +397,7 @@ class EditServiceOrder extends EditRecord
                                                         trans('Email receiver not found, please update your service settings')
                                                     )
                                                         ->failure();
-                                                    $action->halt();
+                                                    $action->halt(shouldRollBackDatabaseTransaction: true);
                                                 }
 
                                                 try {

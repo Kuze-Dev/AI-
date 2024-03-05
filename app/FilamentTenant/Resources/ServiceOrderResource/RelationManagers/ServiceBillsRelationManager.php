@@ -211,7 +211,8 @@ class ServiceBillsRelationManager extends RelationManager
                             }),
                     ])
                     ->action(function (Tables\Actions\Action $action, ServiceBill $record, array $data) {
-
+                        $action->successNotificationTitle('tets')->success();
+                        $action->halt(shouldRollBackDatabaseTransaction: true);
                         $paymentRemarks = PaymentRemark::tryFrom($data['payment_remark']);
 
                         $payment = $record->latestPayment();
@@ -251,7 +252,7 @@ class ServiceBillsRelationManager extends RelationManager
                             } catch (ModelNotFoundException $e) {
                                 $action->failureNotificationTitle($e->getMessage())
                                     ->failure();
-                                $action->halt();
+                                $action->halt(shouldRollBackDatabaseTransaction: true);
                             }
                         }
 

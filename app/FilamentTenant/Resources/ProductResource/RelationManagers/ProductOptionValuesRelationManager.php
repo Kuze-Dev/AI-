@@ -206,21 +206,20 @@ class ProductOptionValuesRelationManager extends RelationManager
 
     private function create(array $data, Tables\Actions\CreateAction $action): ProductOptionValue
     {
-        return
-            /** @var ProductOptionValue $productOptionValue */
-            $productOptionValue = ProductOptionValue::create([
-                'product_option_id' => $data['productOption'],
-                'name' => $data['name'],
-                'data' => isset($data['icon_type'])
-                    ? [
-                        'icon_type' => $data['icon_type'],
-                        'icon_value' => $data['icon_value'] ?? '',
-                    ]
-                    : [
-                        'icon_type' => 'text',
-                        'icon_value' => '',
-                    ],
-            ]);
+        /** @var ProductOptionValue $productOptionValue */
+        $productOptionValue = ProductOptionValue::create([
+            'product_option_id' => $data['productOption'],
+            'name' => $data['name'],
+            'data' => isset($data['icon_type'])
+                ? [
+                    'icon_type' => $data['icon_type'],
+                    'icon_value' => $data['icon_value'] ?? '',
+                ]
+                : [
+                    'icon_type' => 'text',
+                    'icon_value' => '',
+                ],
+        ]);
 
         /** @var ProductOption $ownerRecordProductOption */
         $ownerRecordProductOption = $this->ownerRecord
@@ -266,7 +265,7 @@ class ProductOptionValuesRelationManager extends RelationManager
                 } catch (Throwable $e) {
 
                     $action->failureNotificationTitle($e->getMessage())->failure();
-                    $action->halt();
+                    $action->halt(shouldRollBackDatabaseTransaction: true);
                 }
             });
 
@@ -300,7 +299,7 @@ class ProductOptionValuesRelationManager extends RelationManager
             } catch (Throwable $e) {
 
                 $action->failureNotificationTitle($e->getMessage())->failure();
-                $action->halt();
+                $action->halt(shouldRollBackDatabaseTransaction: true);
             }
         }
 
@@ -310,6 +309,7 @@ class ProductOptionValuesRelationManager extends RelationManager
 
     private function update(ProductOptionValue $record, array $data, Tables\Actions\EditAction $action): void
     {
+
         $record->update([
             'name' => $data['name'],
             'data' => isset($data['icon_type'])
@@ -346,7 +346,7 @@ class ProductOptionValuesRelationManager extends RelationManager
             } catch (Throwable $e) {
                 $action->failureNotificationTitle($e->getMessage())
                     ->failure();
-                $action->halt();
+                $action->halt(shouldRollBackDatabaseTransaction: true);
             }
         }
 
