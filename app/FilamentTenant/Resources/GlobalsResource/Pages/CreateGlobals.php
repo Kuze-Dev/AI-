@@ -8,7 +8,7 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Actions\CreateGlobalsAction;
 use Domain\Globals\DataTransferObjects\GlobalsData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,7 +22,7 @@ class CreateGlobals extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];

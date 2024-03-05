@@ -61,7 +61,7 @@ class ContentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(ignoreRecord: true)
                         ->string()
@@ -93,7 +93,7 @@ class ContentResource extends Resource
                         ->afterStateHydrated(function (Forms\Components\Select $component, ?Content $record) {
                             $component->state($record ? $record->taxonomies->pluck('id')->toArray() : []);
                         }),
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         Forms\Components\Toggle::make('display_publish_dates')
                             ->helperText(trans('Enable publish date visibility and behavior of contents'))
                             ->reactive()
@@ -123,17 +123,17 @@ class ContentResource extends Resource
                                     ->searchable()
                                     ->columnSpan(['sm' => 1])
                                     ->required(),
-                            ])->when(fn (\Filament\Forms\Get $get) => $get('display_publish_dates')),
+                            ])->hidden(fn (\Filament\Forms\Get $get) => !$get('display_publish_dates')),
                     ]),
 
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         Forms\Components\Toggle::make('is_sortable')
                             ->label(trans('Allow ordering'))
                             ->helperText(trans('Grants option for ordering of content entries'))
                             ->reactive(),
                     ]),
 
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         Forms\Components\CheckboxList::make('sites')
                             ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
                             ->rules([

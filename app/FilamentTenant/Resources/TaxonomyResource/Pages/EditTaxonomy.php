@@ -8,8 +8,8 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TaxonomyResource;
 use Domain\Taxonomy\Actions\UpdateTaxonomyAction;
 use Domain\Taxonomy\DataTransferObjects\TaxonomyData;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,7 +23,7 @@ class EditTaxonomy extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -38,6 +38,6 @@ class EditTaxonomy extends EditRecord
 
     protected function getRedirectUrl(): ?string
     {
-        return TaxonomyResource::getUrl('edit', $this->record);
+        return TaxonomyResource::getUrl('edit', [$this->record]);
     }
 }

@@ -44,10 +44,10 @@ class GlobalsResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Card::make([
+            Forms\Components\Section::make([
                 Forms\Components\TextInput::make('name')
                     ->unique(
-                        callback: function ($livewire, Unique $rule) {
+                        modifyRuleUsing: function ($livewire, Unique $rule) {
 
                             if (TenantFeatureSupport::active(SitesManagement::class)) {
                                 return false;
@@ -65,7 +65,9 @@ class GlobalsResource extends Resource
                     ->required()
                     ->preload()
                     ->optionsFromModel(Blueprint::class, 'name')
-                    ->disabled(fn (?Globals $record) => $record !== null)
+                    ->disableOptionWhen(fn (?Globals $record) => $record !== null)
+                    ->helperText(fn (?Globals $record) => $record !== null ? 'Updating of Blueprint is Restricted' : null)
+                    // ->disabled(fn (?Globals $record) => $record !== null)
                     ->reactive(),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
@@ -73,7 +75,7 @@ class GlobalsResource extends Resource
                     ->searchable()
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class))
                     ->required(),
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\CheckboxList::make('sites')
                         ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
                         ->rules([
@@ -119,6 +121,7 @@ class GlobalsResource extends Resource
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
+                    ->hidden(fn (?Globals $record) => ! $record)
                     ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
