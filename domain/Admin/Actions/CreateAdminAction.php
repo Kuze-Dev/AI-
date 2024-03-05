@@ -16,7 +16,7 @@ class CreateAdminAction
         $admin = Admin::create($this->getAdminAttributes($adminData));
 
         if ($adminData->roles !== null) {
-            $admin->syncRoles($adminData->roles);
+            $admin->roles()->sync($adminData->roles);
         }
 
         if ($adminData->permissions !== null) {
