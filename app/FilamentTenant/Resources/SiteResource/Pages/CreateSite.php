@@ -10,7 +10,6 @@ use Domain\Site\DataTransferObjects\SiteData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateSite extends CreateRecord
 {
@@ -29,9 +28,7 @@ class CreateSite extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
 
-        return DB::transaction(
-            fn () => app(CreateSiteAction::class)
-                ->execute(SiteData::fromArray($data))
-        );
+        return app(CreateSiteAction::class)
+            ->execute(SiteData::fromArray($data));
     }
 }

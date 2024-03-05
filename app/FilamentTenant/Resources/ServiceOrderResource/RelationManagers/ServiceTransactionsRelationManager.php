@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
-class ServiceTransactionRelationManager extends RelationManager
+class ServiceTransactionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'serviceTransactions';
 

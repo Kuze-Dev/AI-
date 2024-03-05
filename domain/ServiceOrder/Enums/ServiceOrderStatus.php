@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\ServiceOrder\Enums;
 
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Support\Str;
@@ -46,5 +47,30 @@ enum ServiceOrderStatus: string implements HasColor, HasLabel
     public function getLabel(): ?string
     {
         return Str::headline($this->value);
+    }
+
+    public static function casesForServiceOrder(ServiceOrder $serviceOrder): array
+    {
+        $cases = collect([
+            self::PENDING,
+            self::FORPAYMENT,
+        ]);
+
+        if ($serviceOrder->billing_cycle === null) {
+            $cases = $cases->merge([
+                self::INPROGRESS,
+                self::COMPLETED,
+            ]);
+        } else {
+            $cases = $cases->merge([
+                self::ACTIVE,
+                self::CLOSED,
+            ]);
+        }
+
+        return $cases
+            ->mapWithKeys(fn (self $case) => [
+                $case->value => $case->getLabel(),
+            ])->toArray();
     }
 }

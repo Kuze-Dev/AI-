@@ -19,27 +19,35 @@ class MetaDataFormV2 extends Section
             ->heading(trans('Meta Data'))
             ->relationship('metaData')
             ->schema([
+
                 Forms\Components\TextInput::make('title')
+                    ->translateLabel()
                     ->string()
-                    ->maxLength(255)
-                    ->formatStateUsing(fn (?MetaData $record) => $record?->title),
+                    ->maxLength(255),
+
                 Forms\Components\TextInput::make('keywords')
+                    ->translateLabel()
                     ->string()
-                    ->maxLength(255)
-                    ->formatStateUsing(fn (?MetaData $record) => $record?->keywords),
+                    ->maxLength(255),
+
                 Forms\Components\TextInput::make('author')
+                    ->translateLabel()
                     ->string()
-                    ->maxLength(255)
-                    ->formatStateUsing(fn (?MetaData $record) => $record?->author),
+                    ->maxLength(255),
+
                 Forms\Components\Textarea::make('description')
-                    ->maxLength(fn (int $value = 160) => $value)
-                    ->formatStateUsing(fn (?MetaData $record) => $record?->description),
+                    ->translateLabel()
+                    ->maxLength(fn (int $value = 160) => $value),
+
                 Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                    ->translateLabel()
                     ->collection('image')
                     ->preserveFilenames()
                     ->customProperties(fn (Get $get) => ['alt_text' => $get('image_alt_text')])
                     ->image(),
+
                 Forms\Components\TextInput::make('image_alt_text')
+                    ->translateLabel()
                     ->visible(fn (Get $get) => filled($get('image')))
                     ->formatStateUsing(
                         fn (?MetaData $record) => $record

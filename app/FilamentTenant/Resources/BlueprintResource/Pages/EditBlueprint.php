@@ -19,7 +19,6 @@ use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
 class EditBlueprint extends EditRecord
@@ -44,14 +43,14 @@ class EditBlueprint extends EditRecord
     /** @param  Blueprint  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateBlueprintAction::class)
+        return app(UpdateBlueprintAction::class)
             ->execute(
                 $record,
                 new BlueprintData(
                     name: $data['name'],
                     schema: SchemaData::fromArray($data['schema']),
                 )
-            ));
+            );
     }
 
     protected function afterSave(): void

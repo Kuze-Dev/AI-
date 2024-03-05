@@ -7,8 +7,8 @@ namespace App\FilamentTenant\Resources;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\EditServiceOrder;
 use App\FilamentTenant\Resources\ServiceOrderResource\Pages\ListServiceOrder;
-use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillRelationManager;
-use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionRelationManager;
+use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceBillsRelationManager;
+use App\FilamentTenant\Resources\ServiceOrderResource\RelationManagers\ServiceTransactionsRelationManager;
 use App\FilamentTenant\Resources\ServiceOrderResource\Rules\PaymentPlanAmountRule;
 use App\FilamentTenant\Resources\ServiceOrderResource\Schema;
 use App\FilamentTenant\Resources\ServiceOrderResource\Support;
@@ -286,12 +286,12 @@ class ServiceOrderResource extends Resource
                                                             ->rule(
                                                                 fn (Get $get) => new PaymentPlanAmountRule(
                                                                     floatval(Support::currencyFormat($get, 'totalPriceFloat')),
-                                                                    $get('payment_value')
+                                                                    PaymentPlanValue::tryFrom($get('payment_value'))
                                                                 )
                                                             )
                                                             ->columns()
                                                             ->visible(
-                                                                fn (Get $get) => $get('payment_type') === PaymentPlanType::MILESTONE
+                                                                fn (Get $get) => $get('payment_value') && $get('payment_type') === PaymentPlanType::MILESTONE
                                                             )
                                                             ->reactive()
                                                             ->schema([
@@ -463,8 +463,8 @@ class ServiceOrderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ServiceTransactionRelationManager::class,
-            ServiceBillRelationManager::class,
+            ServiceTransactionsRelationManager::class,
+            ServiceBillsRelationManager::class,
         ];
     }
 

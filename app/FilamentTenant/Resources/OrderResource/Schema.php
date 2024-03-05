@@ -15,7 +15,6 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class Schema
@@ -87,50 +86,48 @@ final class Schema
                                     }
                                 }
 
-                                DB::transaction(function () use ($data, $record) {
-
-                                    if ($data['status'] === OrderStatuses::CANCELLED) {
-                                        if (! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
-                                            Notification::make()
-                                                ->title(trans("You can't cancel this order."))
-                                                ->warning()
-                                                ->send();
-
-                                            return;
-                                        }
-
-                                        /** @var Payment $payment */
-                                        $payment = $record->payments->first();
-
-                                        $payment->update([
-                                            'status' => 'cancelled',
-                                        ]);
-
-                                        $result = $record->update([
-                                            'status' => $data['status'],
-                                            'cancelled_at' => now(),
-                                        ]);
-                                    } else {
-                                        $result = $record->update([
-                                            'status' => $data['status'],
-                                        ]);
-                                    }
-
-                                    event(new AdminOrderStatusUpdatedEvent(
-                                        $record,
-                                        $data['send_email'],
-                                        $data['status']->value,
-                                        $data['email_remarks'],
-                                        $record->customer,
-                                    ));
-
-                                    if ($result) {
+                                if ($data['status'] === OrderStatuses::CANCELLED) {
+                                    if (! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
                                         Notification::make()
-                                            ->title(trans('Order updated successfully'))
-                                            ->success()
+                                            ->title(trans("You can't cancel this order."))
+                                            ->warning()
                                             ->send();
+
+                                        return;
                                     }
-                                });
+
+                                    /** @var Payment $payment */
+                                    $payment = $record->payments->first();
+
+                                    $payment->update([
+                                        'status' => 'cancelled',
+                                    ]);
+
+                                    $result = $record->update([
+                                        'status' => $data['status'],
+                                        'cancelled_at' => now(),
+                                    ]);
+                                } else {
+                                    $result = $record->update([
+                                        'status' => $data['status'],
+                                    ]);
+                                }
+
+                                event(new AdminOrderStatusUpdatedEvent(
+                                    $record,
+                                    $data['send_email'],
+                                    $data['status']->value,
+                                    $data['email_remarks'],
+                                    $record->customer,
+                                ));
+
+                                if ($result) {
+                                    Notification::make()
+                                        ->title(trans('Order updated successfully'))
+                                        ->success()
+                                        ->send();
+                                }
+
                             })
                             ->hidden(
                                 fn (Order $record) => $record->status == OrderStatuses::CANCELLED ||
@@ -160,30 +157,27 @@ final class Schema
                             ->requiresConfirmation()
                             ->action(function (array $data, Order $record, Set $set) {
 
-                                DB::transaction(function () use ($record) {
-                                    $isPaid = ! $record->is_paid;
+                                $isPaid = ! $record->is_paid;
 
-                                    $result = $record->update([
-                                        'is_paid' => $isPaid,
-                                    ]);
+                                $result = $record->update([
+                                    'is_paid' => $isPaid,
+                                ]);
 
-                                    if (! $result) {
-                                        return;
-                                    }
-                                    /** @var Payment $payment */
-                                    $payment = $record->payments->first();
+                                if (! $result) {
+                                    return;
+                                }
+                                /** @var Payment $payment */
+                                $payment = $record->payments->first();
 
-                                    $payment->update([
-                                        'status' => $record->is_paid ? 'paid' : 'pending',
-                                    ]);
+                                $payment->update([
+                                    'status' => $record->is_paid ? 'paid' : 'pending',
+                                ]);
 
-                                    // $set('is_paid', $isPaid);
-                                    Notification::make()
-                                        ->title(trans('Order marked successfully'))
-                                        ->success()
-                                        ->send();
-
-                                });
+                                // $set('is_paid', $isPaid);
+                                Notification::make()
+                                    ->title(trans('Order marked successfully'))
+                                    ->success()
+                                    ->send();
                             }),
                     ])
                         ->hidden(
@@ -293,56 +287,53 @@ final class Schema
                                         return;
                                     }
 
-                                    DB::transaction(function () use ($payment, $data, $record) {
+                                    $result = $payment->update($data);
 
-                                        $result = $payment->update($data);
+                                    if (! $result) {
+                                        return;
+                                    }
 
-                                        if (! $result) {
-                                            return;
-                                        }
+                                    $isPaid = $data['remarks'] === 'approved';
 
-                                        $isPaid = $data['remarks'] === 'approved';
+                                    $record->update([
+                                        'is_paid' => $isPaid,
+                                    ]);
 
-                                        $record->update([
-                                            'is_paid' => $isPaid,
+                                    if ($isPaid) {
+                                        $payment->update([
+                                            'status' => 'paid',
                                         ]);
 
-                                        if ($isPaid) {
-                                            $payment->update([
-                                                'status' => 'paid',
-                                            ]);
+                                        $record->update([
+                                            'status' => OrderStatuses::PROCESSING,
+                                        ]);
 
-                                            $record->update([
-                                                'status' => OrderStatuses::PROCESSING,
-                                            ]);
+                                    } else {
+                                        $payment->update([
+                                            'status' => 'cancelled',
+                                        ]);
 
-                                        } else {
-                                            $payment->update([
-                                                'status' => 'cancelled',
-                                            ]);
+                                        $record->update([
+                                            'status' => OrderStatuses::CANCELLED,
+                                        ]);
 
-                                            $record->update([
-                                                'status' => OrderStatuses::CANCELLED,
-                                            ]);
+                                    }
 
-                                        }
+                                    $customer = $record->customer;
 
-                                        $customer = $record->customer;
+                                    if ($customer) {
+                                        event(new AdminOrderBankPaymentEvent(
+                                            $customer,
+                                            $record,
+                                            $data['remarks'],
+                                        ));
+                                    }
 
-                                        if ($customer) {
-                                            event(new AdminOrderBankPaymentEvent(
-                                                $customer,
-                                                $record,
-                                                $data['remarks'],
-                                            ));
-                                        }
+                                    Notification::make()
+                                        ->title(trans('Proof of payment updated successfully'))
+                                        ->success()
+                                        ->send();
 
-                                        Notification::make()
-                                            ->title(trans('Proof of payment updated successfully'))
-                                            ->success()
-                                            ->send();
-
-                                    });
                                 }),
                         ]),
 

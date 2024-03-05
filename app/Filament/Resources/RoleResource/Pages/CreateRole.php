@@ -11,8 +11,6 @@ use Domain\Role\DataTransferObjects\RoleData;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class CreateRole extends CreateRecord
 {
@@ -30,9 +28,8 @@ class CreateRole extends CreateRecord
         ];
     }
 
-    /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateRoleAction::class)->execute(RoleData::fromArray($data)));
+        return app(CreateRoleAction::class)->execute(RoleData::fromArray($data));
     }
 }

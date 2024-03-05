@@ -11,7 +11,6 @@ use Domain\Menu\DataTransferObjects\MenuData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateMenu extends CreateRecord
 {
@@ -31,6 +30,6 @@ class CreateMenu extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateMenuAction::class)->execute(MenuData::fromArray($data)));
+        return app(CreateMenuAction::class)->execute(MenuData::fromArray($data));
     }
 }

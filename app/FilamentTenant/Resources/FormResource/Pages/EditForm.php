@@ -13,8 +13,6 @@ use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class EditForm extends EditRecord
 {
@@ -36,11 +34,9 @@ class EditForm extends EditRecord
 
     /**
      * @param  \Domain\Form\Models\Form  $record
-     *
-     * @throws Throwable
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateFormAction::class)->execute($record, FormData::fromArray($data)));
+        return app(UpdateFormAction::class)->execute($record, FormData::fromArray($data));
     }
 }

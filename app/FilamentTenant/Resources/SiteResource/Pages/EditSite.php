@@ -12,7 +12,6 @@ use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class EditSite extends EditRecord
 {
@@ -34,17 +33,12 @@ class EditSite extends EditRecord
     }
 
     /**
-     * Execute database transaction
-     * for updating collections.
-     *
      * @param  Site  $record
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
 
-        return DB::transaction(
-            fn () => app(UpdateSiteAction::class)
-                ->execute($record, SiteData::fromArray($data))
-        );
+        return app(UpdateSiteAction::class)
+            ->execute($record, SiteData::fromArray($data));
     }
 }

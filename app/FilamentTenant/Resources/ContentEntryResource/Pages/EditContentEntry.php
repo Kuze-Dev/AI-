@@ -314,9 +314,7 @@ class EditContentEntry extends EditRecord
     /** @param  \Domain\Content\Models\ContentEntry  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateContentEntryAction::class)
-                ->execute($record, ContentEntryData::fromArray($data))
-        );
+        return app(UpdateContentEntryAction::class)
+            ->execute($record, ContentEntryData::fromArray($data));
     }
 }
