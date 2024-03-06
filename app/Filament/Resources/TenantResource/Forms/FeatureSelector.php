@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Support\Forms;
+namespace App\Filament\Resources\TenantResource\Forms;
 
 use App\Features\GroupFeature;
 use App\Features\GroupFeatureExtra;

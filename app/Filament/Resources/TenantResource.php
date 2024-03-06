@@ -6,10 +6,10 @@ namespace App\Filament\Resources;
 
 use App\Features;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\Filament\Resources\TenantResource\Forms\FeatureSelector;
 use App\Filament\Resources\TenantResource\Pages;
 use App\Filament\Rules\CheckDatabaseConnection;
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
-use App\Filament\Support\Forms\FeatureSelector;
 use Domain\Tenant\Models\Tenant;
 use Filament\Facades\Filament;
 use Filament\Forms;
