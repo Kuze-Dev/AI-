@@ -11,7 +11,6 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Support as ServiceOrderSup
 use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\ButtonAction;
 use App\FilamentTenant\Support\SchemaFormBuilder;
-use App\FilamentTenant\Support\TextLabel;
 use App\Settings\ServiceSettings;
 use Closure;
 use Domain\Payments\Enums\PaymentRemark;
@@ -148,19 +147,9 @@ class EditServiceOrder extends EditRecord
                                 ->columnSpan(2)
                                 ->visible(fn (ServiceOrder $record) => $record->payment_type === PaymentPlanType::MILESTONE)
                                 ->schema([
-                                    //                            TextLabel::make('')
-                                    //                                ->label(trans('Payment Plan'))
-                                    //                                ->alignLeft()
-                                    //                                ->size('xl')
-                                    //                                ->weight('bold')
-                                    //                                ->inline()
-                                    //                                ->readOnly()
-                                    //                                ->columnSpan(2),
-
-                                    //                            Divider::make('')->columnSpan(2),
 
                                     Forms\Components\Repeater::make('payment_plan')
-                                        ->label(trans('Payment'))
+                                        ->translateLabel()
                                         ->columnSpan(2)
                                         ->reactive()
                                         ->itemLabel(function ($uuid, $component) {
@@ -169,6 +158,8 @@ class EditServiceOrder extends EditRecord
 
                                             return $index + 1;
                                         })
+                                        ->columns(4)
+                                        ->disabled()
                                         ->schema([
                                             Forms\Components\TextInput::make('description')
                                                 ->translateLabel()
@@ -177,6 +168,13 @@ class EditServiceOrder extends EditRecord
                                             Forms\Components\TextInput::make('amount')
                                                 ->label(fn (ServiceOrder $record) => $record->payment_value?->getLabel())
                                                 ->required(),
+
+                                            Forms\Components\Actions::make([
+                                                Forms\Components\Actions\Action::make('generate')
+                                                    ->translateLabel()
+                                                    ->successNotificationTitle('TODO:')
+                                                    ->action(fn (Forms\Components\Actions\Action $action) => $action->success()),
+                                            ]),
                                             //                                    Support\ButtonAction::make('Generate')
                                             //                                        ->execute(function (ServiceOrder $record, Closure $get, Closure $set, $component) {
                                             //                                            return Forms\Components\Actions\Action::make(trans('generate'))
@@ -208,9 +206,7 @@ class EditServiceOrder extends EditRecord
                                             //                                                ->modalWidth('xl');
                                             //                                        })
                                             //                                        ->columnSpan(1),
-                                        ])
-                                        ->columns(4)
-                                        ->disabled(),
+                                        ]),
 
                                 ]),
                         ])
