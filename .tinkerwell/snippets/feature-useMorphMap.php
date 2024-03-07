@@ -1,7 +1,7 @@
 <?php
 
 $featureModel = new class extends \Illuminate\Database\Eloquent\Model {
-    protected $fillable = ['value', 'scope'];
+    protected $fillable = ['scope'];
 
     public function getTable()
     {
