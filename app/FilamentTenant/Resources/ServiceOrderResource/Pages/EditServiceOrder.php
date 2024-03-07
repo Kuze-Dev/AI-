@@ -8,7 +8,6 @@ use Akaunting\Money\Money;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
 use App\FilamentTenant\Resources\ServiceOrderResource\Support as ServiceOrderSupport;
-use App\FilamentTenant\Support;
 use App\FilamentTenant\Support\ButtonAction;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\Settings\ServiceSettings;
@@ -171,60 +170,39 @@ class EditServiceOrder extends EditRecord
                                                 ->hintAction(
                                                     Forms\Components\Actions\Action::make('generate')
                                                         ->translateLabel()
-//                                                    ->disabled(function (ServiceOrder $record) use ($component) {
-//                                                        $state = $component->getContainer()->getState();
-//
-//                                                        if (is_null($record->payment_plan)) {
-//                                                            return true;
-//                                                        }
-//
-//                                                        $key = array_search($state['description'], array_column($record->payment_plan, 'description'));
-//
-//                                                        if ($key !== false) {
-//                                                            return $record->payment_plan[$key]['is_generated'];
-//                                                        }
-//
-//                                                        return true;
-//                                                    })
-                                                        ->successNotificationTitle('TODO:')
-                                                        ->action(function (Forms\Components\Actions\Action $action, ServiceOrder $record, $state): void {
-                                                            ray($state);
-                                                            //                                                        app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
+                                                        ->requiresConfirmation()
+                                                        ->disabled(function (ServiceOrder $record, Get $get) {
+
+                                                            if (is_null($record->payment_plan)) {
+                                                                return true;
+                                                            }
+
+                                                            $key = array_search($get('description'), array_column($record->payment_plan, 'description'));
+
+                                                            if ($key !== false) {
+                                                                return $record->payment_plan[$key]['is_generated'];
+                                                            }
+
+                                                            return true;
+                                                        })
+                                                        ->successNotificationTitle(trans('Milestone generated successfully'))
+                                                        ->action(function (Forms\Components\Actions\Action $action, ServiceOrder $record, int|float $state, Get $get): void {
+
+                                                            app(GenerateMilestonePipelineAction::class)
+                                                                ->execute(
+                                                                    new ServiceBillMilestonePipelineData(
+                                                                        $record,
+                                                                        [
+                                                                            'description' => $get('description'),
+                                                                            'amount' => $state,
+                                                                        ]
+                                                                    )
+                                                                );
+
                                                             $action->success();
                                                         }),
                                                 ),
 
-                                            //                                                                                Support\ButtonAction::make('Generate')
-                                            //                                                                                    ->execute(function (ServiceOrder $record, Closure $get, Closure $set, $component) {
-                                            //                                                                                        return Forms\Components\Actions\Action::make(trans('generate'))
-                                            //                                                                                            ->color('secondary')
-                                            //                                                                                            ->label('Generate')
-                                            //                                                                                            ->size('lg')
-                                            //                                                                                            ->action(function () use ($record, $component) {
-                                            //                                                                                                $state = $component->getContainer()->getState();
-                                            //
-                                            //                                                                                                app(GenerateMilestonePipelineAction::class)->execute(new ServiceBillMilestonePipelineData($record, $state));
-                                            //                                                                                            })
-                                            //                                                                                            ->modalHeading(trans('Edit Status'))
-                                            //                                                                                            ->disabled(function () use ($record, $component) {
-                                            //                                                                                                $state = $component->getContainer()->getState();
-                                            //
-                                            //                                                                                                if (is_null($record->payment_plan)) {
-                                            //                                                                                                    return true;
-                                            //                                                                                                }
-                                            //
-                                            //                                                                                                $key = array_search($state['description'], array_column($record->payment_plan, 'description'));
-                                            //
-                                            //                                                                                                if ($key !== false) {
-                                            //                                                                                                    return $record->payment_plan[$key]['is_generated'];
-                                            //
-                                            //                                                                                                }
-                                            //
-                                            //                                                                                                return true;
-                                            //                                                                                            })
-                                            //                                                                                            ->modalWidth('xl');
-                                            //                                                                                    })
-                                            //                                                                                    ->columnSpan(1),
                                         ]),
 
                                 ]),

@@ -382,16 +382,18 @@ class CreateServiceOrder extends CreateRecord
                                                             ->reactive()
                                                             ->schema([
                                                                 TextInput::make('description')
-                                                                    ->required()
                                                                     ->translateLabel()
+                                                                    ->required()
                                                                     ->distinct(),
 
                                                                 TextInput::make('amount')
+                                                                    ->translateLabel()
+                                                                    ->numeric()
                                                                     ->required(),
 
                                                                 Toggle::make('is_generated')
-                                                                    ->required()
                                                                     ->translateLabel()
+                                                                    ->required()
                                                                     ->visible(false)
                                                                     ->default(false),
                                                             ]),
