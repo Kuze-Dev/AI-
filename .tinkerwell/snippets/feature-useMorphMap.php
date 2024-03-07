@@ -6,7 +6,11 @@ use Illuminate\Support\Facades\DB;
 foreach (DB::table('features')->get() as $feature) {
     $scope = str($feature->scope)->explode('|');
 
-    if (!($scope[0] instanceof Model)) {
+    if (!class_exists($scope[0])) {
+        continue;
+    }
+
+    if (!(new $scope[0]) instanceof Model) {
         continue;
     }
 
