@@ -186,6 +186,7 @@ class AppServiceProvider extends ServiceProvider
                 : config('catpcha.credentials')
         );
 
+        Feature::useMorphMap();
         Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
         Feature::discover('App\\Features\\Customer', app_path('Features/Customer'));
