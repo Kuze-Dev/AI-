@@ -34,7 +34,7 @@ final readonly class GroupFeatureExtra
     {
         return collect($this->extra)
             ->map(fn (string $extra) => app($extra))
-            ->mapWithKeys(fn (FeatureContract $extra) => [$extra->name => $extra->getLabel()])
+            ->mapWithKeys(fn (FeatureContract $extra) => [$extra::class => $extra->getLabel()])
             ->toArray();
     }
 }

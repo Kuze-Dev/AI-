@@ -46,6 +46,6 @@ final readonly class GroupFeature
             return false;
         }
 
-        return Feature::for($tenant)->active($this->getFeature()->name);
+        return Feature::for($tenant)->active($this->getFeature()::class);
     }
 }
