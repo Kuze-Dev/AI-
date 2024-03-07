@@ -27,21 +27,11 @@ foreach ($featureModel->get() as $feature) {
             'name' => $feature->name,
             'scope' => $newScope
         ])
-        ->first();
+        ->delete();
 
-    if (filled($existFeature)) {
-
-        $existFeature->update([
-            'value' => $feature->value
-        ]);
-
-        $feature->delete();
-
-    } else {
-        $feature->update([
-            'scope' => $newScope
-        ]);
-    }
+    $feature->update([
+        'scope' => $newScope
+    ]);
 }
 
 echo 'done!';
