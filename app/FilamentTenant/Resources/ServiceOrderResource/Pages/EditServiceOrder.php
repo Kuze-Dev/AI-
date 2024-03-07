@@ -8,19 +8,20 @@ use Akaunting\Money\Money;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceOrderResource;
 use App\FilamentTenant\Resources\ServiceOrderResource\Support as ServiceOrderSupport;
-use App\FilamentTenant\Support\ButtonAction;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\Settings\ServiceSettings;
-use Closure;
 use Domain\Payments\Enums\PaymentRemark;
+use Domain\Payments\Enums\PaymentStatus;
+use Domain\Payments\Models\Payment;
 use Domain\ServiceOrder\Actions\GenerateMilestonePipelineAction;
 use Domain\ServiceOrder\Actions\GetTaxableInfoAction;
-use Domain\ServiceOrder\Actions\ServiceOrderBankTransferAction;
 use Domain\ServiceOrder\Actions\UpdateServiceBillAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceBillData;
 use Domain\ServiceOrder\Enums\PaymentPlanType;
+use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
+use Domain\ServiceOrder\Events\AdminServiceOrderBankPaymentEvent;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
 use Domain\ServiceOrder\Exceptions\MissingServiceSettingsConfigurationException;
@@ -32,14 +33,12 @@ use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Throwable;
 
 /**
  * @property-read \Domain\ServiceOrder\Models\ServiceOrder $record
@@ -451,8 +450,109 @@ class EditServiceOrder extends EditRecord
                                         ->translatedFormat('F d, Y g:i A')
                                 ),
 
-                            //                                    self::ProofOfPaymentButton(),
-                            //                                    Divider::make(''),
+                            Forms\Components\Group::make(fn (ServiceOrder $record) => [
+                                Forms\Components\Actions::make([
+                                    Forms\Components\Actions\Action::make('view_proof_of_payment')
+                                        ->translateLabel()
+                                        ->icon('heroicon-s-eye')
+                                        ->outlined()
+                                        ->slideOver()
+                                        ->modalHeading(trans('Proof of Payment'))
+                                        ->modalWidth('lg')
+                                        ->form([
+                                            Forms\Components\Textarea::make('customer_message')
+                                                ->translateLabel()
+                                                ->formatStateUsing(fn () => $record->payments->value('customer_message'))
+                                                ->disabled(),
+
+                                            Forms\Components\SpatieMediaLibraryFileUpload::make('customer_upload')
+                                                ->translateLabel()
+                                                ->model(fn () => $record->payments[0])
+                                                ->collection('image')
+                                                ->disabled()
+                                                ->formatStateUsing(
+                                                    fn (Payment $record) => $record->getMedia('image')
+                                                        ->mapWithKeys(fn (Media $media) => [$media->uuid => $media->uuid])
+                                                        ->toArray()
+                                                ),
+
+                                            Forms\Components\ToggleButtons::make('payment_remarks')
+                                                ->label(trans('Status'))
+                                                ->inline()
+                                                ->required()
+                                                ->options(PaymentRemark::class)
+                                                ->enum(PaymentRemark::class),
+
+                                            Forms\Components\Textarea::make('admin_message')
+                                                ->translateLabel()
+                                                ->maxLength(255)
+                                                ->formatStateUsing(fn () => $record->payments->value('admin_message')),
+                                        ])
+                                        ->successNotificationTitle(trans('Proof of payment updated successfully'))
+                                        ->action(function (Forms\Components\Actions\Action $action, array $data) use ($record) {
+                                            $paymentRemark = PaymentRemark::tryFrom($data['payment_remarks']);
+                                            unset($data['payment_remarks']);
+
+                                            /** @var \Domain\Payments\Models\Payment $payment */
+                                            $payment = $record->latestPayment();
+
+                                            $result = $payment->update([
+                                                'remarks' => $paymentRemark->value,
+                                                'admin_message' => $data['admin_message'],
+                                            ]);
+
+                                            if (! $result) {
+                                                $action
+                                                    ->failureNotificationTitle(trans('Invalid Data!'))
+                                                    ->failure();
+                                                $action->halt(shouldRollBackDatabaseTransaction: true);
+                                            }
+
+                                            if ($paymentRemark === PaymentRemark::DECLINED) {
+                                                $payment->update([
+                                                    'status' => 'pending',
+                                                ]);
+
+                                                $record->update([
+                                                    'status' => ServiceOrderStatus::FORPAYMENT,
+                                                ]);
+
+                                                $action->success();
+
+                                                return;
+                                            }
+
+                                            $payment->update([
+                                                'status' => PaymentStatus::PAID,
+                                            ]);
+
+                                            if ($record->serviceBills->first()?->status === ServiceBillStatus::PENDING) {
+                                                $record->update([
+                                                    'status' => ServiceOrderStatus::FORPAYMENT,
+                                                ]);
+                                            }
+
+                                            try {
+                                                event(new AdminServiceOrderBankPaymentEvent(
+                                                    $record,
+                                                    $paymentRemark->value,
+                                                    $payment
+                                                ));
+                                            } catch (ModelNotFoundException $e) {
+                                                $action
+                                                    ->failureNotificationTitle(trans($e->getMessage()))
+                                                    ->failure();
+                                                $action->halt(shouldRollBackDatabaseTransaction: true);
+                                            }
+
+                                            $action->success();
+                                        }),
+                                ])
+                                    ->visible(fn (ServiceOrder $record) => $record->status === ServiceOrderStatus::FOR_APPROVAL)
+                                    ->columnSpanFull()
+                                    ->fullWidth()
+                                    ->alignCenter(),
+                            ]),
 
                             Forms\Components\Placeholder::make(trans('Service Price'))
                                 ->inlineLabel()
@@ -517,100 +617,5 @@ class EditServiceOrder extends EditRecord
 
         ])
             ->columns(3);
-    }
-
-    private static function ProofOfPaymentButton(): ButtonAction
-    {
-        return ButtonAction::make('proof_of_payment')
-            ->disableLabel()
-            ->execute(function (ServiceOrder $record, Set $set) {
-                $footerActions = self::showProofOfPaymentActions($record, $set);
-
-                return $footerActions;
-            })
-            ->fullWidth()
-            ->size('md')
-            ->hidden(function (ServiceOrder $record) {
-
-                if ($record->status === ServiceOrderStatus::FOR_APPROVAL) {
-                    return false;
-                }
-
-                return true;
-            });
-    }
-
-    private static function showProofOfPaymentActions(ServiceOrder $record, Closure $set): Forms\Components\Actions\Action
-    {
-        $order = $record;
-
-        return Forms\Components\Actions\Action::make('proof_of_payment')
-            ->color('gray')
-            ->label(trans('View Proof of payment'))
-            ->size('sm')
-            ->action(function (array $data) use ($record, $set) {
-                app(ServiceOrderBankTransferAction::class)->execute($data, $record, $set);
-            })
-            ->modalHeading(trans('Proof of Payment'))
-            ->modalWidth('lg')
-            ->form([
-                Forms\Components\Textarea::make('customer_message')
-                    ->label(trans('Customer Message'))
-                    ->formatStateUsing(function () use ($order) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
-
-                        return $payment->customer_message;
-                    })->disabled(),
-                Forms\Components\FileUpload::make('bank_proof_image')
-                    ->label(trans('Customer Upload'))
-                    ->formatStateUsing(function () use ($record) {
-                        return $record->latestPayment()?->getMedia('image')
-                            ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                            ->toArray() ?? [];
-                    })
-                    ->hidden(function () use ($record) {
-                        return (bool) (empty($record->latestPayment()?->getFirstMediaUrl('image')));
-                    })
-                    ->image()
-                    ->getUploadedFileUrlUsing(static function (
-                        Forms\Components\FileUpload $component,
-                        string $file
-                    ): ?string {
-                        $mediaClass = config('media-library.media_model', Media::class);
-
-                        /** @var ?Media $media */
-                        $media = $mediaClass::findByUuid($file);
-
-                        if ($component->getVisibility() === 'private') {
-                            try {
-                                return $media?->getTemporaryUrl(now()->addMinutes(5));
-                            } catch (Throwable) {
-                            }
-                        }
-
-                        return $media?->getUrl();
-                    })->disabled(),
-                Forms\Components\Select::make('payment_remarks')
-                    ->label('Status')
-                    ->required()
-                    ->options(
-                        collect(PaymentRemark::cases())
-                            ->mapWithKeys(fn (PaymentRemark $target) => [$target->value => Str::headline($target->value)])
-                            ->toArray()
-                    )
-                    ->enum(PaymentRemark::class),
-                Forms\Components\Textarea::make('message')
-                    ->maxLength(255)
-                    ->label(trans('Admin Message'))
-                    ->formatStateUsing(function () use ($order) {
-                        /** @var \Domain\Payments\Models\Payment $payment */
-                        $payment = $order->payments->first();
-
-                        return $payment->admin_message;
-                    }),
-            ])
-            ->slideOver()
-            ->icon('heroicon-s-eye');
     }
 }
