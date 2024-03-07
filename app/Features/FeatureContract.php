@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Features;
 
 /**
- * @phpstan-param string $name
+ * @property-read string $name
  */
 interface FeatureContract
 {
