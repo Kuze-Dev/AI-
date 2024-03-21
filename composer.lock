@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b421d2183249cba3d276b76e2a381965",
+    "content-hash": "61a0a8e7a1a54867dd9c238aa86eaed6",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -2260,28 +2260,28 @@
         },
         {
             "name": "flowframe/laravel-trend",
-            "version": "v0.1.5",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Flowframe/laravel-trend.git",
-                "reference": "bc43bf7840ff60aca39e856ad96f5e990fac83d7"
+                "reference": "bae1232325a59a7c9e99a372c80afab82309503b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Flowframe/laravel-trend/zipball/bc43bf7840ff60aca39e856ad96f5e990fac83d7",
-                "reference": "bc43bf7840ff60aca39e856ad96f5e990fac83d7",
+                "url": "https://api.github.com/repos/Flowframe/laravel-trend/zipball/bae1232325a59a7c9e99a372c80afab82309503b",
+                "reference": "bae1232325a59a7c9e99a372c80afab82309503b",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "^8.37|^9|^10.0",
-                "php": "^8.0",
+                "illuminate/contracts": "^8.37|^9|^10.0|^11.0",
+                "php": "^8.2",
                 "spatie/laravel-package-tools": "^1.4.3"
             },
             "require-dev": {
-                "nunomaduro/collision": "^5.3|^6.1",
-                "orchestra/testbench": "^6.15|^7.0|^8.0",
-                "pestphp/pest": "^1.18",
-                "pestphp/pest-plugin-laravel": "^1.1",
+                "nunomaduro/collision": "^5.3|^6.1|^8.0",
+                "orchestra/testbench": "^6.15|^7.0|^8.0|^9.0",
+                "pestphp/pest": "^1.18|^2.34",
+                "pestphp/pest-plugin-laravel": "^1.1|^2.3",
                 "spatie/laravel-ray": "^1.23",
                 "vimeo/psalm": "^4.8|^5.6"
             },
@@ -2322,7 +2322,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Flowframe/laravel-trend/issues",
-                "source": "https://github.com/Flowframe/laravel-trend/tree/v0.1.5"
+                "source": "https://github.com/Flowframe/laravel-trend/tree/v0.2.0"
             },
             "funding": [
                 {
@@ -2330,7 +2330,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-03-22T20:51:43+00:00"
+            "time": "2024-03-14T13:45:40+00:00"
         },
         {
             "name": "fruitcake/php-cors",
