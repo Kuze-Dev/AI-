@@ -30,7 +30,7 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
             ->subject(trans('Register Invitation'))
             ->line(
                 trans(
-                    'Welcome to [:site]!
+                    'Welcome to :site!
             We\'re thrilled to have you on board.
             If you have any questions or need assistance,
             feel free to reach out.
