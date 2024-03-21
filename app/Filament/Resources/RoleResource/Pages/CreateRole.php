@@ -38,6 +38,6 @@ class CreateRole extends CreateRecord
     /** @throws Throwable */
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateRoleAction::class)->execute(new RoleData(...$data)));
+        return DB::transaction(fn () => app(CreateRoleAction::class)->execute(RoleData::fromArray($data)));
     }
 }

@@ -19,6 +19,7 @@ class PublishedPageDraftAction
         protected CreateBlockContentAction $createBlockContent,
         protected UpdateBlockContentAction $updateBlockContent,
         protected DeleteBlockContentAction $deleteBlockContent,
+        protected TransferBlockContentToPageAction $transferBlockToPageAction,
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
@@ -28,6 +29,7 @@ class PublishedPageDraftAction
 
     public function execute(Page $page, Page $pageDraft, PageData $pageData): Page
     {
+        $parentPage = $page;
 
         $page->update([
             'author_id' => $pageData->author_id,
@@ -48,13 +50,15 @@ class PublishedPageDraftAction
         $blockContentIds = array_map(
             fn ($blockContentData) => ($blockContent = $page->blockContents->firstWhere('id', $blockContentData->id))
                 ? $this->updateBlockContent->execute($blockContent, $blockContentData)->id
-                : $this->createBlockContent->execute($page, $blockContentData)->id,
+                : ($blockContentData->id != null ? $this->transferBlockToPageAction->execute($parentPage, $blockContentData)->id : $this->createBlockContent->execute($page, $blockContentData)->id),
             $pageData->block_contents
         );
 
         BlockContent::setNewOrder($blockContentIds);
 
         $this->createOrUpdateRouteUrl->execute($page, $pageData->route_url_data);
+
+        $pageDraft->refresh();
 
         $this->deletePage->execute($pageDraft);
 

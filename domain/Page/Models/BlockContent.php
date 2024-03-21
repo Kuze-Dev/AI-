@@ -45,6 +45,7 @@ class BlockContent extends Model implements Sortable
 
     protected $fillable = [
         'block_id',
+        'page_id',
         'data',
         'order',
     ];
@@ -56,7 +57,7 @@ class BlockContent extends Model implements Sortable
     /** @return BelongsTo<Block, self> */
     public function block(): BelongsTo
     {
-        return $this->belongsTo(Block::class);
+        return $this->belongsTo(Block::class)->with(['blueprint']);
     }
 
     /** @return MorphMany<BlueprintData> */
