@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Concerns;
 
-use App\Filament\Pages\Settings\BaseSettings;
+use App\Filament\Clusters\Settings\Pages\BaseSettings;
 use Carbon\CarbonInterval;
 use DateInterval;
 use Filament\Forms\ComponentContainer;
