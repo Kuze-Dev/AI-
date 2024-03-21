@@ -10,6 +10,7 @@ use App\FilamentTenant\Pages\ConfirmPassword;
 use App\FilamentTenant\Pages\EditProfile;
 use App\FilamentTenant\Pages\Login;
 use App\FilamentTenant\Widgets\DeployStaticSite;
+use App\FilamentTenant\Widgets\Report as ReportWidget;
 use App\Settings\SiteSettings;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
@@ -63,6 +64,13 @@ class TenantPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 DeployStaticSite::class,
+                ReportWidget\TotalSales::class,
+                ReportWidget\ConversionRate::class,
+                ReportWidget\MostSoldProduct::class,
+                ReportWidget\LeastSoldProduct::class,
+                ReportWidget\TotalOrder::class,
+                ReportWidget\AverageOrderValue::class,
+                ReportWidget\MostFavoriteProduct::class,
             ])
             ->navigationGroups([
                 NavigationGroup::make()->label(fn () => trans('Shop Configuration')),

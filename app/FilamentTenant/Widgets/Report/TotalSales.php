@@ -9,17 +9,24 @@ use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
-use Filament\Widgets\BarChartWidget;
+use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 
-class TotalSales extends BarChartWidget
+class TotalSales extends ChartWidget
 {
     protected static ?string $heading = 'Total sales';
 
     public ?string $filter = 'perMonth';
 
+    protected int|string|array $columnSpan = 'full';
+
     protected static ?string $pollingInterval = null;
+
+    protected function getType(): string
+    {
+        return 'bar';
+    }
 
     protected function getFilters(): ?array
     {

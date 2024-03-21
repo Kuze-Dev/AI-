@@ -8,17 +8,22 @@ use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Order\Models\Order;
-use Filament\Widgets\BarChartWidget;
+use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 
-class AverageOrderValue extends BarChartWidget
+class AverageOrderValue extends ChartWidget
 {
     protected static ?string $heading = 'Average Order Value';
 
     protected static ?string $pollingInterval = null;
 
     public ?string $filter = 'perMonth';
+
+    protected function getType(): string
+    {
+        return 'bar';
+    }
 
     protected function getFilters(): ?array
     {

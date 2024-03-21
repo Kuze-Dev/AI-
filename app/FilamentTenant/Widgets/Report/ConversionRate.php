@@ -9,17 +9,24 @@ use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
-use Filament\Widgets\LineChartWidget;
+use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 
-class ConversionRate extends LineChartWidget
+class ConversionRate extends ChartWidget
 {
     protected static ?string $heading = 'Conversion Rate';
 
     protected static ?string $pollingInterval = null;
 
     public ?string $filter = 'perMonth';
+
+    protected int|string|array $columnSpan = 'full';
+
+    protected function getType(): string
+    {
+        return 'line';
+    }
 
     protected function getFilters(): ?array
     {
