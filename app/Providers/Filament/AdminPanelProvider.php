@@ -71,7 +71,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
-            ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
+//            ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
+            ->spa()
             ->maxContentWidth(MaxWidth::Full)
             ->databaseTransactions()
             ->middleware([
