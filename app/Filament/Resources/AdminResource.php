@@ -56,10 +56,12 @@ class AdminResource extends Resource
             ->schema([
                 Forms\Components\Section::make([
                     Forms\Components\TextInput::make('first_name')
+                        ->translateLabel()
                         ->required(),
                     Forms\Components\TextInput::make('last_name')
                         ->required(),
                     Forms\Components\TextInput::make('email')
+                        ->translateLabel()
                         ->email()
                         ->rules(Rule::email())
                         ->unique(ignoreRecord: true)
@@ -67,7 +69,9 @@ class AdminResource extends Resource
                         ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
                         ->disabled(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email')),
                     Forms\Components\TextInput::make('password')
+                        ->translateLabel()
                         ->password()
+                        ->revealable()
                         ->required()
                         ->rule(Password::default())
                         ->helperText(
@@ -77,9 +81,11 @@ class AdminResource extends Resource
                         )
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')
+                        ->translateLabel()
                         ->required()
                         ->password()
                         ->same('password')
+                        ->revealable()
                         ->dehydrated(false)
                         ->rule(Password::default())
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
@@ -94,25 +100,29 @@ class AdminResource extends Resource
                     Forms\Components\Section::make(trans('Status'))
                         ->schema([
                             Forms\Components\Toggle::make('active')
+                                ->translateLabel()
                                 ->default(true),
                         ]),
                     Forms\Components\Section::make(trans('Access'))
                         ->schema([
                             Forms\Components\Select::make('roles')
-                                ->multiple()
-                                ->preload()
+                                ->translateLabel()
                                 ->relationship(
                                     titleAttribute: 'name',
                                     modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
-                                        ->where('name', '!=', config('domain.role.super_admin'))
-                                ),
+                                )
+                                ->multiple()
+                                ->preload()
+                                ->searchable(),
                             Forms\Components\Select::make('permissions')
-                                ->multiple()
-                                ->preload()
+                                ->translateLabel()
                                 ->relationship(
                                     titleAttribute: 'name',
                                     modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
-                                ),
+                                )
+                                ->multiple()
+                                ->preload()
+                                ->searchable(),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
@@ -126,16 +136,20 @@ class AdminResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('full_name')
+                    ->translateLabel()
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(['first_name', 'last_name'])
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->tooltip(fn ($state) => $state),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
                     ->getStateUsing(fn (Admin $record): bool => $record->hasVerifiedEmail())
                     ->boolean(),
                 Tables\Columns\IconColumn::make('active')
+                    ->translateLabel()
                     ->boolean(),
                 Tables\Columns\TextColumn::make('roles.name')
+                    ->translateLabel()
                     ->badge(),
 
                 Tables\Columns\TextColumn::make('updated_at')
@@ -152,6 +166,7 @@ class AdminResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('role')
+                    ->translateLabel()
                     ->options(
                         app(config('permission.models.role'))
                             ->pluck('name', 'id')
@@ -273,7 +288,7 @@ class AdminResource extends Resource
                         ]
                     ),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getPages(): array
