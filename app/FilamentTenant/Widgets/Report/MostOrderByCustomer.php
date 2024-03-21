@@ -6,13 +6,18 @@ namespace App\FilamentTenant\Widgets\Report;
 
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use Domain\Order\Models\OrderLine;
-use Filament\Widgets\PieChartWidget;
+use Filament\Widgets\ChartWidget;
 
-class MostOrderByCustomer extends PieChartWidget
+class MostOrderByCustomer extends ChartWidget
 {
     protected static ?string $heading = 'Most Order By Customer';
 
     protected static ?string $pollingInterval = null;
+
+    protected function getType(): string
+    {
+        return 'pie';
+    }
 
     protected function getData(): array
     {
