@@ -332,6 +332,7 @@ class ProductResource extends Resource
 
                 Tables\Actions\ExportBulkAction::make()
                     ->exporter(ProductExporter::class)
+                    ->columnMapping(false)
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary'),
 

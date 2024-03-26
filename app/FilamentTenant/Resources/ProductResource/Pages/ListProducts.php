@@ -46,6 +46,7 @@ class ListProducts extends ListRecords
 
             Actions\ExportAction::make('export')
                 ->exporter(ProductExporter::class)
+                ->columnMapping(false)
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('primary'),
 
