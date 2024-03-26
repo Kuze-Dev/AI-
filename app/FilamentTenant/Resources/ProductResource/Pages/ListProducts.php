@@ -56,7 +56,9 @@ class ListProducts extends ListRecords
             ExportAction::make()
                 ->model(Product::class)
                 ->queue()
-                ->query(fn (Builder $query) => $query->with('productVariants')->latest())
+                ->query(
+                    fn (Builder $query) => $query->with('productVariants')->latest()
+                )
                 ->mapUsing(
                     [
                         'product_id', 'is_variant', 'variant_id', 'name', 'variant_combination', 'sku',
