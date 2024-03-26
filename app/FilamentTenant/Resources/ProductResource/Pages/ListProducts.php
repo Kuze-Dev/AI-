@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
+use App\Features\ECommerce\ProductBatchUpdate;
 use App\FilamentTenant\Resources\ProductResource;
 use App\FilamentTenant\Support\ImportProductBatchUpdateAction;
 use App\FilamentTenant\Support\ImportProductVariantAction;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
+use Domain\Product\Exports\ProductExporter;
+use Domain\Product\Imports\ProductBatchUpdateImporter;
+use Domain\Product\Imports\ProductImporter;
+use Domain\Product\Imports\ProductVariantImporter;
 use Domain\Product\Models\Product;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use HalcyonAgile\FilamentExport\Actions\ExportAction;
@@ -21,13 +27,34 @@ class ListProducts extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        // TODO: import export
         return [
+            //            Actions\ImportAction::make()
+            //                ->importer(ProductImporter::class)
+            //                ->icon('heroicon-o-arrow-up-tray')
+            //                ->color('primary'),
+
+            Actions\ImportAction::make()
+                ->importer(ProductVariantImporter::class)
+                ->icon('heroicon-o-arrow-up-tray')
+                ->color('primary'),
+
+            Actions\ImportAction::make('import_batch_update')
+                ->label(trans('Import batch update'))
+                ->modalHeading(trans('Import batch update'))
+                ->importer(ProductBatchUpdateImporter::class)
+                ->icon('heroicon-o-arrow-up-tray')
+                ->color('primary')
+                ->visible(fn () => TenantFeatureSupport::active(ProductBatchUpdate::class)),
+
+            Actions\ExportAction::make('export')
+                ->exporter(ProductExporter::class)
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('primary'),
+
             Actions\CreateAction::make(),
         ];
 
         return [
-            // ImportProductAction::proceed(),
             ImportProductVariantAction::proceed(),
             ImportProductBatchUpdateAction::proceed(),
             ExportAction::make()
