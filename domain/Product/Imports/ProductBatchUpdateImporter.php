@@ -8,10 +8,10 @@ use Domain\Product\Actions\UpdateProductAction;
 use Domain\Product\Actions\UpdateProductVariantFromCsvAction;
 use Domain\Product\DataTransferObjects\ProductData;
 use Domain\Product\DataTransferObjects\ProductVariantData;
-use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
+use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
-use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class ProductBatchUpdateImporter extends Importer
 {
@@ -63,21 +63,21 @@ class ProductBatchUpdateImporter extends Importer
             ImportColumn::make('retail_price')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'numeric', 'mn:0.1'])
+                ->rules(['required', 'numeric', 'min:0.1'])
                 ->exampleHeader('Retail price')
                 ->example('1.1'),
 
             ImportColumn::make('selling_price')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'numeric', 'mn:0.1'])
+                ->rules(['required', 'numeric', 'min:0.1'])
                 ->exampleHeader('Selling price')
                 ->example('1.1'),
 
             ImportColumn::make('stock')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'numeric', 'mn:0'])
+                ->rules(['required', 'numeric', 'min:0'])
                 ->exampleHeader('Stock')
                 ->example('1'),
 
@@ -86,6 +86,60 @@ class ProductBatchUpdateImporter extends Importer
                 ->rules(['required', new Enum(Status::class)])
                 ->exampleHeader('Status')
                 ->example(Status::INACTIVE->value),
+
+            ImportColumn::make('is_digital_product')
+                ->rules(['nullable', Rule::in(['yes', 'no'])])
+                ->exampleHeader('Is digital product')
+                ->example('yes'),
+
+            ImportColumn::make('is_featured')
+                ->rules(['nullable', Rule::in(['yes', 'no'])])
+                ->exampleHeader('Is featured')
+                ->example('yes'),
+
+            ImportColumn::make('is_special_offer')
+                ->rules(['nullable', Rule::in(['yes', 'no'])])
+                ->exampleHeader('Is special offer')
+                ->example('yes'),
+
+            ImportColumn::make('allow_customer_remarks')
+                ->rules(['nullable', Rule::in(['yes', 'no'])])
+                ->exampleHeader('Allow customer remarks')
+                ->example('yes'),
+
+            ImportColumn::make('allow_stocks')
+                ->rules(['nullable', Rule::in(['yes', 'no'])])
+                ->exampleHeader('Allow stocks')
+                ->example('yes'),
+
+            ImportColumn::make('allow_guest_purchase')
+                ->rules(['nullable', Rule::in(['yes', 'no'])])
+                ->exampleHeader('Allow guest purchase')
+                ->example('yes'),
+
+            ImportColumn::make('weight')
+                ->numeric()
+                ->rules(['nullable', 'numeric', 'min:0.1'])
+                ->exampleHeader('Weight')
+                ->example('1.1'),
+
+            ImportColumn::make('length')
+                ->numeric()
+                ->rules(['nullable', 'numeric', 'min:1'])
+                ->exampleHeader('Length')
+                ->example('1'),
+
+            ImportColumn::make('width')
+                ->numeric()
+                ->rules(['nullable', 'numeric', 'min:1'])
+                ->exampleHeader('Width')
+                ->example('1'),
+
+            ImportColumn::make('height')
+                ->numeric()
+                ->rules(['nullable', 'numeric', 'min:1'])
+                ->exampleHeader('Height')
+                ->example('1'),
         ];
     }
 
@@ -95,59 +149,53 @@ class ProductBatchUpdateImporter extends Importer
         return new Product();
     }
 
+    /**
+     * @throws RowImportFailedException
+     * @throws Throwable
+     */
     public function saveRecord(): void
     {
-        DB::beginTransaction();
+        DB::transaction(function () {
+            $row = $this->data;
+            if ($row['is_variant'] === 'yes' && $row['variant_id'] && $row['variant_combination']) {
+                self::processVariantBatchUpdate($row);
+            } elseif ($row['is_variant'] === 'no' && $row['product_id'] && $row['name']) {
+                self::processProductBatchUpdate($row);
+            }
 
-        $row = $this->data;
-
-        // Product Variant Batch Update
-        if ($row['is_variant'] === Decision::YES->value && $row['variant_id'] && $row['variant_combination']) {
-            self::processVariantBatchUpdate($row);
-        }
-
-        // Product Batch Update
-        if ($row['is_variant'] === Decision::NO->value && $row['product_id'] && $row['name']) {
-            self::processProductBatchUpdate($row);
-        }
-
-        // Fail case in
-        throw ValidationException::withMessages([
-            'row_error' => trans("The data from row is insufficient. System can't process it."),
-        ]);
+            throw new RowImportFailedException(
+                trans("The data from row is insufficient. System can't process it."),
+            );
+        });
     }
 
+    /**
+     * @throws RowImportFailedException
+     */
     private static function processVariantBatchUpdate(array $row): void
     {
         $decodedPayloadVariantCombination = json_decode($row['variant_combination'], true);
 
         $productVariant = ProductVariant::find($row['variant_id']);
 
-        if (! $productVariant instanceof ProductVariant) {
-            throw ValidationException::withMessages([
-                'variant_id' => trans('There is no matching variant record for the Variant ID.'),
-            ]);
+        if ($decodedPayloadVariantCombination !== $productVariant->combination) {
+            throw new RowImportFailedException(
+                trans("Row with Variant ID {$row['variant_id']} has mismatch combination."),
+            );
         }
 
-        // If variant combination is matched
-        if ($decodedPayloadVariantCombination != $productVariant->combination) {
-            throw ValidationException::withMessages([
-                'variant_combination' => trans("Row with Variant ID {$row['variant_id']} has mismatch combination."),
-            ]);
-        }
-
-        if ($row['product_id'] != $productVariant->product_id) {
-            throw ValidationException::withMessages([
-                'product_id' => trans("Assigned product to row's variant is not matched with the row's product ID."),
-            ]);
+        if ($row['product_id'] !== $productVariant->product_id) {
+            throw new RowImportFailedException(
+                trans("Assigned product to row's variant is not matched with the row's product ID."),
+            );
         }
 
         $product = Product::find($productVariant->product_id);
 
         if (! $product instanceof Product) {
-            throw ValidationException::withMessages([
-                'product_id' => trans('There is no matching product record for the Product ID.'),
-            ]);
+            throw new RowImportFailedException(
+                trans('There is no matching product record for the Product ID.'),
+            );
         }
 
         $variantData = [
@@ -156,7 +204,7 @@ class ProductBatchUpdateImporter extends Importer
             'combination' => $decodedPayloadVariantCombination,
             'retail_price' => $row['retail_price'],
             'selling_price' => $row['selling_price'],
-            'status' => $row['status'] == 'active' ? true : false,
+            'status' => $row['status'] === 'active',
             'stock' => $row['stock'],
             'product_id' => $row['product_id'],
         ];
@@ -165,14 +213,17 @@ class ProductBatchUpdateImporter extends Importer
             ->execute($productVariant, ProductVariantData::fromArray($variantData));
     }
 
+    /**
+     * @throws RowImportFailedException
+     */
     private static function processProductBatchUpdate(array $row): void
     {
         $foundProduct = Product::whereId($row['product_id'])->with(['productOptions.productOptionValues.media', 'productVariants', 'media'])->first();
 
         if (! $foundProduct instanceof Product) {
-            throw ValidationException::withMessages([
-                'product_id' => trans('There is no matching product record for the Product ID.'),
-            ]);
+            throw new RowImportFailedException(
+                trans('There is no matching product record for the Product ID.'),
+            );
         }
 
         $data = [
@@ -188,30 +239,30 @@ class ProductBatchUpdateImporter extends Importer
             'meta_data' => ['title' => $row['name']],
         ];
 
-        $data['product_options'] = $foundProduct->productOptions->map(function ($option) {
-            return [
+        $data['product_options'] = $foundProduct->productOptions
+            ->map(fn ($option) => [
                 'id' => $option->id,
                 'name' => $option->name,
                 'slug' => $option->slug,
                 'is_custom' => $option->is_custom,
-                'productOptionValues' => $option->productOptionValues->map(function ($optionValue) {
-                    $optionValueToArray = $optionValue->toArray();
+                'productOptionValues' => $option->productOptionValues
+                    ->map(function ($optionValue) {
+                        $optionValueToArray = $optionValue->toArray();
 
-                    return [
-                        'id' => $optionValueToArray['id'],
-                        'name' => $optionValueToArray['name'],
-                        'slug' => $optionValueToArray['slug'],
-                        'product_option_id' => $optionValueToArray['product_option_id'],
-                        'icon_type' => $optionValueToArray['data']['icon_type'] ?? 'text',
-                        'icon_value' => $optionValueToArray['data']['icon_value'] ?? null,
-                        'images' => array_map(fn ($image) => $image['uuid'], $optionValueToArray['media']),
-                    ];
-                })->toArray(),
-            ];
-        })->toArray();
+                        return [
+                            'id' => $optionValueToArray['id'],
+                            'name' => $optionValueToArray['name'],
+                            'slug' => $optionValueToArray['slug'],
+                            'product_option_id' => $optionValueToArray['product_option_id'],
+                            'icon_type' => $optionValueToArray['data']['icon_type'] ?? 'text',
+                            'icon_value' => $optionValueToArray['data']['icon_value'] ?? null,
+                            'images' => array_map(fn ($image) => $image['uuid'], $optionValueToArray['media']),
+                        ];
+                    })->toArray(),
+            ])->toArray();
 
-        $data['product_variants'] = $foundProduct->productVariants->map(function ($variant) {
-            return [
+        $data['product_variants'] = $foundProduct->productVariants
+            ->map(fn ($variant) => [
                 'id' => $variant->id,
                 'retail_price' => $variant->retail_price,
                 'selling_price' => $variant->selling_price,
@@ -219,18 +270,20 @@ class ProductBatchUpdateImporter extends Importer
                 'sku' => $variant->sku,
                 'status' => $variant->status,
                 'combination' => $variant->combination,
-            ];
-        })->toArray();
+            ])->toArray();
 
         app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsvBulkUpdate($data));
     }
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your product import has completed and '.number_format($import->successful_rows).' '.str('row')->plural($import->successful_rows).' imported.';
+        $body = 'Your product/variant batch update import has completed and '.
+            number_format($import->successful_rows).' '.
+            str('row')->plural($import->successful_rows).' imported.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' '.number_format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to import.';
+            $body .= ' '.number_format($failedRowsCount).' '.
+                str('row')->plural($failedRowsCount).' failed to import.';
         }
 
         return $body;

@@ -6,7 +6,6 @@ namespace App\FilamentTenant\Resources\ProductResource\Pages;
 
 use App\Features\ECommerce\ProductBatchUpdate;
 use App\FilamentTenant\Resources\ProductResource;
-use App\FilamentTenant\Support\ImportProductBatchUpdateAction;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Exports\ProductExporter;
@@ -54,7 +53,6 @@ class ListProducts extends ListRecords
         ];
 
         return [
-            ImportProductBatchUpdateAction::proceed(),
             ExportAction::make()
                 ->model(Product::class)
                 ->queue()
