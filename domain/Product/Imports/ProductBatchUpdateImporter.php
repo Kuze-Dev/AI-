@@ -162,11 +162,11 @@ class ProductBatchUpdateImporter extends Importer
                 self::processVariantBatchUpdate($row);
             } elseif ($row['is_variant'] === 'no' && $row['product_id'] && $row['name']) {
                 self::processProductBatchUpdate($row);
+            } else {
+                throw new RowImportFailedException(
+                    trans("The data from row is insufficient. System can't process it."),
+                );
             }
-
-            throw new RowImportFailedException(
-                trans("The data from row is insufficient. System can't process it."),
-            );
         });
     }
 
