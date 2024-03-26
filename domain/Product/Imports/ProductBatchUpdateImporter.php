@@ -77,7 +77,7 @@ class ProductBatchUpdateImporter extends Importer
             ImportColumn::make('stock')
                 ->requiredMapping()
                 ->numeric()
-                ->rules(['required', 'numeric', 'min:0'])
+                ->rules(['required', 'integer', 'min:0'])
                 ->castStateUsing(fn (int|float $state): int => (int) $state)
                 ->exampleHeader('Stock')
                 ->example('1'),
