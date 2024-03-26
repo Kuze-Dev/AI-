@@ -176,7 +176,7 @@ class ProductBatchUpdateImporter extends Importer
     {
         $decodedPayloadVariantCombination = json_decode($row['variant_combination'], true);
 
-        $productVariant = ProductVariant::find($row['variant_id']);
+        $productVariant = ProductVariant::whereKey($row['variant_id'])->sole();
 
         if ($decodedPayloadVariantCombination !== $productVariant->combination) {
             throw new RowImportFailedException(
@@ -218,7 +218,10 @@ class ProductBatchUpdateImporter extends Importer
      */
     private static function processProductBatchUpdate(array $row): void
     {
-        $foundProduct = Product::whereId($row['product_id'])->with(['productOptions.productOptionValues.media', 'productVariants', 'media'])->first();
+        $foundProduct = Product::whereId($row['product_id'])->with([
+            'productOptions.productOptionValues.media',
+            'productVariants', 'media',
+        ])->first();
 
         if (! $foundProduct instanceof Product) {
             throw new RowImportFailedException(
