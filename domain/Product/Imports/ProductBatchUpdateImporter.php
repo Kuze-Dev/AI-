@@ -28,17 +28,17 @@ class ProductBatchUpdateImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            ImportColumn::make('is_variant')
-                ->requiredMapping()
-                ->rules(['required', Rule::in(['yes', 'no'])])
-                ->exampleHeader('Is variant')
-                ->example('yes'),
-
             ImportColumn::make('product_id')
                 ->requiredMapping()
                 ->rules(['required', Rule::exists(Product::class, 'id')])
                 ->exampleHeader('Product id')
                 ->example('1'),
+
+            ImportColumn::make('is_variant')
+                ->requiredMapping()
+                ->rules(['required', Rule::in(['yes', 'no'])])
+                ->exampleHeader('Is variant')
+                ->example('yes'),
 
             ImportColumn::make('variant_id')
                 ->rules(['required_if:is_variant,yes', Rule::exists(ProductVariant::class, 'id')])
