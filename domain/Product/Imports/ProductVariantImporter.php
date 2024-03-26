@@ -43,21 +43,21 @@ class ProductVariantImporter extends Importer
                 ->numeric()
                 ->rules(['required', 'numeric', 'min:0'])
                 ->exampleHeader('Stock')
-                ->example('123'),
+                ->example('1'),
 
             ImportColumn::make('retail_price')
                 ->requiredMapping()
                 ->numeric()
                 ->rules(['required', 'numeric', 'min:0.1'])
                 ->exampleHeader('Retail price')
-                ->example('123.44'),
+                ->example('1.1'),
 
             ImportColumn::make('selling_price')
                 ->requiredMapping()
                 ->numeric()
                 ->rules(['required', 'numeric', 'min:0.1'])
                 ->exampleHeader('Selling price')
-                ->example('123.44'),
+                ->example('1.1'),
 
             // option 1
 
