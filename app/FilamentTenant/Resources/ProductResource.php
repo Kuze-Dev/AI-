@@ -16,6 +16,7 @@ use Closure;
 use Domain\Product\Enums\Status;
 use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Exports\ProductExporter;
+use Domain\Product\Exports\ProductVariantExporter;
 use Domain\Product\Models\Product;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Tenant\TenantFeatureSupport;
@@ -330,8 +331,15 @@ class ProductResource extends Resource
                 Tables\Actions\DeleteBulkAction::make()
                     ->translateLabel(),
 
-                Tables\Actions\ExportBulkAction::make()
+                Tables\Actions\ExportBulkAction::make('export_products')
                     ->exporter(ProductExporter::class)
+                    ->columnMapping(false)
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('primary'),
+
+                Tables\Actions\ExportBulkAction::make('export_product_variants')
+                    ->label(trans('Export product variants'))
+                    ->exporter(ProductVariantExporter::class)
                     ->columnMapping(false)
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary'),

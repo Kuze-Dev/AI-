@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\ProductResource;
 use Domain\Product\Enums\Decision;
 use Domain\Product\Enums\Status;
 use Domain\Product\Exports\ProductExporter;
+use Domain\Product\Exports\ProductVariantExporter;
 use Domain\Product\Imports\ProductBatchUpdateImporter;
 use Domain\Product\Imports\ProductImporter;
 use Domain\Product\Imports\ProductVariantImporter;
@@ -44,8 +45,14 @@ class ListProducts extends ListRecords
                 ->color('primary')
                 ->visible(fn () => TenantFeatureSupport::active(ProductBatchUpdate::class)),
 
-            Actions\ExportAction::make('export')
+            Actions\ExportAction::make('export_products')
                 ->exporter(ProductExporter::class)
+                ->columnMapping(false)
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('primary'),
+
+            Actions\ExportAction::make('export_product_variants')
+                ->exporter(ProductVariantExporter::class)
                 ->columnMapping(false)
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('primary'),

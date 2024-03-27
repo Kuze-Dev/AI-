@@ -24,10 +24,7 @@ class ProductExporter extends Exporter
             ExportColumn::make('id')
                 ->label('Product id'),
 
-            ExportColumn::make('is_variant'),
-            ExportColumn::make('variant_id'),
             ExportColumn::make('name'),
-            ExportColumn::make('variant_combination'),
             ExportColumn::make('sku'),
             ExportColumn::make('retail_price'),
             ExportColumn::make('selling_price'),
