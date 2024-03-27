@@ -95,7 +95,7 @@ class ProductExporter extends Exporter
 
     public static function modifyQuery(Builder $query): Builder
     {
-        return $query->with('productVariants')->latest();
+        return $query->with('productVariants');
     }
 
     public static function getCompletedNotificationBody(Export $export): string

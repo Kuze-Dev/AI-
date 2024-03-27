@@ -25,7 +25,8 @@ class ProductVariantExporter extends Exporter
             ExportColumn::make('id')
                 ->label('Variant id'),
 
-            ExportColumn::make('combination'),
+            ExportColumn::make('combination')
+                ->listAsJson(),
             ExportColumn::make('sku'),
             ExportColumn::make('retail_price'),
             ExportColumn::make('selling_price'),
@@ -42,7 +43,7 @@ class ProductVariantExporter extends Exporter
 
     public static function modifyQuery(Builder $query): Builder
     {
-        return $query->latest();
+        return ProductVariant::query();
     }
 
     public static function getCompletedNotificationBody(Export $export): string
