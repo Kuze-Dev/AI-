@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "63c6673bf474f6fc7ac2fe6760f5387a",
+    "content-hash": "d0bb98907c7bf3a08f335008dec4da08",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -197,16 +197,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.301.7",
+            "version": "3.301.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "2fd8cae93e87326f2263c420fa9031ad8903a2f2"
+                "reference": "a6ad44dd7bc4ace137d583c91439fa9c16331b01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2fd8cae93e87326f2263c420fa9031ad8903a2f2",
-                "reference": "2fd8cae93e87326f2263c420fa9031ad8903a2f2",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/a6ad44dd7bc4ace137d583c91439fa9c16331b01",
+                "reference": "a6ad44dd7bc4ace137d583c91439fa9c16331b01",
                 "shasum": ""
             },
             "require": {
@@ -286,9 +286,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.301.7"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.301.8"
             },
-            "time": "2024-03-25T18:14:28+00:00"
+            "time": "2024-03-26T18:14:03+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -3130,16 +3130,16 @@
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",
-            "version": "3.5.2",
+            "version": "3.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kirschbaum-development/eloquent-power-joins.git",
-                "reference": "2fae3aca9eefd4591603a7e53406ab9f56b69fad"
+                "reference": "fc8bb379f062cd120ffab20a6913ad824c3366d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kirschbaum-development/eloquent-power-joins/zipball/2fae3aca9eefd4591603a7e53406ab9f56b69fad",
-                "reference": "2fae3aca9eefd4591603a7e53406ab9f56b69fad",
+                "url": "https://api.github.com/repos/kirschbaum-development/eloquent-power-joins/zipball/fc8bb379f062cd120ffab20a6913ad824c3366d8",
+                "reference": "fc8bb379f062cd120ffab20a6913ad824c3366d8",
                 "shasum": ""
             },
             "require": {
@@ -3186,9 +3186,9 @@
             ],
             "support": {
                 "issues": "https://github.com/kirschbaum-development/eloquent-power-joins/issues",
-                "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/3.5.2"
+                "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/3.5.4"
             },
-            "time": "2024-03-20T10:23:27+00:00"
+            "time": "2024-03-26T19:12:33+00:00"
         },
         {
             "name": "lab404/laravel-impersonate",
@@ -3466,16 +3466,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.23.1",
+            "version": "v5.23.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "7475de7eb5b465c2da84218002fe1a62b8175da0"
+                "reference": "96d154340f1223bcc161ea7cee355c8fc29ff81e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/7475de7eb5b465c2da84218002fe1a62b8175da0",
-                "reference": "7475de7eb5b465c2da84218002fe1a62b8175da0",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/96d154340f1223bcc161ea7cee355c8fc29ff81e",
+                "reference": "96d154340f1223bcc161ea7cee355c8fc29ff81e",
                 "shasum": ""
             },
             "require": {
@@ -3488,6 +3488,7 @@
                 "nesbot/carbon": "^2.17|^3.0",
                 "php": "^8.0",
                 "ramsey/uuid": "^4.0",
+                "symfony/console": "^6.0|^7.0",
                 "symfony/error-handler": "^6.0|^7.0",
                 "symfony/process": "^6.0|^7.0"
             },
@@ -3538,9 +3539,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.23.1"
+                "source": "https://github.com/laravel/horizon/tree/v5.23.2"
             },
-            "time": "2024-02-20T15:14:10+00:00"
+            "time": "2024-03-23T12:11:34+00:00"
         },
         {
             "name": "laravel/pennant",
@@ -3620,16 +3621,16 @@
         },
         {
             "name": "laravel/prompts",
-            "version": "v0.1.16",
+            "version": "v0.1.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/prompts.git",
-                "reference": "ca6872ab6aec3ab61db3a61f83a6caf764ec7781"
+                "reference": "8ee9f87f7f9eadcbe21e9e72cd4176b2f06cd5b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/prompts/zipball/ca6872ab6aec3ab61db3a61f83a6caf764ec7781",
-                "reference": "ca6872ab6aec3ab61db3a61f83a6caf764ec7781",
+                "url": "https://api.github.com/repos/laravel/prompts/zipball/8ee9f87f7f9eadcbe21e9e72cd4176b2f06cd5b5",
+                "reference": "8ee9f87f7f9eadcbe21e9e72cd4176b2f06cd5b5",
                 "shasum": ""
             },
             "require": {
@@ -3671,9 +3672,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/prompts/issues",
-                "source": "https://github.com/laravel/prompts/tree/v0.1.16"
+                "source": "https://github.com/laravel/prompts/tree/v0.1.17"
             },
-            "time": "2024-02-21T19:25:27+00:00"
+            "time": "2024-03-13T16:05:43+00:00"
         },
         {
             "name": "laravel/sanctum",
@@ -3938,16 +3939,16 @@
         },
         {
             "name": "laravel/vapor-core",
-            "version": "v2.37.0",
+            "version": "v2.37.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/vapor-core.git",
-                "reference": "03ec602ca43ff780f2924a9be8bb944ed960813f"
+                "reference": "9fac8cd0f9b6979887253dd676e04ecb868be615"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/vapor-core/zipball/03ec602ca43ff780f2924a9be8bb944ed960813f",
-                "reference": "03ec602ca43ff780f2924a9be8bb944ed960813f",
+                "url": "https://api.github.com/repos/laravel/vapor-core/zipball/9fac8cd0f9b6979887253dd676e04ecb868be615",
+                "reference": "9fac8cd0f9b6979887253dd676e04ecb868be615",
                 "shasum": ""
             },
             "require": {
@@ -4011,9 +4012,9 @@
                 "vapor"
             ],
             "support": {
-                "source": "https://github.com/laravel/vapor-core/tree/v2.37.0"
+                "source": "https://github.com/laravel/vapor-core/tree/v2.37.1"
             },
-            "time": "2024-02-16T17:41:53+00:00"
+            "time": "2024-03-26T16:55:06+00:00"
         },
         {
             "name": "league/commonmark",
@@ -13541,16 +13542,16 @@
         },
         {
             "name": "laravel/pint",
-            "version": "v1.14.0",
+            "version": "v1.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pint.git",
-                "reference": "6b127276e3f263f7bb17d5077e9e0269e61b2a0e"
+                "reference": "c52de679b3ac01207016c179d7ce173e4be128c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pint/zipball/6b127276e3f263f7bb17d5077e9e0269e61b2a0e",
-                "reference": "6b127276e3f263f7bb17d5077e9e0269e61b2a0e",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/c52de679b3ac01207016c179d7ce173e4be128c4",
+                "reference": "c52de679b3ac01207016c179d7ce173e4be128c4",
                 "shasum": ""
             },
             "require": {
@@ -13603,7 +13604,7 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-            "time": "2024-02-20T17:38:05+00:00"
+            "time": "2024-03-26T16:40:24+00:00"
         },
         {
             "name": "laravel/sail",
