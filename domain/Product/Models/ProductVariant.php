@@ -7,6 +7,9 @@ namespace Domain\Product\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Image\Manipulations;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
@@ -40,9 +43,10 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  *
  * @mixin \Eloquent
  */
-class ProductVariant extends Model
+class ProductVariant extends Model implements HasMedia
 {
     use ConstraintsRelationships;
+    use InteractsWithMedia;
 
     protected $fillable = [
         'product_id',
@@ -95,5 +99,18 @@ class ProductVariant extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')
+            ->registerMediaConversions(function () {
+                $this->addMediaConversion('original');
+                $this->addMediaConversion('preview')
+                    ->fit(Manipulations::FIT_CROP, 300, 300);
+            });
+
+        $this->addMediaCollection('video')
+            ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }

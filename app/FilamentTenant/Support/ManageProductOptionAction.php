@@ -169,7 +169,7 @@ class ManageProductOptionAction
                         ->columnSpan(2),
                 ])
                 ->disableItemMovement()
-                ->maxItems(2)
+                // ->maxItems(2)
                 ->collapsible(),
         ];
     }
