@@ -41,7 +41,7 @@ it('can send link', function () {
     postJson('api/account/password/email', ['email' => $customer->email])
         ->assertValid()
         ->assertOk()
-        ->assertJson(['message' => 'We have emailed your password reset link']);
+        ->assertJson(['message' => 'We have emailed your password reset link.']);
 
     Notification::assertSentTo([$customer], ResetPassword::class);
     Event::assertDispatched(PasswordResetSent::class);
@@ -66,7 +66,7 @@ it('can reset password', function () {
     ])
         ->assertValid()
         ->assertOk()
-        ->assertJson(['message' => 'Your password has been reset!']);
+        ->assertJson(['message' => 'Your password has been reset.']);
 
     $customer->refresh();
 
