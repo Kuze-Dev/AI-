@@ -19,8 +19,6 @@ class SyncMediaCollectionAction
 {
     /**
      * @return MediaCollection<int, Media>|null
-     *
-     * @deprecated use https://filamentphp.com/plugins/filament-spatie-media-library
      */
     public function execute(Model&HasMedia $model, MediaCollectionData $mediaCollectionData): ?MediaCollection
     {
