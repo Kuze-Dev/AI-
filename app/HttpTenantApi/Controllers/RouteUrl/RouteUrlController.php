@@ -7,8 +7,10 @@ namespace App\HttpTenantApi\Controllers\RouteUrl;
 use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
+use App\HttpTenantApi\Resources\TaxonomyResource;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
+use Domain\Taxonomy\Models\Taxonomy;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Spatie\RouteAttributes\Attributes\Get;
@@ -26,9 +28,15 @@ class RouteUrlController
     ]
     public function __invoke(string $url = ''): JsonApiResource
     {
+        /** @var array */
+        $notDraftableModels = [
+            app(Taxonomy::class)->getMorphClass()
+        ];
+
+        /** @var \Illuminate\Database\Eloquent\Builder */
         $queryRouteUrl = RouteUrl::whereUrl(Str::start($url, '/'))
             ->with('model');
-
+        
         if (
             tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             request('site')
@@ -42,8 +50,12 @@ class RouteUrlController
 
         }
 
-        $queryRouteUrl->whereHas('model', function ($query) {
-            return $query->where('draftable_id', null);
+        $queryRouteUrl->whereHas('model', function ($query) use ($notDraftableModels){
+           
+            if (!in_array($query->getModel()->getMorphClass(),$notDraftableModels)) {
+                return $query->where('draftable_id', null);
+            }
+            return $query;
         });
 
         $routeUrl = $queryRouteUrl->firstOrFail();
@@ -51,6 +63,7 @@ class RouteUrlController
         return match ($routeUrl->model::class) {
             Page::class => PageResource::make($routeUrl->model),
             ContentEntry::class => ContentEntryResource::make($routeUrl->model),
+            Taxonomy::class => TaxonomyResource::make($routeUrl->model),
             default => throw new InvalidArgumentException('No resource found for model '.$routeUrl->model::class),
         };
     }

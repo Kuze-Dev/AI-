@@ -30,7 +30,10 @@ class RouteUrlFieldset extends Group
         $this->registerListeners([
             'route_url::update' => [
                 function (self $component, ...$eventParameters): void {
-                    $component->evaluate(function (HasRouteUrl|string $model, Closure $get, Closure $set, array $state) use ($eventParameters) {
+
+                    $statePath = $this->getStatePath();
+
+                    $component->evaluate(function (HasRouteUrl|string $model, Closure $get, Closure $set, array $state) use ($eventParameters, $statePath) {
                         if ((bool) $get('is_override')) {
                             return;
                         }
@@ -40,7 +43,7 @@ class RouteUrlFieldset extends Group
 
                         if ($eventParameters && $eventParameters[0] === 'input') {
                             /** @var string */
-                            $inputUrl = $get('route_url.url');
+                            $inputUrl = $get($statePath.'.url');
                             $inputUrl = Str::startsWith($inputUrl, '/') ?
                                 Str::contains($inputUrl, "/$locale/") ? Str::replace("/$locale/", '/', $inputUrl) : $inputUrl
                                 : '/'.$inputUrl;
@@ -48,15 +51,15 @@ class RouteUrlFieldset extends Group
                             $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ?
                                 "/$locale$inputUrl" : $inputUrl;
 
-                            $set('route_url.url', $newUrl);
+                            $set($statePath.'.url', $newUrl);
 
                             return;
                         }
 
                         $newUrl = $model::generateRouteUrl($this->getModelForRouteUrl(), $get('data', true));
                         $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ? "/$locale$newUrl" : $newUrl;
-
-                        $set('route_url.url', $newUrl);
+                      
+                        $set($statePath.'.url', $newUrl);
                     });
                 },
             ],

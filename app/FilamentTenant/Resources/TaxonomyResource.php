@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
@@ -81,6 +82,7 @@ class TaxonomyResource extends Resource
                         ->preload()
                         ->optionsFromModel(Blueprint::class, 'name')
                         ->disabled(fn (?Taxonomy $record) => $record !== null),
+                    RouteUrlFieldset::make(),
                 ]),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
@@ -99,9 +101,15 @@ class TaxonomyResource extends Resource
                         ->schema([
                             Forms\Components\Grid::make(['md' => 1])
                                 ->schema([
-                                    Forms\Components\TextInput::make('name')
+                                    Forms\Components\Section::make('Term')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
                                         ->required()
                                         ->unique(ignoreRecord: true),
+                                        RouteUrlFieldset::make()
+                                        ->statePath('termsrouteUrl'),
+                                    ]),
+                                    
                                     SchemaFormBuilder::make('data', fn (Taxonomy $record) => $record->blueprint->schema),
                                 ]),
                         ]),

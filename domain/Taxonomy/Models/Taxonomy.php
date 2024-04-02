@@ -15,9 +15,12 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\RouteUrl\HasRouteUrl;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
 
 /**
  * Domain\Taxonomy\Models\Taxonomy
@@ -54,10 +57,11 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
     OnDeleteCascade(['taxonomyTerms']),
     OnDeleteRestrict(['contents'])
 ]
-class Taxonomy extends Model
+class Taxonomy extends Model implements HasRouteUrlContract
 {
     use ConstraintsRelationships;
     use HasSlug;
+    use HasRouteUrl;
     use LogsActivity;
 
     protected $fillable = [
@@ -115,5 +119,10 @@ class Taxonomy extends Model
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    public static function generateRouteUrl(Model $model, array $attributes): string
+    {
+        return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 }

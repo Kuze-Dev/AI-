@@ -19,6 +19,9 @@ use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\RouteUrl\HasRouteUrl;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
+use Illuminate\Support\Str;
 
 /**
  * Domain\Taxonomy\Models\TaxonomyTerm
@@ -60,10 +63,11 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
     OnDeleteCascade(['contentEntries', 'children']),
     OnDeleteRestrict(['products'])
 ]
-class TaxonomyTerm extends Model implements Sortable
+class TaxonomyTerm extends Model implements Sortable, HasRouteUrlContract
 {
     use ConstraintsRelationships;
     use HasSlug;
+    use HasRouteUrl;
     use SortableTrait;
 
     protected $fillable = [
@@ -135,5 +139,10 @@ class TaxonomyTerm extends Model implements Sortable
     public function buildSortQuery(): Builder
     {
         return static::query()->whereTaxonomyId($this->taxonomy_id)->whereParentId($this->parent_id);
+    }
+
+    public static function generateRouteUrl(Model $model, array $attributes): string
+    {
+        return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 }
