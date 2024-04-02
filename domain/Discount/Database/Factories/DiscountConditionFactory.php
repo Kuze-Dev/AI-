@@ -14,6 +14,7 @@ class DiscountConditionFactory extends Factory
 {
     protected $model = DiscountCondition::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

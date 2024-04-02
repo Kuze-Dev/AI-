@@ -13,6 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class BlueprintDataResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         $this->loadMissing('media');

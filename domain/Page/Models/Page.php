@@ -104,6 +104,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
      * Define default reference
      * for meta data properties.
      */
+    #[\Override]
     public function defaultMetaData(): array
     {
         return [
@@ -118,6 +119,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     }
 
     /** @return PageBuilder<self> */
+    #[\Override]
     public function newEloquentBuilder($query): PageBuilder
     {
         return new PageBuilder($query);
@@ -137,6 +139,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         return $this->hasMany(BlockContent::class);
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -163,6 +166,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
+    #[\Override]
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
         return Str::of($attributes['name'])->slug()->start('/')->toString();

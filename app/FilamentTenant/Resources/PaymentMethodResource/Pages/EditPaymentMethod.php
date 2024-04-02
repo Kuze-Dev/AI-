@@ -22,6 +22,7 @@ class EditPaymentMethod extends EditRecord
 
     protected static string $resource = PaymentMethodResource::class;
 
+    #[\Override]
     public function mount(int|string $record): void
     {
         parent::mount($record);
@@ -36,6 +37,7 @@ class EditPaymentMethod extends EditRecord
         }
     }
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

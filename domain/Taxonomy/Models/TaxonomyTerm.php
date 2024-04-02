@@ -117,6 +117,7 @@ class TaxonomyTerm extends Model implements Sortable
         return $this->belongsToMany(Service::class, 'service_taxonomy_terms');
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

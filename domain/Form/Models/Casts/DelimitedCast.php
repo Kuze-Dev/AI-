@@ -11,6 +11,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
  */
 class DelimitedCast implements CastsAttributes
 {
+    #[\Override]
     public function get($model, string $key, $value, array $attributes): ?array
     {
         if ($value === null) {
@@ -21,6 +22,7 @@ class DelimitedCast implements CastsAttributes
     }
 
     /** @param  string|array  $value */
+    #[\Override]
     public function set($model, string $key, $value, array $attributes): ?string
     {
         if (is_array($value)) {

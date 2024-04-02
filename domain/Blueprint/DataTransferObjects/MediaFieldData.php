@@ -31,6 +31,7 @@ class MediaFieldData extends FieldData
     ) {
     }
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         //        if ( ! $data['type'] instanceof FieldType) {
@@ -57,6 +58,7 @@ class MediaFieldData extends FieldData
     }
 
     /** @return array<string, mixed> */
+    #[\Override]
     public function toArray()
     {
         return (array) $this;

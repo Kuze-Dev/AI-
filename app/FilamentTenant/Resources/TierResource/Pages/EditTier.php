@@ -22,6 +22,7 @@ class EditTier extends EditRecord
     protected static string $resource = TierResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

@@ -51,6 +51,7 @@ class EditContentEntry extends EditRecord
      *
      * @param  mixed  $record
      */
+    #[\Override]
     public function mount(int|string $record, string $ownerRecord = ''): void
     {
         $this->ownerRecord = app(Content::class)
@@ -65,6 +66,7 @@ class EditContentEntry extends EditRecord
     }
 
     /** @param  string  $key */
+    #[\Override]
     protected function resolveRecord($key): Model
     {
         $record = $this->ownerRecord->resolveChildRouteBinding('contentEntries', $key, null);
@@ -76,6 +78,7 @@ class EditContentEntry extends EditRecord
         return $record;
     }
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -283,6 +286,7 @@ class EditContentEntry extends EditRecord
         return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }
 
+    #[\Override]
     protected function configureDeleteAction(DeleteAction $action): void
     {
         $resource = static::getResource();
@@ -294,6 +298,7 @@ class EditContentEntry extends EditRecord
             ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
     }
 
+    #[\Override]
     public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
@@ -312,6 +317,7 @@ class EditContentEntry extends EditRecord
     }
 
     /** @param  \Domain\Content\Models\ContentEntry  $record */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateContentEntryAction::class)

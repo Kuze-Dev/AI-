@@ -103,6 +103,7 @@ class Taxonomy extends Model
         return $this->belongsToMany(Content::class);
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

@@ -28,16 +28,19 @@ class ActivityResource extends Resource
     protected static ?int $navigationSort = 2;
 
     /** @throws \Spatie\Activitylog\Exceptions\InvalidConfiguration */
+    #[\Override]
     public static function getModel(): string
     {
         return ActivitylogServiceProvider::determineActivityModel();
     }
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('System');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -78,6 +81,7 @@ class ActivityResource extends Resource
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -157,6 +161,7 @@ class ActivityResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

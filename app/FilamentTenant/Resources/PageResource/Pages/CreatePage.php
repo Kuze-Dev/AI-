@@ -23,6 +23,7 @@ class CreatePage extends CreateRecord
 
     protected static string $resource = PageResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -63,6 +64,7 @@ class CreatePage extends CreateRecord
     }
 
     /** @throws Throwable */
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreatePageAction::class)->execute(PageData::fromArray($data));

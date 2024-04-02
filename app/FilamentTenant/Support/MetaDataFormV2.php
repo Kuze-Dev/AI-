@@ -11,6 +11,7 @@ use Support\MetaData\Models\MetaData;
 
 class MetaDataFormV2 extends Section
 {
+    #[\Override]
     public function setUp(): void
     {
         parent::setUp();

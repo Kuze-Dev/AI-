@@ -21,6 +21,7 @@ class Tree extends Field
 
     protected string|Closure $childrenStateName = 'children';
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -99,6 +100,7 @@ class Tree extends Field
         $this->registerActions([TreeFormAction::make()]);
     }
 
+    #[\Override]
     public function getChildComponentContainers(bool $withHidden = false, ?string $statePath = null): array
     {
         return [];

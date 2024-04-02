@@ -20,6 +20,7 @@ class GuestCartSummaryRequest extends AddressRequest
     /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     private Collection $cartLinesCache;
 
+    #[\Override]
     public function rules(): array
     {
         return [

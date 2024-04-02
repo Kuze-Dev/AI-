@@ -21,6 +21,7 @@ use Illuminate\Support\ServiceProvider;
 
 class ShippingMethodServiceProvider extends ServiceProvider implements DeferrableProvider
 {
+    #[\Override]
     public function register(): void
     {
         $this->app->singleton(
@@ -104,6 +105,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
         }
     }
 
+    #[\Override]
     public function provides(): array
     {
         return [

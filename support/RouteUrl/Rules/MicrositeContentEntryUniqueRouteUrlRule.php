@@ -23,6 +23,7 @@ class MicrositeContentEntryUniqueRouteUrlRule implements ValidationRule
     }
 
     /** @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail */
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
 

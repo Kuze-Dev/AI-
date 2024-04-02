@@ -15,6 +15,7 @@ class TenantFactory extends Factory
 {
     protected $model = Tenant::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

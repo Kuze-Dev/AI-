@@ -17,6 +17,7 @@ class SiteSettings extends BaseSettings
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

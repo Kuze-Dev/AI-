@@ -19,6 +19,7 @@ class CustomersRelationManager extends RelationManager
     protected static ?string $recordTitleAttribute = 'email';
 
     /** @throws Exception */
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

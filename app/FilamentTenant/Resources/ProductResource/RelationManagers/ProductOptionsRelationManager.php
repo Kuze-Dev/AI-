@@ -15,6 +15,7 @@ class ProductOptionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'productOptions';
 
+    #[\Override]
     public function form(Form $form): Form
     {
         return $form->schema([
@@ -44,6 +45,7 @@ class ProductOptionsRelationManager extends RelationManager
         ]);
     }
 
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

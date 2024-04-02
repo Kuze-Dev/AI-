@@ -19,6 +19,7 @@ abstract class BaseSettings extends SettingsPage
 
     protected static ?string $cluster = Settings::class;
 
+    #[\Override]
     public static function canAccess(): bool
     {
         $settingsPermissions = app(PermissionRegistrar::class)

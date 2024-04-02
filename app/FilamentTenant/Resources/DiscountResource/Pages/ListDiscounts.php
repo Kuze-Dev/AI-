@@ -12,6 +12,7 @@ class ListDiscounts extends ListRecords
 {
     protected static string $resource = DiscountResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

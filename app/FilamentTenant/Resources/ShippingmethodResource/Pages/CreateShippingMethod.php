@@ -15,6 +15,7 @@ class CreateShippingMethod extends CreateRecord
 
     protected static string $resource = ShippingMethodResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

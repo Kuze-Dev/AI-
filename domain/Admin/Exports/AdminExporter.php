@@ -15,6 +15,7 @@ class AdminExporter extends Exporter
 {
     protected static ?string $model = Admin::class;
 
+    #[\Override]
     public static function getColumns(): array
     {
         return [
@@ -37,6 +38,7 @@ class AdminExporter extends Exporter
         ];
     }
 
+    #[\Override]
     public static function getCompletedNotificationBody(Export $export): string
     {
         $body = 'Your admin export has completed and '.number_format($export->successful_rows).

@@ -19,6 +19,7 @@ class EditMenu extends EditRecord
 
     protected static string $resource = MenuResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -31,11 +32,13 @@ class EditMenu extends EditRecord
     }
 
     /** @param  \Domain\Menu\Models\Menu  $record */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateMenuAction::class)->execute($record, MenuData::fromArray($data));
     }
 
+    #[\Override]
     protected function getRedirectUrl(): ?string
     {
         return MenuResource::getUrl('edit', $this->record);

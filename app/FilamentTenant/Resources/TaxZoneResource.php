@@ -26,16 +26,19 @@ class TaxZoneResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Shop Configuration');
     }
 
+    #[\Override]
     public static function getNavigationLabel(): string
     {
         return trans('Tax Zone');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -134,6 +137,7 @@ class TaxZoneResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -171,6 +175,7 @@ class TaxZoneResource extends Resource
             ->bulkActions([]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -178,6 +183,7 @@ class TaxZoneResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

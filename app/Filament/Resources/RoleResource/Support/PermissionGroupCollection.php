@@ -16,6 +16,7 @@ use Spatie\Permission\PermissionRegistrar;
 class PermissionGroupCollection extends Collection
 {
     /**  @param  array<string, mixed>  $params */
+    #[\Override]
     public static function make($params = []): self
     {
         $items = app(PermissionRegistrar::class)

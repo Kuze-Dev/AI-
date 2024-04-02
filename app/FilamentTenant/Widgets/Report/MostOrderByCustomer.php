@@ -14,11 +14,13 @@ class MostOrderByCustomer extends ChartWidget
 
     protected static ?string $pollingInterval = null;
 
+    #[\Override]
     protected function getType(): string
     {
         return 'pie';
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $products = OrderLine::whereHas('order')

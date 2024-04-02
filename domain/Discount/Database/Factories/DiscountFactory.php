@@ -16,6 +16,7 @@ class DiscountFactory extends Factory
 {
     protected $model = Discount::class;
 
+    #[\Override]
     public function definition(): array
     {
         $name = fake()->firstName();

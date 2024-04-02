@@ -37,11 +37,13 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('eCommerce');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -251,6 +253,7 @@ class ProductResource extends Resource
     /**
      * @throws \Exception
      */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -348,6 +351,7 @@ class ProductResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -360,6 +364,7 @@ class ProductResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

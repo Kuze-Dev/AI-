@@ -16,6 +16,7 @@ class ShippingUsps implements FeatureContract
         return false;
     }
 
+    #[\Override]
     public function getLabel(): string
     {
         return trans('Shipping - USPS');

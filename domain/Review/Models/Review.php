@@ -79,6 +79,7 @@ class Review extends Model implements HasMedia
         'is_anonymous' => 'bool',
     ];
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function (Media $media) {

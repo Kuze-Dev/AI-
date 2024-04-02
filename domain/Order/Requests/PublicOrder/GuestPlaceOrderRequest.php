@@ -16,6 +16,7 @@ use Throwable;
 
 class GuestPlaceOrderRequest extends AddressRequest
 {
+    #[\Override]
     public function rules(): array
     {
 

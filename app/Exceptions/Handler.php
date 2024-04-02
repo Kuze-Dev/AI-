@@ -40,6 +40,7 @@ class Handler extends ExceptionHandler
     ];
 
     /** Register the exception handling callbacks for the application. */
+    #[\Override]
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {

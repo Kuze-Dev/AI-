@@ -12,6 +12,7 @@ class ListGlobals extends ListRecords
 {
     protected static string $resource = GlobalsResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

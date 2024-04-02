@@ -27,12 +27,14 @@ class InviteCustomerResource extends CustomerResource
 
     protected static ?string $slug = 'invite-customers';
 
+    #[\Override]
     public static function getModelLabel(): string
     {
         return trans('Invite Customer');
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         $table = parent::table($table);
@@ -122,6 +124,7 @@ class InviteCustomerResource extends CustomerResource
             ]);
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -132,6 +135,7 @@ class InviteCustomerResource extends CustomerResource
     }
 
     /** @return Builder<\Domain\Customer\Models\Customer> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         /** @var Builder<Customer> $query */
@@ -144,6 +148,7 @@ class InviteCustomerResource extends CustomerResource
             ->whereNot('register_status', RegisterStatus::REGISTERED);
     }
 
+    #[\Override]
     public static function canCreate(): bool
     {
         return static::can('create');

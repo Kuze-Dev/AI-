@@ -16,6 +16,7 @@ use InvalidArgumentException;
 
 class PaymentServiceProvider extends ServiceProvider implements DeferrableProvider
 {
+    #[\Override]
     public function register()
     {
         $this->app->singleton(
@@ -49,6 +50,7 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
 
     }
 
+    #[\Override]
     public function provides()
     {
 

@@ -22,6 +22,7 @@ class AdminImporter extends Importer
 {
     protected static ?string $model = Admin::class;
 
+    #[\Override]
     public static function getColumns(): array
     {
         return [
@@ -71,6 +72,7 @@ class AdminImporter extends Importer
         ];
     }
 
+    #[\Override]
     public function resolveRecord(): ?Admin
     {
         return Admin::firstOrNew(
@@ -99,6 +101,7 @@ class AdminImporter extends Importer
         $this->record->assignRole(explode(',', $this->data['roles']));
     }
 
+    #[\Override]
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Your admin import has completed and '.

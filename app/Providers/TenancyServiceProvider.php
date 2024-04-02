@@ -119,6 +119,7 @@ class TenancyServiceProvider extends ServiceProvider
         ];
     }
 
+    #[\Override]
     public function register(): void
     {
     }

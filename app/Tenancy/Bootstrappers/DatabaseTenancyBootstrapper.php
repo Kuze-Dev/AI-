@@ -17,6 +17,7 @@ class DatabaseTenancyBootstrapper implements TenancyBootstrapper
     ) {
     }
 
+    #[\Override]
     public function bootstrap(Tenant $tenant): void
     {
         /** @var TenantWithDatabase $tenant */
@@ -36,6 +37,7 @@ class DatabaseTenancyBootstrapper implements TenancyBootstrapper
         $this->database->connectToTenant($tenant);
     }
 
+    #[\Override]
     public function revert(): void
     {
         $this->database->reconnectToCentral();

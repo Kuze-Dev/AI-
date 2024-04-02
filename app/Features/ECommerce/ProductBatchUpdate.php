@@ -16,6 +16,7 @@ class ProductBatchUpdate implements FeatureContract
         return false;
     }
 
+    #[\Override]
     public function getLabel(): string
     {
         return trans('Product Batch Update');

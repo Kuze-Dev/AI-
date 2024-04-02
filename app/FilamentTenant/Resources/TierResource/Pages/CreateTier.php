@@ -15,6 +15,7 @@ class CreateTier extends CreateRecord
 
     protected static string $resource = TierResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

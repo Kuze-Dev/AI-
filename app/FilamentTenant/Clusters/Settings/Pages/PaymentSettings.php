@@ -24,6 +24,7 @@ class PaymentSettings extends TenantBaseSettings
 
     protected static string|array $routeMiddleware = RequirePassword::class.':filament.tenant.password.confirm';
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

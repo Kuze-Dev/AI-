@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 
 class AdminServiceProvider extends ServiceProvider
 {
+    #[\Override]
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/config/admin.php', 'domain.admin');

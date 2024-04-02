@@ -19,11 +19,13 @@ class MostSoldProduct extends ChartWidget
 
     public ?string $filter = 'allTime';
 
+    #[\Override]
     protected function getType(): string
     {
         return 'pie';
     }
 
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -34,6 +36,7 @@ class MostSoldProduct extends ChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $activeFilter = $this->filter;

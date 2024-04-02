@@ -84,6 +84,7 @@ class PaymentMethod extends Model implements HasMedia
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logo')
@@ -94,6 +95,7 @@ class PaymentMethod extends Model implements HasMedia
      * Set the column reference
      * for route keys.
      */
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

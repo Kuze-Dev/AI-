@@ -76,6 +76,7 @@ class Menu extends Model
         return $this->hasMany(Node::class);
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

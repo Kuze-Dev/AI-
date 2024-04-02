@@ -63,11 +63,13 @@ class ConfirmPassword extends SimplePage
         return redirect()->intended(Filament::getUrl());
     }
 
+    #[\Override]
     public function form(Form $form): Form
     {
         return $form;
     }
 
+    #[\Override]
     protected function getForms(): array
     {
         return [

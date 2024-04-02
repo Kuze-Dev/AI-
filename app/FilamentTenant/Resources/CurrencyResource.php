@@ -20,17 +20,20 @@ class CurrencyResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('eCommerce');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['code'];
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -78,6 +81,7 @@ class CurrencyResource extends Resource
             ->defaultSort('id', 'asc');
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

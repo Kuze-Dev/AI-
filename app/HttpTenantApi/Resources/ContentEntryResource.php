@@ -18,6 +18,7 @@ class ContentEntryResource extends JsonApiResource
 {
     use TransformsSchemaPayload;
 
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [
@@ -34,6 +35,7 @@ class ContentEntryResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [
@@ -50,6 +52,7 @@ class ContentEntryResource extends JsonApiResource
         return $this->content->blueprint->schema;
     }
 
+    #[\Override]
     public static function newCollection(mixed $resource)
     {
         if ($resource instanceof Collection) {

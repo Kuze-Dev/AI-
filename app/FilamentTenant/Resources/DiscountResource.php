@@ -56,11 +56,13 @@ class DiscountResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('eCommerce');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -198,6 +200,7 @@ class DiscountResource extends Resource
     /**
      * @throws \Exception
      */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -298,6 +301,7 @@ class DiscountResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -306,6 +310,7 @@ class DiscountResource extends Resource
     }
 
     /** @return Builder<\Domain\Discount\Models\Discount> */
+    #[\Override]
     public static function getEloquentQuery(): EloquentBuilder
     {
         return parent::getEloquentQuery()
@@ -315,6 +320,7 @@ class DiscountResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

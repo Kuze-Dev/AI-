@@ -16,7 +16,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 class SearchController
 {
-    private const SEARCHABLE_MODELS = ['page', 'contentEntry'];
+    private const array SEARCHABLE_MODELS = ['page', 'contentEntry'];
 
     #[Get('/search')]
     public function index(Request $request): JsonResponse

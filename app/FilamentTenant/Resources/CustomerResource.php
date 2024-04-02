@@ -41,11 +41,13 @@ class CustomerResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Customer Management');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return [
@@ -55,6 +57,7 @@ class CustomerResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -181,6 +184,7 @@ class CustomerResource extends Resource
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -318,6 +322,7 @@ class CustomerResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -326,6 +331,7 @@ class CustomerResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -336,6 +342,7 @@ class CustomerResource extends Resource
     }
 
     /** @return Builder<\Domain\Customer\Models\Customer> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -345,6 +352,7 @@ class CustomerResource extends Resource
             ->where('register_status', RegisterStatus::REGISTERED);
     }
 
+    #[\Override]
     public static function canCreate(): bool
     {
         return false;

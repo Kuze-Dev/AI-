@@ -36,11 +36,13 @@ class AdminResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'full_name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Access');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return [
@@ -50,6 +52,7 @@ class AdminResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -131,6 +134,7 @@ class AdminResource extends Resource
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -291,6 +295,7 @@ class AdminResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -301,6 +306,7 @@ class AdminResource extends Resource
     }
 
     /** @return Builder<Admin> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -309,6 +315,7 @@ class AdminResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [

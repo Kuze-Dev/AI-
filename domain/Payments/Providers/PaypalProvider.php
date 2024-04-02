@@ -49,6 +49,7 @@ class PaypalProvider extends Provider
         $this->payPalclient->getAccessToken();
     }
 
+    #[\Override]
     public function authorize(): PaymentAuthorize
     {
 
@@ -118,6 +119,7 @@ class PaypalProvider extends Provider
         }
     }
 
+    #[\Override]
     public function capture(ModelsPayment $paymentModel, array $data): PaymentCapture
     {
         return match ($data['status']) {
@@ -156,6 +158,7 @@ class PaypalProvider extends Provider
         );
     }
 
+    #[\Override]
     public function refund(ModelsPayment $paymentModel, int $amount): PaymentRefund
     {
         return new PaymentRefund(success: false);

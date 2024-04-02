@@ -18,6 +18,7 @@ class EditService extends EditRecord
     protected static string $resource = ServiceResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

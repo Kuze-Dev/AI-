@@ -19,6 +19,7 @@ class EditAdmin extends EditRecord
 
     protected static string $resource = AdminResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

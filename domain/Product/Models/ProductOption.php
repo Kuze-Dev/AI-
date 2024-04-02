@@ -61,6 +61,7 @@ class ProductOption extends Model
         'is_custom' => 'boolean',
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

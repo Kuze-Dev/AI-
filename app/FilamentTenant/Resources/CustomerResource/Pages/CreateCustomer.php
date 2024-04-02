@@ -23,6 +23,7 @@ class CreateCustomer extends CreateRecord
     protected static string $resource = CustomerResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -33,6 +34,7 @@ class CreateCustomer extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['status'] = Status::INACTIVE;

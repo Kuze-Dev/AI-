@@ -12,6 +12,7 @@ class RoleResource extends BaseRoleResource
 {
     protected static string|array $routeMiddleware = RequirePassword::class.':filament.tenant.password.confirm';
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

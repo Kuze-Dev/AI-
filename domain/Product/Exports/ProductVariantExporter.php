@@ -18,6 +18,7 @@ class ProductVariantExporter extends Exporter
 {
     protected static ?string $model = ProductVariant::class;
 
+    #[\Override]
     public static function getColumns(): array
     {
         return [
@@ -41,11 +42,13 @@ class ProductVariantExporter extends Exporter
         ];
     }
 
+    #[\Override]
     public static function modifyQuery(Builder $query): Builder
     {
         return ProductVariant::query();
     }
 
+    #[\Override]
     public static function getCompletedNotificationBody(Export $export): string
     {
         $body = 'Your product variant export has completed and '.

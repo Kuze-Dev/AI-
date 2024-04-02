@@ -25,6 +25,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class ShippingMethodResourcev2 extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         $rateData = $this->getRateData($request);
@@ -42,6 +43,7 @@ class ShippingMethodResourcev2 extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [

@@ -17,6 +17,7 @@ class TaxonomyTermResource extends JsonApiResource
 {
     use TransformsSchemaPayload;
 
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [
@@ -27,6 +28,7 @@ class TaxonomyTermResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [

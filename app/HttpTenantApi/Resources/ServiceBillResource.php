@@ -13,6 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class ServiceBillResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
 
@@ -35,6 +36,7 @@ class ServiceBillResource extends JsonApiResource
     /**
      * @return array<string, callable>
      */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [

@@ -157,11 +157,13 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         return $this->belongsToMany(Site::class);
     }
 
+    #[\Override]
     public function getFilamentName(): string
     {
         return $this->full_name;
     }
 
+    #[\Override]
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

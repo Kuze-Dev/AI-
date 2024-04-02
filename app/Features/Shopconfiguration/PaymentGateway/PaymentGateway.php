@@ -16,6 +16,7 @@ class PaymentGateway implements FeatureContract
         return false;
     }
 
+    #[\Override]
     public function getLabel(): string
     {
         return trans('PaymentGateway');

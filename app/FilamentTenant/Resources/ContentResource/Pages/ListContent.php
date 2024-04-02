@@ -15,6 +15,7 @@ class ListContent extends ListRecords
 {
     protected static string $resource = ContentResource::class;
 
+    #[\Override]
     protected function getTableRecordUrlUsing(): ?Closure
     {
         if (self::$resource::canViewAny()) {
@@ -28,6 +29,7 @@ class ListContent extends ListRecords
      * Declare action buttons that
      * are available on the page.
      */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

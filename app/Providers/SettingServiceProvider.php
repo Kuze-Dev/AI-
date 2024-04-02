@@ -11,6 +11,7 @@ use Spatie\LaravelSettings\Support\SettingsCacheFactory as SettingsCacheFactoryS
 
 class SettingServiceProvider extends ServiceProvider
 {
+    #[\Override]
     public function register(): void
     {
         $this->app->bind(

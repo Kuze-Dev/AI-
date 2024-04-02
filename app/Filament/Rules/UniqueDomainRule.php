@@ -16,6 +16,7 @@ class UniqueDomainRule implements ValidationRule
     ) {
     }
 
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         // Remove http:// or https:// and www. if they're present

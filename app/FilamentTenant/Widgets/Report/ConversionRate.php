@@ -23,11 +23,13 @@ class ConversionRate extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    #[\Override]
     protected function getType(): string
     {
         return 'line';
     }
 
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -37,6 +39,7 @@ class ConversionRate extends ChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $activeFilter = $this->filter;

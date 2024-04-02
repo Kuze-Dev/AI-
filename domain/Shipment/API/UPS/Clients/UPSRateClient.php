@@ -10,6 +10,7 @@ use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class UPSRateClient extends BaseClient
 {
+    #[\Override]
     public static function uri(): string
     {
         return 'api/rating/v1/Rate';

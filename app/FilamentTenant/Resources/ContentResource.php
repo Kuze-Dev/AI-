@@ -34,29 +34,34 @@ class ContentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name', 'contentEntries.title'];
     }
 
     /** @return Builder<Content> */
+    #[\Override]
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('contentEntries');
     }
 
     /** @param  Content  $record */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @phpstan-ignore-next-line */
         return [trans('Total Entries') => $record->content_entries_count];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -181,6 +186,7 @@ class ContentResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -233,6 +239,7 @@ class ContentResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -241,6 +248,7 @@ class ContentResource extends Resource
     }
 
     /** @return Builder<\Domain\Content\Models\Content> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
@@ -260,6 +268,7 @@ class ContentResource extends Resource
 
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

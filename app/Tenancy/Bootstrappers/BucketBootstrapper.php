@@ -17,11 +17,13 @@ class BucketBootstrapper implements TenancyBootstrapper
         $this->orignalBucket = $this->app->make('config')['filesystems.disks.s3.bucket'];
     }
 
+    #[\Override]
     public function bootstrap(Tenant $tenant): void
     {
         $this->app->make('config')->set('filesystems.disks.s3.bucket', $tenant->getInternal('bucket'));
     }
 
+    #[\Override]
     public function revert(): void
     {
         $this->app->make('config')->set('filesystems.disks.s3.bucket', $this->orignalBucket);

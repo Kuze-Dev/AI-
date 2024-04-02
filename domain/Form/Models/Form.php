@@ -97,6 +97,7 @@ class Form extends Model
         return $this->hasMany(FormSubmission::class);
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

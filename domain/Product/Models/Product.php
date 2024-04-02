@@ -147,6 +147,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
      * Define default reference
      * for meta data properties.
      */
+    #[\Override]
     public function defaultMetaData(): array
     {
         return [
@@ -155,6 +156,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     }
 
     /** @return ProductBuilder<self> */
+    #[\Override]
     public function newEloquentBuilder($query): ProductBuilder
     {
         return new ProductBuilder($query);
@@ -168,6 +170,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -295,6 +298,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
         return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')

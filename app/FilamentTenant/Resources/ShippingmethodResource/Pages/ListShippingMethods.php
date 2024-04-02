@@ -12,6 +12,7 @@ class ListShippingMethods extends ListRecords
 {
     protected static string $resource = ShippingMethodResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

@@ -56,6 +56,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         return $string;
     }
 
+    #[\Override]
     protected function buildView(): array
     {
         return [

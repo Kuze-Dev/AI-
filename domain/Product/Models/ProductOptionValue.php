@@ -55,6 +55,7 @@ class ProductOptionValue extends Model implements HasMedia
         'data' => 'array',
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -100,6 +101,7 @@ class ProductOptionValue extends Model implements HasMedia
         return $this->belongsTo(ProductOption::class);
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('media')

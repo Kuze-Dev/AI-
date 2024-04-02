@@ -37,11 +37,13 @@ class FormResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -251,6 +253,7 @@ class FormResource extends Resource
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -295,6 +298,7 @@ class FormResource extends Resource
     }
 
     /** @return Builder<\Domain\Form\Models\Form> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
@@ -314,6 +318,7 @@ class FormResource extends Resource
 
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -324,6 +329,7 @@ class FormResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

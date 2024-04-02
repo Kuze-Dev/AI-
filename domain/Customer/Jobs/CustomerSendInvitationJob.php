@@ -23,7 +23,7 @@ final class CustomerSendInvitationJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    private const LIMIT = 1_00;
+    private const int LIMIT = 1_00;
 
     private readonly SendRegisterInvitationAction $sendRegisterInvitation;
 

@@ -19,6 +19,7 @@ class EditGlobals extends EditRecord
 
     protected static string $resource = GlobalsResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -33,6 +34,7 @@ class EditGlobals extends EditRecord
     /**
      * @param  \Domain\Globals\Models\Globals  $record
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateGlobalsAction::class)->execute($record, GlobalsData::fromArray($data));

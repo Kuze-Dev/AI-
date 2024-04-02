@@ -22,6 +22,7 @@ class SiteSettings extends TenantBaseSettings
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [
@@ -64,6 +65,7 @@ class SiteSettings extends TenantBaseSettings
         ];
     }
 
+    #[\Override]
     protected function afterSave(): void
     {
         Cache::flush();

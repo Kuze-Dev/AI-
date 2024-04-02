@@ -18,6 +18,7 @@ class CreateTaxonomy extends CreateRecord
 
     protected static string $resource = TaxonomyResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -28,6 +29,7 @@ class CreateTaxonomy extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateTaxonomyAction::class)->execute(TaxonomyData::fromArray($data));

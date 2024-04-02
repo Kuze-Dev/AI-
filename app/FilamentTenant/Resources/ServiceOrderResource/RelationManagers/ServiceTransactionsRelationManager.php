@@ -20,6 +20,7 @@ class ServiceTransactionsRelationManager extends RelationManager
 
     protected static ?string $title = 'Payment';
 
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

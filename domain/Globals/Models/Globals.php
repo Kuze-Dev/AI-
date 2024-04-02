@@ -89,6 +89,7 @@ class Globals extends Model
      * Set the column reference
      * for route keys.
      */
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

@@ -12,6 +12,7 @@ class ListTaxZones extends ListRecords
 {
     protected static string $resource = TaxZoneResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

@@ -23,6 +23,7 @@ class EditTaxZone extends EditRecord
 
     protected static string $resource = TaxZoneResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -35,6 +36,7 @@ class EditTaxZone extends EditRecord
     }
 
     /** @param  TaxZone  $record */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateTaxZoneAction::class)->execute($record, TaxZoneData::formArray($data));

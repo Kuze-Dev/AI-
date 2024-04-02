@@ -21,6 +21,7 @@ class ProductVariantsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'Variant';
 
+    #[\Override]
     public function form(Form $form): Form
     {
         return $form
@@ -115,6 +116,7 @@ class ProductVariantsRelationManager extends RelationManager
             ])->columns(1);
     }
 
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

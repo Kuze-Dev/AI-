@@ -73,6 +73,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
 {
+    #[\Override]
     public function register(): void
     {
     }

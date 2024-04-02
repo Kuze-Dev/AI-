@@ -19,6 +19,7 @@ class CreateBlueprint extends CreateRecord
 
     protected static string $resource = BlueprintResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -29,6 +30,7 @@ class CreateBlueprint extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateBlueprintAction::class)

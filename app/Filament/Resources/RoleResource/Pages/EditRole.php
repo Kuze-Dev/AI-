@@ -19,6 +19,7 @@ class EditRole extends EditRecord
 
     protected static string $resource = RoleResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -33,6 +34,7 @@ class EditRole extends EditRecord
     /**
      * @param  \Domain\Role\Models\Role  $record
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateRoleAction::class)->execute($record, RoleData::fromArray($data));

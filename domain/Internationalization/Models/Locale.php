@@ -49,6 +49,7 @@ class Locale extends Model
         'is_default',
     ];
 
+    #[\Override]
     protected static function booted()
     {
         static::saving(function ($locale) {
@@ -78,6 +79,7 @@ class Locale extends Model
      * Set the column reference
      * for route keys.
      */
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'code';

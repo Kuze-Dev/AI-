@@ -20,11 +20,13 @@ class AverageOrderValue extends ChartWidget
 
     public ?string $filter = 'perMonth';
 
+    #[\Override]
     protected function getType(): string
     {
         return 'bar';
     }
 
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -34,6 +36,7 @@ class AverageOrderValue extends ChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $activeFilter = $this->filter;

@@ -22,11 +22,13 @@ class UpsResponse implements RateResponse
         );
     }
 
+    #[\Override]
     public function getRateResponseAPI(): array
     {
         return ['is_united_state_domestic' => true] + get_object_vars($this);
     }
 
+    #[\Override]
     public function getRate(int|string|null $serviceID = null): float
     {
         return (float) $this->package['TotalCharges']['MonetaryValue'];

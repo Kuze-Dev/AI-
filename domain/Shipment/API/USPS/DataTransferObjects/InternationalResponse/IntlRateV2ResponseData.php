@@ -65,11 +65,13 @@ class IntlRateV2ResponseData implements RateResponse
         );
     }
 
+    #[\Override]
     public function getRateResponseAPI(): array
     {
         return ['is_united_state_domestic' => false] + get_object_vars($this);
     }
 
+    #[\Override]
     public function getRate(int|string|null $serviceID = null): float
     {
         foreach ($this->package->services as $service) {

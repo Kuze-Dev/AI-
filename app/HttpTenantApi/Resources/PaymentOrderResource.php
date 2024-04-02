@@ -13,6 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class PaymentOrderResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         /** @var \Domain\PaymentMethod\Models\PaymentMethod $paymentMethod */

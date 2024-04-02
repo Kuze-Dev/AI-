@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Http;
 
 final class Client
 {
-    public const PRODUCTION_URL = 'https://secure.shippingapis.com';
+    public const string PRODUCTION_URL = 'https://secure.shippingapis.com';
 
-    public const SANDBOX_URL = 'https://production.shippingapis.com';
+    public const string SANDBOX_URL = 'https://production.shippingapis.com';
 
     private PendingRequest $client;
 

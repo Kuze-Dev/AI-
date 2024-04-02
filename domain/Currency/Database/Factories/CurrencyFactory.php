@@ -14,6 +14,7 @@ class CurrencyFactory extends Factory
 {
     protected $model = Currency::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

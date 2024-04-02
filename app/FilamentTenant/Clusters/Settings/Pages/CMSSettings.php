@@ -21,6 +21,7 @@ class CMSSettings extends TenantBaseSettings
 
     protected static ?string $title = 'CMS Settings';
 
+    #[\Override]
     protected function getHeaderWidgets(): array
     {
         return [
@@ -28,6 +29,7 @@ class CMSSettings extends TenantBaseSettings
         ];
     }
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

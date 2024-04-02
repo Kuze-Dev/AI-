@@ -10,6 +10,7 @@ use Spatie\MediaLibrary\Support\PathGenerator\DefaultPathGenerator;
 
 class MediaPathGenerator extends DefaultPathGenerator
 {
+    #[\Override]
     protected function getBasePath(Media $media): string
     {
         if ($media->model_type === Customer::class) {

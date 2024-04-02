@@ -68,6 +68,7 @@ class SchemaFormBuilder extends Component
         return $static;
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -87,6 +88,7 @@ class SchemaFormBuilder extends Component
         return $this->evaluate($this->schemaData);
     }
 
+    #[\Override]
     public function getChildComponents(): array
     {
         return ($schema = $this->getSchemaData())

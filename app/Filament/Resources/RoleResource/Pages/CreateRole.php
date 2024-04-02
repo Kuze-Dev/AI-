@@ -18,6 +18,7 @@ class CreateRole extends CreateRecord
 
     protected static string $resource = RoleResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -28,6 +29,7 @@ class CreateRole extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateRoleAction::class)->execute(RoleData::fromArray($data));

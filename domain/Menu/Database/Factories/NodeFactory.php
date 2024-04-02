@@ -16,6 +16,7 @@ class NodeFactory extends Factory
 {
     protected $model = Node::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

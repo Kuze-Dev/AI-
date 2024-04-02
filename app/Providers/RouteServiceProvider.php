@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 class RouteServiceProvider extends ServiceProvider
 {
     /** Define your route model bindings, pattern filters, and other route configuration. */
+    #[\Override]
     public function boot(): void
     {
         $this->configureRateLimiting();

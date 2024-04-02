@@ -25,6 +25,7 @@ class AuthServiceProvider extends EventServiceProvider
         ],
     ];
 
+    #[\Override]
     public function register(): void
     {
         parent::register();

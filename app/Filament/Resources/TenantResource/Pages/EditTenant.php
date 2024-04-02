@@ -20,6 +20,7 @@ class EditTenant extends EditRecord
 
     protected static string $resource = TenantResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

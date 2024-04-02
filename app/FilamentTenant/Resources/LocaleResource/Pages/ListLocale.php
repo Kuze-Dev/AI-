@@ -12,6 +12,7 @@ class ListLocale extends ListRecords
 {
     protected static string $resource = LocaleResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

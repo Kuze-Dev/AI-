@@ -26,6 +26,7 @@ class EditContent extends EditRecord
      * Declare action buttons that
      * are available on the page.
      */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -48,6 +49,7 @@ class EditContent extends EditRecord
      *
      * @param  Content  $record
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateContentAction::class)

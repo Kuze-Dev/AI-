@@ -13,6 +13,7 @@ class ResetPassword extends \Illuminate\Auth\Notifications\ResetPassword impleme
 {
     use Queueable;
 
+    #[\Override]
     protected function buildMailMessage($url)
     {
         return (new MailMessage())

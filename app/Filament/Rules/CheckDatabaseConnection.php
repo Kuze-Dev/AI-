@@ -20,6 +20,7 @@ class CheckDatabaseConnection implements DataAwareRule, ValidationRule
     ) {
     }
 
+    #[\Override]
     public function setData($data): self
     {
         $this->data = $data['data'];
@@ -30,6 +31,7 @@ class CheckDatabaseConnection implements DataAwareRule, ValidationRule
     /**
      * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (config("database.connections.{$this->connectionTemplate}.driver") === 'sqlite') {

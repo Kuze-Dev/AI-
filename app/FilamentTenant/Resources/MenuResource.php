@@ -39,29 +39,34 @@ class MenuResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name', 'nodes.url', 'nodes.label'];
     }
 
     /** @return Builder<Menu> */
+    #[\Override]
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('nodes');
     }
 
     /** @param  Menu  $record */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @phpstan-ignore-next-line */
         return [trans('Total Nodes') => $record->nodes_count];
     }
 
+    #[\Override]
     public static function resolveRecordRouteBinding(int|string $key): ?Model
     {
         return app(static::getModel())
@@ -70,6 +75,7 @@ class MenuResource extends Resource
             ->first();
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -234,6 +240,7 @@ class MenuResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -272,6 +279,7 @@ class MenuResource extends Resource
     }
 
     /** @return Builder<\Domain\Menu\Models\Menu> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
@@ -291,6 +299,7 @@ class MenuResource extends Resource
 
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -298,6 +307,7 @@ class MenuResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

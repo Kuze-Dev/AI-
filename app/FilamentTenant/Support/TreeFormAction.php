@@ -10,11 +10,13 @@ use Illuminate\Support\Str;
 
 class TreeFormAction extends Action
 {
+    #[\Override]
     public static function getDefaultName(): ?string
     {
         return 'tree-form';
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

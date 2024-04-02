@@ -14,6 +14,7 @@ class ListPages extends ListRecords
     protected static string $resource = PageResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

@@ -6,7 +6,7 @@ namespace App\Jobs;
 
 class QueueJobPriority
 {
-    final public const PRIORITIES = [
+    final public const array PRIORITIES = [
         self::HIGH,
         self::MEDIUM,
         self::LOW,
@@ -17,21 +17,21 @@ class QueueJobPriority
         self::DB_BACKUP,
     ];
 
-    final public const HIGH = 'high';
+    final public const string HIGH = 'high';
 
-    final public const MEDIUM = 'medium';
+    final public const string MEDIUM = 'medium';
 
-    final public const LOW = 'low';
+    final public const string LOW = 'low';
 
-    final public const DEFAULT = 'default';
+    final public const string DEFAULT = 'default';
 
-    final public const IMPORT = 'import';
+    final public const string IMPORT = 'import';
 
-    final public const EXPORT = 'export';
+    final public const string EXPORT = 'export';
 
-    final public const MEDIA_LIBRARY = 'media_library';
+    final public const string MEDIA_LIBRARY = 'media_library';
 
-    final public const DB_BACKUP = 'db_backup';
+    final public const string DB_BACKUP = 'db_backup';
 
     private function __construct()
     {

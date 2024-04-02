@@ -30,6 +30,7 @@ class EditCustomer extends EditRecord
     protected static string $resource = CustomerResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -44,6 +45,7 @@ class EditCustomer extends EditRecord
         ];
     }
 
+    #[\Override]
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $customerTier = null;

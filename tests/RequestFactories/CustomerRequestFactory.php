@@ -15,6 +15,7 @@ use Worksome\RequestFactories\RequestFactory;
 
 class CustomerRequestFactory extends RequestFactory
 {
+    #[\Override]
     public function definition(): array
     {
         return [

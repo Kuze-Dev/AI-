@@ -13,6 +13,7 @@ use Vyuldashev\XmlToArray\XmlToArray;
 
 class RateClient extends BaseClient
 {
+    #[\Override]
     public static function uri(): string
     {
         return 'ShippingAPI.dll';

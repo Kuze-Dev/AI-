@@ -26,11 +26,13 @@ class TenantResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -195,6 +197,7 @@ class TenantResource extends Resource
             ])->columns(2);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -237,6 +240,7 @@ class TenantResource extends Resource
             ->bulkActions([]);
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -246,6 +250,7 @@ class TenantResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [

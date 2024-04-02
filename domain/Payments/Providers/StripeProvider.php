@@ -30,6 +30,7 @@ class StripeProvider extends Provider
         }
     }
 
+    #[\Override]
     public function authorize(): PaymentAuthorize
     {
 
@@ -88,6 +89,7 @@ class StripeProvider extends Provider
 
     }
 
+    #[\Override]
     public function refund(Payment $paymentModel, int $amount): PaymentRefund
     {
 
@@ -133,6 +135,7 @@ class StripeProvider extends Provider
 
     }
 
+    #[\Override]
     public function capture(Payment $paymentModel, array $data): PaymentCapture
     {
         return match ($data['status']) {

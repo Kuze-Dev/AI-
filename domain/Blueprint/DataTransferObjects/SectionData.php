@@ -33,6 +33,7 @@ class SectionData implements Arrayable
     }
 
     /** @return array<string, mixed> */
+    #[\Override]
     public function toArray()
     {
         return (array) $this;

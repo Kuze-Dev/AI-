@@ -24,6 +24,7 @@ class OrderSettings extends Settings
 
     public ?string $email_footer = null;
 
+    #[\Override]
     public static function group(): string
     {
         return 'order';

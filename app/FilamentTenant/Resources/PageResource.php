@@ -44,6 +44,7 @@ class PageResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
@@ -52,6 +53,7 @@ class PageResource extends Resource
     /** @var Collection<int, Block> */
     public static ?Collection $cachedBlocks = null;
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -218,6 +220,7 @@ class PageResource extends Resource
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -309,6 +312,7 @@ class PageResource extends Resource
     }
 
     /** @return Builder<\Domain\Page\Models\Page> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
@@ -328,6 +332,7 @@ class PageResource extends Resource
 
     }
 
+    #[\Override]
     public static function getRecordTitle(?Model $record): ?string
     {
 
@@ -349,6 +354,7 @@ class PageResource extends Resource
         return $truncatedTitle.''.$status;
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -356,6 +362,7 @@ class PageResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

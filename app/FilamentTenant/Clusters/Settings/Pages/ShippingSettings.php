@@ -22,6 +22,7 @@ class ShippingSettings extends TenantBaseSettings
 
     protected static ?string $title = 'Shipping Settings';
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

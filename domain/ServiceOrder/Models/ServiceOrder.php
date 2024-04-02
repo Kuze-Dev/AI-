@@ -200,16 +200,19 @@ class ServiceOrder extends Model implements PayableInterface
         'payment_value' => PaymentPlanValue::class,
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'reference';
     }
 
+    #[\Override]
     public function getReferenceNumber(): string
     {
         return $this->reference;
     }
 
+    #[\Override]
     public function newEloquentBuilder($query): ServiceOrderQueryBuilder
     {
         return new ServiceOrderQueryBuilder($query);

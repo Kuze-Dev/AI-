@@ -83,6 +83,7 @@ class BlueprintData extends Model implements HasMedia
     /** @var bool */
     public $registerMediaConversionsUsingModelInstance = true;
 
+    #[\Override]
     public function registerMediaConversions(?Media $media = null): void
     {
         $blueprint = $this->blueprint;

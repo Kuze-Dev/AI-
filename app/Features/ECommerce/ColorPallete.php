@@ -16,6 +16,7 @@ class ColorPallete implements FeatureContract
         return false;
     }
 
+    #[\Override]
     public function getLabel(): string
     {
         return trans('Color Pallete');

@@ -12,6 +12,7 @@ class ListTaxonomies extends ListRecords
 {
     protected static string $resource = TaxonomyResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

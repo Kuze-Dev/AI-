@@ -66,6 +66,7 @@ class MetaData extends Model implements HasMedia
         return $this->morphTo();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')

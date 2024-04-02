@@ -23,6 +23,7 @@ class CreateContentEntry extends CreateRecord
 
     public mixed $ownerRecord;
 
+    #[\Override]
     public function mount(string $ownerRecord = ''): void
     {
         $this->ownerRecord = app(Content::class)->resolveRouteBinding($ownerRecord)?->load('taxonomies.taxonomyTerms');
@@ -34,11 +35,13 @@ class CreateContentEntry extends CreateRecord
         parent::mount();
     }
 
+    #[\Override]
     public function getBreadcrumb(): string
     {
         return trans('Create :label Content Entry', ['label' => $this->ownerRecord->name]);
     }
 
+    #[\Override]
     public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
@@ -55,6 +58,7 @@ class CreateContentEntry extends CreateRecord
         );
     }
 
+    #[\Override]
     public function getTitle(): string
     {
         return trans('Create :label Content Entry', [
@@ -62,6 +66,7 @@ class CreateContentEntry extends CreateRecord
         ]);
     }
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -72,12 +77,14 @@ class CreateContentEntry extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateContentEntryAction::class)
             ->execute($this->ownerRecord, ContentEntryData::fromArray($data));
     }
 
+    #[\Override]
     protected function getRedirectUrl(): string
     {
         $resource = static::getResource();

@@ -15,11 +15,13 @@ class HealthCheckResults extends \ShuvroRoy\FilamentSpatieLaravelHealth\Pages\He
         abort_unless(Auth::user()?->hasRole(config('domain.role.super_admin')) ?? false, 403);
     }
 
+    #[\Override]
     public static function shouldRegisterNavigation(): bool
     {
         return Auth::user()?->hasRole(config('domain.role.super_admin')) ?? false;
     }
 
+    #[\Override]
     public static function getNavigationGroup(): string
     {
         return trans('System');

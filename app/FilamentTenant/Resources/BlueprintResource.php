@@ -39,16 +39,19 @@ class BlueprintResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -85,6 +88,7 @@ class BlueprintResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -116,6 +120,7 @@ class BlueprintResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -125,6 +130,7 @@ class BlueprintResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [

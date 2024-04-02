@@ -17,6 +17,7 @@ class ListCustomers extends ListRecords
     protected static string $resource = CustomerResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

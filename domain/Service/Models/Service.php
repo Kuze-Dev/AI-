@@ -133,6 +133,7 @@ class Service extends Model implements HasMedia, HasMetaDataContract
         'selling_price' => 'float',
     ];
 
+    #[\Override]
     public function uniqueIds(): array
     {
         return ['uuid'];
@@ -153,6 +154,7 @@ class Service extends Model implements HasMedia, HasMetaDataContract
         return $this->belongsTo(Blueprint::class);
     }
 
+    #[\Override]
     public function defaultMetaData(): array
     {
         return [
@@ -160,6 +162,7 @@ class Service extends Model implements HasMedia, HasMetaDataContract
         ];
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'uuid';
@@ -173,6 +176,7 @@ class Service extends Model implements HasMedia, HasMetaDataContract
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('media')

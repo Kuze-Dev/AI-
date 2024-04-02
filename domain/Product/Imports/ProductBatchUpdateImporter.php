@@ -25,6 +25,7 @@ class ProductBatchUpdateImporter extends Importer
 {
     protected static ?string $model = Product::class;
 
+    #[\Override]
     public static function getColumns(): array
     {
         return [
@@ -144,6 +145,7 @@ class ProductBatchUpdateImporter extends Importer
         ];
     }
 
+    #[\Override]
     public function resolveRecord(): ?Model
     {
         // ignore
@@ -154,6 +156,7 @@ class ProductBatchUpdateImporter extends Importer
      * @throws RowImportFailedException
      * @throws Throwable
      */
+    #[\Override]
     public function saveRecord(): void
     {
         DB::transaction(function () {
@@ -279,6 +282,7 @@ class ProductBatchUpdateImporter extends Importer
         app(UpdateProductAction::class)->execute($foundProduct, ProductData::fromCsvBulkUpdate($data));
     }
 
+    #[\Override]
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Your product/variant batch update import has completed and '.

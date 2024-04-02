@@ -26,12 +26,14 @@ class LocaleResource extends Resource
 
     protected static ?int $navigationSort = 9;
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
     /** @throws FileNotFoundException */
+    #[\Override]
     public static function form(Form $form): Form
     {
         /** @var array<string, array> $locales_json */
@@ -68,6 +70,7 @@ class LocaleResource extends Resource
         ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -94,6 +97,7 @@ class LocaleResource extends Resource
             ->defaultSort('is_default', 'desc');
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -101,6 +105,7 @@ class LocaleResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

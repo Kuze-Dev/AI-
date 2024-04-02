@@ -18,6 +18,7 @@ class ContentEntryFactory extends Factory
     protected $model = ContentEntry::class;
 
     /** Define values of model instance. */
+    #[\Override]
     public function definition(): array
     {
         return [
@@ -26,6 +27,7 @@ class ContentEntryFactory extends Factory
         ];
     }
 
+    #[\Override]
     public function configure(): self
     {
         return $this->has(MetaDataFactory::new())

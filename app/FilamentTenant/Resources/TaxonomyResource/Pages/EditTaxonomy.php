@@ -19,6 +19,7 @@ class EditTaxonomy extends EditRecord
 
     protected static string $resource = TaxonomyResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -31,11 +32,13 @@ class EditTaxonomy extends EditRecord
     }
 
     /** @param  \Domain\Taxonomy\Models\Taxonomy  $record */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data));
     }
 
+    #[\Override]
     protected function getRedirectUrl(): ?string
     {
         return TaxonomyResource::getUrl('edit', [$this->record]);

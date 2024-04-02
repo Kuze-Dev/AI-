@@ -79,6 +79,7 @@ class Discount extends Model
         'valid_end_at' => 'datetime',
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'code';

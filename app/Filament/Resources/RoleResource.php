@@ -37,16 +37,19 @@ class RoleResource extends Resource
 
     protected static string|array $routeMiddleware = RequirePassword::class.':filament.admin.password.confirm';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Access');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -68,6 +71,7 @@ class RoleResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -103,6 +107,7 @@ class RoleResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -269,6 +274,7 @@ class RoleResource extends Resource
         $set("{$groupName}_abilities", $get($groupName) ? $permissionGroup->abilities->pluck('id')->toArray() : []);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [

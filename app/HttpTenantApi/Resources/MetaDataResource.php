@@ -12,6 +12,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class MetaDataResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         $image = $this->getFirstMedia('image');

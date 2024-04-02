@@ -21,6 +21,7 @@ class CustomerExporter extends Exporter
     //        return QueueJobPriority::EXCEL;
     //    }
 
+    #[\Override]
     public static function getColumns(): array
     {
         return [
@@ -45,6 +46,7 @@ class CustomerExporter extends Exporter
         ];
     }
 
+    #[\Override]
     public static function getCompletedNotificationBody(Export $export): string
     {
         $body = 'Your customer export has completed and '.number_format($export->successful_rows).

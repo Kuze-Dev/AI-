@@ -38,16 +38,19 @@ class ServiceResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Service Management');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -208,6 +211,7 @@ class ServiceResource extends Resource
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -284,6 +288,7 @@ class ServiceResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -291,6 +296,7 @@ class ServiceResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -301,6 +307,7 @@ class ServiceResource extends Resource
     }
 
     /** @return Builder<\Domain\Service\Models\Service> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()

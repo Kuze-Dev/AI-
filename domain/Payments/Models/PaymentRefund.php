@@ -79,6 +79,7 @@ class PaymentRefund extends Model implements HasMedia
         return $this->belongsTo(Payment::class);
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')

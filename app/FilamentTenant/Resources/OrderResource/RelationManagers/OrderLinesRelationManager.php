@@ -20,6 +20,7 @@ class OrderLinesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'label';
 
+    #[\Override]
     public function table(Table $table): Table
     {
 

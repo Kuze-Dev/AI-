@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Http;
 
 final class AuspostClient
 {
-    public const API_URL = 'https://digitalapi.auspost.com.au';
+    public const string API_URL = 'https://digitalapi.auspost.com.au';
 
     private PendingRequest $client;
 

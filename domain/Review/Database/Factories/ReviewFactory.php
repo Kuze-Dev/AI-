@@ -15,6 +15,7 @@ class ReviewFactory extends Factory
 {
     protected $model = Review::class;
 
+    #[\Override]
     public function definition(): array
     {
         $order = OrderFactory::new()->create();

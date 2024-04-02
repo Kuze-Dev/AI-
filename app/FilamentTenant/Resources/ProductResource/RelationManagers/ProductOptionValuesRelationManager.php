@@ -28,6 +28,7 @@ class ProductOptionValuesRelationManager extends RelationManager
 {
     protected static string $relationship = 'productOptionValues';
 
+    #[\Override]
     public function form(Form $form): Form
     {
         $isProductOptionCustom = fn (Forms\Get $get): bool => once(
@@ -121,6 +122,7 @@ class ProductOptionValuesRelationManager extends RelationManager
             ->columns();
     }
 
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

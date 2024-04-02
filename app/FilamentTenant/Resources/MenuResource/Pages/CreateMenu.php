@@ -18,6 +18,7 @@ class CreateMenu extends CreateRecord
 
     protected static string $resource = MenuResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -28,6 +29,7 @@ class CreateMenu extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateMenuAction::class)->execute(MenuData::fromArray($data));

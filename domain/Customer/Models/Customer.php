@@ -148,11 +148,13 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         'tier_approval_status' => TierApprovalStatus::class,
     ];
 
+    #[\Override]
     public function uniqueIds(): array
     {
         return ['cuid'];
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'cuid';
@@ -175,6 +177,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         );
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
@@ -186,6 +189,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
             ->acceptsFile(fn () => ['application/pdf']);
     }
 
+    #[\Override]
     public function newEloquentBuilder($query): CustomerQueryBuilder
     {
         return new CustomerQueryBuilder($query);
@@ -203,11 +207,13 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         return $this->hasMany(Address::class);
     }
 
+    #[\Override]
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail());
     }
 
+    #[\Override]
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPassword($token));

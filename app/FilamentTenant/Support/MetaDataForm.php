@@ -14,6 +14,7 @@ use Throwable;
  */
 class MetaDataForm extends Section
 {
+    #[\Override]
     public function setUp(): void
     {
         parent::setUp();

@@ -53,6 +53,7 @@ class Cart extends Model
         'coupon_code',
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'uuid';

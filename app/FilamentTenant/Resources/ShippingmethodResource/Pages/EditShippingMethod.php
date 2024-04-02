@@ -21,6 +21,7 @@ class EditShippingMethod extends EditRecord
 
     protected static string $resource = ShippingMethodResource::class;
 
+    #[\Override]
     public function mount(int|string $record): void
     {
         parent::mount($record);
@@ -35,6 +36,7 @@ class EditShippingMethod extends EditRecord
         }
     }
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

@@ -22,6 +22,7 @@ class ListContentEntry extends ListRecords
 
     public mixed $ownerRecord;
 
+    #[\Override]
     public function mount(string $ownerRecord = ''): void
     {
         $this->ownerRecord = app(Content::class)->resolveRouteBinding($ownerRecord)?->load('taxonomies.taxonomyTerms');
@@ -33,6 +34,7 @@ class ListContentEntry extends ListRecords
         parent::mount();
     }
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -46,11 +48,13 @@ class ListContentEntry extends ListRecords
         ];
     }
 
+    #[\Override]
     public function getTitle(): string
     {
         return $this->ownerRecord->name.' '.Str::headline(static::getResource()::getPluralModelLabel());
     }
 
+    #[\Override]
     public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
@@ -73,6 +77,7 @@ class ListContentEntry extends ListRecords
     }
 
     /** @return Builder<\Domain\Content\Models\ContentEntry> */
+    #[\Override]
     protected function getTableQuery(): Builder
     {
 

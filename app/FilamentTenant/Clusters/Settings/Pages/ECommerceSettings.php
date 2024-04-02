@@ -20,6 +20,7 @@ class ECommerceSettings extends TenantBaseSettings
 
     protected static ?string $title = 'E Commerce Settings';
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

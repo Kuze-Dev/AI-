@@ -44,6 +44,7 @@ class EditPage extends EditRecord
     protected static string $resource = PageResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -266,6 +267,7 @@ class EditPage extends EditRecord
      *
      * @throws Throwable
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdatePageAction::class)->execute($record, PageData::fromArray($data));

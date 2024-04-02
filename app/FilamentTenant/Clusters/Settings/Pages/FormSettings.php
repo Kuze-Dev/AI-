@@ -19,6 +19,7 @@ class FormSettings extends TenantBaseSettings
 
     protected static ?string $title = 'Form Settings';
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

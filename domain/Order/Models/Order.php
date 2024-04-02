@@ -149,6 +149,7 @@ class Order extends Model implements HasMedia, PayableInterface
         'cancelled_at' => 'datetime',
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'reference';
@@ -184,6 +185,7 @@ class Order extends Model implements HasMedia, PayableInterface
         return $this->belongsTo(ShippingMethod::class, 'shipping_method_id');
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function () {
@@ -203,6 +205,7 @@ class Order extends Model implements HasMedia, PayableInterface
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
     public function getReferenceNumber(): string
     {
         return $this->reference;

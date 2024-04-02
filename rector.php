@@ -20,7 +20,7 @@ return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->sets([
         LaravelSetList::LARAVEL_100,
-        SetList::PHP_82,
+        SetList::PHP_83,
     ]);
 
     $rectorConfig->rules([
@@ -30,7 +30,7 @@ return static function (RectorConfig $rectorConfig): void {
         Spatie\Ray\Rector\RemoveRayCallRector::class,
     ]);
 
-    $rectorConfig->phpVersion(PhpVersion::PHP_82);
+    $rectorConfig->phpVersion(PhpVersion::PHP_83);
 
     //     $rectorConfig->phpstanConfig(__DIR__.'/phpstan.neon');
 

@@ -51,6 +51,7 @@ class Country extends Model
         'active' => 'bool',
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'code';

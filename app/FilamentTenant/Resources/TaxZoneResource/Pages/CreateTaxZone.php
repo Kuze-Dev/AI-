@@ -18,6 +18,7 @@ class CreateTaxZone extends CreateRecord
 
     protected static string $resource = TaxZoneResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -28,6 +29,7 @@ class CreateTaxZone extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateTaxZoneAction::class)->execute(TaxZoneData::formArray($data));

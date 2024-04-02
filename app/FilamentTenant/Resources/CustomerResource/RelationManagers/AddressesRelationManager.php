@@ -33,6 +33,7 @@ class AddressesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'full_detail';
 
+    #[\Override]
     public function form(Form $form): Form
     {
         return $form
@@ -96,6 +97,7 @@ class AddressesRelationManager extends RelationManager
     }
 
     /** @throws Exception */
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

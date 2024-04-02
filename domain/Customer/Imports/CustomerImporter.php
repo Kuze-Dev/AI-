@@ -23,6 +23,7 @@ class CustomerImporter extends Importer
     //        return 'central';
     //    }
 
+    #[\Override]
     public static function getColumns(): array
     {
         return [
@@ -60,6 +61,7 @@ class CustomerImporter extends Importer
         ];
     }
 
+    #[\Override]
     public function resolveRecord(): ?Customer
     {
         return app(ImportCustomerAction::class)
@@ -69,6 +71,7 @@ class CustomerImporter extends Importer
         //        ]);
     }
 
+    #[\Override]
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Your customer import has completed and '.

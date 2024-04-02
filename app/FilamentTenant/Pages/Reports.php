@@ -15,11 +15,13 @@ class Reports extends Page
 
     protected static ?int $navigationSort = 999;
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('eCommerce');
     }
 
+    #[\Override]
     protected function getHeaderWidgets(): array
     {
         return [

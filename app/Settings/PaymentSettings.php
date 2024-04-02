@@ -20,11 +20,13 @@ class PaymentSettings extends Settings
 
     public bool $stripe_production_mode;
 
+    #[\Override]
     public static function group(): string
     {
         return 'payments';
     }
 
+    #[\Override]
     public static function encrypted(): array
     {
         return [

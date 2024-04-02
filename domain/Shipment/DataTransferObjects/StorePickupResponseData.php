@@ -13,11 +13,13 @@ class StorePickupResponseData implements RateResponse
     ) {
     }
 
+    #[\Override]
     public function getRateResponseAPI(): array
     {
         return get_object_vars($this);
     }
 
+    #[\Override]
     public function getRate(int|string|null $serviceID = null): float
     {
         return $this->rate;

@@ -26,6 +26,7 @@ class TiersRelationManager extends RelationManager
     protected static ?string $title = 'Tier Discounts';
 
     /** @throws Exception */
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

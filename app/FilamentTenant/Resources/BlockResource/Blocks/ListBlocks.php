@@ -14,6 +14,7 @@ class ListBlocks extends ListRecords
     protected static string $resource = BlockResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -21,6 +22,7 @@ class ListBlocks extends ListRecords
         ];
     }
 
+    #[\Override]
     protected function getTableRecordsPerPageSelectOptions(): array
     {
         return [12, 24, 48, -1];

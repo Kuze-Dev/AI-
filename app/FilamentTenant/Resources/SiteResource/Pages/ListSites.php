@@ -15,6 +15,7 @@ class ListSites extends ListRecords
     protected static string $resource = SiteResource::class;
 
     /** @return Builder<\Domain\Site\Models\Site> */
+    #[\Override]
     protected function getTableQuery(): Builder
     {
         /** @var \Domain\Admin\Models\Admin */
@@ -31,6 +32,7 @@ class ListSites extends ListRecords
         });
     }
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

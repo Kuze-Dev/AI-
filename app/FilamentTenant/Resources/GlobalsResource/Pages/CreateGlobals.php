@@ -18,6 +18,7 @@ class CreateGlobals extends CreateRecord
 
     protected static string $resource = GlobalsResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -28,6 +29,7 @@ class CreateGlobals extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateGlobalsAction::class)->execute(GlobalsData::fromArray($data));

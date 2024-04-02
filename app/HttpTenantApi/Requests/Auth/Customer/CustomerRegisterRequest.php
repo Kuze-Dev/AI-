@@ -98,6 +98,7 @@ class CustomerRegisterRequest extends FormRequest
         return $rules;
     }
 
+    #[\Override]
     public function messages(): array
     {
         return [
@@ -137,6 +138,7 @@ class CustomerRegisterRequest extends FormRequest
         ];
     }
 
+    #[\Override]
     public function attributes(): array
     {
         return [

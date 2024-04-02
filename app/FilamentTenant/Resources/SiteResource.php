@@ -30,16 +30,19 @@ class SiteResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -80,6 +83,7 @@ class SiteResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -169,12 +173,14 @@ class SiteResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function shouldRegisterNavigation(): bool
     {
         return TenantFeatureSupport::active(SitesManagement::class);
     }
 
     /** @return Builder<Site> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -183,6 +189,7 @@ class SiteResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -190,6 +197,7 @@ class SiteResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

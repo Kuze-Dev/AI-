@@ -23,6 +23,7 @@ class OrderFactory extends Factory
 {
     protected $model = Order::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [
@@ -61,6 +62,7 @@ class OrderFactory extends Factory
         ];
     }
 
+    #[\Override]
     public function configure()
     {
         return $this->afterCreating(function (Order $order) {

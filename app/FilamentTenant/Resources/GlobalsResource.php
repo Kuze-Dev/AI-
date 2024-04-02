@@ -36,11 +36,13 @@ class GlobalsResource extends Resource
 
     protected static ?int $navigationSort = 9;
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -127,6 +129,7 @@ class GlobalsResource extends Resource
         ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -173,6 +176,7 @@ class GlobalsResource extends Resource
     }
 
     /** @return Builder<\Domain\Globals\Models\Globals> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
@@ -192,6 +196,7 @@ class GlobalsResource extends Resource
 
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -199,6 +204,7 @@ class GlobalsResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

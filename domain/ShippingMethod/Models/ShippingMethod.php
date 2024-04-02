@@ -101,6 +101,7 @@ class ShippingMethod extends Model implements HasMedia
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -121,6 +122,7 @@ class ShippingMethod extends Model implements HasMedia
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logo')

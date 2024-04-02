@@ -17,6 +17,7 @@ class MetaDataFactory extends Factory
 {
     protected $model = MetaData::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [
@@ -29,6 +30,7 @@ class MetaDataFactory extends Factory
         ];
     }
 
+    #[\Override]
     public function configure(): self
     {
         return $this->state(function (array $attributes, ?Model $model) {

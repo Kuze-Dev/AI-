@@ -26,6 +26,7 @@ class GuestCartMobileSummaryRequest extends AddressRequest
 
     private array $cartLineIds;
 
+    #[\Override]
     public function rules(): array
     {
         return [

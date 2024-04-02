@@ -21,6 +21,7 @@ class ProductVariantImporter extends Importer
 {
     protected static ?string $model = ProductVariant::class;
 
+    #[\Override]
     public static function getColumns(): array
     {
         return [
@@ -118,6 +119,7 @@ class ProductVariantImporter extends Importer
         ];
     }
 
+    #[\Override]
     public function resolveRecord(): ProductVariant
     {
         return ProductVariant::firstOrNew([
@@ -128,6 +130,7 @@ class ProductVariantImporter extends Importer
     /**
      * @throws \Throwable
      */
+    #[\Override]
     public function saveRecord(): void
     {
         if ($this->record->exists) {
@@ -234,6 +237,7 @@ class ProductVariantImporter extends Importer
         return $combination;
     }
 
+    #[\Override]
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Your product variant import has completed and '.

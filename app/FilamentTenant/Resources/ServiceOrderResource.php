@@ -22,11 +22,13 @@ class ServiceOrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'reference';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Service Management');
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -68,6 +70,7 @@ class ServiceOrderResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -76,6 +79,7 @@ class ServiceOrderResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

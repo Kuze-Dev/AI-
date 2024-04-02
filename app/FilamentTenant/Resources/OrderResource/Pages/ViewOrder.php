@@ -16,6 +16,7 @@ class ViewOrder extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
 
+    #[\Override]
     public function getHeading(): string|Htmlable
     {
         return trans('Order #:order', ['order' => $this->record->reference]);

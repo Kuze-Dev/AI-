@@ -20,6 +20,7 @@ class RouteUrlFieldset extends Group
 {
     protected ?Closure $generateModelForRouteUrlUsing = null;
 
+    #[\Override]
     public function setUp(): void
     {
         parent::setUp();

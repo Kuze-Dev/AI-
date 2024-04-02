@@ -23,6 +23,7 @@ class SpatieMediaLibraryImageEntry extends \Filament\Infolists\Components\Spatie
     }
 
     // override
+    #[\Override]
     public function getRecord(): ?Model
     {
         $model = $this->evaluate($this->model);

@@ -12,6 +12,7 @@ class ListServiceOrder extends ListRecords
 {
     protected static string $resource = ServiceOrderResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

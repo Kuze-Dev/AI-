@@ -17,6 +17,7 @@ class RewardPointsSettings extends TenantBaseSettings
 
     protected static ?string $navigationIcon = 'heroicon-s-tag';
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

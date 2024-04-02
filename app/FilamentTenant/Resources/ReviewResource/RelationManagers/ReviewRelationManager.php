@@ -16,6 +16,7 @@ class ReviewRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'comment';
 
+    #[\Override]
     public function form(Form $form): Form
     {
         return $form
@@ -29,6 +30,7 @@ class ReviewRelationManager extends RelationManager
             ])->columns(1);
     }
 
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

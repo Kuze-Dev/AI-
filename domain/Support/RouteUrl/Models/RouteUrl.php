@@ -53,6 +53,7 @@ class RouteUrl extends Model implements Stringable
         return $this->morphTo();
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->url;

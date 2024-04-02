@@ -21,6 +21,7 @@ class EditSite extends EditRecord
      * Declare action buttons that
      * are available on the page.
      */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -35,6 +36,7 @@ class EditSite extends EditRecord
     /**
      * @param  Site  $record
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
 

@@ -19,6 +19,7 @@ class OrderSettings extends TenantBaseSettings
 
     protected static ?string $title = 'Order Settings';
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

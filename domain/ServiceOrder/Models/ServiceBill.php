@@ -109,21 +109,25 @@ class ServiceBill extends Model implements HasMedia, PayableInterface
         'status' => ServiceBillStatus::class,
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'reference';
     }
 
+    #[\Override]
     public function getReferenceNumber(): string
     {
         return $this->reference;
     }
 
+    #[\Override]
     public function newEloquentBuilder($query): ServiceBillQueryBuilder
     {
         return new ServiceBillQueryBuilder($query);
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function () {

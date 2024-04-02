@@ -80,6 +80,7 @@ class ShippingBox extends Model
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

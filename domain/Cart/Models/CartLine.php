@@ -76,6 +76,7 @@ class CartLine extends Model implements HasMedia
         'checked_out_at' => 'datetime',
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'uuid';
@@ -93,6 +94,7 @@ class CartLine extends Model implements HasMedia
         return $this->morphTo();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function (Media $media) {

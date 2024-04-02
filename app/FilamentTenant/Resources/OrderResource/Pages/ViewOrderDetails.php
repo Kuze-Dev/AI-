@@ -21,21 +21,25 @@ class ViewOrderDetails extends ViewRecord
 {
     protected static string $resource = OrderResource::class;
 
+    #[\Override]
     public function getHeading(): string|Htmlable
     {
         return trans('Order Details #:order', ['order' => $this->record->reference]);
     }
 
+    #[\Override]
     public function getBreadcrumb(): string
     {
         return trans('View details');
     }
 
+    #[\Override]
     public function getRelationManagers(): array
     {
         return [];
     }
 
+    #[\Override]
     public function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         return $infolist

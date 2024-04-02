@@ -67,6 +67,7 @@ class ContentEntryResource extends Resource
     }
 
     /** @param  ContentEntry  $record */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @phpstan-ignore-next-line */
@@ -74,17 +75,20 @@ class ContentEntryResource extends Resource
     }
 
     /** @param  ContentEntry  $record */
+    #[\Override]
     public static function getGlobalSearchResultUrl(Model $record): ?string
     {
         return self::getUrl('edit', [$record->content, $record]);
     }
 
     /** @return Builder<ContentEntry> */
+    #[\Override]
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->with('content');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -213,6 +217,7 @@ class ContentEntryResource extends Resource
             ->columns(3);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -331,6 +336,7 @@ class ContentEntryResource extends Resource
             ->defaultSort('order');
     }
 
+    #[\Override]
     public static function getRecordTitle(?Model $record): ?string
     {
 
@@ -352,6 +358,7 @@ class ContentEntryResource extends Resource
         return $truncatedTitle.''.$status;
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -359,6 +366,7 @@ class ContentEntryResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

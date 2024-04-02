@@ -123,6 +123,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
      * Define default reference
      * for meta data properties.
      */
+    #[\Override]
     public function defaultMetaData(): array
     {
         return [
@@ -177,18 +178,21 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
      * Set the column reference
      * for route keys.
      */
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
     /** @return ContentEntryBuilder<self> */
+    #[\Override]
     public function newEloquentBuilder($query): ContentEntryBuilder
     {
         return new ContentEntryBuilder($query);
     }
 
     /** @param  self  $model */
+    #[\Override]
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
         return Str::start($model->content->prefix, '/').Str::of($attributes['title'])->slug()->start('/');

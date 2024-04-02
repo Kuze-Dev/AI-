@@ -28,6 +28,7 @@ class ServiceSettings extends TenantBaseSettings
         return parent::authorizeAccess() && TenantFeatureSupport::active(ServiceBase::class);
     }
 
+    #[\Override]
     protected function getFormSchema(): array
     {
         return [

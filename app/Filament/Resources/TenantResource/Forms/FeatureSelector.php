@@ -23,6 +23,7 @@ class FeatureSelector extends Field
 
     protected string $view = 'filament-forms::components.group';
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

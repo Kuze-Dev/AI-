@@ -12,6 +12,7 @@ class ListForms extends ListRecords
 {
     protected static string $resource = FormResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

@@ -12,6 +12,7 @@ class RewardPointsSettings extends Settings
 
     public ?int $equivalent_point = 1;
 
+    #[\Override]
     public static function group(): string
     {
         return 'reward-points';

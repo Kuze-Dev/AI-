@@ -18,6 +18,7 @@ class CreateForm extends CreateRecord
 
     protected static string $resource = FormResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -28,6 +29,7 @@ class CreateForm extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateFormAction::class)->execute(FormData::fromArray($data));

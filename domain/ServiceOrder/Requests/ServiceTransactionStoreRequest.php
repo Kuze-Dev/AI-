@@ -49,6 +49,7 @@ class ServiceTransactionStoreRequest extends FormRequest
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException
      */
+    #[\Override]
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([

@@ -16,6 +16,7 @@ class ServiceBillFactory extends Factory
 {
     protected $model = ServiceBill::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

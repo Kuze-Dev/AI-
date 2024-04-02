@@ -33,17 +33,20 @@ class TaxonomyResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name', 'taxonomyTerms.name'];
     }
 
     /** @param  Taxonomy  $record */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @phpstan-ignore-next-line */
@@ -51,11 +54,13 @@ class TaxonomyResource extends Resource
     }
 
     /** @return Builder<Taxonomy> */
+    #[\Override]
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('taxonomyTerms');
     }
 
+    #[\Override]
     public static function resolveRecordRouteBinding(int|string $key): ?Model
     {
         return app(static::getModel())
@@ -64,6 +69,7 @@ class TaxonomyResource extends Resource
             ->first();
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -110,6 +116,7 @@ class TaxonomyResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -149,6 +156,7 @@ class TaxonomyResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -156,6 +164,7 @@ class TaxonomyResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

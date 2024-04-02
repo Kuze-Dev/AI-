@@ -51,6 +51,7 @@ class EditServiceOrder extends EditRecord
 
     protected static ?string $recordTitleAttribute = 'reference';
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -61,11 +62,13 @@ class EditServiceOrder extends EditRecord
         ];
     }
 
+    #[\Override]
     public function getHeading(): string|Htmlable
     {
         return trans('Service Order Details #:service-order', ['service-order' => $this->record->reference]);
     }
 
+    #[\Override]
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $amountInfo = app(GetTaxableInfoAction::class)
@@ -99,6 +102,7 @@ class EditServiceOrder extends EditRecord
         }
     }
 
+    #[\Override]
     public function form(Forms\Form $form): Forms\Form
     {
         return $form->schema([

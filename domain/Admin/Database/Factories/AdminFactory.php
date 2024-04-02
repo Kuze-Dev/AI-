@@ -20,6 +20,7 @@ class AdminFactory extends Factory
 {
     protected $model = Admin::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

@@ -19,6 +19,7 @@ class ListInviteCustomers extends ListCustomers
     protected static string $resource = InviteCustomerResource::class;
 
     /** @throws \Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

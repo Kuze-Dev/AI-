@@ -24,6 +24,7 @@ class CheckBoxFieldData extends FieldData
     ) {
     }
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {

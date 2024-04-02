@@ -13,11 +13,13 @@ use Lloricode\Timezone\Timezone;
 
 class EditProfile extends \Filament\Pages\Auth\EditProfile
 {
+    #[\Override]
     public static function canAccess(): bool
     {
         return ! Filament::auth()->user()?->isZeroDayAdmin();
     }
 
+    #[\Override]
     protected function getForms(): array
     {
         /** @var Forms\Components\TextInput $emailTextInput */
@@ -64,6 +66,7 @@ class EditProfile extends \Filament\Pages\Auth\EditProfile
         ];
     }
 
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Admin $admin */

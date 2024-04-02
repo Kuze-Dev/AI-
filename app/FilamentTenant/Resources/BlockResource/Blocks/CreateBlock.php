@@ -18,6 +18,7 @@ class CreateBlock extends CreateRecord
 
     protected static string $resource = BlockResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -29,6 +30,7 @@ class CreateBlock extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateBlockAction::class)

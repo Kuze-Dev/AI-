@@ -16,17 +16,20 @@ class OfflinePayment extends Provider
 {
     protected string $name = 'offline';
 
+    #[\Override]
     public function authorize(): PaymentAuthorize
     {
 
         return new PaymentAuthorize(true);
     }
 
+    #[\Override]
     public function refund(Payment $paymentModel, int $amount): PaymentRefund
     {
         return new PaymentRefund(success: false);
     }
 
+    #[\Override]
     public function capture(Payment $paymentModel, array $data): PaymentCapture
     {
         return match ($data['status']) {

@@ -23,11 +23,13 @@ class TotalSales extends ChartWidget
 
     protected static ?string $pollingInterval = null;
 
+    #[\Override]
     protected function getType(): string
     {
         return 'bar';
     }
 
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -37,6 +39,7 @@ class TotalSales extends ChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $activeFilter = $this->filter;

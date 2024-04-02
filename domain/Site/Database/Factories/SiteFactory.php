@@ -14,6 +14,7 @@ class SiteFactory extends Factory
 {
     protected $model = Site::class;
 
+    #[\Override]
     public function definition(): array
     {
         $name = $this->faker->name();

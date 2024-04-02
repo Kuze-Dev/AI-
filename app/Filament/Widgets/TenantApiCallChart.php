@@ -15,6 +15,7 @@ class TenantApiCallChart extends BarChartWidget
 
     protected static ?string $pollingInterval = '300';
 
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -25,6 +26,7 @@ class TenantApiCallChart extends BarChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         /** @var string */

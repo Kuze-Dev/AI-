@@ -15,6 +15,7 @@ class CreatePaymentMethod extends CreateRecord
 
     protected static string $resource = PaymentMethodResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

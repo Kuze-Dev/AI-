@@ -27,16 +27,19 @@ class OrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'reference';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('eCommerce');
     }
 
+    #[\Override]
     public static function getNavigationBadge(): ?string
     {
         return (string) Order::whereIn('status', [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])->count();
     }
 
+    #[\Override]
     public static function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         return $infolist
@@ -159,6 +162,7 @@ class OrderResource extends Resource
             ])->columns(3);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -291,11 +295,13 @@ class OrderResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    #[\Override]
     public static function canCreate(): bool
     {
         return false;
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -304,6 +310,7 @@ class OrderResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

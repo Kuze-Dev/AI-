@@ -15,6 +15,7 @@ class BlueprintFactory extends Factory
 {
     protected $model = Blueprint::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

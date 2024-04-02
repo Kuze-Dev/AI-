@@ -12,6 +12,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class FormResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [
@@ -21,6 +22,7 @@ class FormResource extends JsonApiResource
         ];
     }
 
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [

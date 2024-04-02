@@ -21,6 +21,7 @@ class EditForm extends EditRecord
     protected static string $resource = FormResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -35,6 +36,7 @@ class EditForm extends EditRecord
     /**
      * @param  \Domain\Form\Models\Form  $record
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateFormAction::class)->execute($record, FormData::fromArray($data));

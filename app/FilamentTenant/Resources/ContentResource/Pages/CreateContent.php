@@ -19,6 +19,7 @@ class CreateContent extends CreateRecord
 
     protected static string $resource = ContentResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -29,6 +30,7 @@ class CreateContent extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
         return app(CreateContentAction::class)

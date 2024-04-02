@@ -30,6 +30,7 @@ class ServiceSettings extends Settings
 
     public ?int $days_before_due_date_notification = 1;
 
+    #[\Override]
     public static function group(): string
     {
         return 'service';

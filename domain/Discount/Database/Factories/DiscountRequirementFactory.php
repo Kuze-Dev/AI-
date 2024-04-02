@@ -15,6 +15,7 @@ class DiscountRequirementFactory extends Factory
 {
     protected $model = DiscountRequirement::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

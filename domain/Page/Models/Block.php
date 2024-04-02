@@ -89,6 +89,7 @@ class Block extends Model implements HasMedia
         return $this->hasMany(BlockContent::class);
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')

@@ -29,6 +29,7 @@ class ServiceBillsRelationManager extends RelationManager
 
     protected static ?string $title = 'Service Bills';
 
+    #[\Override]
     public function infolist(Infolists\Infolist $infolist): Infolists\Infolist
     {
         return $infolist->schema([
@@ -131,6 +132,7 @@ class ServiceBillsRelationManager extends RelationManager
             ->columns(3);
     }
 
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

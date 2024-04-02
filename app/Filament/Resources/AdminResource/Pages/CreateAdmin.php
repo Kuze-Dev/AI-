@@ -19,6 +19,7 @@ class CreateAdmin extends CreateRecord
 
     protected static string $resource = AdminResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

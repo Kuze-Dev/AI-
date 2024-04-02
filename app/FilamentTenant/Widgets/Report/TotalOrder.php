@@ -17,6 +17,7 @@ class TotalOrder extends Widget
 
     public array $status = ['pending', 'cancelled', 'packed', 'delivered', 'shipped', 'refunded',  'fulfilled'];
 
+    #[\Override]
     protected function getViewData(): array
     {
         $statusCounts = [];

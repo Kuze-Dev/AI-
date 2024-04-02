@@ -17,6 +17,7 @@ class CreateService extends CreateRecord
     protected static string $resource = ServiceResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -28,6 +29,7 @@ class CreateService extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['pay_upfront'] ??= false;

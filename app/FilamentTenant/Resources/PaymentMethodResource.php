@@ -27,16 +27,19 @@ class PaymentMethodResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Shop Configuration');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['title', 'gateway'];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -74,6 +77,7 @@ class PaymentMethodResource extends Resource
     /**
      * @throws \Exception
      */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -121,6 +125,7 @@ class PaymentMethodResource extends Resource
     }
 
     /** @return Builder<PaymentMethod> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -129,6 +134,7 @@ class PaymentMethodResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

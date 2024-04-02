@@ -18,6 +18,7 @@ class FormSubmissionsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'id';
 
+    #[\Override]
     public function form(Form $form): Form
     {
         return $form
@@ -29,6 +30,7 @@ class FormSubmissionsRelationManager extends RelationManager
             ]);
     }
 
+    #[\Override]
     public function table(Table $table): Table
     {
         return $table

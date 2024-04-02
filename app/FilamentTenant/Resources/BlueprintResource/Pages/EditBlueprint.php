@@ -29,6 +29,7 @@ class EditBlueprint extends EditRecord
 
     protected static string $resource = BlueprintResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -41,6 +42,7 @@ class EditBlueprint extends EditRecord
     }
 
     /** @param  Blueprint  $record */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateBlueprintAction::class)

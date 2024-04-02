@@ -16,21 +16,25 @@ class TwoFactorAuthenticationProvider implements TwoFactorAuthenticationProvider
     ) {
     }
 
+    #[\Override]
     public function generateSecretKey(): string
     {
         return $this->engine->generateSecretKey();
     }
 
+    #[\Override]
     public function getCurrentOtp(string $secret): string
     {
         return $this->engine->getCurrentOtp($secret);
     }
 
+    #[\Override]
     public function qrCodeUrl(string $name, string $holder, string $secret): string
     {
         return $this->engine->getQRCodeUrl($name, $holder, $secret);
     }
 
+    #[\Override]
     public function verify(string $secret, string $code): bool
     {
         if (is_int($customWindow = config('domain.auth.two_factor.totp.window'))) {

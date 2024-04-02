@@ -15,6 +15,7 @@ class CreateSite extends CreateRecord
 {
     protected static string $resource = SiteResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -25,6 +26,7 @@ class CreateSite extends CreateRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
 

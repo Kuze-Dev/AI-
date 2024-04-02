@@ -19,6 +19,7 @@ class EditDiscount extends EditRecord
 
     protected static string $resource = DiscountResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

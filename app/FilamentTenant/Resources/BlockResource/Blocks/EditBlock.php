@@ -21,6 +21,7 @@ class EditBlock extends EditRecord
     protected static string $resource = BlockResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [
@@ -35,6 +36,7 @@ class EditBlock extends EditRecord
     /**
      * @param  \Domain\Page\Models\Block  $record
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateBlockAction::class)

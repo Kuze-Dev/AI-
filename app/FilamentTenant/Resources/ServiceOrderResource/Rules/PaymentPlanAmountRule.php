@@ -16,6 +16,7 @@ class PaymentPlanAmountRule implements ValidationRule
     ) {
     }
 
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $amounts = array_column($value, 'amount');

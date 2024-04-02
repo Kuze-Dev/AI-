@@ -12,6 +12,7 @@ class ListBlueprints extends ListRecords
 {
     protected static string $resource = BlueprintResource::class;
 
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

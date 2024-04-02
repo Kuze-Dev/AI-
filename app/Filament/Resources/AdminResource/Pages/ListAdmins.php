@@ -18,6 +18,7 @@ class ListAdmins extends ListRecords
     protected static string $resource = AdminResource::class;
 
     /** @throws Exception */
+    #[\Override]
     protected function getHeaderActions(): array
     {
         return [

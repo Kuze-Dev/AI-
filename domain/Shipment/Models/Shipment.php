@@ -80,6 +80,7 @@ class Shipment extends Model
         return $this->belongsTo(ShippingMethod::class);
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
