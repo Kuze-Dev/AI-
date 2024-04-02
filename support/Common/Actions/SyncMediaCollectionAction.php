@@ -15,12 +15,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
 
-/**
- * @deprecated use https://filamentphp.com/plugins/filament-spatie-media-library
- */
 class SyncMediaCollectionAction
 {
-    /** @return MediaCollection<int, Media>|null  */
+    /**
+     * @return MediaCollection<int, Media>|null
+     *
+     * @deprecated use https://filamentphp.com/plugins/filament-spatie-media-library
+     */
     public function execute(Model&HasMedia $model, MediaCollectionData $mediaCollectionData): ?MediaCollection
     {
         $media = collect($mediaCollectionData->media)
