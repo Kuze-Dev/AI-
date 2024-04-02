@@ -49,6 +49,7 @@ class ProductOptionValue extends Model implements HasMedia
 
     protected $with = [
         'media',
+        'productOption',
     ];
 
     protected $casts = [
@@ -98,7 +99,7 @@ class ProductOptionValue extends Model implements HasMedia
      */
     public function productOption(): BelongsTo
     {
-        return $this->belongsTo(ProductOption::class);
+        return $this->belongsTo(ProductOption::class)->without('productOptionValues');
     }
 
     #[\Override]
