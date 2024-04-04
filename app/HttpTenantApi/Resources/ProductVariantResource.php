@@ -29,6 +29,7 @@ class ProductVariantResource extends JsonApiResource
     {
         return [
             'product' => fn () => ProductResource::make($this->product),
+            'media' => fn () => MediaResource::collection($this->media),
         ];
     }
 }

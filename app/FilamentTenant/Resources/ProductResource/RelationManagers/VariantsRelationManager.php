@@ -9,6 +9,7 @@ namespace App\FilamentTenant\Resources\ProductResource\RelationManagers;
 use Closure;
 use Domain\Product\Enums\Status;
 use Domain\Product\Models\ProductVariant;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
@@ -34,11 +35,12 @@ class VariantsRelationManager extends RelationManager
                                         \Filament\Forms\Components\TextInput::make("combination[{$key}].option_value")
                                             ->formatStateUsing(fn () => ucfirst($combination['option_value']))
                                             ->label(trans(ucfirst($combination['option'])))
+                                            ->dehydrated(false)
                                             ->disabled();
                                 }
 
                                 return $schemaArray;
-                            })->columns(2),
+                            })->dehydrated(false)->columns(2),
                         \Filament\Forms\Components\Section::make('Inventory')
                             ->translateLabel()
                             ->schema([
@@ -110,6 +112,12 @@ class VariantsRelationManager extends RelationManager
                                     )
                                     ->helperText('This product variant will be hidden from all sales channels.'),
                             ])->columns(2),
+                        \Filament\Forms\Components\Section::make('Media')
+                            ->translateLabel()
+                            ->schema([
+                                SpatieMediaLibraryFileUpload::make('images')
+                                    ->collection('image'),
+                            ]),
                     ]),
             ])->columns(1);
     }

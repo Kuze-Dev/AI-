@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use App\Console\Commands\CreateServiceBillCommand;
-use App\Console\Commands\InactivateServiceOrderCommand;
-use App\Console\Commands\NotifyCustomerServiceBillDueDateCommand;
 use App\Console\Commands\TenancyAwareScheduler\ClearResetsTenancyAwareSchedulerCommand;
 use App\Console\Commands\TenancyAwareScheduler\PruneExportTenancyAwareSchedulerCommand;
 use App\Console\Commands\TenancyAwareScheduler\PruneImportTenancyAwareSchedulerCommand;
 use App\Console\Commands\TenancyAwareScheduler\SanctumPruneExpiredTenancyAwareScheduler;
+use Domain\ServiceOrder\Commands\CreateServiceBillCommand;
+use Domain\ServiceOrder\Commands\InactivateServiceOrderCommand;
+use Domain\ServiceOrder\Commands\NotifyCustomerServiceBillDueDateCommand;
 use HalcyonAgile\FilamentExport\Commands\PruneExportCommand;
 use HalcyonAgile\FilamentImport\Commands\PruneImportCommand;
 use Illuminate\Console\Scheduling\Schedule;

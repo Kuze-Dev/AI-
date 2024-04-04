@@ -50,7 +50,7 @@ class ProductController
                 ->allowedIncludes([
                     'taxonomyTerms.taxonomy',
                     'productOptions',
-                    'productVariants',
+                    'productVariants.media',
                     'media',
                     'metaData',
                     'tiers',
@@ -69,7 +69,7 @@ class ProductController
             ->allowedIncludes([
                 'taxonomyTerms',
                 'productOptions',
-                'productVariants',
+                'productVariants.media',
                 'media',
                 'metaData',
                 'tiers',
