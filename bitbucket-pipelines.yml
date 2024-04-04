@@ -10,19 +10,15 @@ definitions:
     cp .env.example .env &&
     php artisan key:generate
     php artisan about --only=environment
+    php -v
   steps:
     - step: &common-step
         caches:
           - composer
-    - step: &install-php-8.2
-        name: Install PHP 8.2
-        script:
-          - apt-get update && apt-get install -y php8.2 php8.2-cli php8.2-common php8.2-json php8.2-opcache php8.2-mysql php8.2-mbstring php8.2-xml php8.2-gd php8.2-curl
     - step: &check-format
         <<: *common-step
         name: Check Format
         script:
-          - *install-php-8.2
           - *setup-script
           - composer format-dry-run
         condition:
@@ -34,7 +30,6 @@ definitions:
         <<: *common-step
         name: Analyse
         script:
-          - *install-php-8.2
           - *setup-script
           - composer analyse-no-memory-limit
         caches:
@@ -49,7 +44,6 @@ definitions:
         <<: *common-step
         name: Test
         script:
-          - *install-php-8.2
           - *setup-script
           # TODO: remove test-no-timeout when using stancl/tenancy v4
           - composer test-no-timeout -- --ci --passthru-php="-d memory_limit=-1"
@@ -71,7 +65,6 @@ pipelines:
           name: Deploy to Staging
           deployment: staging
           script:
-            - *install-php-8.2
             - *setup-script
             - composer require laravel/vapor-cli
             - ./vendor/bin/vapor deploy staging --commit="$BITBUCKET_COMMIT"
@@ -86,7 +79,6 @@ pipelines:
           deployment: production
           trigger: manual
           script:
-            - *install-php-8.2
             - *setup-script
             - composer require laravel/vapor-cli
             - ./vendor/bin/vapor deploy production --commit="$BITBUCKET_COMMIT"
@@ -100,7 +92,6 @@ pipelines:
               name: Deploy to Ecommerce Branch
               deployment: ecommerce
               script:
-                - *install-php-8.2
                 - *setup-script
                 - composer require laravel/vapor-cli
                 - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
