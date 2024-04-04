@@ -1,5 +1,5 @@
 image:
-  name: bitnami/laravel:10.3.3 # https://bitnami.com/stack/laravel
+  name: bitnami/laravel:10.3.3-8.2.17 # https://bitnami.com/stack/laravel
   run-as-user: 1000
 
 definitions:
