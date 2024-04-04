@@ -80,7 +80,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::shouldBeStrict($this->app->isLocal() || $this->app->runningUnitTests());
 
-        // Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
+        Model::handleLazyLoadingViolationUsing(Integration::lazyLoadingViolationReporter());
 
         Model::handleMissingAttributeViolationUsing(function (Model $model, string $key) {
             if ($model instanceof Tenant && Str::startsWith($key, Tenant::internalPrefix())) {
