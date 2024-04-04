@@ -14,11 +14,11 @@ class UpdateAdminAction
         $admin->update($this->getAdminAttributes($adminData));
 
         if ($adminData->roles !== null) {
-            $admin->syncRoles($adminData->roles);
+            $admin->roles()->sync($adminData->roles);
         }
 
         if ($adminData->permissions !== null) {
-            $admin->syncPermissions($adminData->permissions);
+            $admin->permissions()->sync($adminData->permissions);
         }
 
         if ($admin->wasChanged('email')) {
