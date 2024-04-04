@@ -20,7 +20,7 @@ class CreateAdminAction
         }
 
         if ($adminData->permissions !== null) {
-            $admin->syncPermissions($adminData->permissions);
+            $admin->permissions()->sync($adminData->permissions);
         }
 
         event(new Registered($admin));
