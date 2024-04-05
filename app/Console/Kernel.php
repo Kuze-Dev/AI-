@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use App\Console\Commands\CreateServiceBillCommand;
-use App\Console\Commands\InactivateServiceOrderCommand;
-use App\Console\Commands\NotifyCustomerServiceBillDueDateCommand;
 use App\Console\Commands\TenancyAwareScheduler\ClearResetsTenancyAwareSchedulerCommand;
 use App\Console\Commands\TenancyAwareScheduler\SanctumPruneExpiredTenancyAwareScheduler;
+use Domain\ServiceOrder\Commands\CreateServiceBillCommand;
+use Domain\ServiceOrder\Commands\InactivateServiceOrderCommand;
+use Domain\ServiceOrder\Commands\NotifyCustomerServiceBillDueDateCommand;
+use HalcyonAgile\FilamentExport\Commands\PruneExportCommand;
+use HalcyonAgile\FilamentImport\Commands\PruneImportCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -30,40 +32,27 @@ class Kernel extends ConsoleKernel
 
     private static function tenantsSchedules(Schedule $schedule): void
     {
-        $tenants = tenancy()->model()->cursor()->pluck('id')->toArray();
-
-        $schedule->command(
-            NotifyCustomerServiceBillDueDateCommand::class,
-            ['--tenants' => $tenants]
-        )
+        $schedule->command(NotifyCustomerServiceBillDueDateCommand::class)
             ->daily()
             ->sentryMonitor();
 
-        $schedule->command(
-            CreateServiceBillCommand::class,
-            ['--tenants' => $tenants]
-        )
+        $schedule->command(CreateServiceBillCommand::class)
             ->daily()
             ->sentryMonitor();
 
-        $schedule->command(
-            InactivateServiceOrderCommand::class,
-            ['--tenants' => $tenants]
-        )
+        $schedule->command(InactivateServiceOrderCommand::class)
             ->daily()
             ->sentryMonitor();
 
         $schedule->command(
             ClearResetsTenancyAwareSchedulerCommand::class, [
                 'customer',
-                '--tenants' => $tenants,
             ])
             ->everyFifteenMinutes();
 
         $schedule->command(
             SanctumPruneExpiredTenancyAwareScheduler::class, [
                 '--hours' => 24,
-                '--tenants' => $tenants,
             ])
             ->daily();
     }

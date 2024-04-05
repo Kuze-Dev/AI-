@@ -184,7 +184,7 @@ class AdminResource extends Resource
 
                                 return;
                             }
-                            $query->role($data['value']);
+                            $query->whereHas('roles', fn ($role) => $role->where('id', $data['value']));
                         });
                     }),
                 Tables\Filters\SelectFilter::make('active')
