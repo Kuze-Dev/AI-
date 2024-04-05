@@ -10,7 +10,6 @@ definitions:
     cp .env.example .env &&
     php artisan key:generate
     php artisan about --only=environment
-    php -v
   steps:
     - step: &common-step
         caches:
