@@ -38,51 +38,32 @@ class Kernel extends ConsoleKernel
 
     private static function tenantsSchedules(Schedule $schedule): void
     {
-        $tenants = tenancy()->model()->cursor()->pluck('id')->toArray();
-
-        $schedule->command(
-            NotifyCustomerServiceBillDueDateCommand::class,
-            ['--tenants' => $tenants]
-        )
+        $schedule->command(NotifyCustomerServiceBillDueDateCommand::class)
             ->daily()
             ->sentryMonitor();
 
-        $schedule->command(
-            CreateServiceBillCommand::class,
-            ['--tenants' => $tenants]
-        )
+        $schedule->command(CreateServiceBillCommand::class)
             ->daily()
             ->sentryMonitor();
 
-        $schedule->command(
-            InactivateServiceOrderCommand::class,
-            ['--tenants' => $tenants]
-        )
+        $schedule->command(InactivateServiceOrderCommand::class)
             ->daily()
             ->sentryMonitor();
 
-        $schedule->command(
-            PruneExportTenancyAwareSchedulerCommand::class,
-            ['--tenants' => $tenants]
-        )
+        $schedule->command(PruneExportTenancyAwareSchedulerCommand::class)
             ->daily();
-        $schedule->command(
-            PruneImportTenancyAwareSchedulerCommand::class,
-            ['--tenants' => $tenants]
-        )
+        $schedule->command(PruneImportTenancyAwareSchedulerCommand::class)
             ->daily();
 
         $schedule->command(
             ClearResetsTenancyAwareSchedulerCommand::class, [
                 'customer',
-                '--tenants' => $tenants,
             ])
             ->everyFifteenMinutes();
 
         $schedule->command(
             SanctumPruneExpiredTenancyAwareScheduler::class, [
                 '--hours' => 24,
-                '--tenants' => $tenants,
             ])
             ->daily();
     }
