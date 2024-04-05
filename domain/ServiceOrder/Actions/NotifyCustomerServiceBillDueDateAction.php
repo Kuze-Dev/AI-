@@ -7,57 +7,55 @@ namespace Domain\ServiceOrder\Actions;
 use App\Settings\ServiceSettings;
 use Domain\ServiceOrder\Jobs\NotifyCustomerServiceBillDueDateJob;
 use Domain\ServiceOrder\Models\ServiceOrder;
-use Domain\Tenant\TenantSupport;
 
 class NotifyCustomerServiceBillDueDateAction
 {
-    public function __construct(private readonly ServiceSettings $serviceSettings)
+    public function __construct(private ServiceSettings $serviceSettings)
     {
     }
 
     public function execute(): void
     {
-        TenantSupport::model()->run(function () {
-            $serviceOrders = ServiceOrder::query()
-                ->whereActive()
-                ->whereSubscriptionBased()
-                ->with(['serviceBills' => fn ($query) => $query->whereNotifiable()])
-                ->whereHas('serviceBills', fn ($query) => $query->whereNotifiable())
-                ->get();
 
-            /** @var int $daysBeforeDueDateNotification */
-            $daysBeforeDueDateNotification = $this->serviceSettings
-                ->days_before_due_date_notification ?? config('domain.service-order.days_before_due_date_notification');
+        $serviceOrders = ServiceOrder::query()
+            ->whereActive()
+            ->whereSubscriptionBased()
+            ->with(['serviceBills' => fn ($query) => $query->whereNotifiable()])
+            ->whereHas('serviceBills', fn ($query) => $query->whereNotifiable())
+            ->get();
 
-            $serviceOrders->each(
-                function (ServiceOrder $serviceOrder) use ($daysBeforeDueDateNotification) {
-                    /** @var \Domain\ServiceOrder\Models\ServiceBill $latestPendingServiceBill */
-                    $latestPendingServiceBill = $serviceOrder->latestPendingServiceBill();
+        /** @var int $daysBeforeDueDateNotification */
+        $daysBeforeDueDateNotification = $this->serviceSettings
+            ->days_before_due_date_notification ?? config('domain.service-order.days_before_due_date_notification');
 
-                    $dateOfNotification = now()->parse($latestPendingServiceBill->due_date)
-                        ->subDays($daysBeforeDueDateNotification)
-                        ->toDateString();
+        $serviceOrders->each(
+            function (ServiceOrder $serviceOrder) use ($daysBeforeDueDateNotification) {
+                /** @var \Domain\ServiceOrder\Models\ServiceBill $latestPendingServiceBill */
+                $latestPendingServiceBill = $serviceOrder->latestPendingServiceBill();
 
-                    $dateToday = now()->toDateString();
+                $dateOfNotification = now()->parse($latestPendingServiceBill->due_date)
+                    ->subDays($daysBeforeDueDateNotification)
+                    ->toDateString();
 
-                    $isDateOfNotificationToday = $dateOfNotification === $dateToday;
+                $dateToday = now()->toDateString();
 
-                    $billDate = now()->parse($latestPendingServiceBill->bill_date)
-                        ->toDateString();
+                $isDateOfNotificationToday = $dateOfNotification === $dateToday;
 
-                    $overeachedBillDate = $dateOfNotification < $billDate;
+                $billDate = now()->parse($latestPendingServiceBill->bill_date)
+                    ->toDateString();
 
-                    $isBillingDateToday = $billDate === $dateToday;
+                $overeachedBillDate = $dateOfNotification < $billDate;
 
-                    $shouldNotifyOnBillingDate = $overeachedBillDate && $isBillingDateToday;
+                $isBillingDateToday = $billDate === $dateToday;
 
-                    NotifyCustomerServiceBillDueDateJob::dispatchIf(
-                        $shouldNotifyOnBillingDate || $isDateOfNotificationToday,
-                        $serviceOrder,
-                        $latestPendingServiceBill
-                    );
-                }
-            );
-        });
+                $shouldNotifyOnBillingDate = $overeachedBillDate && $isBillingDateToday;
+
+                NotifyCustomerServiceBillDueDateJob::dispatchIf(
+                    $shouldNotifyOnBillingDate || $isDateOfNotificationToday,
+                    $serviceOrder,
+                    $latestPendingServiceBill
+                );
+            }
+        );
     }
 }
