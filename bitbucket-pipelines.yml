@@ -7,7 +7,7 @@ definitions:
     phpstan: build/phpstan
   setup-script: &setup-script |
     composer install --prefer-dist --no-interaction
-    cp .env.testing .env
+    cp .env.example .env
     php artisan key:generate
     php artisan about --only=environment
   steps:
