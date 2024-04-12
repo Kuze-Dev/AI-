@@ -49,10 +49,9 @@ class CreateProductAction
                 /** @var array<int, array> $mediaMaterials */
                 $mediaMaterials = $media['materials'];
 
-                $mediaData = collect($mediaMaterials)->map(function ($material) {
+                $mediaData = collect($mediaMaterials)->map(fn ($material) =>
                     /** @var \Illuminate\Http\UploadedFile|string $material */
-                    return new MediaData(media: $material);
-                })->toArray();
+                    new MediaData(media: $material))->toArray();
 
                 $this->syncMediaCollection->execute($product, new MediaCollectionData(
                     collection: $media['collection'],

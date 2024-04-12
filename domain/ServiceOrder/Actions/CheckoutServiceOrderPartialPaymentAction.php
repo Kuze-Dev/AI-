@@ -30,8 +30,8 @@ class CheckoutServiceOrderPartialPaymentAction
     public function __construct(
         private PaymentMethod $paymentMethod,
         private ServiceOrder $serviceOrder,
-        private CreatePaymentAction $createPaymentAction,
-        private CreateServiceTransactionAction $createServiceTransactionAction
+        private readonly CreatePaymentAction $createPaymentAction,
+        private readonly CreateServiceTransactionAction $createServiceTransactionAction
     ) {
     }
 

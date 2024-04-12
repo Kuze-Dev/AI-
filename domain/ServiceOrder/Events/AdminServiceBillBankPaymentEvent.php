@@ -11,15 +11,7 @@ class AdminServiceBillBankPaymentEvent
 {
     use SerializesModels;
 
-    public ServiceBill $serviceBill;
-
-    public string $paymentRemarks;
-
-    public function __construct(
-        ServiceBill $serviceBill,
-        string $paymentRemarks,
-    ) {
-        $this->serviceBill = $serviceBill;
-        $this->paymentRemarks = $paymentRemarks;
+    public function __construct(public ServiceBill $serviceBill, public string $paymentRemarks)
+    {
     }
 }

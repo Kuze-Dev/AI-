@@ -26,7 +26,7 @@ class GenerateReferenceNumberAction
 
         /** @var string $prefix */
         $prefix = is_array($words)
-            ? implode(array_map(fn ($word) => substr($word, 0, 1), $words))
+            ? implode('', array_map(fn ($word) => substr((string) $word, 0, 1), $words))
             : '';
 
         $referenceNumber = $prefix.now()->format('ymd');

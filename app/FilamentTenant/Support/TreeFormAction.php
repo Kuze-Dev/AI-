@@ -21,11 +21,9 @@ class TreeFormAction extends Action
     {
         parent::setUp();
 
-        $this->modalHeading(function ($component, self $action) {
-            return ($activeTreeState = $action->getActiveTreeState())
-                ? trans('Edit :label', ['label' => $component->getItemLabel($activeTreeState)])
-                : trans('Add :name', ['name' => (string) Str::of($component->getName())->headline()->singular()]);
-        });
+        $this->modalHeading(fn ($component, self $action) => ($activeTreeState = $action->getActiveTreeState())
+            ? trans('Edit :label', ['label' => $component->getItemLabel($activeTreeState)])
+            : trans('Add :name', ['name' => (string) Str::of($component->getName())->headline()->singular()]));
 
         $this->slideOver(true);
 
@@ -35,9 +33,7 @@ class TreeFormAction extends Action
             $form->fill($action->getActiveTreeState());
         });
 
-        $this->form(function ($component) {
-            return $component->getChildComponents();
-        });
+        $this->form(fn ($component) => $component->getChildComponents());
 
         $this->action(function ($livewire, self $action, array $data) {
             data_set(

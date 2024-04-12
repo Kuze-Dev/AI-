@@ -57,10 +57,8 @@ class SiteResource extends Resource
                         ->rules([new FullyQualifiedDomainNameRule()])
                         ->maxLength(100)
                         ->reactive()
-                        ->formatStateUsing(function (?string $state): ?string {
-                            return $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null;
-                        })
-                        ->dehydrateStateUsing(fn ($state) => $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null)
+                        ->formatStateUsing(fn (?string $state): ?string => $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null)
+                        ->dehydrateStateUsing(fn ($state) => $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', (string) $state) : null)
                         ->label(trans('Frontend Domain')),
                     Forms\Components\TextInput::make('deploy_hook'),
                     Forms\Components\Fieldset::make('Site Managers')
@@ -71,13 +69,10 @@ class SiteResource extends Resource
                                 ->searchable()
                                 ->formatStateUsing(fn (?Site $record) => $record ? $record->siteManager->pluck('id')->toArray() : [])
                                 ->columns(2)
-                                ->options(function () {
-                                    return \Domain\Admin\Models\Admin::permission('site.siteManager')
-                                        ->get()
-                                        ->pluck('site_label', 'id')
-                                        ->toArray();
-
-                                }),
+                                ->options(fn () => \Domain\Admin\Models\Admin::permission('site.siteManager')
+                                    ->get()
+                                    ->pluck('site_label', 'id')
+                                    ->toArray()),
                         ]),
                 ]),
             ]);
@@ -103,10 +98,7 @@ class SiteResource extends Resource
                     ->button()
                     ->icon('heroicon-o-cog')
                     ->color('gray')
-                    ->disabled(function (Site $record) {
-
-                        return (bool) (is_null($record->deploy_hook));
-                    })
+                    ->disabled(fn (Site $record) => (bool) (is_null($record->deploy_hook)))
                     ->action(function (Site $record) {
 
                         try {

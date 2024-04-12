@@ -27,9 +27,7 @@ class MicrositeContentEntryUniqueRouteUrlRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
 
-        $content = ContentEntry::select('id')->wherehas('sites', function ($q) use ($value) {
-            return $q->whereIn('site_id', $value);
-        })->pluck('id')->toArray();
+        $content = ContentEntry::select('id')->wherehas('sites', fn ($q) => $q->whereIn('site_id', $value))->pluck('id')->toArray();
 
         $query = RouteUrl::whereUrl($this->route_url['url'])
             ->whereIn(

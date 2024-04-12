@@ -178,7 +178,7 @@ class ProductBatchUpdateImporter extends Importer
      */
     private static function processVariantBatchUpdate(array $row): void
     {
-        $decodedPayloadVariantCombination = json_decode($row['variant_combination'], true);
+        $decodedPayloadVariantCombination = json_decode((string) $row['variant_combination'], true);
 
         $productVariant = ProductVariant::whereKey($row['variant_id'])->sole();
 

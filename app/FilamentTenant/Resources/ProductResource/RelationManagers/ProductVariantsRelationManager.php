@@ -35,8 +35,8 @@ class ProductVariantsRelationManager extends RelationManager
                                 foreach ($state['combination'] as $key => $combination) {
                                     $schemaArray[$key] =
                                         Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                            ->formatStateUsing(fn () => ucfirst($combination['option_value']))
-                                            ->label(trans(ucfirst($combination['option'])))
+                                            ->formatStateUsing(fn () => ucfirst((string) $combination['option_value']))
+                                            ->label(trans(ucfirst((string) $combination['option'])))
                                             ->dehydrated(false)
                                             ->disabled();
                                 }
@@ -72,12 +72,10 @@ class ProductVariantsRelationManager extends RelationManager
                                         isSigned: false
                                     ))
                                     ->rules([
-                                        function () {
-                                            return function (string $attribute, mixed $value, Closure $fail) {
-                                                if ($value <= 0) {
-                                                    $fail("{$attribute} must be above zero.");
-                                                }
-                                            };
+                                        fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                            if ($value <= 0) {
+                                                $fail("{$attribute} must be above zero.");
+                                            }
                                         },
                                     ])
                                     ->dehydrateStateUsing(fn ($state) => (float) $state)
@@ -93,13 +91,11 @@ class ProductVariantsRelationManager extends RelationManager
                                         isSigned: false
                                     ))
                                     ->rules([
-                                        function () {
-                                            return function (string $attribute, mixed $value, Closure $fail) {
-                                                if ($value <= 0) {
-                                                    $attributeName = ucfirst(explode('.', $attribute)[1]);
-                                                    $fail("{$attributeName} must be above zero.");
-                                                }
-                                            };
+                                        fn () => function (string $attribute, mixed $value, Closure $fail) {
+                                            if ($value <= 0) {
+                                                $attributeName = ucfirst(explode('.', $attribute)[1]);
+                                                $fail("{$attributeName} must be above zero.");
+                                            }
                                         },
                                     ])
                                     ->dehydrateStateUsing(fn ($state) => (float) $state)

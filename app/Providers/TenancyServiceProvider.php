@@ -62,9 +62,7 @@ class TenancyServiceProvider extends ServiceProvider
                 JobPipeline::make([
                     Jobs\DeleteDatabase::class,
                     DeleteS3Bucket::class,
-                ])->send(function (Events\TenantDeleted $event) {
-                    return $event->tenant;
-                })->shouldBeQueued($this->app->isProduction()),
+                ])->send(fn (Events\TenantDeleted $event) => $event->tenant)->shouldBeQueued($this->app->isProduction()),
             ],
 
             // Domain events

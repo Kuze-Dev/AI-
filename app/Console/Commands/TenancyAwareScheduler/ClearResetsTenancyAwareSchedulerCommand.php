@@ -16,6 +16,7 @@ class ClearResetsTenancyAwareSchedulerCommand extends ClearResetsCommand
 
     protected $signature = 'app:tenants:auth:clear-resets {name? : The name of the password broker}';
 
+    #[\Override]
     public function handle(): int
     {
         // solve `Call to a member function prepare() on null`

@@ -193,9 +193,7 @@ class EditPage extends EditRecord
                     Action::make('published')
                         ->label(trans('Published Draft'))
                         ->action('published')
-                        ->hidden(function () {
-                            return $this->record->draftable_id == null ? true : false;
-                        }),
+                        ->hidden(fn () => $this->record->draftable_id == null ? true : false),
                     Action::make('draft')
                         ->label(trans('Save As Draft'))
                         ->action('draft')
@@ -213,16 +211,11 @@ class EditPage extends EditRecord
                         ->requiresConfirmation()
                         ->modalHeading('Draft for this page already exists')
                         ->modalSubheading('You have an existing draft for this page. Do you want to overwrite the existing draft?')
-                        ->modalCancelAction(function () {
-                            return Action::makeModalAction('redirect')
-                                ->label(trans('Edit Existing Draft'))
-                                ->color('gray')
-                                ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft]));
-                        })
-                        ->hidden(function () {
-
-                            return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
-                        }),
+                        ->modalCancelAction(fn () => Action::makeModalAction('redirect')
+                            ->label(trans('Edit Existing Draft'))
+                            ->color('gray')
+                            ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft])))
+                        ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true),
                     Action::make('save')
                         ->label(trans('Save and Continue Editing'))
                         ->action('save')

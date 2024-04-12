@@ -148,20 +148,18 @@ class RoleResource extends Resource
             Forms\Components\Hidden::make('permissions')
                 ->reactive()
                 ->formatStateUsing(fn (?Role $record) => $record ? $record->permissions->pluck('id') : [])
-                ->dehydrateStateUsing(function (Forms\Get $get): array {
-                    return self::$permissionGroups->reduce(
-                        function (array $permissions, PermissionGroup $permissionGroup, string $groupName) use ($get): array {
-                            if ($get($groupName) ?? false) {
-                                array_push($permissions, $permissionGroup->main->id);
-                            } else {
-                                $permissions = array_merge($permissions, $get("{$groupName}_abilities") ?? []);
-                            }
+                ->dehydrateStateUsing(fn (Forms\Get $get): array => self::$permissionGroups->reduce(
+                    function (array $permissions, PermissionGroup $permissionGroup, string $groupName) use ($get): array {
+                        if ($get($groupName) ?? false) {
+                            array_push($permissions, $permissionGroup->main->id);
+                        } else {
+                            $permissions = array_merge($permissions, $get("{$groupName}_abilities") ?? []);
+                        }
 
-                            return $permissions;
-                        },
-                        []
-                    );
-                }),
+                        return $permissions;
+                    },
+                    []
+                )),
             Forms\Components\Toggle::make('select_all')
                 ->onIcon('heroicon-s-shield-check')
                 ->offIcon('heroicon-s-shield-exclamation')

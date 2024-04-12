@@ -38,15 +38,11 @@ class RouteUrlController
 
             $siteId = request('site');
 
-            $queryRouteUrl->whereHas('model', function ($query) use ($siteId) {
-                return $query->whereHas('sites', fn ($q) => $q->where('site_id', $siteId));
-            });
+            $queryRouteUrl->whereHas('model', fn ($query) => $query->whereHas('sites', fn ($q) => $q->where('site_id', $siteId)));
 
         }
 
-        $queryRouteUrl->whereHas('model', function ($query) {
-            return $query->where('draftable_id', null);
-        });
+        $queryRouteUrl->whereHas('model', fn ($query) => $query->where('draftable_id', null));
 
         $routeUrl = $queryRouteUrl->firstOrFail();
 

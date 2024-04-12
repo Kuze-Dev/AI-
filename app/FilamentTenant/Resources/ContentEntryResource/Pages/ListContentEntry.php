@@ -89,9 +89,7 @@ class ListContentEntry extends ListRecords
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {
-            return $this->ownerRecord->contentEntries()->getQuery()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
-            });
+            return $this->ownerRecord->contentEntries()->getQuery()->wherehas('sites', fn ($q) => $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray()));
         }
 
         return $this->ownerRecord->contentEntries()->getQuery();

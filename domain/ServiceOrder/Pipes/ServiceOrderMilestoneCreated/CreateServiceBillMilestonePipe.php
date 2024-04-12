@@ -12,8 +12,8 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
 class CreateServiceBillMilestonePipe
 {
     public function __construct(
-        private CreateServiceBillAction $createServiceBillAction,
-        private UpdateServiceBillMilestoneAction $updateServiceBillMilestoneAction,
+        private readonly CreateServiceBillAction $createServiceBillAction,
+        private readonly UpdateServiceBillMilestoneAction $updateServiceBillMilestoneAction,
     ) {
     }
 

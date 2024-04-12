@@ -189,14 +189,12 @@ class PageResource extends Resource
                                     ->viewData([
                                         'blocks' => self::getCachedBlocks()
                                             ->sortBy('name')
-                                            ->mapWithKeys(function (Block $block) {
-                                                return [
-                                                    $block->id => [
-                                                        'name' => $block['name'],
-                                                        'image' => $block->getFirstMediaUrl('image'),
-                                                    ],
-                                                ];
-                                            })
+                                            ->mapWithKeys(fn (Block $block) => [
+                                                $block->id => [
+                                                    'name' => $block['name'],
+                                                    'image' => $block->getFirstMediaUrl('image'),
+                                                ],
+                                            ])
                                             ->toArray(),
                                     ])
                                     ->reactive()
@@ -226,10 +224,9 @@ class PageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->searchable(query: function (Builder $query, string $search): Builder {
+                    ->searchable(query: fn (Builder $query, string $search): Builder =>
                         /** @var Builder|Page $query */
-                        return $query->Where('name', 'like', "%{$search}%");
-                    })
+                        $query->Where('name', 'like', "%{$search}%"))
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('name')
                     ->hidden()
@@ -249,9 +246,7 @@ class PageResource extends Resource
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
-                    ->toggleable(condition: function () {
-                        return TenantFeatureSupport::active(SitesManagement::class);
-                    }, isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
                     ->options([
@@ -261,48 +256,47 @@ class PageResource extends Resource
                     ->color(fn ($state) => $state !== null ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
-                    ->searchable(query: function (Builder $query, string $search): Builder {
+                    ->searchable(query: fn (Builder $query, string $search): Builder =>
                         /** @var Builder|Page $query */
-                        return $query->whereHas('author', function ($query) use ($search) {
+                        $query->whereHas('author', function ($query) use ($search) {
                             $query->where('first_name', 'like', "%{$search}%")
                                 ->orWhere('last_name', 'like', "%{$search}%");
-                        });
-                    }),
+                        })),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('visibility')
-                    ->options(
-                        collect(Visibility::cases())
-                            ->mapWithKeys(fn (Visibility $visibility) => [
-                                $visibility->value => Str::headline($visibility->value),
-                            ])
-                            ->toArray()
-                    ),
+                        ->options(
+                            collect(Visibility::cases())
+                                ->mapWithKeys(fn (Visibility $visibility) => [
+                                    $visibility->value => Str::headline($visibility->value),
+                                ])
+                                ->toArray()
+                        ),
                 Tables\Filters\SelectFilter::make('locale')
-                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
+                        ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\SelectFilter::make('sites')
-                    ->multiple()
-                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
-                    ->relationship('sites', 'name'),
+                        ->multiple()
+                        ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
+                        ->relationship('sites', 'name'),
                 Tables\Filters\TernaryFilter::make('published_at')
-                    ->label(trans('Published'))
-                    ->nullable(),
+                        ->label(trans('Published'))
+                        ->nullable(),
             ])
 
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()
-                        ->using(function (Page $record) {
-                            try {
-                                return app(DeletePageAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
+                        Tables\Actions\DeleteAction::make()
+                            ->using(function (Page $record) {
+                                try {
+                                    return app(DeletePageAction::class)->execute($record);
+                                } catch (DeleteRestrictedException) {
+                                    return false;
+                                }
+                            }),
                 ]),
             ])
             ->bulkActions([
@@ -323,9 +317,7 @@ class PageResource extends Resource
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
-            });
+            return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();

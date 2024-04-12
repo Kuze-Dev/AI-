@@ -24,7 +24,7 @@ class UniqueProductSkuRule implements ValidationRule
             return;
         }
 
-        $toArrayVariantStatePath = explode('.', $this->livewire->activeProductVariantItemStatePath);
+        $toArrayVariantStatePath = explode('.', (string) $this->livewire->activeProductVariantItemStatePath);
 
         /** @var array */
         $productVariants = $this->livewire->data['product_variants'];

@@ -11,7 +11,7 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderCreatedPipelineData;
 class CreateServiceOrderAddressPipe
 {
     public function __construct(
-        private CreateServiceOrderAddressAction $createServiceOrderAddressAction
+        private readonly CreateServiceOrderAddressAction $createServiceOrderAddressAction
     ) {
     }
 

@@ -23,7 +23,7 @@ class ServiceOrderPartialPaymentUpdatedListener
         private Payment $payment,
         private ServiceOrder $serviceOrder,
         private ServiceTransaction $serviceTransaction,
-        private ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction
+        private readonly ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction
     ) {
     }
 

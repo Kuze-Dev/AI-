@@ -81,35 +81,32 @@ class GlobalsResource extends Resource
                     Forms\Components\CheckboxList::make('sites')
                         ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
                         ->rules([
-                            function (?Globals $record, \Filament\Forms\Get $get) {
+                            fn (?Globals $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                $siteIDs = $value;
 
-                                    $siteIDs = $value;
+                                if ($record) {
+                                    $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
 
-                                    if ($record) {
-                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
-
-                                        $globals = Globals::where('name', $get('name'))
-                                            ->where('id', '!=', $record->id)
-                                            ->whereHas(
-                                                'sites',
-                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                            )->count();
-
-                                    } else {
-
-                                        $globals = Globals::where('name', $get('name'))->whereHas(
+                                    $globals = Globals::where('name', $get('name'))
+                                        ->where('id', '!=', $record->id)
+                                        ->whereHas(
                                             'sites',
                                             fn ($query) => $query->whereIn('site_id', $siteIDs)
                                         )->count();
-                                    }
 
-                                    if ($globals > 0) {
-                                        $fail("Globals {$get('name')} is already available in selected sites.");
-                                    }
+                                } else {
 
-                                };
+                                    $globals = Globals::where('name', $get('name'))->whereHas(
+                                        'sites',
+                                        fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                    )->count();
+                                }
+
+                                if ($globals > 0) {
+                                    $fail("Globals {$get('name')} is already available in selected sites.");
+                                }
+
                             },
                         ])
                         ->options(
@@ -143,9 +140,7 @@ class GlobalsResource extends Resource
                     ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
                     ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
-                    ->toggleable(condition: function () {
-                        return TenantFeatureSupport::active(SitesManagement::class);
-                    }, isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -187,9 +182,7 @@ class GlobalsResource extends Resource
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
-            });
+            return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();

@@ -12,7 +12,7 @@ use Illuminate\Support\Carbon;
 
 class EarnPointAction
 {
-    public function __construct(private RewardPointsSettings $rewardPoint)
+    public function __construct(private readonly RewardPointsSettings $rewardPoint)
     {
     }
 

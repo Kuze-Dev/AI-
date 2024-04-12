@@ -20,7 +20,7 @@ class UniqueDomainRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         // Remove http:// or https:// and www. if they're present
-        $value = preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $value);
+        $value = preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', (string) $value);
 
         // Check if the domain exists in the database
         $passed = DB::table($this->table)

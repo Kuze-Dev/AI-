@@ -13,7 +13,7 @@ use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 class UpdateServiceOrderStatusPipe
 {
     public function __construct(
-        private UpdateServiceOrderStatusAction $updateServiceOrderStatusAction
+        private readonly UpdateServiceOrderStatusAction $updateServiceOrderStatusAction
     ) {
     }
 

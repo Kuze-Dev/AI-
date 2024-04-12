@@ -120,11 +120,9 @@ class ContentEntryResource extends Resource
                             ->string()
                             ->maxLength(255),
                         RouteUrlFieldset::make()
-                            ->generateModelForRouteUrlUsing(function ($livewire, ContentEntry|string $model) {
-                                return $model instanceof ContentEntry
-                                    ? $model
-                                    : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord);
-                            }),
+                            ->generateModelForRouteUrlUsing(fn ($livewire, ContentEntry|string $model) => $model instanceof ContentEntry
+                                ? $model
+                                : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord)),
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) Locale::where('is_default', true)->first()?->code)
@@ -236,21 +234,18 @@ class ContentEntryResource extends Resource
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
-                    ->searchable(query: function (Builder $query, string $search): Builder {
+                    ->searchable(query: fn (Builder $query, string $search): Builder =>
                         /** @var Builder|ContentEntry $query */
-                        return $query->whereHas('author', function ($query) use ($search) {
+                        $query->whereHas('author', function ($query) use ($search) {
                             $query->where('first_name', 'like', "%{$search}%")
                                 ->orWhere('last_name', 'like', "%{$search}%");
-                        });
-                    }),
+                        })),
                 Tables\Columns\TagsColumn::make('taxonomyTerms.name')
                     ->limit()
                     ->searchable(),
                 Tables\Columns\TagsColumn::make('sites.name')
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
-                    ->toggleable(condition: function () {
-                        return TenantFeatureSupport::active(SitesManagement::class);
-                    }, isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
@@ -261,72 +256,72 @@ class ContentEntryResource extends Resource
             ])
             ->filters([
                 Tables\Filters\Filter::make('taxonomies')
-                    ->form(fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
-                        fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
-                            ->statePath($taxonomy->slug)
-                            ->multiple()
-                            ->options(
-                                $taxonomy->taxonomyTerms->sortBy('name')
-                                    ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->slug => $term->name])
-                                    ->toArray()
-                            )
-                    )->toArray())
-                    ->query(function (ContentEntryBuilder $query, array $data): Builder {
-                        foreach ($data as $taxonomySlug => $taxonomyTermSlugs) {
-                            if (filled($taxonomyTermSlugs)) {
-                                $query->whereTaxonomyTerms($taxonomySlug, $taxonomyTermSlugs);
+                        ->form(fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
+                            fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
+                                ->statePath($taxonomy->slug)
+                                ->multiple()
+                                ->options(
+                                    $taxonomy->taxonomyTerms->sortBy('name')
+                                        ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->slug => $term->name])
+                                        ->toArray()
+                                )
+                        )->toArray())
+                        ->query(function (ContentEntryBuilder $query, array $data): Builder {
+                            foreach ($data as $taxonomySlug => $taxonomyTermSlugs) {
+                                if (filled($taxonomyTermSlugs)) {
+                                    $query->whereTaxonomyTerms($taxonomySlug, $taxonomyTermSlugs);
+                                }
                             }
-                        }
 
-                        return $query;
-                    })
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
+                            return $query;
+                        })
+                        ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
                 Tables\Filters\Filter::make('published_at_year_month')
-                    ->form([
-                        Forms\Components\Select::make('published_at_year')
-                            ->placeholder('Select Year')
-                            ->searchable()
-                            ->options(
-                                collect(range(1900, now()->addYears(10)->year))
-                                    ->mapWithKeys(fn (int $year) => [$year => $year])
-                                    ->toArray()
+                        ->form([
+                            Forms\Components\Select::make('published_at_year')
+                                ->placeholder('Select Year')
+                                ->searchable()
+                                ->options(
+                                    collect(range(1900, now()->addYears(10)->year))
+                                        ->mapWithKeys(fn (int $year) => [$year => $year])
+                                        ->toArray()
+                                )
+                                ->debounce(),
+                            Forms\Components\Select::make('published_at_month')
+                                ->options(
+                                    collect(range(1, 12))
+                                        ->mapWithKeys(fn (int $month) => [$month => now()->month($month)->format('F')])
+                                        ->toArray()
+                                )
+                                ->disabled(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')))
+                                ->helperText(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
+                        ])
+                        ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->when(
+                            filled($data['published_at_year']),
+                            fn (ContentEntryBuilder $query) => $query->wherePublishedAtYearMonth(
+                                (int) $data['published_at_year'],
+                                filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
                             )
-                            ->debounce(),
-                        Forms\Components\Select::make('published_at_month')
-                            ->options(
-                                collect(range(1, 12))
-                                    ->mapWithKeys(fn (int $month) => [$month => now()->month($month)->format('F')])
-                                    ->toArray()
-                            )
-                            ->disabled(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')))
-                            ->helperText(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
-                    ])
-                    ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->when(
-                        filled($data['published_at_year']),
-                        fn (ContentEntryBuilder $query) => $query->wherePublishedAtYearMonth(
-                            (int) $data['published_at_year'],
-                            filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
-                        )
-                    ))
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        ))
+                        ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                 Tables\Filters\Filter::make('published_at_range')
-                    ->form([
-                        Forms\Components\DatePicker::make('published_at_from'),
-                        Forms\Components\DatePicker::make('published_at_to'),
-                    ])
-                    ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
-                        filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
-                        filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
-                    ))
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        ->form([
+                            Forms\Components\DatePicker::make('published_at_from'),
+                            Forms\Components\DatePicker::make('published_at_to'),
+                        ])
+                        ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
+                            filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
+                            filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
+                        ))
+                        ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
             ])
             ->reorderable('order')
 
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
+                        ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                        Tables\Actions\DeleteAction::make(),
                 ]),
 
             ])

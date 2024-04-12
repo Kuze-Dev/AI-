@@ -14,19 +14,13 @@ class AdminOrderPlacedMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private ?array $cc = [];
-
-    private ?array $bcc = [];
-
     private string $url;
 
     private string $reference;
 
     /** Create a new notification instance. */
-    public function __construct(Order $order, ?array $cc = [], ?array $bcc = [])
+    public function __construct(Order $order, private ?array $cc = [], private ?array $bcc = [])
     {
-        $this->cc = $cc;
-        $this->bcc = $bcc;
         $this->url = url("/admin/orders/$order->reference");
         $this->reference = $order->reference;
     }

@@ -53,9 +53,9 @@ class CreateServiceOrder extends CreateRecord
 
     private static bool $is_same_as_billing;
 
-    private static int|string|null $service_address;
+    private static int|string|null $service_address = null;
 
-    private static int|string|null $billing_address;
+    private static int|string|null $billing_address = null;
 
     #[\Override]
     protected function getHeaderActions(): array

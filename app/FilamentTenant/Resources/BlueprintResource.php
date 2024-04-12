@@ -205,13 +205,11 @@ class BlueprintResource extends Resource
                     ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('rules', implode('|', $state ?? []));
                     })
-                    ->dehydrateStateUsing(function (?string $state): array {
-                        return $state !== null
-                            ? Str::of($state)->split('/\|/')
-                                ->map(fn (string $rule) => trim($rule))
-                                ->toArray()
-                            : [];
-                    })
+                    ->dehydrateStateUsing(fn (?string $state): array => $state !== null
+                        ? Str::of($state)->split('/\|/')
+                            ->map(fn (string $rule) => trim($rule))
+                            ->toArray()
+                        : [])
                     ->helperText(new HtmlString(<<<'HTML'
                             Rules should be separated with "|". Available rules can be found on <a href="https://laravel.com/docs/validation#available-validation-rules" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
                         HTML)),
@@ -416,10 +414,9 @@ class BlueprintResource extends Resource
                         (new Collection(config('domain.blueprint.related_resources', [])))
                             ->keys()
                             ->mapWithKeys(
-                                function (string $model) {
+                                fn (string $model) =>
                                     /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
-                                    return [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()];
-                                }
+                                    [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()]
                             )
                             ->sort()
                             ->toArray()

@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
 class CreateServiceBillingsAction
 {
     public function __construct(
-        private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
+        private readonly ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
     ) {
     }
 

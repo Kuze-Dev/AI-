@@ -86,9 +86,7 @@ class EditContentEntry extends EditRecord
                 Action::make('published')
                     ->label(trans('Published Draft'))
                     ->action('published')
-                    ->hidden(function () {
-                        return $this->record->draftable_id == null ? true : false;
-                    }),
+                    ->hidden(fn () => $this->record->draftable_id == null ? true : false),
                 Action::make('draft')
                     ->label(trans('Save As Draft'))
                     ->action('draft')
@@ -106,16 +104,11 @@ class EditContentEntry extends EditRecord
                     ->requiresConfirmation()
                     ->modalHeading('Draft for this content already exists')
                     ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
-                    ->modalCancelAction(function () {
-                        return Action::makeModalAction('redirect')
-                            ->label(trans('Edit Existing Draft'))
-                            ->color('gray')
-                            ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft]));
-                    })
-                    ->hidden(function () {
-
-                        return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
-                    }),
+                    ->modalCancelAction(fn () => Action::makeModalAction('redirect')
+                        ->label(trans('Edit Existing Draft'))
+                        ->color('gray')
+                        ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft])))
+                    ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true),
                 Action::make('save')
                     ->label(trans('Save and Continue Editing'))
                     ->action('save')

@@ -137,9 +137,7 @@ it('can send order email notification to admin', function () {
 
     Notification::assertSentOnDemand(
         AdminOrderPlacedMail::class,
-        function ($notification, $channels, $notifiable) use ($orderSettings) {
-            return $notifiable->routes['mail'] === $orderSettings->admin_main_receiver;
-        }
+        fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === $orderSettings->admin_main_receiver
     );
 });
 
@@ -157,9 +155,7 @@ it('cannot send order email notification to admin', function () {
     Notification::assertNotSentTo(
         new AnonymousNotifiable(),
         AdminOrderPlacedMail::class,
-        function ($notification, $channels, $notifiable) use ($orderSettings) {
-            return $notifiable->routes['mail'] === $orderSettings->admin_main_receiver;
-        }
+        fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === $orderSettings->admin_main_receiver
     );
 });
 

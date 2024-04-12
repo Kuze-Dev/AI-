@@ -21,28 +21,20 @@ class ServiceBillBankPaymentNotification extends Notification implements ShouldQ
 
     private ?ServiceOrder $serviceOrder;
 
-    private ServiceBill $serviceBill;
-
     private string $url;
-
-    private string $paymentRemarks;
 
     private string $payment_method = 'bank-transfer';
 
     public function __construct(
-        ServiceBill $serviceBill,
-        string $paymentRemarks
+        private ServiceBill $serviceBill,
+        private string $paymentRemarks
     ) {
-        $this->serviceBill = $serviceBill;
-
-        $this->serviceOrder = $serviceBill->serviceOrder;
-
-        $this->paymentRemarks = $paymentRemarks;
+        $this->serviceOrder = $this->serviceBill->serviceOrder;
 
         $this->serviceSettings = app(ServiceSettings::class);
 
         $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.
-        '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$serviceBill->reference.
+        '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$this->serviceBill->reference.
         '&payment_method='.$this->payment_method;
 
     }

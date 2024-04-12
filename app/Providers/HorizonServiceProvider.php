@@ -32,8 +32,6 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     #[\Override]
     protected function gate(): void
     {
-        Gate::define('viewHorizon', function ($user) {
-            return $user instanceof Admin && $user->isZeroDayAdmin();
-        });
+        Gate::define('viewHorizon', fn ($user) => $user instanceof Admin && $user->isZeroDayAdmin());
     }
 }

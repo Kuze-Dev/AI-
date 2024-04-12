@@ -12,13 +12,9 @@ class OrderShippedNotification extends Notification
 {
     use Queueable;
 
-    private Order $order;
-
     /** Create a new notification instance. */
-    public function __construct(Order $order)
+    public function __construct(private Order $order)
     {
-
-        $this->order = $order;
     }
 
     /**

@@ -33,18 +33,16 @@ class MetaDataFactory extends Factory
     #[\Override]
     public function configure(): self
     {
-        return $this->state(function (array $attributes, ?Model $model) {
-            return $model instanceof HasMetaData
-                ? array_merge(
-                    $attributes,
-                    [
-                        'title' => $model->defaultMetaData()['title'] ?? $attributes['title'],
-                        'keywords' => $model->defaultMetaData()['keywords'] ?? $attributes['keywords'],
-                        'author' => $model->defaultMetaData()['author'] ?? $attributes['author'],
-                        'description' => $model->defaultMetaData()['description'] ?? $attributes['description'],
-                    ]
-                )
-                : $attributes;
-        });
+        return $this->state(fn (array $attributes, ?Model $model) => $model instanceof HasMetaData
+            ? array_merge(
+                $attributes,
+                [
+                    'title' => $model->defaultMetaData()['title'] ?? $attributes['title'],
+                    'keywords' => $model->defaultMetaData()['keywords'] ?? $attributes['keywords'],
+                    'author' => $model->defaultMetaData()['author'] ?? $attributes['author'],
+                    'description' => $model->defaultMetaData()['description'] ?? $attributes['description'],
+                ]
+            )
+            : $attributes);
     }
 }

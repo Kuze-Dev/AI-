@@ -42,20 +42,12 @@ final class Support
         if ($number % 100 >= 11 && $number % 100 <= 13) {
             $ordinal = $number.'th';
         } else {
-            switch ($number % 10) {
-                case 1:
-                    $ordinal = $number.'st';
-                    break;
-                case 2:
-                    $ordinal = $number.'nd';
-                    break;
-                case 3:
-                    $ordinal = $number.'rd';
-                    break;
-                default:
-                    $ordinal = $number.'th';
-                    break;
-            }
+            $ordinal = match ($number % 10) {
+                1 => $number.'st',
+                2 => $number.'nd',
+                3 => $number.'rd',
+                default => $number.'th',
+            };
         }
 
         return $ordinal;

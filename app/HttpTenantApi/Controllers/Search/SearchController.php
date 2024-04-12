@@ -28,7 +28,7 @@ class SearchController
 
         $results = array_reduce(
             ($validated['filter']['models'] ?? null)
-                ? explode(',', $validated['filter']['models'])
+                ? explode(',', (string) $validated['filter']['models'])
                 : self::SEARCHABLE_MODELS,
             function (array $results, string $model) use ($request, $validated) {
 
@@ -74,7 +74,7 @@ class SearchController
                 ->where('title', 'LIKE', "%{$searchQuery}%")
                 ->when(
                     $filter['content_ids'] ?? null,
-                    fn ($query, $contentIds) => $query->whereIn('content_id', explode(',', $contentIds))
+                    fn ($query, $contentIds) => $query->whereIn('content_id', explode(',', (string) $contentIds))
                 )
                 ->limit(20)
                 ->get()

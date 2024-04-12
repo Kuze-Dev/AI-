@@ -172,7 +172,7 @@ class ProductVariantImporter extends Importer
                 ->where('product_id', $product->id)->first();
 
             if (isset($row["product_option_{$i}_value_1_icon_type"]) && $row["product_option_{$i}_value_1_icon_type"]) {
-                $iconType = strtolower(str_replace(' ', '_', $row["product_option_{$i}_value_1_icon_type"]));
+                $iconType = strtolower(str_replace(' ', '_', (string) $row["product_option_{$i}_value_1_icon_type"]));
             }
 
             if (isset($row["product_option_{$i}_value_1_icon_value"]) && $row["product_option_{$i}_value_1_icon_value"]) {
@@ -213,7 +213,7 @@ class ProductVariantImporter extends Importer
                 $productOption = ProductOption::create([
                     'name' => $row["product_option_{$i}_name"],
                     'product_id' => $product->id,
-                    'is_custom' => $i == 1 ? strtolower($row["product_option_{$i}_is_custom"]) === 'yes' : false,
+                    'is_custom' => $i == 1 ? strtolower((string) $row["product_option_{$i}_is_custom"]) === 'yes' : false,
                 ]);
 
                 $productOptionValue = ProductOptionValue::create([

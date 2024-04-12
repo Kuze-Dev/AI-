@@ -23,9 +23,9 @@ class AdminServiceOrderStatusUpdatedListener
 {
     public function __construct(
         private ServiceOrder $serviceOrder,
-        private CreateServiceBillAction $createServiceBillAction,
-        private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction,
-        private ServiceSettings $serviceSettings,
+        private readonly CreateServiceBillAction $createServiceBillAction,
+        private readonly ComputeServiceBillingCycleAction $computeServiceBillingCycleAction,
+        private readonly ServiceSettings $serviceSettings,
         private bool $shouldNotifyCustomer = false,
     ) {
     }

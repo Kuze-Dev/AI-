@@ -352,10 +352,8 @@ class EditServiceOrder extends EditRecord
                                             ->label(trans('Edit'))
                                             ->modalHeading(trans('Edit Status'))
                                             ->modalWidth('xl')
-                                            ->hidden(function (ServiceOrder $record) {
-                                                return $record->status === ServiceOrderStatus::FORPAYMENT ||
-                                                    $record->status === ServiceOrderStatus::COMPLETED;
-                                            })
+                                            ->hidden(fn (ServiceOrder $record) => $record->status === ServiceOrderStatus::FORPAYMENT ||
+                                                $record->status === ServiceOrderStatus::COMPLETED)
                                             ->withActivityLog()
                                             ->form([
 
@@ -364,9 +362,7 @@ class EditServiceOrder extends EditRecord
                                                     ->options(fn (ServiceOrder $record) => ServiceOrderStatus::casesForServiceOrder($record))
                                                     ->selectablePlaceholder(false)
                                                     ->required()
-                                                    ->default(function (ServiceOrder $record) {
-                                                        return $record->status;
-                                                    }),
+                                                    ->default(fn (ServiceOrder $record) => $record->status),
 
                                                 Forms\Components\Toggle::make('is_send_email')
                                                     ->label(trans('Send email notification'))
@@ -412,7 +408,7 @@ class EditServiceOrder extends EditRecord
                                                         )
                                                             ->success();
                                                     }
-                                                } catch (MissingServiceSettingsConfigurationException $e) {
+                                                } catch (MissingServiceSettingsConfigurationException|ModelNotFoundException $e) {
                                                     $action->failureNotificationTitle(trans($e->getMessage()))
                                                         ->failure();
 
@@ -420,12 +416,6 @@ class EditServiceOrder extends EditRecord
                                                     $action->halt(shouldRollBackDatabaseTransaction: true);
                                                 } catch (InvalidServiceBillException $e) {
                                                     $action->failureNotificationTitle(trans('No service bill found'))
-                                                        ->failure();
-
-                                                    report($e);
-                                                    $action->halt(shouldRollBackDatabaseTransaction: true);
-                                                } catch (ModelNotFoundException $e) {
-                                                    $action->failureNotificationTitle(trans($e->getMessage()))
                                                         ->failure();
 
                                                     report($e);

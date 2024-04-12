@@ -39,7 +39,7 @@ it('can render view order details page', function () {
         ->assertSuccessful()
         ->assertFormSet([
             //summary card
-            'status' => trans(ucfirst($order->status->value)),
+            'status' => trans(ucfirst((string) $order->status->value)),
             'created_at' => $orderDate,
             'sub_total' => $order->currency_symbol.' '.number_format($order->sub_total, 2, '.', ','),
             'shipping_total' => $order->currency_symbol.' '.number_format($order->shipping_total, 2, '.', ','),

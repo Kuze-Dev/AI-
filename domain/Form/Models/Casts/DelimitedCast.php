@@ -18,7 +18,7 @@ class DelimitedCast implements CastsAttributes
             return null;
         }
 
-        return explode(',', $value);
+        return explode(',', (string) $value);
     }
 
     /** @param  string|array  $value */

@@ -230,9 +230,7 @@ class SchemaFormBuilder extends Component
             return [];
         });
 
-        $media->dehydrateStateUsing(function (?array $state) {
-            return array_values($state ?? []) ?: null;
-        });
+        $media->dehydrateStateUsing(fn (?array $state) => array_values($state ?? []) ?: null);
 
         $media->getUploadedFileUsing(function ($file) {
 

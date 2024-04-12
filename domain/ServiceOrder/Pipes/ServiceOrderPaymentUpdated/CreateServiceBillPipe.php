@@ -13,7 +13,7 @@ use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 class CreateServiceBillPipe
 {
     public function __construct(
-        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
+        private readonly GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
     ) {
     }
 

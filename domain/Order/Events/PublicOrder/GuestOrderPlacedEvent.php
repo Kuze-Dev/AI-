@@ -13,19 +13,7 @@ class GuestOrderPlacedEvent
 {
     use SerializesModels;
 
-    public Order $order;
-
-    public GuestPreparedOrderData $guestPreparedOrderData;
-
-    public GuestPlaceOrderData $guestPlaceOrderData;
-
-    public function __construct(
-        Order $order,
-        GuestPreparedOrderData $guestPreparedOrderData,
-        GuestPlaceOrderData $guestPlaceOrderData
-    ) {
-        $this->order = $order;
-        $this->guestPreparedOrderData = $guestPreparedOrderData;
-        $this->guestPlaceOrderData = $guestPlaceOrderData;
+    public function __construct(public Order $order, public GuestPreparedOrderData $guestPreparedOrderData, public GuestPlaceOrderData $guestPlaceOrderData)
+    {
     }
 }

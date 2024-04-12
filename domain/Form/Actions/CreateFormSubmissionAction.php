@@ -40,7 +40,7 @@ class CreateFormSubmissionAction
                             abort(422, 'File '.$value.' Not Found');
                         } else {
 
-                            $objectkey = 'uploads/forms/'.$form->id.'/'.basename($value);
+                            $objectkey = 'uploads/forms/'.$form->id.'/'.basename((string) $value);
 
                             Storage::disk('s3')->move($value, $objectkey);
 

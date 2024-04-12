@@ -17,8 +17,6 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private ServiceBill $serviceBill;
-
     private ?ServiceOrder $serviceOrder;
 
     private string $logo;
@@ -37,13 +35,11 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
     private ?string $footer = null;
 
-    public function __construct(ServiceBill $serviceBill)
+    public function __construct(private ServiceBill $serviceBill)
     {
-        $this->serviceBill = $serviceBill;
+        $this->serviceOrder = $this->serviceBill->serviceOrder;
 
-        $this->serviceOrder = $serviceBill->serviceOrder;
-
-        $this->payment_method = $serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
+        $this->payment_method = $this->serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
 
@@ -54,7 +50,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
         $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.
-                     '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$serviceBill->reference.
+                     '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$this->serviceBill->reference.
                      '&payment_method='.$this->payment_method;
 
         $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];

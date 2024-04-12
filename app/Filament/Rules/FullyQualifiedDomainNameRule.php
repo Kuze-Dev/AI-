@@ -19,7 +19,7 @@ class FullyQualifiedDomainNameRule implements ValidationRule
             $fail('The :attribute is invalid.');
         }
 
-        if (! preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', $value)) {
+        if (! preg_match('/^(?!:\/\/)(?=.{1,255}$)((.{1,63}\.){1,127}(?![0-9]*$)[a-z0-9-]+\.?)$/', (string) $value)) {
             $fail('The :attribute is not a valid domain name.');
         }
     }

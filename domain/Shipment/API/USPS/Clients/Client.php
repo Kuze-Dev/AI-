@@ -7,7 +7,7 @@ namespace Domain\Shipment\API\USPS\Clients;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
-final class Client
+final readonly class Client
 {
     public const string PRODUCTION_URL = 'https://secure.shippingapis.com';
 
@@ -16,9 +16,9 @@ final class Client
     private PendingRequest $client;
 
     public function __construct(
-        public readonly string $username,
-        public readonly string $password,
-        public readonly bool $isProduction,
+        public string $username,
+        public string $password,
+        public bool $isProduction,
     ) {
         $this->client = Http::baseUrl(
             $isProduction

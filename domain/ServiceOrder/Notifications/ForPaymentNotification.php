@@ -18,8 +18,6 @@ class ForPaymentNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private ServiceBill $serviceBill;
-
     private ?ServiceOrder $serviceOrder;
 
     private string $logo;
@@ -39,17 +37,16 @@ class ForPaymentNotification extends Notification implements ShouldQueue
     private ?string $footer = null;
 
     /** Create a new notification instance. */
-    public function __construct(ServiceBill $serviceBill)
+    public function __construct(private ServiceBill $serviceBill)
     {
-        $this->serviceBill = $serviceBill;
-        $this->serviceOrder = $serviceBill->serviceOrder;
-        $this->payment_method = $serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
+        $this->serviceOrder = $this->serviceBill->serviceOrder;
+        $this->payment_method = $this->serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;
         $this->description = app(SiteSettings::class)->description;
         $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.
-                     '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$serviceBill->reference.
+                     '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$this->serviceBill->reference.
                      '&payment_method='.$this->payment_method;
         $this->from = app(ServiceSettings::class)->email_sender_name;
 
@@ -104,7 +101,7 @@ class ForPaymentNotification extends Notification implements ShouldQueue
         $sanitizedEmails = [];
 
         foreach ($emailArray as $email) {
-            $email = trim($email);
+            $email = trim((string) $email);
 
             if (! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;

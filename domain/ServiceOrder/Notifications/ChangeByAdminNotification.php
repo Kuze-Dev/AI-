@@ -24,18 +24,15 @@ class ChangeByAdminNotification extends Notification implements ShouldQueue
 
     private string $reference;
 
-    private string $status;
-
     private string $from;
 
     /** Create a new notification instance. */
-    public function __construct(ServiceOrder $serviceOrder, string $status)
+    public function __construct(ServiceOrder $serviceOrder, private string $status)
     {
         $this->cc = app(ServiceSettings::class)->admin_cc;
         $this->bcc = app(ServiceSettings::class)->admin_bcc;
         $this->url = url("/admin/service-orders/$serviceOrder->reference");
         $this->reference = $serviceOrder->reference;
-        $this->status = $status;
         $this->from = app(ServiceSettings::class)->email_sender_name;
     }
 

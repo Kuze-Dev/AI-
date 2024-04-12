@@ -90,9 +90,7 @@ class RouteUrlFieldset extends Group
                 ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update', 'input')),
         ]);
 
-        $this->generateModelForRouteUrlUsing(function (HasRouteUrl|string $model) {
-            return $model instanceof Model ? $model : new $model();
-        });
+        $this->generateModelForRouteUrlUsing(fn (HasRouteUrl|string $model) => $model instanceof Model ? $model : new $model());
     }
 
     public function getModelForRouteUrl(): Model

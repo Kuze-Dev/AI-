@@ -17,7 +17,7 @@ class ValidateRemarksMedia
         ];
 
         foreach ($value as $filePath) {
-            $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+            $extension = pathinfo((string) $filePath, PATHINFO_EXTENSION);
             if (! in_array($extension, $allowedExtensions)) {
                 $fail('Invalid file media extension.');
             }

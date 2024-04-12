@@ -28,10 +28,10 @@ class BlueprintFactory extends Factory
     {
         $instance = $this;
 
-        foreach (range(1, rand(1, 3)) as $i) {
+        foreach (range(1, random_int(1, 3)) as $i) {
             $instance = $instance->addSchemaSection();
 
-            foreach (range(1, rand(1, 3)) as $i) {
+            foreach (range(1, random_int(1, 3)) as $i) {
                 $instance = $instance->addSchemaField();
             }
         }

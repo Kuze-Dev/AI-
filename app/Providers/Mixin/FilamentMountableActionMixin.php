@@ -18,15 +18,9 @@ class FilamentMountableActionMixin
 {
     public function withActivityLog(): Closure
     {
-        return function (
-            string $logName = 'admin',
-            Closure|string|null $event = null,
-            Closure|string|null $description = null,
-            Closure|array|null $properties = null,
-            Model|int|string|null $causedBy = null,
-        ): MountableAction {
+        return fn (string $logName = 'admin', Closure|string|null $event = null, Closure|string|null $description = null, Closure|array|null $properties = null, Model|int|string|null $causedBy = null): MountableAction =>
             /** @var MountableAction $this */
-            return $this->after(function (MountableAction $action) use ($logName, $event, $description, $properties, $causedBy) {
+            $this->after(function (MountableAction $action) use ($logName, $event, $description, $properties, $causedBy) {
                 $event = $action->evaluate($event) ?? $action->getName();
                 $properties = $action->evaluate($properties);
                 $description = Str::headline($action->evaluate($description ?? $event) ?? $action->getName());
@@ -78,6 +72,5 @@ class FilamentMountableActionMixin
 
                 $log($action instanceof HasRecord ? $action->getRecord() : null);
             });
-        };
     }
 }

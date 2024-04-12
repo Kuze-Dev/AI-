@@ -24,23 +24,8 @@ use Throwable;
 #[Middleware('feature.tenant:'.CustomerBase::class)]
 class RegisterController
 {
-    protected CreateCustomerAction $createCustomerAction;
-
-    protected EditCustomerAction $editCustomerAction;
-
-    protected VerifyEmailAction $verifyEmailAction;
-
-    protected SendForApprovalRegistrationAction $sendForApprovalRegistrationAction;
-
-    public function __construct(CreateCustomerAction $createCustomerAction,
-        EditCustomerAction $editCustomerAction,
-        VerifyEmailAction $verifyEmailAction,
-        SendForApprovalRegistrationAction $sendForApprovalRegistrationAction)
+    public function __construct(protected CreateCustomerAction $createCustomerAction, protected EditCustomerAction $editCustomerAction, protected VerifyEmailAction $verifyEmailAction, protected SendForApprovalRegistrationAction $sendForApprovalRegistrationAction)
     {
-        $this->createCustomerAction = $createCustomerAction;
-        $this->editCustomerAction = $editCustomerAction;
-        $this->verifyEmailAction = $verifyEmailAction;
-        $this->sendForApprovalRegistrationAction = $sendForApprovalRegistrationAction;
     }
 
     /** @throws Throwable */

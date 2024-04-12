@@ -26,16 +26,12 @@ class NodeFactory extends Factory
             'model_id' => null,
             'label' => fake()->word(),
             'target' => Target::self,
-            'type' => function (array $attributes) {
-                return $attributes['model_type'] === null
-                    ? NodeType::URL
-                    : NodeType::RESOURCE;
-            },
-            'url' => function (array $attributes) {
-                return $attributes['model_type'] === null
-                    ? fake()->url()
-                    : null;
-            },
+            'type' => fn (array $attributes) => $attributes['model_type'] === null
+                ? NodeType::URL
+                : NodeType::RESOURCE,
+            'url' => fn (array $attributes) => $attributes['model_type'] === null
+                ? fake()->url()
+                : null,
             'order' => null,
         ];
     }

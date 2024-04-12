@@ -24,8 +24,6 @@ class OrderPlacedMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private Order $order;
-
     private OrderAddress $shippingAddress;
 
     private ShippingMethod $shippingMethod;
@@ -43,11 +41,9 @@ class OrderPlacedMail extends Notification implements ShouldQueue
     private ?string $footer = null;
 
     /** Create a new notification instance. */
-    public function __construct(Order $order, PreparedOrderData|GuestPreparedOrderData $preparedOrderData)
+    public function __construct(private Order $order, PreparedOrderData|GuestPreparedOrderData $preparedOrderData)
     {
-        $this->order = $order;
-
-        $this->shippingAddress = $order->shippingAddress;
+        $this->shippingAddress = $this->order->shippingAddress;
 
         $this->shippingMethod = $preparedOrderData->shippingMethod;
 
@@ -146,7 +142,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
         $sanitizedEmails = [];
 
         foreach ($emailArray as $email) {
-            $email = trim($email);
+            $email = trim((string) $email);
 
             if (! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;

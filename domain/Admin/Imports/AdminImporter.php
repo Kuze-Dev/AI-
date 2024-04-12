@@ -98,7 +98,7 @@ class AdminImporter extends Importer
             return;
         }
 
-        $this->record->assignRole(explode(',', $this->data['roles']));
+        $this->record->assignRole(explode(',', (string) $this->data['roles']));
     }
 
     #[\Override]

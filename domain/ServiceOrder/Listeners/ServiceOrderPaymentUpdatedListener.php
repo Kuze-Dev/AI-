@@ -25,7 +25,7 @@ class ServiceOrderPaymentUpdatedListener
         private ServiceBill $serviceBill,
         private ServiceOrder $serviceOrder,
         private ServiceTransaction $serviceTransaction,
-        private ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction
+        private readonly ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction
     ) {
     }
 

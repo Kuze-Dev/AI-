@@ -23,7 +23,7 @@ class TotalOrder extends Widget
         $statusCounts = [];
 
         foreach ($this->status as $s) {
-            $statusCounts[strtolower($s)] = $this->getOrderByStatus($s);
+            $statusCounts[strtolower((string) $s)] = $this->getOrderByStatus($s);
         }
 
         return [

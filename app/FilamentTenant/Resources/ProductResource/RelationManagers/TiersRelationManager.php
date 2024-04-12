@@ -72,17 +72,16 @@ class TiersRelationManager extends RelationManager
                     ])
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['id', 'name'])
-                    ->using(function (HasRelationshipTable $livewire, array $data): ?Model {
+                    ->using(fn (HasRelationshipTable $livewire, array $data): ?Model =>
                         /** @phpstan-ignore-next-line */
-                        return $livewire->getRelationship()
+                        $livewire->getRelationship()
                             ->attach(
                                 $data['recordId'],
                                 [
                                     'discount_amount_type' => $data['discount_amount_type'],
                                     'discount' => $data['discount'],
                                 ]
-                            );
-                    }),
+                            )),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

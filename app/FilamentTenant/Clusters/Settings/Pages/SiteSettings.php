@@ -43,18 +43,14 @@ class SiteSettings extends TenantBaseSettings
                     ->acceptedFileTypes(['image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
                     ->maxSize(1_000)
                     ->required()
-                    ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
-                        return 'logo.'.$file->extension();
-                    }),
+                    ->getUploadedFileNameForStorageUsing(static fn (TemporaryUploadedFile $file) => 'logo.'.$file->extension()),
                 FileUpload::make('favicon')
                     ->acceptedFileTypes(['image/ico', 'image/png', 'image/webp', 'image/jpg', 'image/jpeg'])
                     ->imageResizeTargetHeight('100')
                     ->imageResizeTargetWidth('100')
                     ->maxSize(1_000)
                     ->required()
-                    ->getUploadedFileNameForStorageUsing(static function (TemporaryUploadedFile $file) {
-                        return 'favicon.'.$file->extension();
-                    }),
+                    ->getUploadedFileNameForStorageUsing(static fn (TemporaryUploadedFile $file) => 'favicon.'.$file->extension()),
                 TextInput::make('front_end_domain')
                     ->required()
                     ->rules([new FullyQualifiedDomainNameRule()])

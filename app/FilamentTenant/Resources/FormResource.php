@@ -82,35 +82,32 @@ class FormResource extends Resource
                         Forms\Components\CheckboxList::make('sites')
                             ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
                             ->rules([
-                                function (?FormModel $record, \Filament\Forms\Get $get) {
+                                fn (?FormModel $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                    return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                    $siteIDs = $value;
 
-                                        $siteIDs = $value;
+                                    if ($record) {
+                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
 
-                                        if ($record) {
-                                            $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
-
-                                            $form = FormModel::where('name', $get('name'))
-                                                ->where('id', '!=', $record->id)
-                                                ->whereHas(
-                                                    'sites',
-                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                                )->count();
-
-                                        } else {
-
-                                            $form = FormModel::where('name', $get('name'))->whereHas(
+                                        $form = FormModel::where('name', $get('name'))
+                                            ->where('id', '!=', $record->id)
+                                            ->whereHas(
                                                 'sites',
                                                 fn ($query) => $query->whereIn('site_id', $siteIDs)
                                             )->count();
-                                        }
 
-                                        if ($form > 0) {
-                                            $fail("Form {$get('name')} is already available in selected sites.");
-                                        }
+                                    } else {
 
-                                    };
+                                        $form = FormModel::where('name', $get('name'))->whereHas(
+                                            'sites',
+                                            fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                        )->count();
+                                    }
+
+                                    if ($form > 0) {
+                                        $fail("Form {$get('name')} is already available in selected sites.");
+                                    }
+
                                 },
                             ])
                             ->options(
@@ -271,9 +268,7 @@ class FormResource extends Resource
                     ->icon('heroicon-m-envelope')
                     ->color(fn (FormModel $record) => $record->store_submission ? 'success' : 'secondary'),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(condition: function () {
-                        return TenantFeatureSupport::active(SitesManagement::class);
-                    }, isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -309,9 +304,7 @@ class FormResource extends Resource
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
-            });
+            return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();

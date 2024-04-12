@@ -124,7 +124,7 @@ class ShippingMethodResourcev2 extends JsonApiResource
     private function getCartLines(Request $request): Collection
     {
 
-        $cartLineIds = is_array($request->cart_line_ids) ? $request->cart_line_ids : explode(',', $request->cart_line_ids);
+        $cartLineIds = is_array($request->cart_line_ids) ? $request->cart_line_ids : explode(',', (string) $request->cart_line_ids);
 
         $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
 

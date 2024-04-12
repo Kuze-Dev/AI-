@@ -12,13 +12,9 @@ class NewRegisterNotification extends Notification
 {
     use Queueable;
 
-    private Customer $customer;
-
     /** Create a new notification instance. */
-    public function __construct(Customer $customer)
+    public function __construct(private Customer $customer)
     {
-
-        $this->customer = $customer;
     }
 
     /**

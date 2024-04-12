@@ -69,7 +69,7 @@ class CartSummaryRequest extends FormRequest
     public function getCartLines(): Collection
     {
         if (empty($this->cartLinesCache)) {
-            $cartLineIds = explode(',', $this->validated('cart_line_ids'));
+            $cartLineIds = explode(',', (string) $this->validated('cart_line_ids'));
 
             $this->cartLinesCache = app(CartLineQuery::class)->execute($cartLineIds);
         }

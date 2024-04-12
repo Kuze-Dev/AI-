@@ -178,9 +178,7 @@ class ServiceBillsRelationManager extends RelationManager
                     ->form(fn (ServiceBill $record) => [
                         Forms\Components\Textarea::make('customer_message')
                             ->label(trans('Customer Message'))
-                            ->formatStateUsing(function (ServiceBill $record) {
-                                return $record->payments->value('customer_message');
-                            })
+                            ->formatStateUsing(fn (ServiceBill $record) => $record->payments->value('customer_message'))
                             ->disabled()
                             ->dehydrated(false),
 
@@ -208,9 +206,7 @@ class ServiceBillsRelationManager extends RelationManager
                         Forms\Components\Textarea::make('admin_message')
                             ->translateLabel()
                             ->maxLength(255)
-                            ->formatStateUsing(function (ServiceBill $record) {
-                                return $record->payments->value('admin_message');
-                            }),
+                            ->formatStateUsing(fn (ServiceBill $record) => $record->payments->value('admin_message')),
                     ])
                     ->action(function (Tables\Actions\Action $action, ServiceBill $record, array $data) {
 

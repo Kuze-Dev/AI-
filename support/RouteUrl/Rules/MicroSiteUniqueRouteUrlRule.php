@@ -25,17 +25,9 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
 
-        $pages = Page::select('id')->wherehas('sites', function ($q) use ($value) {
-            return $q->whereIn('site_id', $value);
-        })->wherehas('routeUrls', function ($r) {
-            return $r->where('url', $this->route_url['url']);
-        })->pluck('id')->toArray();
+        $pages = Page::select('id')->wherehas('sites', fn ($q) => $q->whereIn('site_id', $value))->wherehas('routeUrls', fn ($r) => $r->where('url', $this->route_url['url']))->pluck('id')->toArray();
 
-        $contentEntriesIds = ContentEntry::select('id')->wherehas('sites', function ($q) use ($value) {
-            return $q->whereIn('site_id', $value);
-        })->wherehas('routeUrls', function ($r) {
-            return $r->where('url', $this->route_url['url']);
-        })->pluck('id')->toArray();
+        $contentEntriesIds = ContentEntry::select('id')->wherehas('sites', fn ($q) => $q->whereIn('site_id', $value))->wherehas('routeUrls', fn ($r) => $r->where('url', $this->route_url['url']))->pluck('id')->toArray();
 
         $pagesIds = array_merge($pages, $contentEntriesIds);
 

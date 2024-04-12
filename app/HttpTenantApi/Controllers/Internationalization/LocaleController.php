@@ -20,8 +20,6 @@ class LocaleController
     /** @return Collection<int, Locale> */
     public function index()
     {
-        return Cache::rememberForever('locale', function () {
-            return Locale::all();
-        });
+        return Cache::rememberForever('locale', fn () => Locale::all());
     }
 }

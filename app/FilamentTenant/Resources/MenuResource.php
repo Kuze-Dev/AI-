@@ -106,34 +106,31 @@ class MenuResource extends Resource
                     Forms\Components\CheckboxList::make('sites')
                         ->required(fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
-                            function (?Menu $record, \Filament\Forms\Get $get) {
+                            fn (?Menu $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                $siteIDs = $value;
 
-                                    $siteIDs = $value;
+                                if ($record) {
+                                    $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
 
-                                    if ($record) {
-                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
-
-                                        $menu = Menu::where('name', $get('name'))
-                                            ->where('id', '!=', $record->id)
-                                            ->whereHas(
-                                                'sites',
-                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                            )->count();
-                                    } else {
-                                        $menu = Menu::where('name', $get('name'))->whereHas(
+                                    $menu = Menu::where('name', $get('name'))
+                                        ->where('id', '!=', $record->id)
+                                        ->whereHas(
                                             'sites',
                                             fn ($query) => $query->whereIn('site_id', $siteIDs)
                                         )->count();
+                                } else {
+                                    $menu = Menu::where('name', $get('name'))->whereHas(
+                                        'sites',
+                                        fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                    )->count();
 
-                                    }
+                                }
 
-                                    if ($menu > 0) {
-                                        $fail("Menu {$get('name')} is already available in selected sites.");
-                                    }
+                                if ($menu > 0) {
+                                    $fail("Menu {$get('name')} is already available in selected sites.");
+                                }
 
-                                };
                             },
                         ])
                         ->options(
@@ -204,10 +201,9 @@ class MenuResource extends Resource
                                                                 ContentEntry::class,
                                                             ])
                                                                 ->mapWithKeys(
-                                                                    function (string $model) {
+                                                                    fn (string $model) =>
                                                                         /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
-                                                                        return [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()];
-                                                                    }
+                                                                        [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()]
                                                                 )
                                                                 ->sort()
                                                                 ->toArray()
@@ -253,9 +249,7 @@ class MenuResource extends Resource
                     ->searchable()
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),
                 Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(condition: function () {
-                        return TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class);
-                    }, isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -290,9 +284,7 @@ class MenuResource extends Resource
             Auth::user()?->can('site.siteManager') &&
             ! (Auth::user()->hasRole(config('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
-            });
+            return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();

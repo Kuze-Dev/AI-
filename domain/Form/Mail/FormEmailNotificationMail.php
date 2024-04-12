@@ -109,7 +109,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
             return $customTheme;
         }
 
-        if (str_contains($this->theme, '::')) {
+        if (str_contains((string) $this->theme, '::')) {
             return $this->theme;
         }
 
@@ -142,7 +142,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
             foreach ($this->form_attachments as $value) {
                 $attach[] = Attachment::fromStorageDisk('s3', $value)
-                    ->as(basename($value));
+                    ->as(basename((string) $value));
             }
         }
 

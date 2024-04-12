@@ -45,9 +45,9 @@ class ProductOrderData
             allow_customer_remarks: $data['allow_customer_remarks'],
             description: $data['description'] ?? null,
             stock: $data['stock'] ?? null,
-            allow_stocks: isset($data['allow_stocks']) ? $data['allow_stocks'] : null,
-            minimum_order_quantity: isset($data['minimum_order_quantity']) ? $data['minimum_order_quantity'] : null,
-            allow_guest_purchase: isset($data['allow_guest_purchase']) ? $data['allow_guest_purchase'] : null,
+            allow_stocks: $data['allow_stocks'] ?? null,
+            minimum_order_quantity: $data['minimum_order_quantity'] ?? null,
+            allow_guest_purchase: $data['allow_guest_purchase'] ?? null,
         );
     }
 
@@ -74,9 +74,9 @@ class ProductOrderData
             allow_customer_remarks: (bool) $product->allow_customer_remarks,
             description: $product->description ?? null,
             stock: $product->stock ?? null,
-            allow_stocks: isset($product->allow_stocks) ? $product->allow_stocks : null,
-            minimum_order_quantity: isset($product->minimum_order_quantity) ? $product->minimum_order_quantity : null,
-            allow_guest_purchase: isset($product->allow_guest_purchase) ? $product->allow_guest_purchase : null,
+            allow_stocks: $product->allow_stocks ?? null,
+            minimum_order_quantity: $product->minimum_order_quantity ?? null,
+            allow_guest_purchase: $product->allow_guest_purchase ?? null,
         );
     }
 }

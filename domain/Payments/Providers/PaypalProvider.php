@@ -19,7 +19,7 @@ class PaypalProvider extends Provider
 {
     protected string $name = 'paypal';
 
-    private PayPalClient $payPalclient;
+    private readonly PayPalClient $payPalclient;
 
     public function __construct()
     {

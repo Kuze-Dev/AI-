@@ -14,7 +14,7 @@ final class UPSClient
 
     public const string SANDBOX_URL = 'https://wwwcie.ups.com';
 
-    private PendingRequest $client;
+    private readonly PendingRequest $client;
 
     private ?string $access_token = null;
 

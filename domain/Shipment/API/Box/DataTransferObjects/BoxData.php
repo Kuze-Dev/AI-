@@ -17,17 +17,13 @@ class BoxData
     public function getTotalVolume(): int|float
     {
 
-        return array_reduce($this->boxitems, function ($carry, $boxItem) {
-            return $carry + $boxItem->volume;
-        }, 0);
+        return array_reduce($this->boxitems, fn ($carry, $boxItem) => $carry + $boxItem->volume, 0);
     }
 
     public function getTotalWeight(?string $unit = ''): int|float
     {
 
-        $totalWeight = array_reduce($this->boxitems, function ($carry, $boxItem) {
-            return $carry + $boxItem->weight;
-        }, 0);
+        $totalWeight = array_reduce($this->boxitems, fn ($carry, $boxItem) => $carry + $boxItem->weight, 0);
 
         return match ($unit) {
             UnitEnum::KG->value => $totalWeight * 0.45359237,

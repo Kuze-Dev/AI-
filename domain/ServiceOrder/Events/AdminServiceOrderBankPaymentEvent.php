@@ -12,19 +12,7 @@ class AdminServiceOrderBankPaymentEvent
 {
     use SerializesModels;
 
-    public ServiceOrder $serviceOrder;
-
-    public string $paymentRemarks;
-
-    public Payment $payment;
-
-    public function __construct(
-        ServiceOrder $serviceOrder,
-        string $paymentRemarks,
-        Payment $payment
-    ) {
-        $this->serviceOrder = $serviceOrder;
-        $this->paymentRemarks = $paymentRemarks;
-        $this->payment = $payment;
+    public function __construct(public ServiceOrder $serviceOrder, public string $paymentRemarks, public Payment $payment)
+    {
     }
 }

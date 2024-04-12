@@ -10,7 +10,7 @@ use Domain\ServiceOrder\Models\ServiceBill;
 class CreateServiceBillAction
 {
     public function __construct(
-        private GenerateReferenceNumberAction $generateReferenceNumberAction,
+        private readonly GenerateReferenceNumberAction $generateReferenceNumberAction,
     ) {
     }
 

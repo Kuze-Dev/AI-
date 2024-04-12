@@ -52,7 +52,7 @@ class FilamentSelectFormMixin
                         ->toArray();
                 }
 
-                if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
+                if (str_contains((string) $titleColumnName, '->') && ! str_contains((string) $titleColumnName, ' as ')) {
                     $titleColumnName .= " as {$titleColumnName}";
                 }
 
@@ -85,7 +85,7 @@ class FilamentSelectFormMixin
 
                 $titleColumnName = $component->evaluate($titleColumnName);
 
-                if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
+                if (str_contains((string) $titleColumnName, '->') && ! str_contains((string) $titleColumnName, ' as ')) {
                     $titleColumnName .= " as {$titleColumnName}";
                 }
 
@@ -132,7 +132,7 @@ class FilamentSelectFormMixin
 
                 $titleColumnName = $component->evaluate($titleColumnName);
 
-                if (str_contains($titleColumnName, '->') && ! str_contains($titleColumnName, ' as ')) {
+                if (str_contains((string) $titleColumnName, '->') && ! str_contains((string) $titleColumnName, ' as ')) {
                     $titleColumnName .= " as {$titleColumnName}";
                 }
 

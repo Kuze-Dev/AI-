@@ -78,7 +78,7 @@ function testInTenantContext(array|string|null $features = null): Tenant
     /** @var Tenant */
     $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
 
-    $domain = 'test.'.parse_url(config('app.url'), PHP_URL_HOST);
+    $domain = 'test.'.parse_url((string) config('app.url'), PHP_URL_HOST);
 
     $tenant->createDomain(['domain' => $domain]);
 

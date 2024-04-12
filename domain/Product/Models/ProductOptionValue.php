@@ -74,7 +74,7 @@ class ProductOptionValue extends Model implements HasMedia
                 if (is_null($this->data) || $this->data['icon_type'] == 'text') {
                     return 'Type: Text | Value: N/A';
                 } else {
-                    $iconTypeTransformed = ucwords(str_replace('_', ' ', $this->data['icon_type']));
+                    $iconTypeTransformed = ucwords(str_replace('_', ' ', (string) $this->data['icon_type']));
 
                     return "Type: {$iconTypeTransformed} | Value: {$this->data['icon_value']}";
                 }

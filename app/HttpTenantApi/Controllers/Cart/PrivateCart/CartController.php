@@ -56,9 +56,7 @@ class CartController extends Controller
             ->first();
 
         if ($model && isset($model->cartLines)) {
-            $model->cartLines = $model->cartLines->filter(function ($cartLine) {
-                return $cartLine->purchasable !== null;
-            });
+            $model->cartLines = $model->cartLines->filter(fn ($cartLine) => $cartLine->purchasable !== null);
         }
 
         if ($model) {

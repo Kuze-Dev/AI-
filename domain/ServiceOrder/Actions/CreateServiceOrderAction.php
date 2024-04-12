@@ -24,11 +24,11 @@ use Illuminate\Support\Facades\Auth;
 class CreateServiceOrderAction
 {
     public function __construct(
-        private GenerateReferenceNumberAction $generateReferenceNumberAction,
-        private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
-        private GetTaxableInfoAction $getTaxableInfoAction,
-        private ServiceOrderCreatedPipelineAction $serviceOrderCreatedPipelineAction,
-        private ServiceOrderMilestoneCreatedPipelineAction $serviceOrderMilestoneCreatedPipelineAction
+        private readonly GenerateReferenceNumberAction $generateReferenceNumberAction,
+        private readonly CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
+        private readonly GetTaxableInfoAction $getTaxableInfoAction,
+        private readonly ServiceOrderCreatedPipelineAction $serviceOrderCreatedPipelineAction,
+        private readonly ServiceOrderMilestoneCreatedPipelineAction $serviceOrderMilestoneCreatedPipelineAction
     ) {
     }
 

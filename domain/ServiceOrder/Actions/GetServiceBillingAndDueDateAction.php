@@ -18,7 +18,7 @@ use Throwable;
 class GetServiceBillingAndDueDateAction
 {
     public function __construct(
-        private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
+        private readonly ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
     ) {
     }
 

@@ -30,8 +30,8 @@ class CheckoutServiceOrderAction
         private PaymentMethod $paymentMethod,
         private ServiceBill $serviceBill,
         private ServiceOrder $serviceOrder,
-        private CreatePaymentAction $createPaymentAction,
-        private CreateServiceTransactionAction $createServiceTransactionAction
+        private readonly CreatePaymentAction $createPaymentAction,
+        private readonly CreateServiceTransactionAction $createServiceTransactionAction
     ) {
     }
 
