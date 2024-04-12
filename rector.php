@@ -2,13 +2,9 @@
 
 declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use Rector\Set\ValueObject\SetList;
-use Rector\ValueObject\PhpVersion;
-use RectorLaravel\Set\LaravelSetList;
-
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([
+return Rector\Config\RectorConfig::configure()
+    ->withPhpSets()
+    ->withPaths([
         __DIR__.'/app',
         __DIR__.'/database',
         __DIR__.'/domain',
@@ -16,27 +12,32 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__.'/routes',
         __DIR__.'/support',
         __DIR__.'/tests',
-    ]);
-
-    $rectorConfig->sets([
-        LaravelSetList::LARAVEL_100,
-        SetList::PHP_83,
-    ]);
-
-    $rectorConfig->rules([
-        Rector\Php55\Rector\ClassConstFetch\StaticToSelfOnFinalClassRector::class,
-        Rector\Php72\Rector\FuncCall\GetClassOnNullRector::class,
-        Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
+    ])
+    ->withSets([
+        RectorLaravel\Set\LaravelSetList::LARAVEL_100,
+        RectorLaravel\Set\LaravelSetList::LARAVEL_ARRAY_STR_FUNCTION_TO_STATIC_CALL,
+        //        LaravelSetList::LARAVEL_FACADE_ALIASES_TO_FULL_NAMES,
+    ])
+//    ->withSkip([
+//        RectorLaravel\Rector\FuncCall\DispatchNonShouldQueueToDispatchSyncRector::class, //LARAVEL_100
+//    ])
+    ->withRules([
         Spatie\Ray\Rector\RemoveRayCallRector::class,
-    ]);
-
-    $rectorConfig->phpVersion(PhpVersion::PHP_83);
-
-    //     $rectorConfig->phpstanConfig(__DIR__.'/phpstan.neon');
-
-    // Ensure file system caching is used instead of in-memory.
-    $rectorConfig->cacheClass(Rector\Caching\ValueObject\Storage\FileCacheStorage::class);
-
-    // Specify a path that works locally as well as on CI job runners.
-    $rectorConfig->cacheDirectory('build/rector');
-};
+        //        RectorLaravel\Rector\Class_\AddExtendsAnnotationToModelFactoriesRector::class,
+        //        RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector::class,
+        //        RectorLaravel\Rector\ClassMethod\AddParentBootToModelClassMethodRector::class,
+        //        RectorLaravel\Rector\ClassMethod\AddParentRegisterToEventServiceProviderRector::class,
+        //        //        RectorLaravel\Rector\Class_\AnonymousMigrationsRector::class,
+        //        RectorLaravel\Rector\Expr\AppEnvironmentComparisonToParameterRector::class,
+        //        RectorLaravel\Rector\MethodCall\AssertStatusToAssertMethodRector::class,
+        //        RectorLaravel\Rector\StaticCall\DispatchToHelperFunctionsRector::class,
+        //        RectorLaravel\Rector\MethodCall\EloquentOrderByToLatestOrOldestRector::class,
+        //        RectorLaravel\Rector\PropertyFetch\OptionalToNullsafeOperatorRector::class,
+        //        RectorLaravel\Rector\FuncCall\RemoveDumpDataDeadCodeRector::class,
+        //        RectorLaravel\Rector\Expr\SubStrToStartsWithOrEndsWithStaticMethodCallRector\SubStrToStartsWithOrEndsWithStaticMethodCallRector::class,
+        //        RectorLaravel\Rector\MethodCall\UseComponentPropertyWithinCommandsRector::class,
+    ])
+    ->withCache(
+        cacheDirectory: 'build/rector',
+        cacheClass: Rector\Caching\ValueObject\Storage\FileCacheStorage::class,
+    );
