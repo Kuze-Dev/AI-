@@ -10,17 +10,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\RouteUrl\HasRouteUrl;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
+use Support\RouteUrl\HasRouteUrl;
 
 /**
  * Domain\Taxonomy\Models\Taxonomy
@@ -60,8 +60,8 @@ use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
 class Taxonomy extends Model implements HasRouteUrlContract
 {
     use ConstraintsRelationships;
-    use HasSlug;
     use HasRouteUrl;
+    use HasSlug;
     use LogsActivity;
 
     protected $fillable = [

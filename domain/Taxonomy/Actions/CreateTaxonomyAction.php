@@ -10,11 +10,11 @@ use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class CreateTaxonomyAction
 {
-
     public function __construct(
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
+
     public function execute(TaxonomyData $taxonomyData): Taxonomy
     {
         $taxonomy = Taxonomy::create([

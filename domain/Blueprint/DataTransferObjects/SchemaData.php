@@ -45,4 +45,36 @@ class SchemaData implements Arrayable
 
         return $rules;
     }
+
+    public function getFieldStatePaths(): array
+    {
+        $statepaths = [];
+
+        foreach ($this->sections as $section) {
+            foreach ($section->fields as $field) {
+                $statepaths[] = $section->state_name.'.'.$field->state_name;
+            }
+        }
+
+        return $statepaths;
+    }
+
+    public function getFieldStatekeys(): array
+    {
+        $statepaths = [];
+
+        foreach ($this->sections as $section) {
+
+            $fields = [];
+            foreach ($section->fields as $field) {
+
+                $fields[$field->state_name] = $field->type;
+                // $statepaths[$section->state_name] = []$field->type;
+            }
+
+            $statepaths[$section->state_name] = $fields;
+        }
+
+        return $statepaths;
+    }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Content\Actions;
 
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Models\Locale;
@@ -28,6 +29,13 @@ class UpdateContentEntryAction
      */
     public function execute(ContentEntry $contentEntry, ContentEntryData $contentEntryData): ContentEntry
     {
+        $sanitizeData = array_merge($contentEntryData->data,
+            $this->sanitizeBlueprintData(
+                $contentEntry->content->blueprint,
+                $contentEntryData->data
+            )
+        );
+
         $contentEntry->update([
             'author_id' => $contentEntryData->author_id,
             'title' => $contentEntryData->title,
@@ -53,5 +61,27 @@ class UpdateContentEntryAction
         $this->updateBlueprintDataAction->execute($contentEntry);
 
         return $contentEntry;
+    }
+
+    private function sanitizeBlueprintData(Blueprint $blueprint, array $data): array
+    {
+        $array1 = $data;
+        $array2 = $blueprint->schema->getFieldStatekeys();
+
+        foreach ($array1 as $key => $value) {
+
+            if (! array_key_exists($key, $array2)) {
+                unset($array1[$key]);
+            }
+
+            foreach ($value as $key_field => $field) {
+                if (! array_key_exists($key_field, $array2[$key] ?? [])) {
+                    unset($array1[$key][$key_field]);
+                }
+            }
+
+        }
+
+        return $array1;
     }
 }

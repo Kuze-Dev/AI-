@@ -96,7 +96,7 @@ class BlueprintResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                    // ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
+                // ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),

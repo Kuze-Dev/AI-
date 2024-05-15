@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\Tree;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Internationalization\Models\Locale;
 use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
@@ -24,6 +26,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 
 class TaxonomyResource extends Resource
 {
@@ -82,7 +85,13 @@ class TaxonomyResource extends Resource
                         ->preload()
                         ->optionsFromModel(Blueprint::class, 'name')
                         ->disabled(fn (?Taxonomy $record) => $record !== null),
-                    RouteUrlFieldset::make(),
+                    Forms\Components\Toggle::make('has_route')
+                        ->reactive()
+                        ->lazy()
+                        ->label(trans('Has Route')),
+                    RouteUrlFieldset::make()
+                        ->disabled(fn (Closure $get) => ! $get('has_route'))
+                        ->hidden(fn (Closure $get) => ! $get('has_route')),
                 ]),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
@@ -102,14 +111,59 @@ class TaxonomyResource extends Resource
                             Forms\Components\Grid::make(['md' => 1])
                                 ->schema([
                                     Forms\Components\Section::make('Term')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('name')
-                                        ->required()
-                                        ->unique(ignoreRecord: true),
-                                        RouteUrlFieldset::make()
-                                        ->statePath('termsrouteUrl'),
-                                    ]),
-                                    
+                                        ->schema([
+                                            Forms\Components\Hidden::make('id'),
+                                            Forms\Components\TextInput::make('name')
+                                                ->required()
+                                                ->unique(ignoreRecord: true),
+                                            Forms\Components\Group::make([
+                                                // Forms\Components\Toggle::make('is_override')
+                                                // ->formatStateUsing(function(Closure $get) {
+
+                                                //     $term = TaxonomyTerm::with(
+                                                //         'routeUrls'
+                                                //     )->findorFail($get('id'));
+                                                //     dd($term);
+                                                // })
+                                                // ->label(trans('Custom URL'))
+                                                // ->reactive(),
+
+                                                Forms\Components\TextInput::make('url')
+                                                    ->label(trans('URL'))
+                                                    ->reactive()
+                                                    ->disabled(fn ($livewire) => ! $livewire->data['has_route'])
+                                                    ->hidden(fn ($livewire) => ! $livewire->data['has_route'])
+                                                    // ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl?->url)
+                                                    ->formatStateUsing(function (Closure $get, $livewire) {
+
+                                                        $term = TaxonomyTerm::with(
+                                                            'routeUrls'
+                                                        )->find($get('id'));
+
+                                                        return $term ? $term->ActiveRouteurl?->url : null;
+
+                                                    })
+                                                    ->required()
+                                                    ->string()
+                                                    ->maxLength(255)
+                                                    ->startsWith('/')
+                                                    ->rule(
+                                                        function (Closure $get) {
+
+                                                            /** @var \Support\RouteUrl\Contracts\HasRouteUrl */
+                                                            $term = TaxonomyTerm::with(
+                                                                'routeUrls'
+                                                            )->find($get('id'));
+
+                                                            return tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
+                                                            new UniqueActiveRouteUrlRule($term) : null;
+                                                        }
+                                                        // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
+                                                    ),
+                                            ]),
+
+                                        ]),
+
                                     SchemaFormBuilder::make('data', fn (Taxonomy $record) => $record->blueprint->schema),
                                 ]),
                         ]),

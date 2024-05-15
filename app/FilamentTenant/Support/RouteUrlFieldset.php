@@ -44,6 +44,8 @@ class RouteUrlFieldset extends Group
                         if ($eventParameters && $eventParameters[0] === 'input') {
                             /** @var string */
                             $inputUrl = $get($statePath.'.url');
+                            // dump($statePath.'.url');
+                            // dump($inputUrl);
                             $inputUrl = Str::startsWith($inputUrl, '/') ?
                                 Str::contains($inputUrl, "/$locale/") ? Str::replace("/$locale/", '/', $inputUrl) : $inputUrl
                                 : '/'.$inputUrl;
@@ -58,7 +60,7 @@ class RouteUrlFieldset extends Group
 
                         $newUrl = $model::generateRouteUrl($this->getModelForRouteUrl(), $get('data', true));
                         $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ? "/$locale$newUrl" : $newUrl;
-                      
+
                         $set($statePath.'.url', $newUrl);
                     });
                 },

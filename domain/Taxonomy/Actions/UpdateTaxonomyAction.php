@@ -25,7 +25,7 @@ class UpdateTaxonomyAction
         $this->syncTermAction->execute($taxonomy, $taxonomyData->terms);
 
         $this->createOrUpdateRouteUrl->execute($taxonomy, $taxonomyData->route_url_data);
-        
+
         return $taxonomy;
     }
 }

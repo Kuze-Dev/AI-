@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Sluggable\HasSlug;
@@ -19,9 +20,8 @@ use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
-use Support\RouteUrl\HasRouteUrl;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
-use Illuminate\Support\Str;
+use Support\RouteUrl\HasRouteUrl;
 
 /**
  * Domain\Taxonomy\Models\TaxonomyTerm
@@ -63,11 +63,11 @@ use Illuminate\Support\Str;
     OnDeleteCascade(['contentEntries', 'children']),
     OnDeleteRestrict(['products'])
 ]
-class TaxonomyTerm extends Model implements Sortable, HasRouteUrlContract
+class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
 {
     use ConstraintsRelationships;
-    use HasSlug;
     use HasRouteUrl;
+    use HasSlug;
     use SortableTrait;
 
     protected $fillable = [

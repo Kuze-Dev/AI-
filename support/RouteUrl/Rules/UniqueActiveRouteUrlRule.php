@@ -34,7 +34,7 @@ class UniqueActiveRouteUrlRule implements ValidationRule
                             ->whereColumn('sub_query_table.model_id', 'route_urls.model_id')
                     )
             );
-          
+
         if ($this->ignoreModel !== null) {
 
             if ($this->ignoreModel->parentPage ?? false) {
