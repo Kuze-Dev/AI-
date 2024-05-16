@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Actions;
 
+use App\Settings\CustomerSettings;
 use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
+use Domain\Blueprint\Actions\CreateBlueprintDataAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
@@ -19,13 +21,18 @@ class CreateCustomerAction
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
         private readonly CreateAddressAction $createAddress,
-        private readonly GenerateCustomerIDAction $generateCustomerID
+        private readonly GenerateCustomerIDAction $generateCustomerID,
+        protected CreateBlueprintDataAction $createBlueprintDataAction
     ) {
     }
 
     public function execute(CustomerData $customerData): Customer
     {
         $customer = $this->create($customerData);
+
+        if (app(CustomerSettings::class)->blueprint_id) {
+            $this->createBlueprintDataAction->execute($customer);
+        }
 
         if ($customerData->shipping_address_data !== null) {
             $this->createAddress
@@ -86,6 +93,7 @@ class CreateCustomerAction
             'email_verification_type' => $customerData->email_verification_type,
             'register_status' => $customerData->register_status,
             'tier_approval_status' => $customerData->tier_approval_status,
+            'data' => $customerData->data,
         ]);
     }
 

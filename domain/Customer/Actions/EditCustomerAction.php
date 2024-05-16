@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Actions;
 
+use App\Settings\CustomerSettings;
+use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
@@ -13,8 +15,10 @@ use Support\Common\DataTransferObjects\MediaData;
 
 class EditCustomerAction
 {
-    public function __construct(private readonly SyncMediaCollectionAction $syncMediaCollection)
-    {
+    public function __construct(
+        private readonly SyncMediaCollectionAction $syncMediaCollection,
+        protected UpdateBlueprintDataAction $updateBlueprintDataAction,
+    ) {
     }
 
     public function execute(Customer $customer, CustomerData $customerData): mixed
@@ -31,7 +35,12 @@ class EditCustomerAction
             'password' => $customerData->password,
             'tier_approval_status' => $customerData->tier_approval_status,
             'register_status' => $customerData->register_status,
+            'data' => $customerData->data,
         ]));
+
+        if (app(CustomerSettings::class)->blueprint_id) {
+            $this->updateBlueprintDataAction->execute($customer);
+        }
 
         if ($customerData->image !== null) {
             $this->syncMediaCollection->execute($customer, new MediaCollectionData(
