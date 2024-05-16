@@ -35,6 +35,7 @@ final readonly class CustomerData
         public EmailVerificationType $email_verification_type = EmailVerificationType::LINK,
         public RegisterStatus $register_status = RegisterStatus::REGISTERED,
         public ?TierApprovalStatus $tier_approval_status = null,
+        public readonly ?array $data = [],
         public bool $through_api_registration = false,
     ) {
     }
@@ -94,6 +95,7 @@ final readonly class CustomerData
             register_status: RegisterStatus::REGISTERED,
             tier_approval_status: null,
             through_api_registration: true,
+            data: $validated['data'] ?? null,
         );
     }
 
@@ -125,6 +127,7 @@ final readonly class CustomerData
             image: $data['image'] ?? null,
             register_status: RegisterStatus::UNREGISTERED,
             tier_approval_status: TierApprovalStatus::APPROVED,
+            data: $data['data'] ?? null,
         );
     }
 
@@ -147,6 +150,7 @@ final readonly class CustomerData
             image: $data['image'],
             register_status: $registerStatus,
             tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
+            data: $data['data'] ?? null,
         );
     }
 
@@ -223,6 +227,7 @@ final readonly class CustomerData
             image: $data['profile_image'] ?? null,
             tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::REGISTERED,
+            data: $data['data'] ?? null,
         );
     }
 }
