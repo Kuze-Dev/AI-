@@ -26,7 +26,9 @@ class CustomerSettings extends TenantBaseSettings
                     ->label(trans('Blueprint'))
                     ->required()
                     ->preload()
-                    ->optionsFromModel(Blueprint::class, 'name'),
+                    ->reactive()
+                    ->optionsFromModel(Blueprint::class, 'name')
+                    ->disabled(fn () => app(SettingCustomer::class)->blueprint_id ? true : false),
             ]),
 
         ];
