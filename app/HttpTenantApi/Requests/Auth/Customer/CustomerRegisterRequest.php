@@ -47,6 +47,7 @@ class CustomerRegisterRequest extends FormRequest
             'birth_date' => 'required|date',
             'password' => ['required', 'confirmed', Password::default()],
             'invited' => 'nullable|exists:customers,cuid',
+            'data' => 'nullable',
         ];
 
         // Billing and shipping rules
