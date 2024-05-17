@@ -9,6 +9,7 @@ use Domain\Address\Models\Address;
 use Domain\Auth\Contracts\HasEmailVerificationOTP;
 use Domain\Auth\EmailVerificationOTP;
 use Domain\Auth\Enums\EmailVerificationType;
+use Domain\Blueprint\Models\BlueprintData;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -127,6 +129,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         'status',
         'register_status',
         'birth_date',
+        'data',
         'email_verification_type',
         'tier_approval_status',
     ];
@@ -138,6 +141,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
     protected $casts = [
         'password' => 'hashed',
         'birth_date' => 'date',
+        'data' => 'array',
         'status' => Status::class,
         'gender' => Gender::class,
         'email_verification_type' => EmailVerificationType::class,
@@ -228,6 +232,12 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
     public function serviceOrders(): HasMany
     {
         return $this->hasMany(ServiceOrder::class);
+    }
+
+    /** @return MorphMany<BlueprintData> */
+    public function blueprintData(): MorphMany
+    {
+        return $this->morphMany(BlueprintData::class, 'model');
     }
 
     public function isAllowedInvite(): bool

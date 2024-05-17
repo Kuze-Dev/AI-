@@ -8,8 +8,10 @@ use App\Features\Customer\TierBase;
 use App\Features\ECommerce\RewardPoints;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Actions\DeleteCustomerAction;
 use Domain\Customer\Actions\ForceDeleteCustomerAction;
 use Domain\Customer\Actions\RestoreCustomerAction;
@@ -191,6 +193,12 @@ class CustomerResource extends Resource
                 ])
                     ->columns(2)
                     ->disabled(fn ($record) => $record?->trashed()),
+                SchemaFormBuilder::make(
+                    'data',
+                    fn () => Blueprint::where('id', app(\App\Settings\CustomerSettings::class)->blueprint_id)->first()?->schema
+                )->hidden(
+                    fn () => is_null(app(\App\Settings\CustomerSettings::class)->blueprint_id)
+                ),
             ]);
     }
 
