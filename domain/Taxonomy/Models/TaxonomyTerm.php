@@ -81,6 +81,13 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
 
     protected $casts = ['data' => 'array'];
 
+    protected $appends = ['url'];
+
+    public function getUrlAttribute(): ?string
+    {
+        return $this->activeRouteUrl?->url ?: null;
+    }
+
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomy(): BelongsTo
     {

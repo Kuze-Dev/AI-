@@ -6,6 +6,7 @@ namespace Domain\Taxonomy\Models;
 
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
+use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -63,6 +64,7 @@ class Taxonomy extends Model implements HasRouteUrlContract
     use HasRouteUrl;
     use HasSlug;
     use LogsActivity;
+    use Sites;
 
     protected $fillable = [
         'name',

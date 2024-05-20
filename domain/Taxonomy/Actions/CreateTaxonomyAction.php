@@ -24,6 +24,8 @@ class CreateTaxonomyAction
 
         $this->createOrUpdateRouteUrl->execute($taxonomy, $taxonomyData->route_url_data);
 
+        $taxonomy->sites()->attach($taxonomyData->sites);
+
         return $taxonomy;
     }
 }

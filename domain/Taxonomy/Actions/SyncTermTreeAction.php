@@ -8,10 +8,17 @@ use Arr;
 use Domain\Taxonomy\DataTransferObjects\TaxonomyTermData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class SyncTermTreeAction
 {
     protected Taxonomy $taxonomy;
+
+    public function __construct(
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+    ) {
+    }
 
     /** @param  array<TaxonomyTermData>  $taxonomyTermDataSet */
     public function execute(Taxonomy $taxonomy, array $taxonomyTermDataSet): Taxonomy
@@ -61,6 +68,10 @@ class SyncTermTreeAction
             'parent_id' => $parentTerm?->id,
             'data' => $termData->data,
         ])->save();
+
+        if ($termData->url) {
+            $this->createOrUpdateRouteUrl->execute($term, new RouteUrlData($termData->url, true));
+        }
 
         if (! empty($termData->children)) {
             $this->syncTerms($termData->children, $term);

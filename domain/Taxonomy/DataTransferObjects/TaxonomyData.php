@@ -14,6 +14,7 @@ class TaxonomyData
         public readonly RouteUrlData $route_url_data,
         public readonly string $blueprint_id,
         public readonly array $terms = [],
+        public readonly array $sites = [],
     ) {
     }
 
@@ -24,6 +25,7 @@ class TaxonomyData
             route_url_data: RouteUrlData::fromArray($data['route_url'] ?? []),
             blueprint_id: $data['blueprint_id'],
             terms: array_map(fn (array $termDate) => TaxonomyTermData::fromArray($termDate), $data['terms'] ?? []),
+            sites: $data['sites'] ?? [],
         );
     }
 }
