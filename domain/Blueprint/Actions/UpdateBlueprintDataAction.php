@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\Actions;
 
+use App\Settings\CustomerSettings;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
+use Domain\Customer\Models\Customer;
 use Domain\Page\Models\BlockContent;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -29,6 +32,8 @@ class UpdateBlueprintDataAction
             $blueprintfieldtype = $model->content->blueprint->schema;
         } elseif ($model instanceof BlockContent) {
             $blueprintfieldtype = $model->block->blueprint->schema;
+        } elseif ($model instanceof Customer) {
+            $blueprintfieldtype = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->firstorfail()->schema;
         } else {
             return;
         }

@@ -330,8 +330,10 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('value'),
-                        Forms\Components\TextInput::make('label'),
+                        Forms\Components\TextInput::make('value')
+                            ->required(),
+                        Forms\Components\TextInput::make('label')
+                            ->required(),
                     ]),
             ],
             FieldType::CHECKBOX => [
@@ -345,8 +347,10 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('value'),
-                        Forms\Components\TextInput::make('label'),
+                        Forms\Components\TextInput::make('value')
+                            ->required(),
+                        Forms\Components\TextInput::make('label')
+                            ->required(),
                     ]),
             ],
             FieldType::TEXTAREA => [
@@ -587,8 +591,10 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('value'),
-                        Forms\Components\TextInput::make('label'),
+                        Forms\Components\TextInput::make('value')
+                            ->required(),
+                        Forms\Components\TextInput::make('label')
+                            ->required(),
                     ]),
                 Forms\Components\Repeater::make('descriptions')
                     ->collapsible()
