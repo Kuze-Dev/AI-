@@ -6,10 +6,12 @@ namespace App\HttpTenantApi\Requests\Auth\Customer;
 
 use App\Features\Customer\AddressBase;
 use App\Features\Customer\TierBase;
+use App\Settings\CustomerSettings;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Auth\Enums\EmailVerificationType;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Enums\Gender;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
@@ -27,6 +29,11 @@ class CustomerRegisterRequest extends FormRequest
 
     public function rules(): array
     {
+
+        // if (app(CustomerSettings::class)->blueprint_id) {
+        $customerBlueprint = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->first();
+        // }
+
         $rules = [
             'profile_image' => 'nullable|image',
             'email_verification_type' => ['nullable', Rule::enum(EmailVerificationType::class)],
@@ -47,7 +54,7 @@ class CustomerRegisterRequest extends FormRequest
             'birth_date' => 'required|date',
             'password' => ['required', 'confirmed', Password::default()],
             'invited' => 'nullable|exists:customers,cuid',
-            'data' => 'nullable',
+            // 'data' => 'nullable',
         ];
 
         // Billing and shipping rules
@@ -99,6 +106,13 @@ class CustomerRegisterRequest extends FormRequest
             ];
 
             $rules = array_merge($rules, $shippingRules, $billingRules);
+
+            if ($customerBlueprint) {
+                $bluprintRules = $customerBlueprint->schema->getValidationRules();
+
+                $rules = array_merge($rules, $bluprintRules);
+            }
+
         }
 
         return $rules;
