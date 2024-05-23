@@ -31,7 +31,7 @@ class CustomerRegisterRequest extends FormRequest
     {
 
         // if (app(CustomerSettings::class)->blueprint_id) {
-            $customerBlueprint = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->first();
+        $customerBlueprint = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->first();
         // }
 
         $rules = [
