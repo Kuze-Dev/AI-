@@ -107,12 +107,12 @@ class CustomerRegisterRequest extends FormRequest
 
             $rules = array_merge($rules, $shippingRules, $billingRules);
 
-            if ($customerBlueprint) {
-                $bluprintRules = $customerBlueprint->schema->getValidationRules();
+        }
 
-                $rules = array_merge($rules, $bluprintRules);
-            }
+        if ($customerBlueprint) {
+            $bluprintRules = $customerBlueprint->schema->getValidationRules();
 
+            $rules = array_merge($rules, $bluprintRules);
         }
 
         return $rules;
