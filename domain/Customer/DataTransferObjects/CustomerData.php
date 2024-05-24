@@ -224,8 +224,19 @@ final readonly class CustomerData
         return RegisterStatus::UNREGISTERED;
     }
 
-    public static function updateInvitedCustomer(array $data): self
-    {
+    public static function updateInvitedCustomer(
+        array $data,
+        ?Blueprint $customerBlueprint = null
+    ): self {
+        $customderBlueprintData = [];
+
+        if ($customerBlueprint) {
+
+            foreach ($customerBlueprint->schema->sections as $section) {
+                $customderBlueprintData[$section->state_name] = $data[$section->state_name];
+            }
+        }
+
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
@@ -238,7 +249,7 @@ final readonly class CustomerData
             image: $data['profile_image'] ?? null,
             tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::REGISTERED,
-            data: $data['data'] ?? null,
+            data: $customerBlueprint ? $customderBlueprintData : null,
         );
     }
 }
