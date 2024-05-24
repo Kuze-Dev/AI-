@@ -64,7 +64,7 @@ class RegisterController
             $customerModel = Customer::whereCuid($validated['invited'])->firstOrFail();
 
             $customer = DB::transaction(
-                fn () => $this->editCustomerAction->execute($customerModel, CustomerData::updateInvitedCustomer($validated))
+                fn () => $this->editCustomerAction->execute($customerModel, CustomerData::updateInvitedCustomer($validated, $customerBlueprint))
             );
 
             $this->verifyEmailAction->execute($customer);
