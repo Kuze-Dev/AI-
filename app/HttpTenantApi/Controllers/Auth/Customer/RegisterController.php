@@ -8,7 +8,9 @@ use App\Features\Customer\CustomerBase;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use App\HttpTenantApi\Resources\CustomerResource;
 use App\Notifications\Customer\NewRegisterNotification;
+use App\Settings\CustomerSettings;
 use Domain\Auth\Actions\VerifyEmailAction;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Actions\CreateCustomerAction;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\Actions\SendForApprovalRegistrationAction;
@@ -50,6 +52,8 @@ class RegisterController
 
         $customerTier = Tier::whereId($request->tier_id)->first();
 
+        $customerBlueprint = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->first();
+
         /** @var \Domain\Tier\Models\Tier $defaultTier */
         $defaultTier = Tier::whereName(config('domain.tier.default'))->first();
 
@@ -60,7 +64,7 @@ class RegisterController
             $customerModel = Customer::whereCuid($validated['invited'])->firstOrFail();
 
             $customer = DB::transaction(
-                fn () => $this->editCustomerAction->execute($customerModel, CustomerData::updateInvitedCustomer($validated))
+                fn () => $this->editCustomerAction->execute($customerModel, CustomerData::updateInvitedCustomer($validated, $customerBlueprint))
             );
 
             $this->verifyEmailAction->execute($customer);
@@ -72,7 +76,8 @@ class RegisterController
                         CustomerData::fromRegistrationRequest(
                             request: $request,
                             customerTier: $customerTier,
-                            defaultTier: $defaultTier
+                            defaultTier: $defaultTier,
+                            customerBlueprint: $customerBlueprint
                         )
                     )
             );

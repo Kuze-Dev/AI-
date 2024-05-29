@@ -39,7 +39,26 @@ class SchemaData implements Arrayable
 
         foreach ($this->sections as $section) {
             foreach ($section->fields as $field) {
-                $rules[$section->state_name.'.'.$field->state_name] = $field->rules;
+
+                if ($field instanceof \Domain\Blueprint\DataTransferObjects\RepeaterFieldData) {
+
+                    $repeaterRule = $field->rules;
+
+                    if (! in_array('array', $repeaterRule)) {
+                        $repeaterRule[] = 'array';
+                    }
+
+                    $rules[$section->state_name.'.'.$field->state_name] = $repeaterRule;
+
+                    foreach ($field->fields as $repeaterField) {
+
+                        $rules[$section->state_name.'.'.$field->state_name.'.*.'.$repeaterField->state_name] = $repeaterField->rules;
+                    }
+                } else {
+
+                    $rules[$section->state_name.'.'.$field->state_name] = $field->rules;
+                }
+
             }
         }
 

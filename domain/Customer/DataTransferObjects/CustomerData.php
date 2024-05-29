@@ -8,6 +8,7 @@ use App\Features\Customer\TierBase;
 use App\HttpTenantApi\Requests\Auth\Customer\CustomerRegisterRequest;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Auth\Enums\EmailVerificationType;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
@@ -43,7 +44,8 @@ final readonly class CustomerData
     public static function fromRegistrationRequest(
         CustomerRegisterRequest $request,
         ?Tier $customerTier,
-        Tier $defaultTier
+        Tier $defaultTier,
+        ?Blueprint $customerBlueprint = null
     ): self {
         $tier = null;
         $validated = $request->validated();
@@ -56,6 +58,14 @@ final readonly class CustomerData
 
         if ($customerTier && $customerTier->has_approval && ! $customerTier->isDefault()) {
             $tier = $customerTier;
+        }
+
+        $customderBlueprintData = [];
+        if ($customerBlueprint) {
+
+            foreach ($customerBlueprint->schema->sections as $section) {
+                $customderBlueprintData[$section->state_name] = $validated[$section->state_name];
+            }
         }
 
         return new self(
@@ -95,7 +105,7 @@ final readonly class CustomerData
             register_status: RegisterStatus::REGISTERED,
             tier_approval_status: null,
             through_api_registration: true,
-            data: $validated['data'] ?? null,
+            data: $customerBlueprint ? $customderBlueprintData : null,
         );
     }
 
@@ -108,6 +118,7 @@ final readonly class CustomerData
             gender: Gender::from($data['gender']),
             birth_date: now()->parse($data['birth_date']),
             email: $data['email'],
+            data: $data['data'],
         );
     }
 
@@ -213,8 +224,19 @@ final readonly class CustomerData
         return RegisterStatus::UNREGISTERED;
     }
 
-    public static function updateInvitedCustomer(array $data): self
-    {
+    public static function updateInvitedCustomer(
+        array $data,
+        ?Blueprint $customerBlueprint = null
+    ): self {
+        $customderBlueprintData = [];
+
+        if ($customerBlueprint) {
+
+            foreach ($customerBlueprint->schema->sections as $section) {
+                $customderBlueprintData[$section->state_name] = $data[$section->state_name];
+            }
+        }
+
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
@@ -227,7 +249,7 @@ final readonly class CustomerData
             image: $data['profile_image'] ?? null,
             tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::REGISTERED,
-            data: $data['data'] ?? null,
+            data: $customerBlueprint ? $customderBlueprintData : null,
         );
     }
 }

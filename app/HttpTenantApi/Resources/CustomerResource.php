@@ -25,6 +25,7 @@ class CustomerResource extends JsonApiResource
             'tier_id' => $this->tier_id,
             'birth_date' => $this->birth_date?->toDateString(),
             'is_verified' => $this->hasVerifiedEmail(),
+            'data' => $this->data,
         ];
     }
 
