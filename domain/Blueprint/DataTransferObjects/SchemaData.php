@@ -85,20 +85,12 @@ class SchemaData implements Arrayable
         foreach ($this->sections as $section) {
 
             $statepaths[$section->state_name] = $this->processFields($section->fields, []);
-            // $fields = [];
-            // foreach ($section->fields as $field) {
-
-            //     $fields[$field->state_name] = $field->type;
-            // }
-
-            // $statepaths[$section->state_name] = $fields;
         }
 
-        // dump($statepaths);
         return $statepaths;
     }
 
-    protected function processFields(array $fieldData, array $keys = [])
+    protected function processFields(array $fieldData, array $keys = []): array
     {
 
         foreach ($fieldData as $field) {
