@@ -84,15 +84,35 @@ class SchemaData implements Arrayable
 
         foreach ($this->sections as $section) {
 
-            $fields = [];
-            foreach ($section->fields as $field) {
+            $statepaths[$section->state_name] = $this->processFields($section->fields, []);
+            // $fields = [];
+            // foreach ($section->fields as $field) {
 
-                $fields[$field->state_name] = $field->type;
-            }
+            //     $fields[$field->state_name] = $field->type;
+            // }
 
-            $statepaths[$section->state_name] = $fields;
+            // $statepaths[$section->state_name] = $fields;
         }
 
+        // dump($statepaths);
         return $statepaths;
+    }
+
+    protected function processFields(array $fieldData, array $keys = [])
+    {
+
+        foreach ($fieldData as $field) {
+
+            if ($field instanceof \Domain\Blueprint\DataTransferObjects\RepeaterFieldData) {
+                $keys[$field->state_name][] = $this->processFields($field->fields);
+
+            } else {
+                $keys[$field->state_name] = $field->type;
+            }
+
+        }
+
+        return $keys;
+
     }
 }
