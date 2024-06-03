@@ -78,7 +78,7 @@ final readonly class CustomerData
             status: Status::ACTIVE,
             tier_id: $tier?->getKey(),
             email: $validated['email'],
-            username: $validated['username'] ?: $validated['email'],
+            username: isset($validated['username']) && $validated['username'] != null ? $validated['username'] : $validated['email'],
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
             shipping_address_data: isset($validated['shipping'])
@@ -120,7 +120,7 @@ final readonly class CustomerData
             gender: Gender::from($data['gender']),
             birth_date: now()->parse($data['birth_date']),
             email: $data['email'],
-            username: $data['username'] ?: $data['email'],
+            username: isset($data['username']) && $data['username'] != null ? $data['username'] : $data['email'],
             data: $data['data'],
         );
     }
@@ -137,7 +137,7 @@ final readonly class CustomerData
             status: Status::INACTIVE,
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
-            username: $data['username'] ?: $data['email'],
+            username: isset($data['username']) && $data['username'] != null ? $data['username'] : $data['email'],
             password: $data['password'] ?? null,
             image: $data['image'] ?? null,
             register_status: RegisterStatus::UNREGISTERED,
@@ -162,7 +162,7 @@ final readonly class CustomerData
             status: isset($data['status']) ? Status::from($data['status']) : null,
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
-            username: $data['username'] ?: $data['email'],
+            username: isset($data['username']) && $data['username'] != null ? $data['username'] : $data['email'],
             image: $data['image'],
             register_status: $registerStatus,
             tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
@@ -183,7 +183,7 @@ final readonly class CustomerData
             birth_date: isset($row['birth_date']) ? now()->parse($row['birth_date']) : null,
             tier_id: $tierKey,
             email: $row['email'],
-            username: $row['username'] ?: $row['email'],
+            username: isset($row['username']) && $row['username'] != null ? $row['username'] : $row['email'],
             password: $customerPassword,
             register_status: RegisterStatus::UNREGISTERED,
         );
@@ -251,7 +251,7 @@ final readonly class CustomerData
             birth_date: now()->parse($data['birth_date']),
             status: Status::ACTIVE,
             email: $data['email'],
-            username: $data['username'] ?: $data['email'],
+            username: isset($data['username']) && $data['username'] != null ? $data['username'] : $data['email'],
             password: $data['password'],
             image: $data['profile_image'] ?? null,
             tier_approval_status: TierApprovalStatus::APPROVED,
