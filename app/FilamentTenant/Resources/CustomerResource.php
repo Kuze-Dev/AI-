@@ -171,7 +171,7 @@ class CustomerResource extends Resource
                         ->password()
                         ->rules(Password::sometimes())
                         ->helperText(
-                            app()?->environment('local', 'testing')
+                            app()->environment('local', 'testing')
                                 ? trans('Password must be at least 4 characters.')
                                 : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
                         )
