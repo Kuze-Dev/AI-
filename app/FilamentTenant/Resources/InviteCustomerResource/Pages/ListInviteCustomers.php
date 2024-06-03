@@ -45,6 +45,7 @@ class ListInviteCustomers extends ListCustomers
                             Rule::email(),
                             'distinct',
                         ],
+                        'username' => 'nullable',
                         'first_name' => 'nullable|string|min:3|max:100',
                         'last_name' => 'nullable|string|min:3|max:100',
                         'mobile' => 'nullable|min:3|max:100',
