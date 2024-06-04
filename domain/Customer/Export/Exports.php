@@ -35,10 +35,11 @@ final class Exports
                     ->latest()
             )
             ->mapUsing(
-                ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Gender', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                ['CUID', 'Email', 'Username', 'First Name',  'Last Name', 'Mobile', 'Gender', 'Status', 'Birth Date', 'Tier', 'Created At'],
                 fn (Customer $customer): array => [
                     $customer->cuid,
                     $customer->email,
+                    $customer->username,
                     $customer->first_name,
                     $customer->last_name,
                     $customer->mobile,
@@ -75,10 +76,11 @@ final class Exports
                     ->latest()
             )
             ->mapUsing(
-                ['CUID', 'Email', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                ['CUID', 'Email', 'Username', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
                 fn (Customer $customer): array => [
                     $customer->cuid,
                     $customer->email,
+                    $customer->username,
                     $customer->first_name,
                     $customer->last_name,
                     $customer->mobile,
