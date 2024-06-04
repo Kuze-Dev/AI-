@@ -37,6 +37,7 @@ readonly class ImportCustomerAction
         unset($row);
 
         if ($customer === null) {
+
             return $this->createCustomerAction->execute($data);
         }
 

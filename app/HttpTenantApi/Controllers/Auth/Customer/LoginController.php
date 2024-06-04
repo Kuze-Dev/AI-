@@ -12,7 +12,6 @@ use Domain\Customer\Models\Customer;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 
@@ -24,15 +23,51 @@ class LoginController extends Controller
     public function __invoke(Request $request): mixed
     {
         $validated = $this->validate($request, [
-            'email' => ['required', Rule::email()],
+            'email' => [
+                'required_if:email,null',
+                'nullable',
+                'email',
+            ],
+            'username' => [
+                'required_if:username,null',
+            ],
             'password' => 'required|string',
+            'login' => [
+                'required_if:login,null',
+            ],
         ]);
 
-        if (! Auth::guard('api')->attempt($validated)) {
+        if (array_key_exists('login', $validated)) {
+
+            $loginType = filter_var($validated['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+            $data = [
+                $loginType => $validated['login'],
+                'password' => $validated['password'],
+            ];
+
+        } else {
+
+            if (array_key_exists('email', $validated)) {
+                $loginType = 'email';
+            } else {
+                $loginType = 'username';
+            }
+
+            $data = $validated;
+        }
+
+        if (! Auth::guard('api')->attempt($data)) {
             throw new AuthenticationException(trans('These credentials do not match our records.'));
         }
 
-        $customer = Customer::whereEmail($validated['email'])
+        $customer = Customer::where(function ($q) use ($validated, $loginType) {
+            if (array_key_exists('login', $validated)) {
+                return $q->where($loginType, $validated['login']);
+            }
+
+            return $q->where($loginType, $validated[$loginType]);
+        })
             ->whereStatus(Status::ACTIVE)
             ->whereRegisterStatus(RegisterStatus::REGISTERED)
             ->first();
