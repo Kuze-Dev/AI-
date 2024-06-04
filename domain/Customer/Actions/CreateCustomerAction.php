@@ -83,6 +83,7 @@ class CreateCustomerAction
             'tier_id' => $customerData->tier_id,
             'cuid' => $this->generateCustomerID->execute(),
             'email' => $customerData->email,
+            'username' => $customerData->username,
             'first_name' => $customerData->first_name,
             'last_name' => $customerData->last_name,
             'mobile' => $customerData->mobile,

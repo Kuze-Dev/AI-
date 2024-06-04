@@ -26,6 +26,7 @@ class EditCustomerAction
         $customer->update(array_filter([
             'tier_id' => $customerData->tier_id,
             'email' => $customerData->email,
+            'username' => $customerData->username,
             'first_name' => $customerData->first_name,
             'last_name' => $customerData->last_name,
             'mobile' => $customerData->mobile,
