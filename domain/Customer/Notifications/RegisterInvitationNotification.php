@@ -47,6 +47,7 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
 
         return $baseUrl.'/register?'.http_build_query([
             'email' => $customer->email,
+            'username' => $customer->username,
             'first_name' => $customer->first_name,
             'last_name' => $customer->last_name,
             'mobile' => $customer->mobile,
