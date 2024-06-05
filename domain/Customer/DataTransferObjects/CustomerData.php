@@ -72,7 +72,7 @@ final readonly class CustomerData
         return new self(
             first_name: $validated['first_name'],
             last_name: $validated['last_name'],
-            mobile: $validated['mobile'] ?? null,
+            mobile: isset($validated['mobile']) ? $validated['mobile'] : null,
             gender: isset($validated['gender']) ? Gender::from($validated['gender']) : null,
             birth_date: isset($validated['birth_date']) ? now()->parse($validated['birth_date']) : null,
             status: Status::ACTIVE,
