@@ -28,18 +28,18 @@ class UpdateContentEntryAction
      */
     public function execute(ContentEntry $contentEntry, ContentEntryData $contentEntryData): ContentEntry
     {
-        $sanitizeData = array_merge($contentEntryData->data,
-            $this->sanitizeBlueprintData(
-                $contentEntryData->data,
-                $contentEntry->content->blueprint->schema->getFieldStatekeys(),
-            )
-        );
+        // $sanitizeData = array_merge($contentEntryData->data,
+        //     $this->sanitizeBlueprintData(
+        //         $contentEntryData->data,
+        //         $contentEntry->content->blueprint->schema->getFieldStatekeys(),
+        //     )
+        // );
 
         $contentEntry->update([
             'author_id' => $contentEntryData->author_id,
             'title' => $contentEntryData->title,
             'published_at' => $contentEntryData->published_at,
-            'data' => $sanitizeData,
+            'data' => $contentEntryData->data,
             'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
         ]);
 
