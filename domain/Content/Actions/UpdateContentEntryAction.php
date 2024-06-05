@@ -62,22 +62,22 @@ class UpdateContentEntryAction
         return $contentEntry;
     }
 
-    private function sanitizeBlueprintData(array $array, array $reference): array
-    {
+    // private function sanitizeBlueprintData(array $array, array $reference): array
+    // {
 
-        $filteredArray = [];
+    //     $filteredArray = [];
 
-        foreach ($reference as $key => $value) {
-            if (array_key_exists($key, $array)) {
-                if (is_array($value) && is_array($array[$key])) {
-                    $filteredArray[$key] = $this->sanitizeBlueprintData($array[$key], $value);
-                } else {
-                    $filteredArray[$key] = $array[$key];
-                }
-            }
-        }
+    //     foreach ($reference as $key => $value) {
+    //         if (array_key_exists($key, $array)) {
+    //             if (is_array($value) && is_array($array[$key])) {
+    //                 $filteredArray[$key] = $this->sanitizeBlueprintData($array[$key], $value);
+    //             } else {
+    //                 $filteredArray[$key] = $array[$key];
+    //             }
+    //         }
+    //     }
 
-        return $filteredArray;
+    //     return $filteredArray;
 
-    }
+    // }
 }
