@@ -246,7 +246,7 @@ final readonly class CustomerData
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
-            mobile: $data['mobile'],
+            mobile: isset($data['mobile']) ? $data['mobile'] : null,
             gender: Gender::from($data['gender']),
             birth_date: now()->parse($data['birth_date']),
             status: Status::ACTIVE,
