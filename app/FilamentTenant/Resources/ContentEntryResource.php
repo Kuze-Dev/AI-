@@ -275,6 +275,10 @@ class ContentEntryResource extends Resource
                         return $query;
                     })
                     ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
+                Tables\Filters\SelectFilter::make('sites')
+                    ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name'),
                 Tables\Filters\Filter::make('published_at_year_month')
                     ->form([
                         Forms\Components\Select::make('published_at_year')
