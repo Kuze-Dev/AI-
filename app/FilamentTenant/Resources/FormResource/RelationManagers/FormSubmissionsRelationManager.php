@@ -10,6 +10,8 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class FormSubmissionsRelationManager extends RelationManager
@@ -40,6 +42,29 @@ class FormSubmissionsRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+            ])
+            ->bulkActions([
+                ExportBulkAction::make()
+                    ->queue()
+                    ->query(fn (Builder $query) => $query)
+                    ->mapUsing(
+                        function ($livewire) {
+                            return $livewire->ownerRecord->blueprint->schema->getFieldStatePaths();
+                        },
+                        function (FormSubmission $record) {
+
+                            $statepaths = $record->form->blueprint->schema->getFieldStatePaths();
+
+                            $data = [];
+
+                            foreach ($statepaths as $key) {
+                                $data[$key] = data_get($record->data, $key);
+                            }
+
+                            return $data;
+                        }
+                    ),
+
             ])
             ->defaultSort('created_at', 'desc');
     }
