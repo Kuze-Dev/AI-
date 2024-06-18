@@ -78,6 +78,19 @@ class SchemaData implements Arrayable
         return $statepaths;
     }
 
+    public function getFieldPathLabels(): array
+    {
+        $statepaths = [];
+
+        foreach ($this->sections as $section) {
+            foreach ($section->fields as $field) {
+                $statepaths[$section->state_name.'.'.$field->state_name] = $field->title;
+            }
+        }
+
+        return $statepaths;
+    }
+
     public function getFieldStatekeys(): array
     {
         $statepaths = [];
