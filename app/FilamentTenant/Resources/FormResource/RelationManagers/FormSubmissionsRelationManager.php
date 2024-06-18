@@ -49,7 +49,7 @@ class FormSubmissionsRelationManager extends RelationManager
                     ->query(fn (Builder $query) => $query)
                     ->mapUsing(
                         function ($livewire) {
-                            return $livewire->ownerRecord->blueprint->schema->getFieldStatePaths();
+                            return $livewire->ownerRecord->blueprint->schema->getFieldPathLabels();
                         },
                         function (FormSubmission $record) {
 
