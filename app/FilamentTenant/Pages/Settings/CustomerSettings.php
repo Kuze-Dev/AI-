@@ -9,6 +9,7 @@ use App\Settings\CustomerSettings as SettingCustomer;
 use Domain\Blueprint\Models\Blueprint;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerSettings extends TenantBaseSettings
 {
@@ -28,7 +29,7 @@ class CustomerSettings extends TenantBaseSettings
                     ->preload()
                     ->reactive()
                     ->optionsFromModel(Blueprint::class, 'name')
-                    ->disabled(fn () => app(SettingCustomer::class)->blueprint_id ? true : false),
+                    ->disabled(fn () => (app(SettingCustomer::class)->blueprint_id && Auth::user()?->id !== 1) ? true : false),
             ]),
 
         ];

@@ -76,7 +76,7 @@ final class Exports
                     ->latest()
             )
             ->mapUsing(
-                ['CUID', 'Email', 'Username', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                ['CUID', 'Email', 'Username', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Data', 'Created At'],
                 fn (Customer $customer): array => [
                     $customer->cuid,
                     $customer->email,
@@ -87,6 +87,7 @@ final class Exports
                     $customer->status?->value,
                     $customer->birth_date?->format(config('tables.date_format')),
                     $customer->tier?->name,
+                    $customer->data,
                     $customer->created_at?->format(config('tables.date_time_format')),
                 ]
             )
