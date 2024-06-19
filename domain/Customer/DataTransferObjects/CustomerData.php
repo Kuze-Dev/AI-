@@ -178,11 +178,12 @@ final readonly class CustomerData
         return new self(
             first_name: $row['first_name'] ?? '',
             last_name: $row['last_name'] ?? '',
-            mobile: $row['mobile'] ? (string) $row['mobile'] : null,
+            mobile: isset($row['mobile']) ? (string) $row['mobile'] : null,
             gender: isset($row['gender']) ? Gender::from($row['gender']) : null,
             birth_date: isset($row['birth_date']) ? now()->parse($row['birth_date']) : null,
             tier_id: $tierKey,
             email: $row['email'],
+            data: isset($row['data']) ? json_decode($row['data'], true) : null,
             username: isset($row['username']) && $row['username'] != null ? $row['username'] : null,
             password: $customerPassword,
             register_status: RegisterStatus::UNREGISTERED,
