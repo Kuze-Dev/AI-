@@ -51,6 +51,7 @@ class ListInviteCustomers extends ListCustomers
                         'mobile' => 'nullable|min:3|max:100',
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'birth_date' => 'nullable|date',
+                        'data' => 'nullable',
                         'tier' => [
                             'nullable',
                             Rule::exists(Tier::class, 'name'),
