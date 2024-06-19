@@ -132,6 +132,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         'data',
         'email_verification_type',
         'tier_approval_status',
+        'username',
     ];
 
     protected $hidden = [

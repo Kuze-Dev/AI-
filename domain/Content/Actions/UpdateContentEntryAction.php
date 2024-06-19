@@ -29,12 +29,12 @@ class UpdateContentEntryAction
      */
     public function execute(ContentEntry $contentEntry, ContentEntryData $contentEntryData): ContentEntry
     {
-        $sanitizeData = array_merge($contentEntryData->data,
-            $this->sanitizeBlueprintData(
-                $contentEntry->content->blueprint,
-                $contentEntryData->data
-            )
-        );
+        // $sanitizeData = array_merge($contentEntryData->data,
+        //     $this->sanitizeBlueprintData(
+        //         $contentEntryData->data,
+        //         $contentEntry->content->blueprint->schema->getFieldStatekeys(),
+        //     )
+        // );
 
         $contentEntry->update([
             'author_id' => $contentEntryData->author_id,
@@ -63,25 +63,22 @@ class UpdateContentEntryAction
         return $contentEntry;
     }
 
-    private function sanitizeBlueprintData(Blueprint $blueprint, array $data): array
-    {
-        $array1 = $data;
-        $array2 = $blueprint->schema->getFieldStatekeys();
+    // private function sanitizeBlueprintData(array $array, array $reference): array
+    // {
 
-        foreach ($array1 as $key => $value) {
+    //     $filteredArray = [];
 
-            if (! array_key_exists($key, $array2)) {
-                unset($array1[$key]);
-            }
+    //     foreach ($reference as $key => $value) {
+    //         if (array_key_exists($key, $array)) {
+    //             if (is_array($value) && is_array($array[$key])) {
+    //                 $filteredArray[$key] = $this->sanitizeBlueprintData($array[$key], $value);
+    //             } else {
+    //                 $filteredArray[$key] = $array[$key];
+    //             }
+    //         }
+    //     }
 
-            foreach ($value as $key_field => $field) {
-                if (! array_key_exists($key_field, $array2[$key] ?? [])) {
-                    unset($array1[$key][$key_field]);
-                }
-            }
+    //     return $filteredArray;
 
-        }
-
-        return $array1;
-    }
+    // }
 }
