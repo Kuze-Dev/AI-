@@ -107,6 +107,23 @@ class CustomerResource extends Resource
                         ->email()
                         ->rule(Rule::email())
                         ->maxLength(255),
+                    Forms\Components\TextInput::make('username')
+                        ->label(trans('Username'))
+                        ->required(fn ($state) => ! is_null($state))
+                        ->unique(ignoreRecord: true)
+                        ->formatStateUsing(fn ($state, Closure $get) => $get('email') == $state ? null : $state)
+                        ->rules([
+                            function () {
+                                return function (string $attribute, mixed $value, Closure $fail) {
+                                    if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+
+                                        $fail('email is not allowed.');
+                                    }
+                                };
+                            },
+                        ])
+                        ->reactive()
+                        ->maxLength(255),
                     Forms\Components\TextInput::make('mobile')
                         ->unique(ignoreRecord: true)
                         ->label(trans('Mobile Number'))

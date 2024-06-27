@@ -131,7 +131,11 @@ class FormResource extends Resource
                                 );
                             }),
                     ])
-                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                        ->hidden((bool) ! (tenancy()->tenant?->features()
+                            ->active(
+                                \App\Features\CMS\SitesManagement::class)
+                            // && Auth::user()?->hasRole(config('domain.role.super_admin'))
+                        )),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
                         ->helperText(

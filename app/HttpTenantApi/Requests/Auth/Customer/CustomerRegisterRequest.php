@@ -6,10 +6,12 @@ namespace App\HttpTenantApi\Requests\Auth\Customer;
 
 use App\Features\Customer\AddressBase;
 use App\Features\Customer\TierBase;
+use App\Settings\CustomerSettings;
 use Domain\Address\Enums\AddressLabelAs;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Auth\Enums\EmailVerificationType;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Enums\Gender;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
@@ -27,6 +29,11 @@ class CustomerRegisterRequest extends FormRequest
 
     public function rules(): array
     {
+
+        // if (app(CustomerSettings::class)->blueprint_id) {
+        $customerBlueprint = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->first();
+        // }
+
         $rules = [
             'profile_image' => 'nullable|image',
             'email_verification_type' => ['nullable', Rule::enum(EmailVerificationType::class)],
@@ -34,8 +41,8 @@ class CustomerRegisterRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => [Rule::when(is_null($this->invited), 'required|unique:customers,email', 'required')],
-            'mobile' => [Rule::when(is_null($this->invited), 'required|string|unique:customers,mobile', 'required|string')],
-            'gender' => ['required', Rule::enum(Gender::class)],
+            'mobile' => [Rule::when(is_null($this->invited), 'nullable|string|unique:customers,mobile', 'nullable|string')],
+            'gender' => ['nullable', Rule::enum(Gender::class)],
             'tier_id' => [
                 Rule::when(
                     (bool) tenancy()->tenant?->features()->active(TierBase::class),
@@ -44,9 +51,10 @@ class CustomerRegisterRequest extends FormRequest
                 ),
                 Rule::exists(Tier::class, (new Tier())->getRouteKeyName()),
             ],
-            'birth_date' => 'required|date',
+            'birth_date' => 'nullable|date',
             'password' => ['required', 'confirmed', Password::default()],
             'invited' => 'nullable|exists:customers,cuid',
+            // 'data' => 'nullable',
         ];
 
         // Billing and shipping rules
@@ -98,6 +106,13 @@ class CustomerRegisterRequest extends FormRequest
             ];
 
             $rules = array_merge($rules, $shippingRules, $billingRules);
+
+        }
+
+        if ($customerBlueprint) {
+            $bluprintRules = $customerBlueprint->schema->getValidationRules();
+
+            $rules = array_merge($rules, $bluprintRules);
         }
 
         return $rules;

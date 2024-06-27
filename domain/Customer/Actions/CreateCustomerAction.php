@@ -83,6 +83,7 @@ class CreateCustomerAction
             'tier_id' => $customerData->tier_id,
             'cuid' => $this->generateCustomerID->execute(),
             'email' => $customerData->email,
+            'username' => $customerData->username,
             'first_name' => $customerData->first_name,
             'last_name' => $customerData->last_name,
             'mobile' => $customerData->mobile,
@@ -105,17 +106,18 @@ class CreateCustomerAction
             return null;
         }
 
-        $customer->update([
+        $customer->update(array_filter([
             'first_name' => $customerData->first_name,
             'last_name' => $customerData->last_name,
             'mobile' => $customerData->mobile,
             'status' => $customerData->status,
+            'username' => $customerData->username,
             'gender' => $customerData->gender,
             'birth_date' => $customerData->birth_date,
             'password' => $customerData->password,
             'email_verification_type' => $customerData->email_verification_type,
             'register_status' => $customerData->register_status,
-        ]);
+        ]));
 
         return $customer;
     }
