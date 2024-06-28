@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Domain\Globals\Models;
 
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Blueprint\Models\BlueprintData;
 use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -83,6 +85,12 @@ class Globals extends Model
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
+    }
+
+    /** @return MorphMany<BlueprintData> */
+    public function blueprintData(): MorphMany
+    {
+        return $this->morphMany(BlueprintData::class, 'model');
     }
 
     /**
