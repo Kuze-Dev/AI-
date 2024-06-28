@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Taxonomy\Models;
 
+use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
 use Domain\Product\Models\Product;
 use Domain\Service\Models\Service;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Sluggable\HasSlug;
@@ -38,7 +40,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read int|null $content_entries_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
  * @property-read int|null $products_count
- * @property-read \Domain\Taxonomy\Models\Taxonomy|null $taxonomy
+ * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
  *
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
@@ -115,6 +117,12 @@ class TaxonomyTerm extends Model implements Sortable
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'service_taxonomy_terms');
+    }
+
+    /** @return MorphMany<BlueprintData> */
+    public function blueprintData(): MorphMany
+    {
+        return $this->morphMany(BlueprintData::class, 'model');
     }
 
     public function getRouteKeyName(): string

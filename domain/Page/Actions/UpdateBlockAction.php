@@ -4,18 +4,34 @@ declare(strict_types=1);
 
 namespace Domain\Page\Actions;
 
+use Domain\Blueprint\Models\Blueprint;
+use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Page\DataTransferObjects\BlockData;
 use Domain\Page\Models\Block;
 use Illuminate\Http\UploadedFile;
 
 class UpdateBlockAction
 {
+    use SanitizeBlueprintDataTrait;
+
     public function execute(Block $block, BlockData $blockData): Block
     {
+        /** @var Blueprint|null */
+        $blueprint = Blueprint::whereId($block->blueprint_id)->first();
+
+        if (! $blueprint) {
+            abort(422, 'Cannot Access Blueprint '.$block->blueprint_id);
+        }
+
+        $sanitizeData = $this->sanitizeBlueprintData(
+            $blockData->data,
+            $blueprint->schema->getFieldStatekeys()
+        );
+
         $block->update([
             'name' => $blockData->name,
             'component' => $blockData->component,
-            'data' => $blockData->data,
+            'data' => $sanitizeData,
             'is_fixed_content' => $blockData->is_fixed_content,
         ]);
 
