@@ -11,7 +11,9 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
 use Domain\Customer\Models\Customer;
+use Domain\Globals\Models\Globals;
 use Domain\Page\Models\BlockContent;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 
 class CreateBlueprintDataAction
@@ -68,8 +70,12 @@ class CreateBlueprintDataAction
             $blueprintfieldtype = $model->content->blueprint->schema;
         } elseif ($model instanceof BlockContent) {
             $blueprintfieldtype = $model->block->blueprint->schema;
+        } elseif ($model instanceof TaxonomyTerm) {
+            $blueprintfieldtype = $model->taxonomy->blueprint->schema;
         } elseif ($model instanceof Customer) {
             $blueprintfieldtype = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->firstorfail()->schema;
+        } elseif ($model instanceof Globals) {
+            $blueprintfieldtype = $model->blueprint->schema;
         } else {
             return;
         }
