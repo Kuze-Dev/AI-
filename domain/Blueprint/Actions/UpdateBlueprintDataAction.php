@@ -7,11 +7,14 @@ namespace Domain\Blueprint\Actions;
 use App\Settings\CustomerSettings;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
 use Domain\Customer\Models\Customer;
+use Domain\Globals\Models\Globals;
 use Domain\Page\Models\BlockContent;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -34,6 +37,10 @@ class UpdateBlueprintDataAction
             $blueprintfieldtype = $model->block->blueprint->schema;
         } elseif ($model instanceof Customer) {
             $blueprintfieldtype = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->firstorfail()->schema;
+        } elseif ($model instanceof TaxonomyTerm) {
+            $blueprintfieldtype = $model->taxonomy->blueprint->schema;
+        } elseif ($model instanceof Globals) {
+            $blueprintfieldtype = $model->blueprint->schema;
         } else {
             return;
         }
@@ -58,6 +65,8 @@ class UpdateBlueprintDataAction
         }
 
         $flattenData = $this->extractDataAction->flattenArray($data);
+
+        $this->sanitizeBlueprintStatePaths($flattenData, $model);
 
         foreach ($flattenData as $arrayData) {
             $blueprintDataArray[] = $this->updateBlueprintData($model, BlueprintDataData::fromArray($model, $arrayData));
@@ -134,5 +143,42 @@ class UpdateBlueprintDataAction
         }
 
         return $blueprintData;
+    }
+
+    private function sanitizeBlueprintStatePaths(array $flattenData, Model $model): void
+    {
+
+        $statepaths = array_column($flattenData, 'statepath');
+
+        /** @phpstan-ignore-next-line */
+        $removeBlueprintData = $model->blueprintData()->whereNotIn('state_path', $statepaths)->get();
+
+        if ($removeBlueprintData->count()) {
+
+            $toRemove = [];
+            foreach ($removeBlueprintData as $itemtodelete) {
+
+                $filtered = [];
+                if (is_array($itemtodelete->value)) {
+                    $filtered = array_filter($itemtodelete->value, function ($value) {
+                        $pathInfo = pathinfo($value);
+                        if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
+                            return $value;
+                        }
+                    });
+
+                }
+
+                $toRemove = array_merge($toRemove, $filtered);
+
+            }
+
+            DeleteS3FilesFromDeletedBlueprintDataJob::dispatch(array_unique($toRemove));
+
+            /** @phpstan-ignore-next-line */
+            $model->blueprintData()->whereNotIn('state_path', $statepaths)->delete();
+
+        }
+
     }
 }
