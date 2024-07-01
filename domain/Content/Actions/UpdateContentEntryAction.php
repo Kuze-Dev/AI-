@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Content\Actions;
 
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
-use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Models\Locale;
@@ -15,8 +14,6 @@ use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class UpdateContentEntryAction
 {
-    use SanitizeBlueprintDataTrait;
-
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
@@ -31,16 +28,18 @@ class UpdateContentEntryAction
      */
     public function execute(ContentEntry $contentEntry, ContentEntryData $contentEntryData): ContentEntry
     {
-        $sanitizeData = $this->sanitizeBlueprintData(
-            $contentEntryData->data,
-            $contentEntry->content->blueprint->schema->getFieldStatekeys(),
-        );
+        // $sanitizeData = array_merge($contentEntryData->data,
+        //     $this->sanitizeBlueprintData(
+        //         $contentEntryData->data,
+        //         $contentEntry->content->blueprint->schema->getFieldStatekeys(),
+        //     )
+        // );
 
         $contentEntry->update([
             'author_id' => $contentEntryData->author_id,
             'title' => $contentEntryData->title,
             'published_at' => $contentEntryData->published_at,
-            'data' => $sanitizeData,
+            'data' => $contentEntryData->data,
             'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
         ]);
 
@@ -62,4 +61,23 @@ class UpdateContentEntryAction
 
         return $contentEntry;
     }
+
+    // private function sanitizeBlueprintData(array $array, array $reference): array
+    // {
+
+    //     $filteredArray = [];
+
+    //     foreach ($reference as $key => $value) {
+    //         if (array_key_exists($key, $array)) {
+    //             if (is_array($value) && is_array($array[$key])) {
+    //                 $filteredArray[$key] = $this->sanitizeBlueprintData($array[$key], $value);
+    //             } else {
+    //                 $filteredArray[$key] = $array[$key];
+    //             }
+    //         }
+    //     }
+
+    //     return $filteredArray;
+
+    // }
 }
