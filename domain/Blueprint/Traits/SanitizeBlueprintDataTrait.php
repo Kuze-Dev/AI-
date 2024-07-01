@@ -32,18 +32,15 @@ trait SanitizeBlueprintDataTrait
                     } else {
                         $filteredArray[$key] = $this->sanitizeBlueprintData($array[$key], $value);
                     }
-                } else {
-                    $filteredArray[$key] = $this->sanitizeBlueprintData(null, $value);
                 }
             } else {
-                if (array_key_exists($key, $array) && $array[$key] !== null) {
+                if (isset($array[$key])) {
                     $filteredArray[$key] = $array[$key];
-                } else {
-                    $filteredArray[$key] = null;
                 }
             }
         }
 
         return $filteredArray;
+
     }
 }
