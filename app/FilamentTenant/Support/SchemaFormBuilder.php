@@ -209,6 +209,10 @@ class SchemaFormBuilder extends Component
                 ->imagePreviewHeight('256');
         }
 
+        if ($mediaFieldData->conversions) {
+            $media->image();
+        }
+
         if ($mediaFieldData->reorder) {
             $media->enableReordering($mediaFieldData->reorder);
         }
@@ -235,7 +239,11 @@ class SchemaFormBuilder extends Component
         $media->getUploadedFileUrlUsing(function ($file) {
 
             if (! is_null($file)) {
-                $media = Media::where('uuid', $file)->first();
+
+                $media = Media::where('uuid', $file)
+                    ->orWhere('file_name', $file)
+                    ->first();
+
                 if ($media) {
                     return $media->getUrl();
                 }
