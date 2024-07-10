@@ -38,7 +38,7 @@ class CustomerSettings extends TenantBaseSettings
                         ->required()
                         ->helpertext('date format for validation and export and import customer the default value is default ex: format m-d-Y')
                         ->default('default'),
-            ]),
+                ]),
 
         ];
     }

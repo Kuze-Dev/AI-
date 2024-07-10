@@ -173,7 +173,8 @@ final readonly class CustomerData
     public static function fromArrayImportByAdmin(
         ?string $customerPassword,
         ?int $tierKey,
-        array $row
+        array $row,
+        RegisterStatus $customerStatus = RegisterStatus::UNREGISTERED
     ): self {
         return new self(
             first_name: $row['first_name'] ?? '',
@@ -183,10 +184,11 @@ final readonly class CustomerData
             birth_date: isset($row['birth_date']) ? now()->parse($row['birth_date']) : null,
             tier_id: $tierKey,
             email: $row['email'],
+            status: $customerStatus === RegisterStatus::REGISTERED ? Status::ACTIVE : null,
             data: isset($row['data']) ? json_decode($row['data'], true) : null,
             username: isset($row['username']) && $row['username'] != null ? $row['username'] : null,
             password: $customerPassword,
-            register_status: RegisterStatus::UNREGISTERED,
+            register_status: $customerStatus,
         );
     }
 

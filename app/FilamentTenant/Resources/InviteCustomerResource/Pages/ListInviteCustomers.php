@@ -27,6 +27,7 @@ class ListInviteCustomers extends ListCustomers
     protected function getActions(): array
     {
         $date_format = app(CustomerSettings::class)->date_format;
+
         return [
             ImportAction::make()
                 ->model(Customer::class)
@@ -38,7 +39,7 @@ class ListInviteCustomers extends ListCustomers
                 ])
                 ->processRowsUsing(
                     fn (array $row): Customer => app(ImportCustomerAction::class)
-                        ->execute($row)
+                        ->execute(array_filter($row))
                 )
                 ->withValidation(
                     rules: [
@@ -54,8 +55,10 @@ class ListInviteCustomers extends ListCustomers
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'birth_date' => [
                             'nullable',
-                             ($date_format == 'default' ||
-                             $date_format == '' )? 'date' : 'date_format:'.$date_format ],
+                            ($date_format == 'default' ||
+                            $date_format == '') ? 'date' : 'date_format:'.$date_format],
+                        'password' => 'nullable',
+                        'registered' => 'nullable',
                         'data' => 'nullable',
                         'tier' => [
                             'nullable',
