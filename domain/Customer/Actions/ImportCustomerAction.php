@@ -19,11 +19,15 @@ readonly class ImportCustomerAction
 
     public function execute(array $row): Customer
     {
+
         $customer = Customer::whereEmail($row['email'])
             ->withTrashed()
             ->first();
 
         if ($customer !== null && $customer->trashed()) {
+
+            unset($row);
+
             return $customer;
         }
 
