@@ -18,6 +18,7 @@ readonly class ImportCustomerAction
 
     public function execute(array $row): Customer
     {
+        dd($row);
         $customer = Customer::whereEmail($row['email'])
             ->withTrashed()
             ->first();
