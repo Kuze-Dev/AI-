@@ -31,6 +31,14 @@ class CustomerSettings extends TenantBaseSettings
                     ->optionsFromModel(Blueprint::class, 'name')
                     ->disabled(fn () => (app(SettingCustomer::class)->blueprint_id && Auth::user()?->id !== 1) ? true : false),
             ]),
+            Forms\Components\Section::make(trans('Customer Import Export Settings'))
+                ->schema([
+                    Forms\Components\TextInput::make('date_format')
+                        ->label(trans('Date Format'))
+                        ->required()
+                        ->helpertext('date format for validation and export and import customer the default value is default ex: format m-d-Y')
+                        ->default('default'),
+                ]),
 
         ];
     }
