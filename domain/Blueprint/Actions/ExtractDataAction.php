@@ -72,7 +72,8 @@ class ExtractDataAction
     public function processRepeaterField(array $field): array
     {
         $data = [];
-        if ($field['type'] == FieldType::REPEATER) {
+        if ($field['type'] == FieldType::REPEATER && $field['value'] !== null) {
+
             foreach ($field['value'] as $value) {
                 foreach ($value as $repeaterData) {
                     $data[] = $this->processRepeaterField($repeaterData);
