@@ -12,6 +12,8 @@ class CustomerSettings extends Settings
 
     public ?string $date_format = '';
 
+    public ?array $customer_email_notifications = [];
+
     public static function group(): string
     {
         return 'customer';
