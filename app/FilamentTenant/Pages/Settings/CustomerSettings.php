@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Pages\Settings;
 
 use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
+use App\FilamentTenant\Support\DataInterpolation;
+use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaInterpolations;
 use App\Settings\CustomerSettings as SettingCustomer;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Enums\CustomerEvent;
+use Domain\Customer\Models\Customer;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\MarkdownEditor;
@@ -24,26 +27,46 @@ class CustomerSettings extends TenantBaseSettings
 
     protected static ?string $navigationIcon = 'heroicon-s-users';
 
+    protected function canEditSection(string $permission): bool
+    {
+        if (
+            Auth::user()?->hasRole(config('domain.role.super_admin')) ||
+            Auth::user()?->can('customerSettings.'.$permission)
+        ) {
+            return true;
+        }
+
+        return false;
+      
+    }
+
     protected function getFormSchema(): array
     {
         return [
             Card::make([
                 Forms\Components\Select::make('blueprint_id')
                     ->label(trans('Blueprint'))
-                    ->required()
                     ->preload()
                     ->reactive()
                     ->optionsFromModel(Blueprint::class, 'name')
-                    ->disabled(fn () => (app(SettingCustomer::class)->blueprint_id && Auth::user()?->id !== 1) ? true : false),
+                    ->disabled(!$this->canEditSection('customerBlueprintSettings'))
             ])->columnSpanFull(),
             Forms\Components\Section::make('Customer Notifications')
+                ->disabled(!$this->canEditSection('customerEmailNotificationSettings'))
                 ->schema([
                     Forms\Components\Section::make('Available Values')
                         ->schema([
                             SchemaInterpolations::make('data')
                                 ->schemaData(fn (Closure $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
+                            Divider::make(''),
                             Forms\Components\Placeholder::make('extra value')
-                                ->content(fn () => '$customer will be available as customer array'),
+                                ->content(fn () => '$customer will be available as array'),
+                          
+                            DataInterpolation::make('customer')
+                                ->label('customer')
+                                ->schemaData(function () {
+                                    return app(Customer::class)->with('addresses')->latest()->first()?->toArray() ?? [];
+                                }),
                         ])
                         ->columnSpan(['md' => 1])
                         ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
@@ -103,6 +126,7 @@ class CustomerSettings extends TenantBaseSettings
                         ])->columnSpan(['md' => 3]),
                 ])->columns(4),
             Forms\Components\Section::make(trans('Customer Import Export Settings'))
+                ->disabled(!$this->canEditSection('customerImportExportSettings'))
                 ->schema([
                     Forms\Components\TextInput::make('date_format')
                         ->label(trans('Date Format'))
