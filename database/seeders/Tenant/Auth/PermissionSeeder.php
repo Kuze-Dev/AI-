@@ -29,7 +29,16 @@ class PermissionSeeder extends BasePermissionSeeder
                 ),
                 ...$this->generateFilamentResourcePermissions('role', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('activity', only: ['viewAny', 'view']),
-                ...$this->generatePermissionGroup('cmsSettings', ['site', 'cms', 'form']),
+                ...$this->generatePermissionGroup('cmsSettings', [
+                    'site',
+                    'cms',
+                    'form',
+                ]),
+                ...$this->generatePermissionGroup('customerSettings', [
+                    'customerBlueprintSettings',
+                    'customerImportExportSettings',
+                    'customerEmailNotificationSettings',
+                ]),
                 ...$this->generateFilamentResourcePermissions('blueprint', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('menu', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('page', except: ['deleteAny']),
@@ -55,7 +64,9 @@ class PermissionSeeder extends BasePermissionSeeder
                         'forceDeleteAny',
                     ],
                     hasSoftDeletes: true,
-                    customPermissions: ['sendRegisterInvitation']
+                    customPermissions: [
+                        'sendRegisterInvitation',
+                    ]
                 ),
                 ...$this->generateFilamentResourcePermissions(
                     'tier',
