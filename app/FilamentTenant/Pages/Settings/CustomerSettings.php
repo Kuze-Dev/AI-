@@ -9,9 +9,12 @@ use App\FilamentTenant\Support\SchemaInterpolations;
 use App\Settings\CustomerSettings as SettingCustomer;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Customer\Enums\CustomerEvent;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\MarkdownEditor;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CustomerSettings extends TenantBaseSettings
 {
@@ -32,67 +35,28 @@ class CustomerSettings extends TenantBaseSettings
                     ->reactive()
                     ->optionsFromModel(Blueprint::class, 'name')
                     ->disabled(fn () => (app(SettingCustomer::class)->blueprint_id && Auth::user()?->id !== 1) ? true : false),
-            ]),
-            Card::make([
-                Forms\Components\Section::make('Available Values')
+            ])->columnSpanFull(),
+            Forms\Components\Section::make('Customer Notifications')
+                ->schema([
+                    Forms\Components\Section::make('Available Values')
                         ->schema([
                             SchemaInterpolations::make('data')
                                 ->schemaData(fn (Closure $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
+                            Forms\Components\Placeholder::make('extra value')
+                                ->content(fn () => '$customer will be available as customer array'),
                         ])
                         ->columnSpan(['md' => 1])
                         ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
-                    Forms\Components\Repeater::make('form_email_notifications')
-                        // ->afterStateHydrated(fn (Forms\Components\Repeater $component, ?Setting $record) => $component->state($record?->formEmailNotifications->toArray() ?? []))
+                    Forms\Components\Repeater::make('customer_email_notifications')
                         ->nullable()
                         ->schema([
-                            Forms\Components\Section::make('Recipients')
-                                ->schema([
-                                    Forms\Components\TextInput::make('to')
-                                        ->required()
-                                        ->helperText('Seperated by comma')
-                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
-                                            $component->state(implode(',', $state ?? []));
-                                        })
 
-                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)
-                                                ->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
-                                            : ($state ?? [])),
-                                    Forms\Components\TextInput::make('cc')
-                                        ->label(trans('CC'))
-                                        ->nullable()
-                                        ->helperText('Seperated by comma')
-                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
-                                            $component->state(implode(',', $state ?? []));
-                                        })
-                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)
-                                                ->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
-                                            : ($state ?? [])),
-                                    Forms\Components\TextInput::make('bcc')
-                                        ->label(trans('BCC'))
-                                        ->nullable()
-                                        ->helperText('Seperated by comma')
-                                        ->afterStateHydrated(function (Forms\Components\TextInput $component, ?array $state): void {
-                                            $component->state(implode(',', $state ?? []));
-                                        })
-                                        ->dehydrateStateUsing(fn (string|array|null $state) => is_string($state)
-                                            ? Str::of($state)
-                                                ->split('/\,/')
-                                                ->map(fn (string $rule) => trim($rule))
-                                                ->toArray()
-                                            : ($state ?? [])),
-                                ])
-                                ->columns(3),
-                            // Forms\Components\TextInput::make('sender')
-                            //     // ->default(app(FormSettings::class)->)
-                            //     ->required(),
-                            // Forms\Components\TextInput::make('sender_name')
-                            //     ->required(),
+                            Forms\Components\Select::make('events')
+                                ->options(
+                                    collect(CustomerEvent::cases())
+                                        ->mapWithKeys(fn (CustomerEvent $target) => [$target->value => Str::headline($target->value)])
+                                        ->toArray()
+                                ),
                             Forms\Components\TextInput::make('reply_to')
                                 ->helperText('Seperated by comma')
                                 ->nullable()
@@ -107,38 +71,45 @@ class CustomerSettings extends TenantBaseSettings
                                     : ($state ?? [])),
                             Forms\Components\TextInput::make('subject')
                                 ->required()
-                                ->nullable()
                                 ->columnSpanFull(),
-                            Forms\Components\MarkdownEditor::make('template')
+                            MarkdownEditor::make('template')
                                 ->required()
-                                // ->default(function (Closure $get) {
-                                  
-                                //     if ($blueprint === null) {
-                                //         return '';
-                                //     }
+                                ->default(function (Closure $get) {
 
-                                //     $interpolations = '';
+                                    $blueprint = Blueprint::whereId($get('../../blueprint_id'))->first();
 
-                                //     foreach ($blueprint->schema->sections as $section) {
-                                //         foreach ($section->fields as $field) {
-                                //             $interpolations = "{$interpolations}{$field->title}: {{ \${$section->state_name}['{$field->state_name}'] }}\n";
-                                //         }
-                                //     }
+                                    $customer = "{{ \$customer['first_name'] }}";
 
-                                //     return <<<markdown
-                                //         Hi,
+                                    if ($blueprint === null) {
+                                        return '';
+                                    }
 
-                                //         We've received a new submission:
+                                    $interpolations = '';
 
-                                //         {$interpolations}
-                                //         markdown;
-                                // })
-                                ->columnSpanFull(),
-                            Forms\Components\Toggle::make('has_attachments')
-                                ->helperText('If Enabled Uploaded Files will be attach to this email notification'),
-                        ])
-                        ->columnSpan(['md' => 3]),
-            ]),
+                                    foreach ($blueprint->schema->sections as $section) {
+                                        foreach ($section->fields as $field) {
+                                            $interpolations = "{$interpolations}{$field->title}: {{ \${$section->state_name}['{$field->state_name}'] }}\n";
+                                        }
+                                    }
+
+                                    return <<<markdown
+                                        Hi {$customer},
+
+                                        customer message here:
+
+                                        {$interpolations}
+                                        markdown;
+                                })->columnSpanFull(),
+                        ])->columnSpan(['md' => 3]),
+                ])->columns(4),
+            Forms\Components\Section::make(trans('Customer Import Export Settings'))
+                ->schema([
+                    Forms\Components\TextInput::make('date_format')
+                        ->label(trans('Date Format'))
+                        ->required()
+                        ->helpertext('date format for validation and export and import customer the default value is default ex: format m-d-Y')
+                        ->default('default'),
+                ]),
 
         ];
     }

@@ -50,6 +50,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $first_name
  * @property string $last_name
  * @property string|null $mobile
+ * @property array $data
  * @property Gender|null $gender
  * @property Status|null $status
  * @property RegisterStatus $register_status
