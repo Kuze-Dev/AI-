@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Support;
 
 use Closure;
-use Domain\Blueprint\DataTransferObjects\SchemaData;
 use Filament\Forms\Components\Component;
 
 class DataInterpolation extends Component
@@ -16,7 +15,7 @@ class DataInterpolation extends Component
 
     protected string $name = 'data';
 
-    final public function __construct(string $name, Closure|array $schemaData = null)
+    final public function __construct(string $name, Closure|array|null $schemaData = null)
     {
         $this->statePath($name);
         $this->schemaData($schemaData);
@@ -34,7 +33,7 @@ class DataInterpolation extends Component
         return $static;
     }
 
-    public function schemaData(Closure|array $schemaData = null): self
+    public function schemaData(Closure|array|null $schemaData = null): self
     {
         $this->schemaData = $schemaData;
 
@@ -48,32 +47,34 @@ class DataInterpolation extends Component
 
     public function getInterpolations(): array
     {
-       
-       
-       return $this->getAllKeyPaths($this->getSchemaData(),$this->getLabel());
+        /** @var string */
+        $label = is_string($this->label) ? $this->label : 'main';
 
+        /** @var array */
+        $data = $this->getSchemaData() ?? [];
 
+        return $this->getAllKeyPaths($data, $label);
 
-       
     }
 
-    public function getAllKeyPaths(array $array, string $variableName = 'main'): array {
+    public function getAllKeyPaths(array $array, string $variableName = 'main'): array
+    {
         $result = [];
-    
+
         $traverse = function ($array, $prefix = '') use (&$traverse, &$result, $variableName) {
             foreach ($array as $key => $value) {
-                $currentKey = $prefix === '' ? $key : $prefix . "']['" . $key;
-    
+                $currentKey = $prefix === '' ? $key : $prefix."']['".$key;
+
                 if (is_array($value)) {
                     $traverse($value, $currentKey);
                 } else {
-                    $result[] = "{{ \${$variableName}['" . $currentKey . "'] }}";
+                    $result[] = "{{ \${$variableName}['".$currentKey."'] }}";
                 }
             }
         };
-    
+
         $traverse($array);
-    
+
         return $result;
     }
 }

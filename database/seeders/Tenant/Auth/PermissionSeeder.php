@@ -30,8 +30,8 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('role', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('activity', only: ['viewAny', 'view']),
                 ...$this->generatePermissionGroup('cmsSettings', [
-                    'site', 
-                    'cms', 
+                    'site',
+                    'cms',
                     'form',
                 ]),
                 ...$this->generatePermissionGroup('customerSettings', [
@@ -66,7 +66,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     hasSoftDeletes: true,
                     customPermissions: [
                         'sendRegisterInvitation',
-                        ]
+                    ]
                 ),
                 ...$this->generateFilamentResourcePermissions(
                     'tier',

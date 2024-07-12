@@ -37,7 +37,7 @@ class CustomerSettings extends TenantBaseSettings
         }
 
         return false;
-      
+
     }
 
     protected function getFormSchema(): array
@@ -49,10 +49,10 @@ class CustomerSettings extends TenantBaseSettings
                     ->preload()
                     ->reactive()
                     ->optionsFromModel(Blueprint::class, 'name')
-                    ->disabled(!$this->canEditSection('customerBlueprintSettings'))
+                    ->disabled(! $this->canEditSection('customerBlueprintSettings')),
             ])->columnSpanFull(),
             Forms\Components\Section::make('Customer Notifications')
-                ->disabled(!$this->canEditSection('customerEmailNotificationSettings'))
+                ->disabled(! $this->canEditSection('customerEmailNotificationSettings'))
                 ->schema([
                     Forms\Components\Section::make('Available Values')
                         ->schema([
@@ -61,7 +61,7 @@ class CustomerSettings extends TenantBaseSettings
                             Divider::make(''),
                             Forms\Components\Placeholder::make('extra value')
                                 ->content(fn () => '$customer will be available as array'),
-                          
+
                             DataInterpolation::make('customer')
                                 ->label('customer')
                                 ->schemaData(function () {
@@ -126,7 +126,7 @@ class CustomerSettings extends TenantBaseSettings
                         ])->columnSpan(['md' => 3]),
                 ])->columns(4),
             Forms\Components\Section::make(trans('Customer Import Export Settings'))
-                ->disabled(!$this->canEditSection('customerImportExportSettings'))
+                ->disabled(! $this->canEditSection('customerImportExportSettings'))
                 ->schema([
                     Forms\Components\TextInput::make('date_format')
                         ->label(trans('Date Format'))
