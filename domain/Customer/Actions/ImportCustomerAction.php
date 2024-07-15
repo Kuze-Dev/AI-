@@ -61,7 +61,7 @@ readonly class ImportCustomerAction
                         Mail::send(new CustomerRegisteredNotification(
                             $customer,
                             CustomerNotificationData::fromarray($notification),
-                            $customer->data
+                            $customer->data ?? []
                         )
                         );
                     }
