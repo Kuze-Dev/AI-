@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Export;
 
+use App\Settings\CustomerSettings;
 use Domain\Customer\Models\Customer;
 use Filament\Support\Actions\Action;
 use HalcyonAgile\FilamentExport\Actions\ExportAction;
@@ -25,6 +26,8 @@ final class Exports
      */
     public static function headerList(array $registerStatues): Action
     {
+        $date_format = app(CustomerSettings::class)->date_format;
+
         return ExportAction::make()
             ->model(Customer::class)
             ->queue()
@@ -45,7 +48,11 @@ final class Exports
                     $customer->mobile,
                     $customer->gender?->value,
                     $customer->status?->value,
-                    $customer->birth_date?->format(config('tables.date_format')),
+                    $customer->birth_date?->format(
+                        ($date_format == 'default' || $date_format == null) ?
+                        config('tables.date_format') :
+                            $date_format
+                    ),
                     $customer->tier?->name,
                     $customer->created_at?->format(config('tables.date_time_format')),
                 ]
@@ -67,6 +74,8 @@ final class Exports
      */
     public static function tableBulk(array $registerStatues): Action
     {
+        $date_format = app(CustomerSettings::class)->date_format;
+
         return ExportBulkAction::make()
             ->queue()
             ->query(
@@ -76,7 +85,7 @@ final class Exports
                     ->latest()
             )
             ->mapUsing(
-                ['CUID', 'Email', 'Username', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Created At'],
+                ['CUID', 'Email', 'Username', 'First Name',  'Last Name', 'Mobile', 'Status', 'Birth Date', 'Tier', 'Data', 'Created At'],
                 fn (Customer $customer): array => [
                     $customer->cuid,
                     $customer->email,
@@ -85,8 +94,13 @@ final class Exports
                     $customer->last_name,
                     $customer->mobile,
                     $customer->status?->value,
-                    $customer->birth_date?->format(config('tables.date_format')),
+                    $customer->birth_date?->format(
+                        ($date_format == 'default' || $date_format == null) ?
+                        config('tables.date_format') :
+                            $date_format
+                    ),
                     $customer->tier?->name,
+                    $customer->data,
                     $customer->created_at?->format(config('tables.date_time_format')),
                 ]
             )

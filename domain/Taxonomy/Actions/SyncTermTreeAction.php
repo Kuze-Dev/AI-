@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Domain\Taxonomy\Actions;
 
 use Arr;
+use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
+use Domain\Blueprint\Models\Blueprint;
+use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Taxonomy\DataTransferObjects\TaxonomyTermData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
@@ -13,10 +16,13 @@ use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class SyncTermTreeAction
 {
+    use SanitizeBlueprintDataTrait;
+
     protected Taxonomy $taxonomy;
 
     public function __construct(
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+        protected UpdateBlueprintDataAction $updateBlueprintDataAction,
     ) {
     }
 
@@ -63,15 +69,31 @@ class SyncTermTreeAction
         /** @var TaxonomyTerm $term */
         $term = $this->taxonomy->taxonomyTerms()->where('id', $termData->id)->firstOrNew();
 
+        /** @var Blueprint|null */
+        $blueprint = Blueprint::whereId($this->taxonomy->blueprint_id)->first();
+
+        if (! $blueprint) {
+            abort(422, 'Cannot Access Blueprint '.$this->taxonomy->blueprint_id);
+        }
+
+        $sanitizeData = $this->sanitizeBlueprintData(
+            $termData->data,
+            $blueprint->schema->getFieldStatekeys()
+        );
+
         $term->fill([
             'name' => $termData->name,
             'parent_id' => $parentTerm?->id,
-            'data' => $termData->data,
+            'data' => $sanitizeData,
         ])->save();
 
         if ($termData->url) {
             $this->createOrUpdateRouteUrl->execute($term, new RouteUrlData($termData->url, true));
         }
+        /** @var TaxonomyTerm */
+        $model = TaxonomyTerm::with('taxonomy')->where('id', $term->id)->first();
+
+        $this->updateBlueprintDataAction->execute($model);
 
         if (! empty($termData->children)) {
             $this->syncTerms($termData->children, $term);

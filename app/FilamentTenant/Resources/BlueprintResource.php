@@ -581,6 +581,7 @@ class BlueprintResource extends Resource
                                             ManipulationType::FIT => Forms\Components\Group::make()->schema([
                                                 Forms\Components\Select::make('fit')
                                                     ->translateLabel()
+                                                    ->required()
                                                     ->options($Fitoptions)
                                                     ->formatStateUsing(fn () => $stateData($manipulationType))
                                                     ->hint(
