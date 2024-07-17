@@ -44,6 +44,9 @@ use Support\RouteUrl\HasRouteUrl;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
  * @property-read int|null $products_count
  * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $routeUrls
+ * @property-read int|null $route_urls_count
  *
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()

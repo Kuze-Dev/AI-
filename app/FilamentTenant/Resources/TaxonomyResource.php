@@ -185,12 +185,12 @@ class TaxonomyResource extends Resource
                                                         if ($state) {
                                                             return $state;
                                                         }
-
+                                                        /** @var TaxonomyTerm|null */
                                                         $term = TaxonomyTerm::with(
                                                             'routeUrls'
                                                         )->find($get('id'));
 
-                                                        return $term ? $term->routeUrls->is_override : $state;
+                                                        return $term ? $term->routeUrls?->is_override : $state;
 
                                                     })
                                                     ->label(trans('Is Custom URL'))
