@@ -21,7 +21,7 @@ class CreateTaxonomyAction
             'name' => $taxonomyData->name,
             'blueprint_id' => $taxonomyData->blueprint_id,
         ]);
-        
+
         if ($taxonomyData->has_route) {
             $this->createOrUpdateRouteUrl->execute($taxonomy, $taxonomyData->route_url_data);
         }

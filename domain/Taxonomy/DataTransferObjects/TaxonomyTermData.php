@@ -9,7 +9,8 @@ class TaxonomyTermData
     public function __construct(
         public readonly string $name,
         public readonly array $data,
-        public readonly string $url,
+        public readonly bool $is_custom,
+        public readonly ?string $url,
         public readonly ?int $id = null,
         public readonly ?array $children = [],
     ) {
@@ -20,7 +21,8 @@ class TaxonomyTermData
         return new self(
             name: $data['name'],
             data: $data['data'],
-            url: $data['url'],
+            url: $data['url'] ?? null,
+            is_custom: $data['is_custom'] ?? false,
             id: $data['id'] ?? null,
             children: array_map(fn (array $child) => self::fromArray($child), $data['children'] ?? [])
         );

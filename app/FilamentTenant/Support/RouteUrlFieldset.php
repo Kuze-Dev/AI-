@@ -30,10 +30,7 @@ class RouteUrlFieldset extends Group
         $this->registerListeners([
             'route_url::update' => [
                 function (self $component, ...$eventParameters): void {
-
-                    $statePath = $this->getStatePath();
-
-                    $component->evaluate(function (HasRouteUrl|string $model, Closure $get, Closure $set, array $state) use ($eventParameters, $statePath) {
+                    $component->evaluate(function (HasRouteUrl|string $model, Closure $get, Closure $set, array $state) use ($eventParameters) {
                         if ((bool) $get('is_override')) {
                             return;
                         }
@@ -43,9 +40,7 @@ class RouteUrlFieldset extends Group
 
                         if ($eventParameters && $eventParameters[0] === 'input') {
                             /** @var string */
-                            $inputUrl = $get($statePath.'.url');
-                            // dump($statePath.'.url');
-                            // dump($inputUrl);
+                            $inputUrl = $get('route_url.url');
                             $inputUrl = Str::startsWith($inputUrl, '/') ?
                                 Str::contains($inputUrl, "/$locale/") ? Str::replace("/$locale/", '/', $inputUrl) : $inputUrl
                                 : '/'.$inputUrl;
@@ -53,7 +48,7 @@ class RouteUrlFieldset extends Group
                             $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ?
                                 "/$locale$inputUrl" : $inputUrl;
 
-                            $set($statePath.'.url', $newUrl);
+                            $set('route_url.url', $newUrl);
 
                             return;
                         }
@@ -61,7 +56,7 @@ class RouteUrlFieldset extends Group
                         $newUrl = $model::generateRouteUrl($this->getModelForRouteUrl(), $get('data', true));
                         $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ? "/$locale$newUrl" : $newUrl;
 
-                        $set($statePath.'.url', $newUrl);
+                        $set('route_url.url', $newUrl);
                     });
                 },
             ],

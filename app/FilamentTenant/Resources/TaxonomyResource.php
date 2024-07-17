@@ -27,6 +27,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
@@ -82,7 +83,7 @@ class TaxonomyResource extends Resource
                         ->string()
                         ->reactive()
                         ->maxLength(255)
-                        ->afterStateUpdated(function (Forms\Components\TextInput $component) {
+                        ->afterStateUpdated(function (Forms\Components\TextInput $component, $livewire) {
                             $component->getContainer()
                                 ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                 ?->dispatchEvent('route_url::update');
@@ -97,11 +98,16 @@ class TaxonomyResource extends Resource
                     Forms\Components\Toggle::make('has_route')
                         ->reactive()
                         ->lazy()
+                        ->afterStateUpdated(function (Forms\Components\Toggle $component, $state) {
+                            if ($state) {
+                                $component->getContainer()
+                                    ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                    ?->dispatchEvent('route_url::update');
+                            }
+
+                        })
                         ->formatStateUsing(fn (?Taxonomy $record) => $record?->activeRouteUrl ? true : false)
                         ->label(trans('Has Route')),
-                        // ->aftestateUpdated( fn (Clousure $set, Clousure $get, $state, $record) => $state ? 
-                        // $set('url',$record?->activeRouteUrl) :
-                        // $set('url', Slug))
                     RouteUrlFieldset::make()
                         ->disabled(fn (Closure $get) => ! $get('has_route'))
                         ->hidden(fn (Closure $get) => ! $get('has_route')),
@@ -164,13 +170,36 @@ class TaxonomyResource extends Resource
                                             Forms\Components\Hidden::make('id'),
                                             Forms\Components\TextInput::make('name')
                                                 ->required()
+                                                ->reactive()
+                                                ->lazy()
+                                                ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+                                                    $set('url', $livewire->data['route_url']['url'].'/'.Str::of($state)->slug());
+
+                                                    return $state;
+                                                })
                                                 ->unique(ignoreRecord: true),
                                             Forms\Components\Group::make([
+                                                Forms\Components\Toggle::make('is_custom')
+                                                    ->formatStateUsing(function (Closure $get, $state) {
+
+                                                        if ($state) {
+                                                            return $state;
+                                                        }
+
+                                                        $term = TaxonomyTerm::with(
+                                                            'routeUrls'
+                                                        )->find($get('id'));
+
+                                                        return $term ? $term->routeUrls->is_override : $state;
+
+                                                    })
+                                                    ->label(trans('Is Custom URL'))
+                                                    ->reactive(),
                                                 Forms\Components\TextInput::make('url')
                                                     ->label(trans('URL'))
                                                     ->reactive()
                                                     // ->unique(ignoreRecord: true)
-                                                    ->disabled(fn ($livewire) => ! $livewire->data['has_route'])
+                                                    ->disabled(fn ($livewire, Closure $get) => ! ($livewire->data['has_route'] && $get('is_custom')))
                                                     ->hidden(fn ($livewire) => ! $livewire->data['has_route'])
                                                     ->formatStateUsing(function (Closure $get, $state, $livewire) {
 
@@ -290,8 +319,6 @@ class TaxonomyResource extends Resource
         if ($term->relationLoaded('children') && $term->children->isNotEmpty()) {
             $term->setRelation('children', $term->children->mapWithKeys(self::mapTermWithNormalizedKey(...)));
         }
-
-        // dd($term);
 
         return ["record-{$term->getKey()}" => $term];
     }

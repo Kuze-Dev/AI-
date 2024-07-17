@@ -50,7 +50,7 @@ it('can create taxonomy with route url', function () {
         ->withDummySchema()
         ->createOne();
 
-   $taxonomy = livewire(CreateTaxonomy::class)
+    $taxonomy = livewire(CreateTaxonomy::class)
         ->fillForm([
             'name' => 'Brand',
             'blueprint_id' => $blueprint->getKey(),
@@ -58,7 +58,9 @@ it('can create taxonomy with route url', function () {
         ])
         ->call('create')
         ->assertHasNoFormErrors()
-        ->assertOk();
+        ->assertOk()
+        ->instance()
+        ->record;
 
     assertDatabaseHas(Taxonomy::class, [
         'name' => 'Brand',
@@ -72,4 +74,4 @@ it('can create taxonomy with route url', function () {
         'is_override' => false,
     ]);
 
-})->only();
+});

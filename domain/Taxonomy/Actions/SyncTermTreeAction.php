@@ -88,7 +88,7 @@ class SyncTermTreeAction
         ])->save();
 
         if ($termData->url) {
-            $this->createOrUpdateRouteUrl->execute($term, new RouteUrlData($termData->url, true));
+            $this->createOrUpdateRouteUrl->execute($term, new RouteUrlData($termData->url, $termData->is_custom));
         }
         /** @var TaxonomyTerm */
         $model = TaxonomyTerm::with('taxonomy')->where('id', $term->id)->first();
