@@ -36,6 +36,8 @@ class CreateTaxonomy extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        dump($data);
+        dd(TaxonomyData::fromArray($data));
         return DB::transaction(fn () => app(CreateTaxonomyAction::class)->execute(TaxonomyData::fromArray($data)));
     }
 }

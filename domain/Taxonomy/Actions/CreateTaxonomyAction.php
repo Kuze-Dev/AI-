@@ -21,8 +21,10 @@ class CreateTaxonomyAction
             'name' => $taxonomyData->name,
             'blueprint_id' => $taxonomyData->blueprint_id,
         ]);
-
-        $this->createOrUpdateRouteUrl->execute($taxonomy, $taxonomyData->route_url_data);
+        
+        if ($taxonomyData->has_route) {
+            $this->createOrUpdateRouteUrl->execute($taxonomy, $taxonomyData->route_url_data);
+        }
 
         $taxonomy->sites()->attach($taxonomyData->sites);
 

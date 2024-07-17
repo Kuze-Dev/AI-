@@ -19,6 +19,7 @@ use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
+use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -79,7 +80,13 @@ class TaxonomyResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->string()
+                        ->reactive()
                         ->maxLength(255)
+                        ->afterStateUpdated(function (Forms\Components\TextInput $component) {
+                            $component->getContainer()
+                                ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                ?->dispatchEvent('route_url::update');
+                        })
                         ->unique(ignoreRecord: true),
                     Forms\Components\Select::make('blueprint_id')
                         ->label(trans('Blueprint'))
@@ -92,6 +99,9 @@ class TaxonomyResource extends Resource
                         ->lazy()
                         ->formatStateUsing(fn (?Taxonomy $record) => $record?->activeRouteUrl ? true : false)
                         ->label(trans('Has Route')),
+                        // ->aftestateUpdated( fn (Clousure $set, Clousure $get, $state, $record) => $state ? 
+                        // $set('url',$record?->activeRouteUrl) :
+                        // $set('url', Slug))
                     RouteUrlFieldset::make()
                         ->disabled(fn (Closure $get) => ! $get('has_route'))
                         ->hidden(fn (Closure $get) => ! $get('has_route')),
