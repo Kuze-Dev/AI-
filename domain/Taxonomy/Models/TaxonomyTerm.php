@@ -161,6 +161,9 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
 
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
-        return Str::of($attributes['name'])->slug()->start('/')->toString();
+        /** @var TaxonomyTerm */
+        $taxonomy = $model->load('taxonomy');
+
+        return $taxonomy->taxonomy->activeRouteUrl?->url.'/'.Str::of($attributes['name'])->slug()->toString();
     }
 }

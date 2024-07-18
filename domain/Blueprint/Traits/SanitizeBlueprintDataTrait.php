@@ -16,7 +16,6 @@ trait SanitizeBlueprintDataTrait
      */
     public function sanitizeBlueprintData(?array $array, array $reference): ?array
     {
-        // Check if $array is null or empty
         $filteredArray = [];
 
         foreach ($reference as $key => $value) {

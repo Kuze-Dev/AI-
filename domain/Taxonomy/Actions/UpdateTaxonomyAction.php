@@ -22,11 +22,11 @@ class UpdateTaxonomyAction
             'name' => $taxonomyData->name,
         ]);
 
-        $this->syncTermAction->execute($taxonomy, $taxonomyData->terms);
-
         if ($taxonomyData->has_route) {
             $this->createOrUpdateRouteUrl->execute($taxonomy, $taxonomyData->route_url_data);
         }
+
+        $this->syncTermAction->execute($taxonomy, $taxonomyData->terms);
 
         $taxonomy->sites()->sync($taxonomyData->sites);
 
