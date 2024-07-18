@@ -9,9 +9,13 @@ use Domain\Address\Actions\CreateAddressAction;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
+use Domain\Customer\DataTransferObjects\CustomerNotificationData;
+use Domain\Customer\Enums\CustomerEvent;
 use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Mail\CustomerRegisteredNotification;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Mail;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
@@ -118,6 +122,24 @@ class CreateCustomerAction
             'email_verification_type' => $customerData->email_verification_type,
             'register_status' => $customerData->register_status,
         ]));
+
+        if (! empty(app(CustomerSettings::class)->customer_email_notifications)) {
+
+            $importedNotification = array_filter(app(CustomerSettings::class)->customer_email_notifications, function ($mail_notification) {
+                return $mail_notification['events'] == CustomerEvent::REGISTERED->value;
+            });
+
+            if (! empty($importedNotification)) {
+                foreach ($importedNotification as $notification) {
+                    Mail::send(new CustomerRegisteredNotification(
+                        $customer,
+                        CustomerNotificationData::fromarray($notification),
+                        $customer->data ?? []
+                    )
+                    );
+                }
+            }
+        }
 
         return $customer;
     }

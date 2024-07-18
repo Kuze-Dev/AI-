@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources\InviteCustomerResource\Pages;
 
 use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use App\FilamentTenant\Resources\InviteCustomerResource;
+use App\Settings\CustomerSettings;
 use Domain\Customer\Actions\ImportCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\Gender;
@@ -25,6 +26,8 @@ class ListInviteCustomers extends ListCustomers
     /** @throws \Exception */
     protected function getActions(): array
     {
+        $date_format = app(CustomerSettings::class)->date_format;
+
         return [
             ImportAction::make()
                 ->model(Customer::class)
@@ -36,7 +39,7 @@ class ListInviteCustomers extends ListCustomers
                 ])
                 ->processRowsUsing(
                     fn (array $row): Customer => app(ImportCustomerAction::class)
-                        ->execute($row)
+                        ->execute(array_filter($row))
                 )
                 ->withValidation(
                     rules: [
@@ -50,7 +53,12 @@ class ListInviteCustomers extends ListCustomers
                         'last_name' => 'nullable|string|min:3|max:100',
                         'mobile' => 'nullable|min:3|max:100',
                         'gender' => ['nullable', Rule::enum(Gender::class)],
-                        'birth_date' => 'nullable|date',
+                        'birth_date' => [
+                            'nullable',
+                            ($date_format == 'default' ||
+                            $date_format == '') ? 'date' : 'date_format:'.$date_format],
+                        'password' => 'nullable',
+                        'registered' => 'nullable',
                         'data' => 'nullable',
                         'tier' => [
                             'nullable',
