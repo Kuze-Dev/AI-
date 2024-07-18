@@ -227,19 +227,19 @@ class TaxonomyResource extends Resource
                                                             )->find($get('id'));
 
                                                             return new UniqueActiveRouteUrlRule($term);
-                                                            // return tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
-                                                            // new UniqueActiveRouteUrlRule($term) : null;
                                                         },
-                                                        function ($livewire) {
+                                                        function ($livewire, Closure $get) {
 
                                                             $datas = $livewire->data['terms'];
+                                                            $current_item_id = $get('id');
 
-                                                            return function (string $attribute, $value, Closure $fail) use ($datas) {
-
-                                                                $filtered = array_filter($datas, function ($item) use ($value) {
-                                                                    return isset($item['url']) && $item['url'] === $value;
+                                                            return function (string $attribute, $value, Closure $fail) use ($datas,$current_item_id) {
+                                                               
+                                                                $filtered = array_filter($datas, function ($item) use ($value, $current_item_id) {
+                                                                    
+                                                                    return isset($item['url']) && $item['url'] === $value && $item['id'] != $current_item_id;
                                                                 });
-
+                                                               
                                                                 if (! empty($filtered)) {
                                                                     $fail(trans('The :value is already been used.', ['value' => $value]));
                                                                 }
