@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\RouteUrlFieldset;
@@ -233,13 +232,13 @@ class TaxonomyResource extends Resource
                                                             $datas = $livewire->data['terms'];
                                                             $current_item_id = $get('id');
 
-                                                            return function (string $attribute, $value, Closure $fail) use ($datas,$current_item_id) {
-                                                               
+                                                            return function (string $attribute, $value, Closure $fail) use ($datas, $current_item_id) {
+
                                                                 $filtered = array_filter($datas, function ($item) use ($value, $current_item_id) {
-                                                                    
+
                                                                     return isset($item['url']) && $item['url'] === $value && $item['id'] != $current_item_id;
                                                                 });
-                                                               
+
                                                                 if (! empty($filtered)) {
                                                                     $fail(trans('The :value is already been used.', ['value' => $value]));
                                                                 }
