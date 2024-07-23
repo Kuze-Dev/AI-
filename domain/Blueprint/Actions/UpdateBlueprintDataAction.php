@@ -114,7 +114,7 @@ class UpdateBlueprintDataAction
                 });
 
                 foreach ($filtered as $image) {
-                    $blueprintData->addMediaFromDisk($image, 's3')
+                    $blueprintData->addMediaFromDisk($image, config('filament.default_filesystem_disk'))
                         ->toMediaCollection('blueprint_media');
 
                     $currentMedia[] = $blueprintData->getMedia('blueprint_media')->last()?->uuid;
