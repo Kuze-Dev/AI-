@@ -29,6 +29,14 @@ class CreateTenantAction
         $tenant->setInternal('db_name', $tenantData->database->name);
         $tenant->setInternal('db_username', $tenantData->database->username);
         $tenant->setInternal('db_password', $tenantData->database->password);
+        $tenant->setInternal('bucket', $tenantData->bucket?->bucket);
+        $tenant->setInternal('bucket_driver', $tenantData->bucket?->driver);
+        $tenant->setInternal('bucket_access_key', $tenantData->bucket?->access_key);
+        $tenant->setInternal('bucket_secret_key', $tenantData->bucket?->secret_key);
+        $tenant->setInternal('bucket_endpoint', $tenantData->bucket?->endpoint);
+        $tenant->setInternal('bucket_url', $tenantData->bucket?->url);
+        $tenant->setInternal('bucket_region', $tenantData->bucket?->region);
+        $tenant->setInternal('bucket_style_endpoint', $tenantData->bucket?->style_endpoint);
 
         $tenant->save();
 

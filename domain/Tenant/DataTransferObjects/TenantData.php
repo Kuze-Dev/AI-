@@ -11,6 +11,7 @@ class TenantData
         public readonly string $name,
         public readonly bool $is_suspended = true,
         public readonly ?DatabaseData $database = null,
+        public readonly ?BucketData $bucket = null,
         public readonly array $domains = [],
         public readonly ?array $features = [],
     ) {
@@ -31,6 +32,18 @@ class TenantData
                     password: $data['database']['password'],
                 )
                 : null,
+            bucket: filled($data['bucket'] ?? null)
+            ? new BucketData(
+                driver: $data['bucket']['driver'] ?? null,
+                bucket: $data['bucket']['bucket'],
+                access_key: $data['bucket']['access_key'] ?? null,
+                secret_key: $data['bucket']['secret_key'] ?? null,
+                endpoint: $data['bucket']['endpoint'] ?? null,
+                url: $data['bucket']['url'] ?? null,
+                region: $data['bucket']['region'] ?? null,
+                style_endpoint: $data['bucket']['style_endpoint'] ?? false,
+            )
+            : null,
             domains: array_map(
                 fn ($data) => new DomainData(
                     id: $data['id'] ?? null,
