@@ -17,7 +17,7 @@ class CreateS3PresignUploadUrlAction
 
         $object_key = 'tmp/'.$filename;
 
-        while (Storage::disk('s3')->exists($object_key)) {
+        while (Storage::disk(config('filament.default_filesystem_disk'))->exists($object_key)) {
 
             $filename = uniqid().'.'.$presignedUrlData->ext;
 
@@ -25,7 +25,7 @@ class CreateS3PresignUploadUrlAction
         }
 
         /** @var \Illuminate\Filesystem\AwsS3V3Adapter */
-        $s3 = Storage::disk('s3');
+        $s3 = Storage::disk(config('filament.default_filesystem_disk'));
 
         $client = $s3->getClient();
 
