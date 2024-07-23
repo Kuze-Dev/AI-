@@ -14,6 +14,8 @@ class BucketBootstrapper implements TenancyBootstrapper
 
     protected ?string $orignalBucket;
 
+    protected ?string $originalMediaDisk;
+
     protected ?string $originalBucketKey;
 
     protected ?string $originalBucketSecret;
@@ -29,6 +31,7 @@ class BucketBootstrapper implements TenancyBootstrapper
     public function __construct(protected Application $app)
     {
         $this->originalFileSystemDisk = $this->app->make('config')['filesystems.default'];
+        $this->originalMediaDisk = $this->app->make('config')['media-library.disk_name'];
 
         $this->orignalBucket = $this->app->make('config')['filesystems.disks.s3.bucket'];
 
@@ -45,6 +48,7 @@ class BucketBootstrapper implements TenancyBootstrapper
     {
         if ($tenant->getInternal('bucket_driver') == 'r2') {
 
+            $this->app->make('config')->set('media-library.disk_name', $tenant->getInternal('bucket_driver'));
             $this->app->make('config')->set('filesystems.default', $tenant->getInternal('bucket_driver'));
             $this->app->make('config')->set('filament.default_filesystem_disk', $tenant->getInternal('bucket_driver'));
 
@@ -74,7 +78,7 @@ class BucketBootstrapper implements TenancyBootstrapper
     public function revert(): void
     {
         $this->app->make('config')->set('filesystems.disks.s3.bucket', $this->orignalBucket);
-
+        $this->app->make('config')->set('media-library.disk_name', $this->originalMediaDisk);
         $this->app->make('config')->set('filesystems.default', $this->originalFileSystemDisk);
         $this->app->make('config')->set('filament.default_filesystem_disk', $this->originalFileSystemDisk);
 
