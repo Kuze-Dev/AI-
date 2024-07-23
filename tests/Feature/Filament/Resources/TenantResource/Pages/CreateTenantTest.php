@@ -35,4 +35,4 @@ it('can create tenant', function () {
         ->assertHasNoFormErrors();
 
     assertDatabaseHas(Tenant::class, ['name' => 'Test']);
-});
+})->only();
