@@ -38,8 +38,8 @@ class DeleteS3FilesFromDeletedBlueprintDataJob implements ShouldQueue
     public function handle()
     {
         foreach ($this->files as $filePath) {
-            if (Storage::disk('s3')->exists($filePath)) {
-                Storage::disk('s3')->delete($filePath);
+            if (Storage::disk(config('filament.default_filesystem_disk'))->exists($filePath)) {
+                Storage::disk(config('filament.default_filesystem_disk'))->delete($filePath);
             }
         }
     }
