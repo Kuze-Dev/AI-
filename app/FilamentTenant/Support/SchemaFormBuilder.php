@@ -354,7 +354,7 @@ class SchemaFormBuilder extends Component
     {
 
         $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
-            ->fileAttachmentsDisk('s3')
+            ->fileAttachmentsDisk(config('filament.default_filesystem_disk'))
             ->fileAttachmentsVisibility('public')
             ->showMenuBar()
             ->fileAttachmentsDirectory('tinyeditor_uploads');
