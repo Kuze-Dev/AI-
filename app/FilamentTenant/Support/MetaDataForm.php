@@ -40,7 +40,14 @@ class MetaDataForm extends Section
                         ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
                         ->toArray() ?? [];
                 })
-                ->image()
+                // ->image()
+                ->acceptedFileTypes([
+                    'image/jpg',
+                    'image/jpeg',
+                    'image/png',
+                    'image/bmp',
+                    'image/tiff',
+                ])
                 ->beforeStateDehydrated(null)
                 ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
                 ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
