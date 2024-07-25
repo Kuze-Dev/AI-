@@ -78,10 +78,12 @@ class PageResource extends Resource
                                     }
                                 )
                                 ->lazy()
-                                ->afterStateUpdated(function (Forms\Components\TextInput $component) {
-                                    $component->getContainer()
-                                        ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
-                                        ?->dispatchEvent('route_url::update');
+                                ->afterStateUpdated(function (Forms\Components\TextInput $component, Closure $get) {
+                                    if (! $get('route_url.is_override')) {
+                                        $component->getContainer()
+                                            ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                            ?->dispatchEvent('route_url::update');
+                                    }
                                 })
                                 ->required()
                                 ->string()
