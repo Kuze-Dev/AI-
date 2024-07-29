@@ -30,6 +30,8 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\UnableToCheckFileExistence;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class ServiceResource extends Resource
@@ -66,6 +68,34 @@ class ServiceResource extends Resource
                                 ->required(),
                             Forms\Components\RichEditor::make('description')
                                 ->translateLabel()
+                                ->getUploadedAttachmentUrlUsing(function ($file) {
+
+                                    $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                                    try {
+                                        if (! $storage->exists($file)) {
+                                            return null;
+                                        }
+                                    } catch (UnableToCheckFileExistence $exception) {
+                                        return null;
+                                    }
+
+                                    if (config('filament.default_filesystem_disk') === 'r2') {
+                                        return $storage->url($file);
+                                    } else {
+                                        if ($storage->getVisibility($file) === 'private') {
+                                            try {
+                                                return $storage->temporaryUrl(
+                                                    $file,
+                                                    now()->addMinutes(5),
+                                                );
+                                            } catch (\Throwable $exception) {
+                                                // This driver does not support creating temporary URLs.
+                                            }
+                                        }
+
+                                    }
+                                })
                                 ->maxLength(255),
                             Forms\Components\Select::make('taxonomyTerms')
                                 ->label(trans('Service Category'))
