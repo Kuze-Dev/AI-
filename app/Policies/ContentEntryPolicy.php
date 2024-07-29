@@ -56,7 +56,7 @@ class ContentEntryPolicy
 
             $intersection = array_intersect($contentEntrySites, $userSites);
 
-            return (count($intersection) === count($contentEntrySites)) && $this->checkWildcardPermissions($user);
+            return (count($intersection) > 0) && $this->checkWildcardPermissions($user);
         }
 
         return $this->checkWildcardPermissions($user);

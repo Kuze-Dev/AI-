@@ -9,7 +9,6 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
-use Illuminate\Support\Facades\Auth;
 
 class UpdateGlobalsAction
 {
@@ -48,8 +47,7 @@ class UpdateGlobalsAction
 
         $this->updateBlueprintDataAction->execute($model);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
-            Auth::user()?->hasRole(config('domain.role.super_admin'))
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
         ) {
 
             $globals->sites()
