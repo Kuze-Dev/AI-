@@ -67,7 +67,7 @@ class ServiceResource extends Resource
                                 ->maxLength(100)
                                 ->required(),
                             Forms\Components\RichEditor::make('description')
-                                ->translateLabel()
+                                ->translateLabel()           
                                 ->getUploadedAttachmentUrlUsing(function ($file) {
 
                                     $storage = Storage::disk(config('filament.default_filesystem_disk'));
@@ -95,8 +95,7 @@ class ServiceResource extends Resource
                                         }
 
                                     }
-                                })
-                                ->maxLength(255),
+                                }),
                             Forms\Components\Select::make('taxonomyTerms')
                                 ->label(trans('Service Category'))
                                 ->options(function () {
