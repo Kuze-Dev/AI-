@@ -47,7 +47,14 @@ class ShippingmethodResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('subtitle')
                         ->required(),
-                    Forms\Components\RichEditor::make('description'),
+                    Forms\Components\RichEditor::make('description')
+                        ->toolbarButtons([
+                            'bold',
+                            'italic',
+                            'link',
+                            'redo',
+                            'undo',
+                        ]),
                     Forms\Components\FileUpload::make('logo')
                         ->formatStateUsing(function ($record) {
                             return $record?->getMedia('logo')
