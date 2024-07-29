@@ -63,6 +63,10 @@ class ShippingmethodResource extends Resource
                             /** @var ?Media $media */
                             $media = $mediaClass::findByUuid($file);
 
+                            if (config('filament.default_filesystem_disk') === 'r2') {
+                                return $media?->getUrl();
+                            }
+
                             if ($component->getVisibility() === 'private') {
                                 try {
                                     return $media?->getTemporaryUrl(now()->addMinutes(5));
