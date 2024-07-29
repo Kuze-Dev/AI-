@@ -135,7 +135,8 @@ class ContentResource extends Resource
                     ]),
 
                     Forms\Components\Card::make([
-                        Forms\Components\CheckboxList::make('sites')
+                        // Forms\Components\CheckboxList::make('sites')
+                        \App\FilamentTenant\Support\CheckBoxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
                                 function (?Content $record, Closure $get) {
@@ -174,10 +175,25 @@ class ContentResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray()
                             )
+                            ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return false;
+                                }
+
+                                $user_sites = $user->userSite->pluck('id')->toArray();
+
+                                $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                                return ! in_array($value, $intersect);
+                            })
                             ->formatStateUsing(fn (?Content $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                     ])
-                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                 ]),
             ]);
     }

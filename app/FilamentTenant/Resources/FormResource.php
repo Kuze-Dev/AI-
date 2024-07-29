@@ -77,7 +77,8 @@ class FormResource extends Resource
                         ->required(),
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Card::make([
-                        Forms\Components\CheckboxList::make('sites')
+                        // Forms\Components\CheckboxList::make('sites')
+                        \App\FilamentTenant\Support\CheckBoxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
                                 function (?FormModel $record, Closure $get) {
@@ -116,6 +117,21 @@ class FormResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray()
                             )
+                            ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return false;
+                                }
+
+                                $user_sites = $user->userSite->pluck('id')->toArray();
+
+                                $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                                return ! in_array($value, $intersect);
+                            })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?FormModel $record): void {
                                 if (! $record) {
                                     $component->state([]);
