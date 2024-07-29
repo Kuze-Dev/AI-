@@ -157,7 +157,7 @@ class ContentEntryResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray();
                             })
-                            ->disableOptionWhen(function (string $value, $livewire) {
+                            ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
                                 /** @var \Domain\Admin\Models\Admin */
                                 $user = Auth::user();
@@ -167,7 +167,8 @@ class ContentEntryResource extends Resource
                                 }
 
                                 $user_sites = $user->userSite->pluck('id')->toArray();
-                                $intersect = array_intersect($livewire->ownerRecord->sites->pluck('id')->toarray(), $user_sites);
+
+                                $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
                                 return ! in_array($value, $intersect);
                             })

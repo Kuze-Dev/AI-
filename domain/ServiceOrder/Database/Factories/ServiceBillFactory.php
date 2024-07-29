@@ -23,7 +23,7 @@ class ServiceBillFactory extends Factory
             'reference' => $this->faker->uuid(),
             'bill_date' => now(),
             'due_date' => now()->addDays(2),
-            'currency' => $this->faker->currencyCode(),
+            'currency' => 'PHP',
             'service_price' => $this->faker->randomFloat(2, 1, 100),
             'additional_charges' => [],
             'total_amount' => $this->faker->randomFloat(2, 1, 100),
