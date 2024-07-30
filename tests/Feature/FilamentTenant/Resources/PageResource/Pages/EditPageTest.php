@@ -514,7 +514,7 @@ it('can edit page with media uploaded', function () {
 
     $firstImage = UploadedFile::fake()->image('preview-1.jpeg');
 
-    Storage::disk('s3')->put('/', $firstImage);
+    Storage::disk(config('filament.default_filesystem_disk'))->put('/', $firstImage);
 
     $page1 = PageFactory::new()
         ->addBlockContent(
@@ -551,7 +551,7 @@ it('can edit page with media uploaded', function () {
         ]);
 
     $secondImage = UploadedFile::fake()->image('preview-2.jpeg');
-    Storage::disk('s3')->put('/', $secondImage);
+    Storage::disk(config('filament.default_filesystem_disk'))->put('/', $secondImage);
 
     $updatedPage = livewire(EditPage::class, ['record' => $page1->getRouteKey()])
         ->fillForm([
@@ -602,7 +602,7 @@ it('can edit page with media uploaded inside repeater', function () {
 
     Storage::fake('s3');
     $firstImage = UploadedFile::fake()->image('preview.jpeg');
-    Storage::disk('s3')->put('/', $firstImage);
+    Storage::disk(config('filament.default_filesystem_disk'))->put('/', $firstImage);
 
     $page = livewire(CreatePage::class)
         ->fillForm([
@@ -633,7 +633,7 @@ it('can edit page with media uploaded inside repeater', function () {
 
     $secondImage = UploadedFile::fake()->image('preview.jpeg');
 
-    Storage::disk('s3')->put('/', $secondImage);
+    Storage::disk(config('filament.default_filesystem_disk'))->put('/', $secondImage);
     $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',

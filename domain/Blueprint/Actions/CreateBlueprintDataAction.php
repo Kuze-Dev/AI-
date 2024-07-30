@@ -50,11 +50,11 @@ class CreateBlueprintDataAction
         if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
             if (is_array($blueprintDataData->value)) {
                 foreach ($blueprintDataData->value as $value) {
-                    $blueprintData->addMediaFromDisk($value, 's3')
+                    $blueprintData->addMediaFromDisk($value, config('filament.default_filesystem_disk'))
                         ->toMediaCollection('blueprint_media');
                 }
             } else {
-                $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
+                $blueprintData->addMediaFromDisk($blueprintData->value, config('filament.default_filesystem_disk'))
                     ->toMediaCollection('blueprint_media');
             }
         }

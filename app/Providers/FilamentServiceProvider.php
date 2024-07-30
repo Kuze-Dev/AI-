@@ -396,6 +396,10 @@ class FilamentServiceProvider extends ServiceProvider
                     return null;
                 }
 
+                if (config('filament.default_filesystem_disk') === 'r2') {
+                    return $media->getUrl();
+                }
+
                 if ($component->getVisibility() === 'private') {
                     try {
                         return $media->getTemporaryUrl(now()->addMinutes(5));

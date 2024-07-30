@@ -16,6 +16,10 @@ trait SanitizeBlueprintDataTrait
      */
     public function sanitizeBlueprintData(?array $array, array $reference): ?array
     {
+        if (! $array) {
+            return null;
+        }
+
         $filteredArray = [];
 
         foreach ($reference as $key => $value) {
@@ -29,14 +33,12 @@ trait SanitizeBlueprintDataTrait
                         $filteredArray[$key] = $this->sanitizeBlueprintData($array[$key], $value);
                     }
                 } else {
-                    // If the key exists in $reference but not in $array, set it to an empty array
-                    $filteredArray[$key] = [];
+                    $filteredArray[$key] = $this->sanitizeBlueprintData(null, $value);
                 }
             } else {
-                if (isset($array[$key])) {
+                if (array_key_exists($key, $array) && $array[$key] !== null) {
                     $filteredArray[$key] = $array[$key];
                 } else {
-                    // If the key exists in $reference but not in $array, set it to null
                     $filteredArray[$key] = null;
                 }
             }

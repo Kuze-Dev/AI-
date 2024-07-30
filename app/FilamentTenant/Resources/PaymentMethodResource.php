@@ -16,7 +16,9 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Flysystem\UnableToCheckFileExistence;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
@@ -66,6 +68,10 @@ class PaymentMethodResource extends Resource
                             /** @var ?Media $media */
                             $media = $mediaClass::findByUuid($file);
 
+                            if (config('filament.default_filesystem_disk') === 'r2') {
+                                return $media?->getUrl();
+                            }
+
                             if ($component->getVisibility() === 'private') {
                                 try {
                                     return $media?->getTemporaryUrl(now()->addMinutes(5));
@@ -91,7 +97,35 @@ class PaymentMethodResource extends Resource
                     Forms\Components\Textarea::make('description')
                         ->maxLength(fn (int $value = 250) => $value),
 
-                    Forms\Components\RichEditor::make('instruction'),
+                    Forms\Components\RichEditor::make('instruction')
+                        ->getUploadedAttachmentUrlUsing(function ($file) {
+
+                            $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                            try {
+                                if (! $storage->exists($file)) {
+                                    return null;
+                                }
+                            } catch (UnableToCheckFileExistence $exception) {
+                                return null;
+                            }
+
+                            if (config('filament.default_filesystem_disk') === 'r2') {
+                                return $storage->url($file);
+                            } else {
+                                if ($storage->getVisibility($file) === 'private') {
+                                    try {
+                                        return $storage->temporaryUrl(
+                                            $file,
+                                            now()->addMinutes(5),
+                                        );
+                                    } catch (\Throwable $exception) {
+                                        // This driver does not support creating temporary URLs.
+                                    }
+                                }
+
+                            }
+                        }),
 
                 ]),
             ]);

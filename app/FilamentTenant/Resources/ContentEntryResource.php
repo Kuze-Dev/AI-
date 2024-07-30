@@ -106,10 +106,12 @@ class ContentEntryResource extends Resource
                                 ignoreRecord: true
                             )
                             ->lazy()
-                            ->afterStateUpdated(function (Forms\Components\TextInput $component) {
-                                $component->getContainer()
-                                    ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
-                                    ?->dispatchEvent('route_url::update');
+                            ->afterStateUpdated(function (Forms\Components\TextInput $component, Closure $get) {
+                                if (! $get('route_url.is_override')) {
+                                    $component->getContainer()
+                                        ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                        ?->dispatchEvent('route_url::update');
+                                }
                             })
                             ->required()
                             ->string()
@@ -136,7 +138,8 @@ class ContentEntryResource extends Resource
                             ->default(Auth::id()),
                     ]),
                     Forms\Components\Card::make([
-                        Forms\Components\CheckboxList::make('sites')
+                        // Forms\Components\CheckboxList::make('sites')
+                        \App\FilamentTenant\Support\CheckBoxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rule(fn (?ContentEntry $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(function ($livewire) {
@@ -150,9 +153,24 @@ class ContentEntryResource extends Resource
                                 }
 
                                 return $livewire->ownerRecord->sites
-                                    ->whereIN('id', $user->userSite->pluck('id')->toArray())
+                                    // ->whereIN('id')
                                     ->pluck('name', 'id')
                                     ->toArray();
+                            })
+                            ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return false;
+                                }
+
+                                $user_sites = $user->userSite->pluck('id')->toArray();
+
+                                $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                                return ! in_array($value, $intersect);
                             })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
                                 if (! $record) {
