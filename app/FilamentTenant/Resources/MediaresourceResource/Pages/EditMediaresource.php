@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\MediaresourceResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\MediaresourceResource;
-use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+use Support\Common\Actions\SyncMediaCollectionAction;
 
 class EditMediaresource extends EditRecord
 {
@@ -18,11 +21,18 @@ class EditMediaresource extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
-            Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media */
+        $media = $record;
+
+        return app(SyncMediaCollectionAction::class)->updateMedia($media, $data['custom_properties']);
     }
 
     protected function getFormActions(): array

@@ -60,7 +60,7 @@ class BlockResource extends Resource
                 // Forms\Components\FileUpload::make('image')
                 //     ->mediaLibraryCollection('image')
                 //     ->image(),
-               \App\FilamentTenant\Support\MediaUploader::make('image')
+                \App\FilamentTenant\Support\MediaUploader::make('image')
                     ->mediaLibraryCollection('image')
                     ->enableOpen()
                     ->image(),

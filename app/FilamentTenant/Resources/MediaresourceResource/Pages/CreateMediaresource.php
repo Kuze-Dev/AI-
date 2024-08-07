@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\MediaresourceResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\MediaresourceResource;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Pages\Actions\Action;
 
 class CreateMediaresource extends CreateRecord
 {
@@ -16,10 +17,6 @@ class CreateMediaresource extends CreateRecord
     protected function getActions(): array
     {
         return [
-            Action::make('create')
-                ->label(__('filament::resources/pages/create-record.form.actions.create.label'))
-                ->action('create')
-                ->keyBindings(['mod+s']),
         ];
     }
 

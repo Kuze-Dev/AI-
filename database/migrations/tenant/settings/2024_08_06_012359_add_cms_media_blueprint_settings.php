@@ -13,6 +13,6 @@ return new class extends SettingsMigration
 
     public function down(): void
     {
-        $this->migrator->deleteIfExists('cms.media_blueprint_id');
+        $this->migrator->delete('cms.media_blueprint_id');
     }
 };

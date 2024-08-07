@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\MediaresourceResource\Pages;
 
 use App\FilamentTenant\Resources\MediaresourceResource;
-use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListMediaresources extends ListRecords
@@ -13,7 +14,7 @@ class ListMediaresources extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+
         ];
     }
 }

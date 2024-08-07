@@ -12,6 +12,8 @@ class CMSSettings extends Settings
 
     public ?string $front_end_domain = null;
 
+    public ?string $media_blueprint_id = null;
+
     public static function group(): string
     {
         return 'cms';
