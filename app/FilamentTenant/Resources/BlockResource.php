@@ -57,8 +57,12 @@ class BlockResource extends Resource
                     ->optionsFromModel(Blueprint::class, 'name')
                     ->disabled(fn (?Block $record) => $record !== null)
                     ->reactive(),
-                Forms\Components\FileUpload::make('image')
+                // Forms\Components\FileUpload::make('image')
+                //     ->mediaLibraryCollection('image')
+                //     ->image(),
+                \App\FilamentTenant\Support\MediaUploader::make('image')
                     ->mediaLibraryCollection('image')
+                    ->enableOpen()
                     ->image(),
                 Forms\Components\Toggle::make('is_fixed_content')
                     ->inline(false)

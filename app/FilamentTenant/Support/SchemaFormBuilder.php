@@ -197,9 +197,9 @@ class SchemaFormBuilder extends Component
         return $fileUpload;
     }
 
-    private function makeMediaComponent(MediaFieldData $mediaFieldData): FileUpload
+    private function makeMediaComponent(MediaFieldData $mediaFieldData): MediaUploader
     {
-        $media = FileUpload::make($mediaFieldData->state_name);
+        $media = MediaUploader::make($mediaFieldData->state_name);
 
         if ($mediaFieldData->multiple) {
             $media->multiple($mediaFieldData->multiple)
