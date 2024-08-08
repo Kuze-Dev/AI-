@@ -65,7 +65,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @mixin \Eloquent
  */
 #[
-    OnDeleteCascade(['contentEntries', 'children']),
+    OnDeleteCascade(['contentEntries', 'children', 'blueprintData']),
     OnDeleteRestrict(['products'])
 ]
 class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable

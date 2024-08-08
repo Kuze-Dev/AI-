@@ -16,6 +16,7 @@ use Domain\Globals\Models\Globals;
 use Domain\Page\Models\BlockContent;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class UpdateBlueprintDataAction
@@ -76,11 +77,13 @@ class UpdateBlueprintDataAction
 
     private function updateBlueprintData(Model $model, BlueprintDataData $blueprintDataData): BlueprintData
     {
-
-        $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first();
+        
+        $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)
+            ->where('model_type', $model->getMorphClass())
+            ->where('state_path', $blueprintDataData->state_path)->first();
 
         if (! $blueprintData) {
-
+            
             $this->createBlueprintData->execute($model);
 
             return $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first() ?: new BlueprintData();
@@ -114,8 +117,11 @@ class UpdateBlueprintDataAction
                 });
 
                 foreach ($filtered as $image) {
-                    $blueprintData->addMediaFromDisk($image, config('filament.default_filesystem_disk'))
-                        ->toMediaCollection('blueprint_media');
+                    if (Storage::disk(config('filament.default_filesystem_disk'))->exists($image)) {
+
+                        $blueprintData->addMediaFromDisk($image, config('filament.default_filesystem_disk'))
+                            ->toMediaCollection('blueprint_media');
+                    }
 
                     $currentMedia[] = $blueprintData->getMedia('blueprint_media')->last()?->uuid;
                 }

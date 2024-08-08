@@ -17,6 +17,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Models\MetaData;
 
@@ -64,6 +65,16 @@ class MediaresourceResource extends Resource
                         ->size('100%')
                         ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden bg-neutral-800 pb-8'])
                         ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
+                    Tables\Columns\TextColumn::make('model_type')
+                    ->formatStateUsing(function ($record) {
+
+                        return match ($record->model_type){
+                            app(MetaData::class)->getMorphClass() => 'MetaData',
+                            app(Block::class)->getMorphClass() => 'Blocks',
+                            app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.class_basename(self::getBlueprintDataResourceModel($record)).')',
+                        };
+                        // return Str::upper($state);
+                    })->searchable(),
                     Tables\Columns\TextColumn::make('name')
                         ->url(function (Media $record) {
                             return match ($record->model_type) {
@@ -93,21 +104,31 @@ class MediaresourceResource extends Resource
             ]);
     }
 
+    public static function getBlueprintDataResourceModel(Media $media)
+    {
+        $blueprintData = BlueprintData::where('id', $media->model_id)->first();
+
+        return $blueprintData?->resourceModel; 
+    }
+
     public static function getBlueprintDataResourceUrl(Media $media): string
     {
 
         $blueprintData = BlueprintData::where('id', $media->model_id)->first();
 
         $resource = $blueprintData?->resourceModel;
-
-        return match ($resource::class) {
-            ContentEntry::class => route('filament-tenant.resources.contents.entries.edit', [
-                'ownerRecord' => $resource->content,
-                'record' => $resource,
-            ]),
-            BlockContent::class => route('filament-tenant.resources.pages.edit', ['record' => $resource->page]),
-            default => '/admin',
-        };
+        if ($resource) {
+            return match ($resource::class) {
+                ContentEntry::class => route('filament-tenant.resources.contents.entries.edit', [
+                    'ownerRecord' => $resource->content,
+                    'record' => $resource,
+                ]),
+                BlockContent::class => route('filament-tenant.resources.pages.edit', ['record' => $resource->page]),
+                default => '/admin',
+            };
+        }
+        
+        return '/admin';
 
     }
 

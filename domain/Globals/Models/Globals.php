@@ -44,6 +44,9 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  *
  * @mixin \Eloquent
  */
+#[
+    OnDeleteCascade(['blueprintData']),
+]
 class Globals extends Model
 {
     use ConstraintsRelationships;

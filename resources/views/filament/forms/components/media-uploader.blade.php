@@ -112,8 +112,11 @@
  
 
     <script>
+       
         document.addEventListener('DOMContentLoaded', () => {
+            
             document.addEventListener('click', function (event) {
+                console.log(event);
                 if (event.target.classList.contains('filepond--open-icon')) {
                     event.preventDefault();
 

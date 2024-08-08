@@ -217,6 +217,8 @@ class SchemaFormBuilder extends Component
         if ($mediaFieldData->reorder) {
             $media->enableReordering($mediaFieldData->reorder);
         }
+        
+        $media->enableOpen();
 
         $media->formatStateUsing(function (?array $state): array {
 
