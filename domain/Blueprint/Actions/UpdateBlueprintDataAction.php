@@ -77,13 +77,13 @@ class UpdateBlueprintDataAction
 
     private function updateBlueprintData(Model $model, BlueprintDataData $blueprintDataData): BlueprintData
     {
-        
+
         $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)
             ->where('model_type', $model->getMorphClass())
             ->where('state_path', $blueprintDataData->state_path)->first();
 
         if (! $blueprintData) {
-            
+
             $this->createBlueprintData->execute($model);
 
             return $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first() ?: new BlueprintData();

@@ -10,13 +10,20 @@ use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
+use Domain\Customer\Models\Customer;
+use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Page;
+use Domain\Product\Models\Product;
+use Domain\Service\Models\Service;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Models\MetaData;
@@ -66,21 +73,24 @@ class MediaresourceResource extends Resource
                         ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden bg-neutral-800 pb-8'])
                         ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
                     Tables\Columns\TextColumn::make('model_type')
-                    ->formatStateUsing(function ($record) {
+                        ->formatStateUsing(function ($record) {
 
-                        return match ($record->model_type){
-                            app(MetaData::class)->getMorphClass() => 'MetaData',
-                            app(Block::class)->getMorphClass() => 'Blocks',
-                            app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.class_basename(self::getBlueprintDataResourceModel($record)).')',
-                        };
-                        // return Str::upper($state);
-                    })->searchable(),
+                            return match ($record->model_type) {
+                                app(MetaData::class)->getMorphClass() => 'MetaData',
+                                app(Block::class)->getMorphClass() => 'Blocks',
+                                app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.BlueprintData::select(['id', 'model_type'])->where('id', $record->model_id)->first()?->model_type.')',
+                                default => Str::upper($record->model_type),
+                            };
+
+                        })->searchable(),
                     Tables\Columns\TextColumn::make('name')
                         ->url(function (Media $record) {
                             return match ($record->model_type) {
-                                app(MetaData::class)->getMorphClass() => '/pages',
+                                app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
                                 app(Block::class)->getMorphClass() => route('filament-tenant.resources.blocks.edit', ['record' => $record->model_id]),
                                 app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
+                                app(Service::class)->getMorphClass() => route('filament-tenant.resources.services.edit', ['record' => Service::find($record->model_id)]),
+                                app(Customer::class)->getMorphClass() => route('filament-tenant.resources.customers.edit', ['record' => Customer::find($record->model_id)]),
                                 default => '/admin',
                             };
                         })
@@ -104,12 +114,35 @@ class MediaresourceResource extends Resource
             ]);
     }
 
-    public static function getBlueprintDataResourceModel(Media $media)
+    public static function getMetaDataResourceModel(Media $media): string
     {
-        $blueprintData = BlueprintData::where('id', $media->model_id)->first();
+        $metaData = MetaData::where('id', $media->model_id)->first();
 
-        return $blueprintData?->resourceModel; 
+        $resource = $metaData?->resourceModel;
+        if ($resource) {
+            return match ($resource::class) {
+                ContentEntry::class => route('filament-tenant.resources.contents.entries.edit', [
+                    'ownerRecord' => $resource->content,
+                    'record' => $resource,
+                ]),
+                Page::class => route('filament-tenant.resources.pages.edit', ['record' => $resource]),
+                Product::class => route('filament-tenant.resources.products.edit', ['record' => $resource]),
+                Service::class => route('filament-tenant.resources.services.edit', ['record' => $resource]),
+                // TaxonomyTerm::class => route('filament-tenant.resources.taxonomies.edit', ['record' => $resource->taxonomy]),
+                // Globals::class => route('filament-tenant.resources.globals.edit', ['record' => $resource]),
+                default => '/admin',
+            };
+        }
+
+        return '/admin';
     }
+    // /** @return Model */
+    // public static function getBlueprintDataResourceModel(Media $media) : Model
+    // {
+    //     $blueprintData = BlueprintData::where('id', $media->model_id)->first();
+
+    //     return $blueprintData?->resourceModel;
+    // }
 
     public static function getBlueprintDataResourceUrl(Media $media): string
     {
@@ -124,10 +157,13 @@ class MediaresourceResource extends Resource
                     'record' => $resource,
                 ]),
                 BlockContent::class => route('filament-tenant.resources.pages.edit', ['record' => $resource->page]),
+                TaxonomyTerm::class => route('filament-tenant.resources.taxonomies.edit', ['record' => $resource->taxonomy]),
+                Globals::class => route('filament-tenant.resources.globals.edit', ['record' => $resource]),
+                Customer::class => route('filament-tenant.resources.customers.edit', ['record' => $resource]),
                 default => '/admin',
             };
         }
-        
+
         return '/admin';
 
     }
@@ -143,7 +179,6 @@ class MediaresourceResource extends Resource
     {
         return [
             'index' => Pages\ListMediaresources::route('/'),
-            'create' => Pages\CreateMediaresource::route('/create'),
             'edit' => Pages\EditMediaresource::route('/{record}/edit'),
         ];
     }

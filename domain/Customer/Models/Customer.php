@@ -107,7 +107,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  *
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['addresses','blueprintData'])]
+#[OnDeleteCascade(['addresses', 'blueprintData'])]
 class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMedia, MustVerifyEmail
 {
     use ConstraintsRelationships;
