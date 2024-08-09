@@ -75,7 +75,7 @@ class SyncMediaCollectionAction
             ->toMediaCollection($collection);
     }
 
-    protected function updateMedia(Media $media, array $customProperties = []): Media
+    public function updateMedia(Media $media, array $customProperties = []): Media
     {
         $media->custom_properties = $customProperties;
 

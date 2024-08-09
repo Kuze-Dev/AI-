@@ -7,7 +7,7 @@ namespace Support\RouteUrl\DataTransferObjects;
 class RouteUrlData
 {
     public function __construct(
-        public string $url,
+        public ?string $url,
         public bool $is_override,
     ) {
     }
@@ -15,7 +15,7 @@ class RouteUrlData
     public static function fromArray(array $data): self
     {
         return new self(
-            url: $data['url'],
+            url: $data['url'] ?? null,
             is_override: $data['is_override'] ?? false
         );
     }

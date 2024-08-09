@@ -80,6 +80,12 @@ class BlueprintData extends Model implements HasMedia
         return $this->morphTo();
     }
 
+    /** @return MorphTo<Model, self> */
+    public function resourceModel(): MorphTo
+    {
+        return $this->morphTo(__FUNCTION__, 'model_type', 'model_id');
+    }
+
     /** @var bool */
     public $registerMediaConversionsUsingModelInstance = true;
 
