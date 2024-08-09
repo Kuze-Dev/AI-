@@ -74,7 +74,7 @@ use Support\RouteUrl\HasRouteUrl;
  *
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
+#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls', 'blueprintData'])]
 class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlContact
 {
     use ConstraintsRelationships;

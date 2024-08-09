@@ -6,11 +6,13 @@ namespace Domain\Taxonomy\Actions;
 
 use Domain\Taxonomy\DataTransferObjects\TaxonomyData;
 use Domain\Taxonomy\Models\Taxonomy;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class UpdateTaxonomyAction
 {
     public function __construct(
         protected SyncTermTreeAction $syncTermAction,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
     ) {
     }
 
@@ -20,7 +22,13 @@ class UpdateTaxonomyAction
             'name' => $taxonomyData->name,
         ]);
 
+        if ($taxonomyData->has_route) {
+            $this->createOrUpdateRouteUrl->execute($taxonomy, $taxonomyData->route_url_data);
+        }
+
         $this->syncTermAction->execute($taxonomy, $taxonomyData->terms);
+
+        $taxonomy->sites()->sync($taxonomyData->sites);
 
         return $taxonomy;
     }

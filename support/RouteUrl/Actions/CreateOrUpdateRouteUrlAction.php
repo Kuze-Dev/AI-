@@ -20,6 +20,12 @@ class CreateOrUpdateRouteUrlAction
             $routeUrlData->url :
             $model::generateRouteUrl($model, $model->getAttributes());
 
+        if (is_null($url)) {
+
+            $url = $model::generateRouteUrl($model, $model->getAttributes());
+
+        }
+
         $url = Str::of($url)->trim('/')->prepend('/');
 
         /** @var ?RouteUrl $routeUrl */

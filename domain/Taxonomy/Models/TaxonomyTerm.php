@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Str;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Sluggable\HasSlug;
@@ -21,6 +22,8 @@ use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
+use Support\RouteUrl\HasRouteUrl;
 
 /**
  * Domain\Taxonomy\Models\TaxonomyTerm
@@ -41,6 +44,9 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
  * @property-read int|null $products_count
  * @property-read \Domain\Taxonomy\Models\Taxonomy $taxonomy
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $routeUrls
+ * @property-read int|null $route_urls_count
  *
  * @method static Builder|TaxonomyTerm newModelQuery()
  * @method static Builder|TaxonomyTerm newQuery()
@@ -59,12 +65,13 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @mixin \Eloquent
  */
 #[
-    OnDeleteCascade(['contentEntries', 'children']),
+    OnDeleteCascade(['contentEntries', 'children', 'blueprintData']),
     OnDeleteRestrict(['products'])
 ]
-class TaxonomyTerm extends Model implements Sortable
+class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
 {
     use ConstraintsRelationships;
+    use HasRouteUrl;
     use HasSlug;
     use SortableTrait;
 
@@ -78,6 +85,13 @@ class TaxonomyTerm extends Model implements Sortable
     ];
 
     protected $casts = ['data' => 'array'];
+
+    protected $appends = ['url'];
+
+    public function getUrlAttribute(): ?string
+    {
+        return $this->activeRouteUrl?->url ?: null;
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Taxonomy\Models\TaxonomyTerm> */
     public function taxonomy(): BelongsTo
@@ -143,5 +157,13 @@ class TaxonomyTerm extends Model implements Sortable
     public function buildSortQuery(): Builder
     {
         return static::query()->whereTaxonomyId($this->taxonomy_id)->whereParentId($this->parent_id);
+    }
+
+    public static function generateRouteUrl(Model $model, array $attributes): string
+    {
+        /** @var TaxonomyTerm */
+        $taxonomy = $model->load('taxonomy');
+
+        return $taxonomy->taxonomy->activeRouteUrl?->url.'/'.Str::of($attributes['name'])->slug()->toString();
     }
 }

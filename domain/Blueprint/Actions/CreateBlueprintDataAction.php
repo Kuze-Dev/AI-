@@ -15,6 +15,7 @@ use Domain\Globals\Models\Globals;
 use Domain\Page\Models\BlockContent;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class CreateBlueprintDataAction
 {
@@ -50,13 +51,24 @@ class CreateBlueprintDataAction
         if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
             if (is_array($blueprintDataData->value)) {
                 foreach ($blueprintDataData->value as $value) {
-                    $blueprintData->addMediaFromDisk($value, config('filament.default_filesystem_disk'))
-                        ->toMediaCollection('blueprint_media');
+                    if (Storage::disk(config('filament.default_filesystem_disk'))->exists($value)) {
+                        $blueprintData->addMediaFromDisk($value, config('filament.default_filesystem_disk'))
+                            ->toMediaCollection('blueprint_media');
+                    }
                 }
             } else {
                 $blueprintData->addMediaFromDisk($blueprintData->value, config('filament.default_filesystem_disk'))
                     ->toMediaCollection('blueprint_media');
             }
+
+            $existingMedia = $blueprintData->getMedia('blueprint_media')->pluck('uuid')->toArray();
+
+            $blueprintData->update([
+                'model_id' => $blueprintDataData->model_id,
+                'value' => json_encode($existingMedia),
+            ]);
+
+            $blueprintData->refresh();
         }
 
         return $blueprintData;

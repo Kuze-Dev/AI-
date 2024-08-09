@@ -15,6 +15,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
@@ -44,6 +45,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  *
  * @mixin \Eloquent
  */
+#[ OnDeleteCascade(['blueprintData']) ]
 class Globals extends Model
 {
     use ConstraintsRelationships;

@@ -11,6 +11,8 @@ use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Taxonomy\DataTransferObjects\TaxonomyTermData;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
+use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
 class SyncTermTreeAction
 {
@@ -19,6 +21,7 @@ class SyncTermTreeAction
     protected Taxonomy $taxonomy;
 
     public function __construct(
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
     ) {
     }
@@ -84,6 +87,9 @@ class SyncTermTreeAction
             'data' => $sanitizeData,
         ])->save();
 
+        if ($termData->url) {
+            $this->createOrUpdateRouteUrl->execute($term, new RouteUrlData($termData->url, $termData->is_custom));
+        }
         /** @var TaxonomyTerm */
         $model = TaxonomyTerm::with('taxonomy')->where('id', $term->id)->first();
 
