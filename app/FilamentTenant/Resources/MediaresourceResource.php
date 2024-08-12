@@ -73,28 +73,27 @@ class MediaresourceResource extends Resource
                         ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden bg-neutral-800 pb-8'])
                         ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
                     Tables\Columns\TextColumn::make('model_type')
-                        // ->formatStateUsing(function ($record) {
-
-                        //     return match ($record->model_type) {
-                        //         app(MetaData::class)->getMorphClass() => 'MetaData',
-                        //         app(Block::class)->getMorphClass() => 'Blocks',
-                        //         app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.BlueprintData::select(['id', 'model_type'])->where('id', $record->model_id)->first()?->model_type.')',
-                        //         default => Str::upper($record->model_type),
-                        //     };
-                        // })
+                        ->formatStateUsing(function ($record) {
+                            return match ($record->model_type) {
+                                app(MetaData::class)->getMorphClass() => 'MetaData',
+                                app(Block::class)->getMorphClass() => 'Blocks',
+                                app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.BlueprintData::select(['id', 'model_type'])->where('id', $record->model_id)->first()?->model_type.')',
+                                default => Str::upper($record->model_type),
+                            };
+                        })
                         ->searchable(),
                     Tables\Columns\TextColumn::make('name')
-                        // ->url(function (Media $record) {
-                        //     return match ($record->model_type) {
-                        //         app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
-                        //         app(Block::class)->getMorphClass() => route('filament-tenant.resources.blocks.edit', ['record' => $record->model_id]),
-                        //         app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
-                        //         app(Service::class)->getMorphClass() => route('filament-tenant.resources.services.edit', ['record' => Service::find($record->model_id)]),
-                        //         app(Customer::class)->getMorphClass() => route('filament-tenant.resources.customers.edit', ['record' => Customer::find($record->model_id)]),
-                        //         default => '/admin',
-                        //     };
-                        // })
-                        // ->openUrlInNewTab()
+                        ->url(function (Media $record) {
+                            return match ($record->model_type) {
+                                app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
+                                app(Block::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.blocks.edit', Block::find($record->model_id)),
+                                app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
+                                app(Service::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.services.edit', Service::find($record->model_id)),
+                                app(Customer::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.customers.edit', Customer::find($record->model_id)),
+                                default => '/admin',
+                            };
+                        })
+                        ->openUrlInNewTab()
                         ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden'])
                         ->translateLabel()
                         ->searchable()
@@ -112,6 +111,15 @@ class MediaresourceResource extends Resource
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
             ]);
+    }
+
+    public static function resolveModelUrl(string $routeName, ?Model $model): string
+    {
+        if ($model) {
+            return route($routeName, ['record' => $model]);
+        }
+
+        return '/admin';
     }
 
     public static function getMetaDataResourceModel(Media $media): string
@@ -156,10 +164,10 @@ class MediaresourceResource extends Resource
                     'ownerRecord' => $resource->content,
                     'record' => $resource,
                 ]),
-                BlockContent::class => route('filament-tenant.resources.pages.edit', ['record' => $resource->page]),
-                TaxonomyTerm::class => route('filament-tenant.resources.taxonomies.edit', ['record' => $resource->taxonomy]),
-                Globals::class => route('filament-tenant.resources.globals.edit', ['record' => $resource]),
-                Customer::class => route('filament-tenant.resources.customers.edit', ['record' => $resource]),
+                BlockContent::class => self::resolveModelUrl('filament-tenant.resources.pages.edit', $resource->page),
+                TaxonomyTerm::class => self::resolveModelUrl('filament-tenant.resources.taxonomies.edit', $resource->taxonomy),
+                Globals::class => self::resolveModelUrl('filament-tenant.resources.globals.edit', $resource),
+                Customer::class => self::resolveModelUrl('filament-tenant.resources.customers.edit', $resource),
                 default => '/admin',
             };
         }
