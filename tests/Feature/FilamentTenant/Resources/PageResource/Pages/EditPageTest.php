@@ -59,6 +59,9 @@ it('can render page', function () {
 });
 
 it('can edit page', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $page = PageFactory::new()
         ->addBlockContent(
             BlockFactory::new()
@@ -87,6 +90,8 @@ it('can edit page', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
+    $path = $metaDataImage->store('/', config('filament.default_filesystem_disk'));
+
     $updatedPage = livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
@@ -94,7 +99,7 @@ it('can edit page', function () {
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'visibility' => 'authenticated',
-            'meta_data.image.0' => $metaDataImage,
+            'meta_data.image.0' => $path,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -120,7 +125,6 @@ it('can edit page', function () {
     );
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
 
@@ -236,6 +240,9 @@ it('page block with default value column data must be dehydrated', function () {
 });
 
 it('can create page draft', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $page = PageFactory::new()
         ->addBlockContent(
             BlockFactory::new()
@@ -264,13 +271,15 @@ it('can create page draft', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
+    $path = $metaDataImage->store('/', config('filament.default_filesystem_disk'));
+
     livewire(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'name' => 'Test',
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'visibility' => 'authenticated',
-            'meta_data.image.0' => $metaDataImage,
+            'meta_data.image.0' => $path,
         ])
         ->call('draft')
         ->assertHasNoFormErrors()
@@ -296,7 +305,6 @@ it('can create page draft', function () {
     );
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
 
@@ -315,6 +323,9 @@ it('can create page draft', function () {
 });
 
 it('can overwrite page draft', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $page = PageFactory::new()
         ->addBlockContent(
             BlockFactory::new()
@@ -343,6 +354,8 @@ it('can overwrite page draft', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
+    $path = $metaDataImage->store('/', config('filament.default_filesystem_disk'));
+
     $initialDraft = $page->pageDraft()->create([
         'name' => $page->name.'v2',
         'visibility' => Visibility::AUTHENTICATED->value,
@@ -354,7 +367,7 @@ it('can overwrite page draft', function () {
             'block_contents.record-1.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'visibility' => 'authenticated',
-            'meta_data.image.0' => $metaDataImage,
+            'meta_data.image.0' => $path,
         ])
         ->call('overwriteDraft')
         ->assertHasNoFormErrors()
@@ -386,7 +399,6 @@ it('can overwrite page draft', function () {
     );
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
 
@@ -405,6 +417,9 @@ it('can overwrite page draft', function () {
 });
 
 it('can published page draft', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $page = PageFactory::new()
         ->addBlockContent(
             BlockFactory::new()
@@ -454,13 +469,15 @@ it('can published page draft', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
+    $path = $metaDataImage->store('/', config('filament.default_filesystem_disk'));
+
     livewire(EditPage::class, ['record' => $initialDraft->getRouteKey()])
         ->fillForm([
             'name' => 'published draft',
             'block_contents.record-2.data.main.header' => 'Bar',
             'meta_data' => $metaData,
             'visibility' => 'authenticated',
-            'meta_data.image.0' => $metaDataImage,
+            'meta_data.image.0' => $path,
         ])
         ->call('published')
         ->assertHasNoFormErrors()
@@ -491,7 +508,6 @@ it('can published page draft', function () {
     );
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
 
