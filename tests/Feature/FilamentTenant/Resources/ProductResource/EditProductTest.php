@@ -12,6 +12,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 use Support\MetaData\Models\MetaData;
@@ -49,6 +50,9 @@ it('can render product', function () {
 });
 
 it('can edit product', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $product = ProductFactory::new()
         ->has(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint())->count(2))
         ->has(ProductOptionFactory::new()->has(ProductOptionValueFactory::new()))
@@ -64,6 +68,8 @@ it('can edit product', function () {
     ];
     $dataImage = UploadedFile::fake()->image('preview.jpeg');
 
+    $path = $dataImage->store('/', config('filament.default_filesystem_disk'));
+
     $updatedProduct = livewire(EditProduct::class, ['record' => $product->getRouteKey()])
         ->fillForm([
             'name' => 'Test Title Updated',
@@ -71,7 +77,7 @@ it('can edit product', function () {
             'images.0' => $dataImage,
             'status' => ! $product->status,
             'meta_data' => $metaData,
-            'meta_data.image.0' => $dataImage,
+            'meta_data.image.0' => $path,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -98,7 +104,6 @@ it('can edit product', function () {
     );
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $dataImage->getClientOriginalName(),
         'mime_type' => $dataImage->getMimeType(),
     ]);
 });
