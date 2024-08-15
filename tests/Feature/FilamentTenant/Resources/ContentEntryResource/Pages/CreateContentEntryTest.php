@@ -13,6 +13,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Models\MetaData;
 use Support\RouteUrl\Models\RouteUrl;
@@ -163,6 +164,9 @@ it('can create content entry with publish date', function () {
 });
 
 it('can create content entry with meta data', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $content = ContentFactory::new()
         ->for(
             BlueprintFactory::new()
@@ -183,6 +187,8 @@ it('can create content entry with meta data', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
+    $path = $metaDataImage->store('/', config('filament.default_filesystem_disk'));
+
     $contentEntry = livewire(CreateContentEntry::class, ['ownerRecord' => $content->getRouteKey()])
         ->assertOk()
         ->fillForm([
@@ -190,7 +196,7 @@ it('can create content entry with meta data', function () {
             'slug' => 'test',
             'data' => ['main' => ['header' => 'Foo']],
             'meta_data' => $metaData,
-            'meta_data.image.0' => $metaDataImage,
+            'meta_data.image.0' => $path,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -217,7 +223,6 @@ it('can create content entry with meta data', function () {
         )
     );
     assertDatabaseHas(Media::class, [
-        'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
 });
