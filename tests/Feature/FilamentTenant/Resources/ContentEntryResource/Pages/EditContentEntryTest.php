@@ -13,6 +13,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 use Support\MetaData\Models\MetaData;
@@ -245,6 +246,9 @@ it('can edit content entry to have no taxonomy terms attached', function () {
 });
 
 it('can edit content entry meta data', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $blueprint = BlueprintFactory::new()
         ->addSchemaSection(['title' => 'Main'])
         ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT]);
@@ -279,6 +283,8 @@ it('can edit content entry meta data', function () {
     ];
     $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
 
+    $path = $metaDataImage->store('/', config('filament.default_filesystem_disk'));
+
     $updatedContentEntry = livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
         ->fillForm([
             'title' => 'Updated Foo',
@@ -288,7 +294,7 @@ it('can edit content entry meta data', function () {
                 $content->taxonomies->first()->id => $taxonomyTerms->pluck('id'),
             ],
             'meta_data' => $metaData,
-            'meta_data.image.0' => $metaDataImage,
+            'meta_data.image.0' => $path,
         ])
         ->call('save')
         ->assertOk()
@@ -313,7 +319,6 @@ it('can edit content entry meta data', function () {
     );
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
 

@@ -7,8 +7,10 @@ namespace Support\Common\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use League\Flysystem\UnableToCheckExistence;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -20,6 +22,7 @@ class SyncMediaCollectionAction
     /** @return MediaCollection<int, Media>|null  */
     public function execute(Model&HasMedia $model, MediaCollectionData $mediaCollectionData): ?MediaCollection
     {
+
         $media = collect($mediaCollectionData->media)
             ->map(function (MediaData $mediaData) use ($model, $mediaCollectionData) {
                 if ($mediaData->media instanceof UploadedFile) {
@@ -28,6 +31,24 @@ class SyncMediaCollectionAction
 
                 if (Str::isUrl($mediaData->media)) {
                     return $this->addMediaFromUrl($model, $mediaCollectionData->collection, $mediaData->media);
+                }
+
+                if (pathinfo($mediaData->media, PATHINFO_EXTENSION)) {
+
+                    $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                    if (! $storage->exists($mediaData->media)) {
+                        throw new UnableToCheckExistence();
+                    }
+
+                    /**
+                     * Ignore unknown addMediaFromDisk error for \Spatie\MediaLibrary\HasMedia interface
+                     *
+                     *  @phpstan-ignore-next-line
+                     * */
+                    return $model->addMediaFromDisk($mediaData->media, config('filament.default_filesystem_disk'))
+                        ->withCustomProperties($mediaData->custom_properties)
+                        ->toMediaCollection($mediaCollectionData->collection);
                 }
 
                 if (! Str::isUuid($mediaData->media)) {

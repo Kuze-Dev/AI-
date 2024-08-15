@@ -14,6 +14,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 
@@ -39,6 +40,9 @@ it('can render page', function () {
 });
 
 it('can create service', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
         ->createOne();
@@ -48,6 +52,8 @@ it('can create service', function () {
         ->createOne();
 
     $image = UploadedFile::fake()->image('preview.jpeg');
+
+    $path = $image->store('/', config('filament.default_filesystem_disk'));
 
     $metaData = [
         'title' => 'Test Title',
@@ -67,7 +73,7 @@ it('can create service', function () {
             'taxonomy_term_id' => $taxonomyTerm->id,
             'media.0' => $image,
             'meta_data' => $metaData,
-            'meta_data.image.0' => $image,
+            'meta_data.image.0' => $path,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -96,7 +102,6 @@ it('can create service', function () {
     );
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $image->getClientOriginalName(),
         'mime_type' => $image->getMimeType(),
     ]);
 });
