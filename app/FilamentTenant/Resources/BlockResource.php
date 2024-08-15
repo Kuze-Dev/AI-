@@ -39,42 +39,41 @@ class BlockResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form->schema([
-            Forms\Components\Card::make([
-                Forms\Components\TextInput::make('name')
-                    ->unique(ignoreRecord: true)
-                    ->string()
-                    ->maxLength(255)
-                    ->required(),
-                Forms\Components\TextInput::make('component')
-                    ->required()
-                    ->string()
-                    ->maxLength(255),
-                Forms\Components\Select::make('blueprint_id')
-                    ->label(trans('Blueprint'))
-                    ->required()
-                    ->preload()
-                    ->optionsFromModel(Blueprint::class, 'name')
-                    ->disabled(fn (?Block $record) => $record !== null)
-                    ->reactive(),
-                // Forms\Components\FileUpload::make('image')
-                //     ->mediaLibraryCollection('image')
-                //     ->image(),
-                \App\FilamentTenant\Support\MediaUploader::make('image')
-                    ->mediaLibraryCollection('image')
-                    ->enableOpen()
-                    ->image(),
-                Forms\Components\Toggle::make('is_fixed_content')
-                    ->inline(false)
-                    ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
-                    ->helperText('If enabled, the content below will serve as the default for all related pages')
-                    ->reactive(),
+        return $form
+            ->schema([
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('name')
+                        ->unique(ignoreRecord: true)
+                        ->string()
+                        ->maxLength(255)
+                        ->required(),
+                    Forms\Components\TextInput::make('component')
+                        ->required()
+                        ->string()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('blueprint_id')
+                        ->label(trans('Blueprint'))
+                        ->required()
+                        ->preload()
+                        ->optionsFromModel(Blueprint::class, 'name')
+                        ->disabled(fn (?Block $record) => $record !== null)
+                        ->reactive(),
+                    \App\FilamentTenant\Support\MediaUploader::make('image')
+                        ->mediaLibraryCollection('image')
+                        ->enableOpen()
+                        ->image(),
+                    Forms\Components\Toggle::make('is_fixed_content')
+                        ->inline(false)
+                        ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
+                        ->helperText('If enabled, the content below will serve as the default for all related pages')
+                        ->reactive(),
+                ])
+                    ->disabled(fn () => ! Auth::user()?->hasRole(config('domain.role.super_admin'))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->hidden(fn (Closure $get) => $get('is_fixed_content') ? false : true)
                     ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
-            ]),
-        ]);
+            ]);
     }
 
     /** @throws Exception */
