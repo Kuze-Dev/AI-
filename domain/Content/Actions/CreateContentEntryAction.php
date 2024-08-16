@@ -33,6 +33,7 @@ class CreateContentEntryAction
                 'author_id' => $contentEntryData->author_id,
                 'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
                 'order' => $content->is_sortable ? $content->contentEntries->count() + 1 : null,
+                'status' => $contentEntryData->status,
             ]);
 
         $this->createMetaData->execute($contentEntry, $contentEntryData->meta_data);

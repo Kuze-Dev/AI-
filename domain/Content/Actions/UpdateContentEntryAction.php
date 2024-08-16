@@ -42,6 +42,7 @@ class UpdateContentEntryAction
             'published_at' => $contentEntryData->published_at,
             'data' => $sanitizeData,
             'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
+            'status' => $contentEntryData->status,
         ]);
 
         $contentEntry->metaData()->exists()

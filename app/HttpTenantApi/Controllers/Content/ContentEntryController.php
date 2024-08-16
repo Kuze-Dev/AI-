@@ -27,7 +27,9 @@ class ContentEntryController
     public function index(Content $content): JsonApiResourceCollection
     {
         return ContentEntryResource::collection(
-            QueryBuilder::for($content->contentEntries()->with(['content.blueprint', 'activeRouteUrl', 'blueprintData']))
+            QueryBuilder::for($content->contentEntries()
+                ->where('status', true)
+                ->with(['content.blueprint', 'activeRouteUrl', 'blueprintData']))
                 ->allowedFilters([
                     'title',
                     'slug',
@@ -86,6 +88,7 @@ class ContentEntryController
         return ContentEntryResource::make(
             QueryBuilder::for(
                 ContentEntry::whereSlug($contentEntry)
+                    ->where('status', true)
                     ->whereRelation('content', 'slug', $content)
             )
                 ->allowedIncludes([
