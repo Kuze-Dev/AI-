@@ -30,6 +30,7 @@ class PublishedContentEntryDraftAction
             'title' => $contentEntryData->title,
             'published_at' => $contentEntryData->published_at,
             'data' => $contentEntryData->data,
+            'status' => $contentEntryData->status,
             'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
         ]);
 
