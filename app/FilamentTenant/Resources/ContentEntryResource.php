@@ -222,9 +222,16 @@ class ContentEntryResource extends Resource
                         ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
                     SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                 ])->columnSpan(2),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make(trans('Status'))
+                            ->schema([
+                                Forms\Components\Toggle::make('status')
+                                    ->helperText('If disabled, this content will not be accessible on the website.'),
 
-                MetaDataForm::make('Meta Data')
-                    ->columnSpan(1),
+                            ]),
+                        MetaDataForm::make('Meta Data'),
+                    ])->columnSpan(1),
 
             ])
             ->columns(3);
