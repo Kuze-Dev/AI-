@@ -90,7 +90,16 @@ class UpdateBlueprintDataAction
         }
 
         if ($blueprintData->type == FieldType::MEDIA->value) {
+
             if (! $blueprintDataData->value) {
+
+                $blueprintData->clearMediaCollection('blueprint_media');
+
+                $blueprintData->update([
+                    'model_id' => $blueprintDataData->model_id,
+                    'value' => $blueprintDataData->value,
+                ]);
+
                 return $blueprintData;
             }
 
