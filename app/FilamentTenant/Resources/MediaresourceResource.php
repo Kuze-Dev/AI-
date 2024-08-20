@@ -71,6 +71,12 @@ class MediaresourceResource extends Resource
             ->columns([
                 Tables\Columns\Layout\Stack::make([
                     Tables\Columns\ImageColumn::make('original_url')
+                        ->getStateUsing(function ($record) {
+                            return match ($record->getTypeFromMime()) {
+                                'image' => $record->original_url,
+                                default => 'https://dummyimage.com/600x400/000/fff&text='.$record->getTypeFromMime(),
+                            };
+                        })
                         ->height(200)
                         ->width('100%')
                         ->extraAttributes(['class' => 'rounded-lg w-full overflow-hidden bg-neutral-800'])
