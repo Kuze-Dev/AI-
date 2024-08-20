@@ -15,8 +15,10 @@ use Domain\Globals\Models\Globals;
 use Domain\Page\Models\Block;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
+use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Product\Models\Product;
 use Domain\Service\Models\Service;
+use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -69,8 +71,9 @@ class MediaresourceResource extends Resource
             ->columns([
                 Tables\Columns\Layout\Stack::make([
                     Tables\Columns\ImageColumn::make('original_url')
-                        ->size('100%')
-                        ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden bg-neutral-800 pb-8'])
+                        ->height(200)
+                        ->width('100%')
+                        ->extraAttributes(['class' => 'rounded-lg w-full overflow-hidden bg-neutral-800'])
                         ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
                     Tables\Columns\TextColumn::make('model_type')
                         ->formatStateUsing(function ($record) {
@@ -90,6 +93,9 @@ class MediaresourceResource extends Resource
                                 app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
                                 app(Service::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.services.edit', Service::find($record->model_id)),
                                 app(Customer::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.customers.edit', Customer::find($record->model_id)),
+                                app(PaymentMethod::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.payment-methods.edit', PaymentMethod::find($record->model_id)),
+                                app(Product::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.products.edit', Product::find($record->model_id)),
+                                app(ShippingMethod::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.shipping-methods.edit', ShippingMethod::find($record->model_id)),
                                 default => '/admin',
                             };
                         })
