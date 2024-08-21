@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('contents', function (Blueprint $table) {
-            //
+            $table->string('visibility')->default('public');
         });
     }
 
@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('contents', function (Blueprint $table) {
-            //
+            $table->dropColumn('visibility');
         });
     }
 };

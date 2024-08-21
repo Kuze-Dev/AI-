@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Controllers\Content;
 use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentResource;
 use Domain\Content\Models\Content;
+use Domain\Page\Enums\Visibility;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -22,10 +23,12 @@ class ContentController
     public function index(): JsonApiResourceCollection
     {
         return ContentResource::collection(
-            QueryBuilder::for(Content::query())
+            QueryBuilder::for(Content::query()
+                ->where('visibility', '!=', Visibility::AUTHENTICATED->value)
+            )
                 ->allowedIncludes([
-                    'taxonomies',
-                ])
+                'taxonomies',
+            ])
                 ->allowedFilters(['name', 'slug', 'prefix', AllowedFilter::exact('sites.id')])
                 ->jsonPaginate()
         );
@@ -34,10 +37,13 @@ class ContentController
     public function show(string $content): ContentResource
     {
         return ContentResource::make(
-            QueryBuilder::for(Content::whereSlug($content))
+            QueryBuilder::for(
+                Content::whereSlug($content)
+                    ->where('visibility', '!=', Visibility::AUTHENTICATED->value)
+            )
                 ->allowedIncludes([
-                    'taxonomies',
-                ])
+                'taxonomies',
+            ])
                 ->firstOrFail()
         );
     }

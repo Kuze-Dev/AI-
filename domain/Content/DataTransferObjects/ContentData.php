@@ -12,6 +12,7 @@ class ContentData
         public readonly string $name,
         public readonly string $blueprint_id,
         public readonly string $prefix,
+        public readonly string $visibility,
         public readonly array $taxonomies = [],
         public readonly ?PublishBehavior $past_publish_date_behavior = null,
         public readonly ?PublishBehavior $future_publish_date_behavior = null,

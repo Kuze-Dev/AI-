@@ -14,16 +14,18 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Prefix;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
-    ApiResource('contents.entries', only: ['index', 'show'], parameters: ['entries' => 'contentEntry']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Prefix('v2'),
+    Middleware(['feature.tenant:'.CMSBase::class, 'auth:sanctum'])
 ]
-class ContentEntryController
+class ContentEntryV2Controller
 {
+    #[Get('/contents/{content}/entries', name: 'v2.contents.entries.index')]
     public function index(Content $content): JsonApiResourceCollection
     {
         return ContentEntryResource::collection(
@@ -83,6 +85,7 @@ class ContentEntryController
         );
     }
 
+    #[Get('/contents/{content}/entries/{contentEntry}', name: 'v2.contents.entries.show')]
     public function show(string $content, string $contentEntry): ContentEntryResource
     {
         return ContentEntryResource::make(

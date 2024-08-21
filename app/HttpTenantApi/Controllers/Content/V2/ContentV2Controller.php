@@ -9,16 +9,18 @@ use App\HttpTenantApi\Resources\ContentResource;
 use Domain\Content\Models\Content;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Prefix;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
-    ApiResource('contents', only: ['index', 'show']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Prefix('v2'),
+    Middleware(['feature.tenant:'.CMSBase::class, 'auth:sanctum'])
 ]
-class ContentController
+class ContentV2Controller
 {
+    #[Get('/contents', name: 'v2.contents.index')]
     public function index(): JsonApiResourceCollection
     {
         return ContentResource::collection(
@@ -31,6 +33,7 @@ class ContentController
         );
     }
 
+    #[Get('/contents/{content}', name: 'v2.contents.show')]
     public function show(string $content): ContentResource
     {
         return ContentResource::make(

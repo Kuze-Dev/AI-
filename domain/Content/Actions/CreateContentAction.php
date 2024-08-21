@@ -15,6 +15,7 @@ class CreateContentAction
         $content = Content::create([
             'name' => $contentData->name,
             'prefix' => $contentData->prefix,
+            'visibility' => $contentData->visibility,
             'blueprint_id' => $contentData->blueprint_id,
             'past_publish_date_behavior' => $contentData->past_publish_date_behavior,
             'future_publish_date_behavior' => $contentData->future_publish_date_behavior,

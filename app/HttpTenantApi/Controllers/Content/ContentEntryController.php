@@ -10,6 +10,7 @@ use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Page\Enums\Visibility;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -28,56 +29,58 @@ class ContentEntryController
     {
         return ContentEntryResource::collection(
             QueryBuilder::for($content->contentEntries()
+                ->with(['content.blueprint', 'activeRouteUrl', 'blueprintData', 'content'])
                 ->where('status', true)
-                ->with(['content.blueprint', 'activeRouteUrl', 'blueprintData']))
+                ->whereRelation('content', 'visibility', '!=', Visibility::AUTHENTICATED->value)
+            )
                 ->allowedFilters([
-                    'title',
-                    'slug',
-                    AllowedFilter::callback(
-                        'publish_status',
-                        fn (ContentEntryBuilder $query, $value) => $query->wherePublishStatus(PublishBehavior::tryFrom($value))
-                    ),
-                    AllowedFilter::callback(
-                        'published_at_start',
-                        fn (ContentEntryBuilder $query, $value) => $query->wherePublishedAtRange(publishedAtStart: Carbon::parse($value))
-                    ),
-                    AllowedFilter::callback(
-                        'published_at_end',
-                        fn (ContentEntryBuilder $query, $value) => $query->wherePublishedAtRange(publishedAtEnd: Carbon::parse($value))
-                    ),
-                    AllowedFilter::callback(
-                        'published_at_year_month',
-                        function (ContentEntryBuilder $query, string|array $value) {
-                            $value = Arr::wrap($value);
+                'title',
+                'slug',
+                AllowedFilter::callback(
+                    'publish_status',
+                    fn (ContentEntryBuilder $query, $value) => $query->wherePublishStatus(PublishBehavior::tryFrom($value))
+                ),
+                AllowedFilter::callback(
+                    'published_at_start',
+                    fn (ContentEntryBuilder $query, $value) => $query->wherePublishedAtRange(publishedAtStart: Carbon::parse($value))
+                ),
+                AllowedFilter::callback(
+                    'published_at_end',
+                    fn (ContentEntryBuilder $query, $value) => $query->wherePublishedAtRange(publishedAtEnd: Carbon::parse($value))
+                ),
+                AllowedFilter::callback(
+                    'published_at_year_month',
+                    function (ContentEntryBuilder $query, string|array $value) {
+                        $value = Arr::wrap($value);
 
-                            $year = (int) $value[0];
-                            $month = filled($value[1] ?? null) ? (int) $value[1] : null;
+                        $year = (int) $value[0];
+                        $month = filled($value[1] ?? null) ? (int) $value[1] : null;
 
-                            $query->wherePublishedAtYearMonth($year, $month);
-                        },
-                    ),
-                    AllowedFilter::callback(
-                        'taxonomies',
-                        function (ContentEntryBuilder $query, array $value) {
-                            foreach ($value as $taxonomySlug => $taxonomyTermSlugs) {
-                                if (filled($taxonomyTermSlugs)) {
-                                    $query->whereTaxonomyTerms($taxonomySlug, Arr::wrap($taxonomyTermSlugs));
-                                }
+                        $query->wherePublishedAtYearMonth($year, $month);
+                    },
+                ),
+                AllowedFilter::callback(
+                    'taxonomies',
+                    function (ContentEntryBuilder $query, array $value) {
+                        foreach ($value as $taxonomySlug => $taxonomyTermSlugs) {
+                            if (filled($taxonomyTermSlugs)) {
+                                $query->whereTaxonomyTerms($taxonomySlug, Arr::wrap($taxonomyTermSlugs));
                             }
                         }
-                    ),
-                    AllowedFilter::exact('sites.id'),
-                ])
+                    }
+                ),
+                AllowedFilter::exact('sites.id'),
+            ])
                 ->allowedSorts([
-                    'order',
-                    'title',
-                    'published_at',
+                'order',
+                'title',
+                'published_at',
                 ])
                 ->allowedIncludes([
-                    'taxonomyTerms.taxonomy',
-                    'routeUrls',
-                    'metaData',
-                    'blueprintData.media',
+                'taxonomyTerms.taxonomy',
+                'routeUrls',
+                'metaData',
+                'blueprintData.media',
                 ])
                 ->jsonPaginate()
         );
@@ -89,6 +92,7 @@ class ContentEntryController
             QueryBuilder::for(
                 ContentEntry::whereSlug($contentEntry)
                     ->where('status', true)
+                    ->whereRelation('content', 'visibility', '!=', Visibility::AUTHENTICATED->value)
                     ->whereRelation('content', 'slug', $content)
             )
                 ->allowedIncludes([
