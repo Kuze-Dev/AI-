@@ -31,6 +31,8 @@ class TaxonomyTermResource extends JsonApiResource
     {
         return [
             'children' => fn () => TaxonomyTermResource::collection($this->children),
+            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
+            'taxonomy' => fn () => TaxonomyResource::make($this->taxonomy),
         ];
     }
 
