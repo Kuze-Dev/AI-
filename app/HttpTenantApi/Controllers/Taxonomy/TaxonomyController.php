@@ -47,6 +47,7 @@ class TaxonomyController
                     'parentTerms.taxonomy',
                     'taxonomyTerms.children',
                     'taxonomyTerms.taxonomy',
+                    'taxonomyTerms.blueprintData',
                 ])
                 ->firstOrFail()
         );
