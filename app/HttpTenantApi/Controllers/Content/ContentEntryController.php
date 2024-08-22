@@ -27,6 +27,11 @@ class ContentEntryController
 {
     public function index(Content $content): JsonApiResourceCollection
     {
+        abort_if(
+            $content->visibility === Visibility::AUTHENTICATED->value,
+            403
+        );
+
         return ContentEntryResource::collection(
             QueryBuilder::for($content->contentEntries()
                 ->with(['content.blueprint', 'activeRouteUrl', 'blueprintData', 'content'])
