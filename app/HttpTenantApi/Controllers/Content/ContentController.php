@@ -27,8 +27,8 @@ class ContentController
                 ->where('visibility', '!=', Visibility::AUTHENTICATED->value)
             )
                 ->allowedIncludes([
-                'taxonomies',
-            ])
+                    'taxonomies',
+                ])
                 ->allowedFilters(['name', 'slug', 'prefix', AllowedFilter::exact('sites.id')])
                 ->jsonPaginate()
         );
@@ -42,8 +42,8 @@ class ContentController
                     ->where('visibility', '!=', Visibility::AUTHENTICATED->value)
             )
                 ->allowedIncludes([
-                'taxonomies',
-            ])
+                    'taxonomies',
+                ])
                 ->firstOrFail()
         );
     }
