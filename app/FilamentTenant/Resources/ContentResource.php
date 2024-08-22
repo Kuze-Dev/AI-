@@ -12,6 +12,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Actions\DeleteContentAction;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Content;
+use Domain\Page\Enums\Visibility;
 use Domain\Site\Models\Site;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Forms;
@@ -133,6 +134,16 @@ class ContentResource extends Resource
                             ->helperText(trans('Grants option for ordering of content entries'))
                             ->reactive(),
                     ]),
+                    Forms\Components\Select::make('visibility')
+                        ->options(
+                            collect(Visibility::cases())
+                                ->mapWithKeys(fn (Visibility $visibility) => [
+                                    $visibility->value => Str::headline($visibility->value),
+                                ])
+                                ->toArray()
+                        )
+                        ->default(Visibility::PUBLIC->value)
+                        ->required(),
 
                     Forms\Components\Card::make([
                         // Forms\Components\CheckboxList::make('sites')

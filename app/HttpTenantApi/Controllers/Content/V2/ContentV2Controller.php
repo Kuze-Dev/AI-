@@ -2,30 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Content;
+namespace App\HttpTenantApi\Controllers\Content\V2;
 
 use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentResource;
 use Domain\Content\Models\Content;
-use Domain\Page\Enums\Visibility;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Prefix;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
-    ApiResource('contents', only: ['index', 'show']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Prefix('v2'),
+    Middleware(['feature.tenant:'.CMSBase::class, 'auth:sanctum'])
 ]
-class ContentController
+class ContentV2Controller
 {
+    #[Get('/contents', name: 'v2.contents.index')]
     public function index(): JsonApiResourceCollection
     {
         return ContentResource::collection(
-            QueryBuilder::for(Content::query()
-                ->where('visibility', '!=', Visibility::AUTHENTICATED->value)
-            )
+            QueryBuilder::for(Content::query())
                 ->allowedIncludes([
                     'taxonomies',
                 ])
@@ -34,13 +33,11 @@ class ContentController
         );
     }
 
+    #[Get('/contents/{content}', name: 'v2.contents.show')]
     public function show(string $content): ContentResource
     {
         return ContentResource::make(
-            QueryBuilder::for(
-                Content::whereSlug($content)
-                    ->where('visibility', '!=', Visibility::AUTHENTICATED->value)
-            )
+            QueryBuilder::for(Content::whereSlug($content))
                 ->allowedIncludes([
                     'taxonomies',
                 ])
