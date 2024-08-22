@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Content;
+namespace App\HttpTenantApi\Controllers\Content\V2;
 
 use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentEntryResource;
@@ -10,29 +10,28 @@ use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
-use Domain\Page\Enums\Visibility;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\RouteAttributes\Attributes\ApiResource;
+use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
+use Spatie\RouteAttributes\Attributes\Prefix;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
-    ApiResource('contents.entries', only: ['index', 'show'], parameters: ['entries' => 'contentEntry']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Prefix('v2'),
+    Middleware(['feature.tenant:'.CMSBase::class, 'auth:sanctum'])
 ]
-class ContentEntryController
+class ContentEntryV2Controller
 {
+    #[Get('/contents/{content}/entries', name: 'v2.contents.entries.index')]
     public function index(Content $content): JsonApiResourceCollection
     {
         return ContentEntryResource::collection(
             QueryBuilder::for($content->contentEntries()
-                ->with(['content.blueprint', 'activeRouteUrl', 'blueprintData', 'content'])
                 ->where('status', true)
-                ->whereRelation('content', 'visibility', '!=', Visibility::AUTHENTICATED->value)
-            )
+                ->with(['content.blueprint', 'activeRouteUrl', 'blueprintData']))
                 ->allowedFilters([
                     'title',
                     'slug',
@@ -86,13 +85,13 @@ class ContentEntryController
         );
     }
 
+    #[Get('/contents/{content}/entries/{contentEntry}', name: 'v2.contents.entries.show')]
     public function show(string $content, string $contentEntry): ContentEntryResource
     {
         return ContentEntryResource::make(
             QueryBuilder::for(
                 ContentEntry::whereSlug($contentEntry)
                     ->where('status', true)
-                    ->whereRelation('content', 'visibility', '!=', Visibility::AUTHENTICATED->value)
                     ->whereRelation('content', 'slug', $content)
             )
                 ->allowedIncludes([
