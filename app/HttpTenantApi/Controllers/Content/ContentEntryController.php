@@ -88,6 +88,14 @@ class ContentEntryController
 
     public function show(string $content, string $contentEntry): ContentEntryResource
     {
+
+        $contentModel = Content::whereSlug($content)->firstOrFail();
+
+        abort_if(
+            $contentModel->visibility === Visibility::AUTHENTICATED->value,
+            403
+        );
+
         return ContentEntryResource::make(
             QueryBuilder::for(
                 ContentEntry::whereSlug($contentEntry)
