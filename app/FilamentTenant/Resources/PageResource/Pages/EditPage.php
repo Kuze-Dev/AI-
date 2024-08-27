@@ -10,6 +10,7 @@ use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
 use Closure;
+use Domain\Internationalization\Models\Locale;
 use Domain\Page\Actions\CreatePageDraftAction;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Actions\PublishedPageDraftAction;
@@ -19,6 +20,7 @@ use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Exception;
 use Filament\Forms\Components\Radio;
+use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
@@ -98,6 +100,22 @@ class EditPage extends EditRecord
             }),
             Actions\DeleteAction::make(),
             'other_page_actions' => CustomPageActionGroup::make([
+                Action::make('createTranslation')
+                    ->color('secondary')
+                    ->slideOver(true)
+                    ->action(function (Action $action, array $data): void {
+
+                       dd($data);
+                    })
+                    ->form([
+                        Forms\Components\Select::make('locale')
+                        ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                        ->default((string) Locale::where('is_default', true)->first()?->code)
+                        ->searchable()
+                        ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                        ->reactive()
+                        ->required(),
+                    ]),
                 Action::make('preview')
                     ->color('secondary')
                     ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
