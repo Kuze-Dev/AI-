@@ -143,6 +143,7 @@ class ContentResource extends Resource
                                 ->toArray()
                         )
                         ->default(Visibility::PUBLIC->value)
+                        ->hidden(fn () => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class))
                         ->required(),
 
                     Forms\Components\Card::make([

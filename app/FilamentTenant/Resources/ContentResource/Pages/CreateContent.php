@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Actions\CreateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Enums\PublishBehavior;
+use Domain\Page\Enums\Visibility;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -48,7 +49,7 @@ class CreateContent extends CreateRecord
                     taxonomies: $data['taxonomies'],
                     blueprint_id: $data['blueprint_id'],
                     is_sortable: $data['is_sortable'],
-                    visibility: $data['visibility'],
+                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
                     prefix: $data['prefix'],
