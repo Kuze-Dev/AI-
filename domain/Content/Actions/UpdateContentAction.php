@@ -18,6 +18,7 @@ class UpdateContentAction
         $content->update([
             'name' => $contentData->name,
             'prefix' => $contentData->prefix,
+            'visibility' => $contentData->visibility,
             'past_publish_date_behavior' => $contentData->past_publish_date_behavior,
             'future_publish_date_behavior' => $contentData->future_publish_date_behavior,
             'is_sortable' => $contentData->is_sortable,

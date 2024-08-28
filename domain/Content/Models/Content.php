@@ -29,6 +29,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $name
  * @property string $slug
  * @property string $prefix
+ * @property string $visibility
  * @property PublishBehavior|null $future_publish_date_behavior
  * @property PublishBehavior|null $past_publish_date_behavior
  * @property bool $is_sortable
@@ -78,6 +79,7 @@ class Content extends Model
         'blueprint_id',
         'slug',
         'prefix',
+        'visibility',
         'past_publish_date_behavior',
         'future_publish_date_behavior',
         'is_sortable',

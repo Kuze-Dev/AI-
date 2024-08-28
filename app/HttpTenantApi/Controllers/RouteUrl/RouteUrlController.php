@@ -7,8 +7,14 @@ namespace App\HttpTenantApi\Controllers\RouteUrl;
 use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
+use App\HttpTenantApi\Resources\TaxonomyResource;
+use App\HttpTenantApi\Resources\TaxonomyTermResource;
+use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Spatie\RouteAttributes\Attributes\Get;
@@ -26,6 +32,13 @@ class RouteUrlController
     ]
     public function __invoke(string $url = ''): JsonApiResource
     {
+        /** @var array */
+        $notDraftableModels = [
+            app(Taxonomy::class)->getMorphClass(),
+            app(TaxonomyTerm::class)->getMorphClass(),
+        ];
+
+        /** @var \Illuminate\Database\Eloquent\Builder<RouteUrl> */
         $queryRouteUrl = RouteUrl::whereUrl(Str::start($url, '/'))
             ->with('model');
 
@@ -42,16 +55,34 @@ class RouteUrlController
 
         }
 
-        $queryRouteUrl->whereHas('model', function ($query) {
-            return $query->where('draftable_id', null);
+        $queryRouteUrl->whereHas('model', function ($query) use ($notDraftableModels) {
+
+            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels)) {
+
+                return $query->where('draftable_id', null);
+            }
+
+            return $query;
         });
 
         $routeUrl = $queryRouteUrl->firstOrFail();
 
         return match ($routeUrl->model::class) {
             Page::class => PageResource::make($routeUrl->model),
-            ContentEntry::class => ContentEntryResource::make($routeUrl->model),
+            ContentEntry::class => $this->handleContentEntryResource($routeUrl->model),
+            Taxonomy::class => TaxonomyResource::make($routeUrl->model),
+            TaxonomyTerm::class => TaxonomyTermResource::make($routeUrl->model),
             default => throw new InvalidArgumentException('No resource found for model '.$routeUrl->model::class),
         };
+    }
+
+    private function handleContentEntryResource(ContentEntry $contentEntry): ContentEntryResource
+    {
+        /** @var \Domain\Content\Models\Content */
+        $content = Content::whereId($contentEntry->content_id)->firstOrFail();
+
+        abort_if($content->visibility === Visibility::AUTHENTICATED->value, 403);
+
+        return ContentEntryResource::make($contentEntry);
     }
 }

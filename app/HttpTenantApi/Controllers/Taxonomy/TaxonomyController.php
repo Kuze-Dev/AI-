@@ -36,12 +36,18 @@ class TaxonomyController
     public function show(string $taxonomy): TaxonomyResource
     {
         return TaxonomyResource::make(
-            QueryBuilder::for(Taxonomy::whereSlug($taxonomy))
+            QueryBuilder::for(Taxonomy::with([
+                'parentTerms.children',
+                'parentTerms.taxonomy',
+                'taxonomyTerms.children',
+                'taxonomyTerms.taxonomy',
+            ])->whereSlug($taxonomy))
                 ->allowedIncludes([
                     'parentTerms.children',
                     'parentTerms.taxonomy',
                     'taxonomyTerms.children',
                     'taxonomyTerms.taxonomy',
+                    'taxonomyTerms.blueprintData',
                 ])
                 ->firstOrFail()
         );

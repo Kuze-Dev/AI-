@@ -50,6 +50,8 @@ class EditCustomerAction
                     new MediaData(media: $customerData->image),
                 ],
             ));
+        } else {
+            $customer->clearMediaCollection('image');
         }
 
         if ($customer->wasChanged('email')) {

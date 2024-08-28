@@ -75,7 +75,7 @@ class UpdateOrderPaymentAction
         }
 
         if (Str::contains($proofOfPayment, 'tmp/')) {
-            if (Storage::disk('s3')->exists($proofOfPayment)) {
+            if (Storage::disk(config('filament.default_filesystem_disk'))->exists($proofOfPayment)) {
 
                 $image = $this->convertUrlToUploadedFile($proofOfPayment);
 
@@ -140,7 +140,7 @@ class UpdateOrderPaymentAction
 
     private function convertUrlToUploadedFile(string $url): UploadedFile|string
     {
-        $fileContent = Storage::disk('s3')->get($url);
+        $fileContent = Storage::disk(config('filament.default_filesystem_disk'))->get($url);
 
         $tempFilePath = (string) tempnam(sys_get_temp_dir(), 'upload');
 

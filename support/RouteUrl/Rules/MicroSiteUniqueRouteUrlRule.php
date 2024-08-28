@@ -7,6 +7,8 @@ namespace Support\RouteUrl\Rules;
 use Closure;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Models\Page;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Support\RouteUrl\Contracts\HasRouteUrl;
@@ -36,7 +38,18 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
             return $r->where('url', $this->route_url['url']);
         })->pluck('id')->toArray();
 
-        $pagesIds = array_merge($pages, $contentEntriesIds);
+        $taxonomyIds = Taxonomy::select('id')->wherehas('sites', function ($q) use ($value) {
+            return $q->whereIn('site_id', $value);
+        })->wherehas('routeUrls', function ($r) {
+            return $r->where('url', $this->route_url['url']);
+        })->pluck('id')->toArray();
+
+        $taxonomyTermsId = TaxonomyTerm::select('id')
+            ->wherehas('routeUrls', function ($r) {
+                return $r->where('url', $this->route_url['url']);
+            })->pluck('id')->toArray();
+
+        $pagesIds = array_merge($pages, $contentEntriesIds, $taxonomyIds, $taxonomyTermsId);
 
         $query = RouteUrl::whereUrl($this->route_url['url'])->whereIn('model_id', $pagesIds);
 

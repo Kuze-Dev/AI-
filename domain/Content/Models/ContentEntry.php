@@ -39,6 +39,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @property string|null $draftable_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
+ * @property bool $status
  * @property int|null $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -74,7 +75,7 @@ use Support\RouteUrl\HasRouteUrl;
  *
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
+#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls', 'blueprintData'])]
 class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlContact
 {
     use ConstraintsRelationships;
@@ -96,6 +97,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         'author_id',
         'published_at',
         'locale',
+        'status',
     ];
 
     /**

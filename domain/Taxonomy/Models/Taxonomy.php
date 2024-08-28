@@ -6,10 +6,12 @@ namespace Domain\Taxonomy\Models;
 
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
+use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -18,6 +20,8 @@ use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
+use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
+use Support\RouteUrl\HasRouteUrl;
 
 /**
  * Domain\Taxonomy\Models\Taxonomy
@@ -54,11 +58,13 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
     OnDeleteCascade(['taxonomyTerms']),
     OnDeleteRestrict(['contents'])
 ]
-class Taxonomy extends Model
+class Taxonomy extends Model implements HasRouteUrlContract
 {
     use ConstraintsRelationships;
+    use HasRouteUrl;
     use HasSlug;
     use LogsActivity;
+    use Sites;
 
     protected $fillable = [
         'name',
@@ -115,5 +121,10 @@ class Taxonomy extends Model
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    public static function generateRouteUrl(Model $model, array $attributes): string
+    {
+        return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 }

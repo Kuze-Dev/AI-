@@ -37,6 +37,7 @@ it('can create content', function () {
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
             'prefix' => 'test-content',
+            'visibility' => 'public',
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -66,6 +67,7 @@ it('can create content with taxonomies', function () {
     livewire(CreateContent::class)
         ->fillForm([
             'name' => 'Test Content',
+            'visibility' => 'public',
             'blueprint_id' => $blueprint->getKey(),
             'taxonomies' => $taxonomies->pluck('id')->toArray(),
         ])

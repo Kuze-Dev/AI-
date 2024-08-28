@@ -40,7 +40,9 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
+use League\Flysystem\UnableToCheckFileExistence;
 use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -108,8 +110,7 @@ class SchemaFormBuilder extends Component
             FileFieldData::class => $this->makeFileUploadComponent($field),
             MarkdownFieldData::class => MarkdownEditor::make($field->state_name)
                 ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons)),
-            RichtextFieldData::class => RichEditor::make($field->state_name)
-                ->toolbarButtons(array_map(fn (RichtextButton $button) => $button->value, $field->buttons)),
+            RichtextFieldData::class => $this->makeRichTextComponent($field),
             SelectFieldData::class => Select::make($field->state_name)
                 ->options(Arr::pluck($field->options, 'label', 'value'))
                 ->multiple($field->multiple),
@@ -196,9 +197,9 @@ class SchemaFormBuilder extends Component
         return $fileUpload;
     }
 
-    private function makeMediaComponent(MediaFieldData $mediaFieldData): FileUpload
+    private function makeMediaComponent(MediaFieldData $mediaFieldData): MediaUploader
     {
-        $media = FileUpload::make($mediaFieldData->state_name);
+        $media = MediaUploader::make($mediaFieldData->state_name);
 
         if ($mediaFieldData->multiple) {
             $media->multiple($mediaFieldData->multiple)
@@ -216,6 +217,8 @@ class SchemaFormBuilder extends Component
         if ($mediaFieldData->reorder) {
             $media->enableReordering($mediaFieldData->reorder);
         }
+
+        $media->enableOpen();
 
         $media->formatStateUsing(function (?array $state): array {
 
@@ -350,13 +353,80 @@ class SchemaFormBuilder extends Component
         return $component;
     }
 
+    private function makeRichTextComponent(RichtextFieldData $richtextFieldData): RichEditor
+    {
+        $richEditor = RichEditor::make($richtextFieldData->state_name)
+            ->toolbarButtons(
+                array_map(
+                    fn (RichtextButton $button) => $button->value, $richtextFieldData->buttons)
+            )
+            ->getUploadedAttachmentUrlUsing(function ($file) {
+
+                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                try {
+                    if (! $storage->exists($file)) {
+                        return null;
+                    }
+                } catch (UnableToCheckFileExistence $exception) {
+                    return null;
+                }
+
+                if (config('filament.default_filesystem_disk') === 'r2') {
+                    return $storage->url($file);
+                } else {
+                    if ($storage->getVisibility($file) === 'private') {
+                        try {
+                            return $storage->temporaryUrl(
+                                $file,
+                                now()->addMinutes(5),
+                            );
+                        } catch (\Throwable $exception) {
+                            // This driver does not support creating temporary URLs.
+                        }
+                    }
+
+                }
+            });
+
+        return $richEditor;
+    }
+
     private function makeTinyEditorComponent(TinyEditorData $tinyEditorData): TinyEditor
     {
 
         $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
-            ->fileAttachmentsDisk('s3')
+            ->fileAttachmentsDisk(config('filament.default_filesystem_disk'))
             ->fileAttachmentsVisibility('public')
             ->showMenuBar()
+            ->getUploadedAttachmentUrlUsing(function ($file) {
+
+                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                try {
+                    if (! $storage->exists($file)) {
+                        return null;
+                    }
+                } catch (UnableToCheckFileExistence $exception) {
+                    return null;
+                }
+
+                if (config('filament.default_filesystem_disk') === 'r2') {
+                    return $storage->url($file);
+                } else {
+                    if ($storage->getVisibility($file) === 'private') {
+                        try {
+                            return $storage->temporaryUrl(
+                                $file,
+                                now()->addMinutes(5),
+                            );
+                        } catch (\Throwable $exception) {
+                            // This driver does not support creating temporary URLs.
+                        }
+                    }
+
+                }
+            })
             ->fileAttachmentsDirectory('tinyeditor_uploads');
 
         if ($tinyEditorData->min_length) {

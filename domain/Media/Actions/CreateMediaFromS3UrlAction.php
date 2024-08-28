@@ -17,9 +17,9 @@ class CreateMediaFromS3UrlAction
         $mediaExcepts = [];
         foreach ($medias as $imageUrl) {
             if (Str::contains($imageUrl, 'tmp/')) {
-                if (Storage::disk('s3')->exists($imageUrl)) {
+                if (Storage::disk(config('filament.default_filesystem_disk'))->exists($imageUrl)) {
                     /** @phpstan-ignore-next-line */
-                    $media = $model->addMediaFromDisk($imageUrl, 's3')
+                    $media = $model->addMediaFromDisk($imageUrl, config('filament.default_filesystem_disk'))
                         ->toMediaCollection($collection);
 
                     $mediaExcepts[] = $media;

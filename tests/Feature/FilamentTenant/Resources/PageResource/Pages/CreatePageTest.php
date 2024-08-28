@@ -349,7 +349,7 @@ it('can create page with media uploaded', function () {
     $file = UploadedFile::fake()->image('preview.jpeg');
 
     // Perform the upload to S3
-    Storage::disk('s3')->put('/', $file);
+    Storage::disk(config('filament.default_filesystem_disk'))->put('/', $file);
 
     $page = livewire(CreatePage::class)
         ->fillForm([
@@ -412,7 +412,7 @@ it('can create page with media uploaded inside repeater', function () {
     $file = UploadedFile::fake()->image('preview.jpeg');
 
     // Perform the upload to S3
-    Storage::disk('s3')->put('/', $file);
+    Storage::disk(config('filament.default_filesystem_disk'))->put('/', $file);
 
     $page = livewire(CreatePage::class)
         ->fillForm([
