@@ -11,6 +11,7 @@ use Domain\Content\Actions\UpdateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Content;
+use Domain\Page\Enums\Visibility;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
@@ -62,7 +63,7 @@ class EditContent extends EditRecord
                     name: $data['name'],
                     taxonomies: $data['taxonomies'],
                     blueprint_id: $data['blueprint_id'],
-                    visibility: $data['visibility'],
+                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
                     is_sortable: $data['is_sortable'],
                     past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
                     future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
