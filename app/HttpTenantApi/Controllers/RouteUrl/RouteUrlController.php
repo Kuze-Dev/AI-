@@ -50,6 +50,16 @@ class RouteUrlController
             $siteId = request('site');
 
             $queryRouteUrl->whereHas('model', function ($query) use ($siteId) {
+
+                if ($query->getModel()->getMorphClass() == app(TaxonomyTerm::class)->getMorphClass()) {
+
+                    return $query->whereHas('taxonomy', function ($parentQuery) use ($siteId) {
+
+                        return $parentQuery->whereHas('sites', fn ($q) => $q->where('site_id', $siteId));
+                    });
+                    // fn ($q) => $q->where('site_id', $siteId));
+                }
+
                 return $query->whereHas('sites', fn ($q) => $q->where('site_id', $siteId));
             });
 
