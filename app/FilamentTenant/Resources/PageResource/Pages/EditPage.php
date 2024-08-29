@@ -12,6 +12,7 @@ use App\Settings\SiteSettings;
 use Closure;
 use Domain\Internationalization\Models\Locale;
 use Domain\Page\Actions\CreatePageDraftAction;
+use Domain\Page\Actions\CreatePageTranslationAction;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Actions\PublishedPageDraftAction;
 use Domain\Page\Actions\UpdatePageAction;
@@ -19,8 +20,8 @@ use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Exception;
-use Filament\Forms\Components\Radio;
 use Filament\Forms;
+use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
@@ -103,18 +104,27 @@ class EditPage extends EditRecord
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    ->action(function (Action $action, array $data): void {
+                    // ->record($this->getRecord())
+                    ->action('createTranslation')
+                    // ->action(function (Page $record, Action $action, array $data) {
 
-                       dd($data);
-                    })
+                    //     $orginalContent = $record->parentTranslation ?? $record;
+
+                    //     $exist = Page::where('translation_id',$orginalContent->id)->where('locale',$data['locale'])->first();
+
+                    //     if ($exist) {
+                    //         # code...
+                    //     }
+
+                    // })
                     ->form([
                         Forms\Components\Select::make('locale')
-                        ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                        ->default((string) Locale::where('is_default', true)->first()?->code)
-                        ->searchable()
-                        ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
-                        ->reactive()
-                        ->required(),
+                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                            ->default((string) Locale::where('is_default', true)->first()?->code)
+                            ->searchable()
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->reactive()
+                            ->required(),
                     ]),
                 Action::make('preview')
                     ->color('secondary')
@@ -316,5 +326,38 @@ class EditPage extends EditRecord
         $draftpage = app(CreatePageDraftAction::class)->execute($record, $pageData);
 
         return redirect(PageResource::getUrl('edit', ['record' => $draftpage]));
+    }
+
+    public function createTranslation(array $data): RedirectResponse|Redirector|false
+    {
+
+        $formData = $this->form->getState();
+
+        $formData['locale'] = $data['locale'];
+
+        $record = $this->record;
+
+        $orginalContent = $record->parentTranslation ?? $record;
+
+        $exist = Page::where('translation_id', $orginalContent->id)->where('locale', $data['locale'])->first();
+
+        if ($exist) {
+
+            $locale = Locale::whereCode($data['locale'])->first();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Page :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->send();
+
+            return false;
+        }
+
+        $pageData = PageData::fromArray($formData);
+
+        $pageTranslation = app(CreatePageTranslationAction::class)->execute($orginalContent, $pageData);
+
+        return redirect(PageResource::getUrl('edit', ['record' => $pageTranslation]));
     }
 }

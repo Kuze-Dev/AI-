@@ -85,6 +85,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         'published_at',
         'locale',
         'draftable_id',
+        'translation_id',
     ];
 
     /**
@@ -172,6 +173,17 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
+    }
+
+    /** @return HasMany<Page> */
+    public function pageTranslation(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_id');
+    }
+
+    public function parentTranslation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_id');
     }
 
     public function isPublished(): bool
