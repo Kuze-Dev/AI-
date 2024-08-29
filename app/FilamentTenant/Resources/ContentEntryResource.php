@@ -227,6 +227,7 @@ class ContentEntryResource extends Resource
                         Forms\Components\Section::make(trans('Status'))
                             ->schema([
                                 Forms\Components\Toggle::make('status')
+                                    ->default(true)
                                     ->helperText('If disabled, this content will not be accessible on the website.'),
 
                             ]),
