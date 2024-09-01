@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\PageResource\RelationManagers;
 
+use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Models\Page;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+// use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class PageTranslationRelationManager extends RelationManager
@@ -22,6 +25,18 @@ class PageTranslationRelationManager extends RelationManager
     protected static ?string $recordTitleAttribute = 'pageTranslation';
 
     public Model $ownerRecord;
+
+    public function getRelationship(): Relation | Builder
+    {
+        if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0) {
+            return $this->getOwnerRecord()->{static::getRelationshipName()}();
+        }
+
+        return $this->getOwnerRecord()->{static::getRelationshipName()}()
+            ->orwhere('id',$this->ownerRecord->translation_id)
+            ->orwhere('translation_id',$this->ownerRecord->translation_id)
+            ->where('id','!=',$this->ownerRecord->id);
+    }
 
     public static function table(Table $table): Table
     {
@@ -71,7 +86,14 @@ class PageTranslationRelationManager extends RelationManager
             ])
 
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('edit')
+                ->url(
+                    fn (Page $record) => PageResource::getUrl('edit', ['record' => $record]) 
+                ),
+                // ->redirect(function (){
+                //     dd(func_get_args());
+                // }), 
+                // ->redirect(fn () => PageResource::getUrl('edit', ['record' => $this->record]) ),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
                         ->using(function (Page $record) {

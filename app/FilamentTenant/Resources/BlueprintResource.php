@@ -632,6 +632,8 @@ class BlueprintResource extends Resource
                     ]),
             ],
             FieldType::TINYEDITOR => [
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\TextInput::make('min_length')
                     ->numeric()
                     ->integer()
