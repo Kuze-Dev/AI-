@@ -13,7 +13,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\HtmlString;
 
 class RegisterInvitationNotification extends Notification implements ShouldQueue
@@ -27,8 +26,6 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
 
     public function toMail(Customer $notifiable): MailMessage
     {
-
-        View::flushFinderCache();
 
         return (new MailMessage())
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))

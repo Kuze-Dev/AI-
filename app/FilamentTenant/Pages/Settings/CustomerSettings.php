@@ -17,6 +17,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\MarkdownEditor;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class CustomerSettings extends TenantBaseSettings
@@ -147,5 +148,10 @@ class CustomerSettings extends TenantBaseSettings
                 ]),
 
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        Cache::flush();
     }
 }
