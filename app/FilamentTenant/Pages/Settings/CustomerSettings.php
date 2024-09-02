@@ -56,12 +56,14 @@ class CustomerSettings extends TenantBaseSettings
                 ->schema([
                     Forms\Components\Section::make('Register Invitation Notification')
                         ->schema([
-                            Forms\Components\TextInput::make('customer_register_invation_greetings')
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_greetings')
                                 ->required()
                                 ->label('Mail Greetings'),
-                            Forms\Components\Textarea::make('customer_register_invation_body')
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_body')
                                 ->required()
                                 ->label('Mail Message'),
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_salutation')
+                                ->label('Mail Salutation'),
                         ]),
                     Forms\Components\Section::make('Available Values')
                         ->schema([

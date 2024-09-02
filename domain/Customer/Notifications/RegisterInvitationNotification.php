@@ -13,6 +13,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class RegisterInvitationNotification extends Notification implements ShouldQueue
 {
@@ -29,12 +30,21 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
         return (new MailMessage())
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
             ->subject(trans('Register Invitation'))
-            ->greeting(app(CustomerSettings::class)->customer_register_invation_greetings ?? 'Hello')
-            ->line(
+            ->greeting(new HtmlString(app(CustomerSettings::class)->customer_register_invitation_greetings ?? '<b>Hello</b>'))
+            ->line(new HtmlString(
                 trans(
-                    app(CustomerSettings::class)->customer_register_invation_body,
+                    app(CustomerSettings::class)->customer_register_invitation_body,
                     ['site' => app(SiteSettings::class)->name]
-                ))
+                )
+            )
+            )
+            ->salutation(new HtmlString(
+                trans(
+                    app(CustomerSettings::class)->customer_register_invitation_salutation ?? '',
+                    ['site' => app(SiteSettings::class)->name]
+                )
+            )
+            ) // Custom salutation
             ->action(trans('Register Email Address'), self::url($notifiable));
     }
 
