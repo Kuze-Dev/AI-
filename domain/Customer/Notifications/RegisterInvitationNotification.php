@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Notifications;
 
+use App\Settings\CustomerSettings;
 use App\Settings\ECommerceSettings;
 use App\Settings\FormSettings;
 use App\Settings\SiteSettings;
@@ -28,13 +29,10 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
         return (new MailMessage())
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
             ->subject(trans('Register Invitation'))
+            ->greeting(app(CustomerSettings::class)->customer_register_invation_greetings ?? 'Hello')
             ->line(
                 trans(
-                    'Welcome to :site!
-            We\'re thrilled to have you on board.
-            If you have any questions or need assistance,
-            feel free to reach out.
-            We\'re here to make your experience with us exceptional.',
+                    app(CustomerSettings::class)->customer_register_invation_body,
                     ['site' => app(SiteSettings::class)->name]
                 ))
             ->action(trans('Register Email Address'), self::url($notifiable));
