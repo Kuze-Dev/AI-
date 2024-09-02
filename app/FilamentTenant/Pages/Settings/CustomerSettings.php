@@ -54,6 +54,17 @@ class CustomerSettings extends TenantBaseSettings
             Forms\Components\Section::make('Customer Notifications')
                 ->disabled(! $this->canEditSection('customerEmailNotificationSettings'))
                 ->schema([
+                    Forms\Components\Section::make('Register Invitation Notification')
+                        ->schema([
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_greetings')
+                                ->required()
+                                ->label('Mail Greetings'),
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_body')
+                                ->required()
+                                ->label('Mail Message'),
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_salutation')
+                                ->label('Mail Salutation'),
+                        ]),
                     Forms\Components\Section::make('Available Values')
                         ->schema([
                             SchemaInterpolations::make('data')
