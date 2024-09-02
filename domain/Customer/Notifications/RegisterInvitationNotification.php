@@ -26,25 +26,24 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
 
     public function toMail(Customer $notifiable): MailMessage
     {
+        $customerSettings = app(CustomerSettings::class);
 
         return (new MailMessage())
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
             ->subject(trans('Register Invitation'))
-            ->greeting(new HtmlString(app(CustomerSettings::class)->customer_register_invitation_greetings ?? '<b>Hello</b>'))
+            ->greeting(new HtmlString($customerSettings->customer_register_invitation_greetings ?? '<b>Hello</b>'))
             ->line(new HtmlString(
                 trans(
-                    app(CustomerSettings::class)->customer_register_invitation_body,
+                    $customerSettings->customer_register_invitation_body,
                     ['site' => app(SiteSettings::class)->name]
                 )
-            )
-            )
+            ))
             ->salutation(new HtmlString(
                 trans(
-                    app(CustomerSettings::class)->customer_register_invitation_salutation ?? '',
+                    $customerSettings->customer_register_invitation_salutation ?? '',
                     ['site' => app(SiteSettings::class)->name]
                 )
-            )
-            ) // Custom salutation
+            )) // Custom salutation
             ->action(trans('Register Email Address'), self::url($notifiable));
     }
 
