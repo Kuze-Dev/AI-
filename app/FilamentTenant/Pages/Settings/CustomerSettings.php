@@ -56,14 +56,18 @@ class CustomerSettings extends TenantBaseSettings
                 ->disabled(! $this->canEditSection('customerEmailNotificationSettings'))
                 ->schema([
                     Forms\Components\Section::make('Register Invitation Notification')
+                        ->disabled(fn () => ! Auth::user()?->hasRole(config('domain.role.super_admin')))
                         ->schema([
                             Forms\Components\MarkdownEditor::make('customer_register_invitation_greetings')
+                                ->helpertext('If you need to update these mail settings, please contact your system administrator')
                                 ->required()
                                 ->label('Mail Greetings'),
                             Forms\Components\MarkdownEditor::make('customer_register_invitation_body')
                                 ->required()
+                                ->helpertext('If you need to update these mail settings, please contact your system administrator')
                                 ->label('Mail Message'),
                             Forms\Components\MarkdownEditor::make('customer_register_invitation_salutation')
+                                ->helpertext('If you need to update these mail settings, please contact your system administrator')
                                 ->label('Mail Salutation'),
                         ]),
                     Forms\Components\Section::make('Available Values')
