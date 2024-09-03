@@ -17,6 +17,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\MarkdownEditor;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class CustomerSettings extends TenantBaseSettings
@@ -54,6 +55,21 @@ class CustomerSettings extends TenantBaseSettings
             Forms\Components\Section::make('Customer Notifications')
                 ->disabled(! $this->canEditSection('customerEmailNotificationSettings'))
                 ->schema([
+                    Forms\Components\Section::make('Register Invitation Notification')
+                        ->disabled(fn () => ! Auth::user()?->hasRole(config('domain.role.super_admin')))
+                        ->schema([
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_greetings')
+                                ->helpertext('If you need to update these mail settings, please contact your system administrator')
+                                ->required()
+                                ->label('Mail Greetings'),
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_body')
+                                ->required()
+                                ->helpertext('If you need to update these mail settings, please contact your system administrator')
+                                ->label('Mail Message'),
+                            Forms\Components\MarkdownEditor::make('customer_register_invitation_salutation')
+                                ->helpertext('If you need to update these mail settings, please contact your system administrator')
+                                ->label('Mail Salutation'),
+                        ]),
                     Forms\Components\Section::make('Available Values')
                         ->schema([
                             SchemaInterpolations::make('data')
@@ -136,5 +152,10 @@ class CustomerSettings extends TenantBaseSettings
                 ]),
 
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        Cache::flush();
     }
 }
