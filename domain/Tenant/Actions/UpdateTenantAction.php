@@ -33,6 +33,9 @@ class UpdateTenantAction
             ]);
         }
 
+        $tenant->setInternal('mail_from_address', $tenantData->mail?->from_address);
+        $tenant->save();
+
         $this->syncDomains($tenant, $tenantData->domains);
 
         if (is_array($tenantData->features)) {
