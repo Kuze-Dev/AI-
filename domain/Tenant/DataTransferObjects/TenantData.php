@@ -12,6 +12,7 @@ class TenantData
         public readonly bool $is_suspended = true,
         public readonly ?DatabaseData $database = null,
         public readonly ?BucketData $bucket = null,
+        public readonly ?MailData $mail = null,
         public readonly array $domains = [],
         public readonly ?array $features = [],
     ) {
@@ -42,6 +43,12 @@ class TenantData
                 url: $data['bucket']['url'] ?? null,
                 region: $data['bucket']['region'] ?? null,
                 style_endpoint: $data['bucket']['style_endpoint'] ?? false,
+            )
+            : null,
+            mail: filled($data['mail'] ?? null)
+            ? new MailData(
+                from_address: $data['mail']['from_address'] ?? null,
+
             )
             : null,
             domains: array_map(
