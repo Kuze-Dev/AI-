@@ -411,21 +411,23 @@ class SchemaFormBuilder extends Component
                     return null;
                 }
 
-                if (config('filament.default_filesystem_disk') === 'r2') {
-                    return $storage->url($file);
-                } else {
-                    if ($storage->getVisibility($file) === 'private') {
-                        try {
-                            return $storage->temporaryUrl(
-                                $file,
-                                now()->addMinutes(5),
-                            );
-                        } catch (\Throwable $exception) {
-                            // This driver does not support creating temporary URLs.
-                        }
-                    }
+                return $storage->url($file);
 
-                }
+                // if (config('filament.default_filesystem_disk') === 'r2') {
+                //     return $storage->url($file);
+                // } else {
+                //     if ($storage->getVisibility($file) === 'private') {
+                //         try {
+                //             return $storage->temporaryUrl(
+                //                 $file,
+                //                 now()->addMinutes(5),
+                //             );
+                //         } catch (\Throwable $exception) {
+                //             // This driver does not support creating temporary URLs.
+                //         }
+                //     }
+
+                // }
             })
             ->fileAttachmentsDirectory('tinyeditor_uploads');
 
