@@ -37,6 +37,7 @@ return [
         // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
         App\Tenancy\Bootstrappers\BucketBootstrapper::class,
         App\Tenancy\Bootstrappers\ExcelBootstrapper::class,
+        App\Tenancy\Bootstrappers\MailBootstrapper::class,
     ],
 
     /**
