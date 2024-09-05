@@ -43,11 +43,12 @@ class ExtractDataAction
 
     public function mergeFields(array $firstField, array|string|null|bool $values, string $parentStatepath): array
     {
+      
         $mergedFields = [
             'type' => $firstField['type'],
             'statepath' => $parentStatepath,
             'value' => $values,
-            'translatable' => $firstField['translatable']
+            'translatable' => isset($firstField['translatable']) ? $firstField['translatable'] : true,
         ];
         $statepath = $mergedFields['statepath'];
         if ($firstField['type'] == FieldType::REPEATER) {

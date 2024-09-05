@@ -59,7 +59,7 @@ class UpdateBlueprintDataAction
                 $combinedArray[$sectionKey][$fieldKey] = $this->extractDataAction->mergeFields($fieldValue, $model->data[$sectionKey][$fieldKey], $fieldValue['statepath']);
             }
         }
-        dump($combinedArray);
+        // dump($combinedArray);
         foreach ($combinedArray as $section) {
             foreach ($section as $field) {
                 $data[] = $this->extractDataAction->processRepeaterField($field);
@@ -67,7 +67,7 @@ class UpdateBlueprintDataAction
         }
         
         $flattenData = $this->extractDataAction->flattenArray($data);
-        dd($flattenData);
+        // dd($flattenData);
         $this->sanitizeBlueprintStatePaths($flattenData, $model);
 
         foreach ($flattenData as $arrayData) {

@@ -32,7 +32,7 @@ class TinyEditorData extends FieldData
             title: $data['title'],
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
-            translatable: $data['translatable'],
+            translatable: isset($data['translatable']) ? $data['translatable'] : true,
             min_length: $data['min_length'] ?? null,
             max_length: $data['max_length'] ?? null,
             helper_text: $data['helper_text'] ?? null,
