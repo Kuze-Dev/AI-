@@ -37,6 +37,7 @@ class CreateTenantAction
         $tenant->setInternal('bucket_url', $tenantData->bucket?->url);
         $tenant->setInternal('bucket_region', $tenantData->bucket?->region);
         $tenant->setInternal('bucket_style_endpoint', $tenantData->bucket?->style_endpoint);
+        $tenant->setInternal('mail_from_address', $tenantData->mail?->from_address);
 
         $tenant->save();
 

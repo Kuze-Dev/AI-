@@ -386,7 +386,10 @@ class SchemaFormBuilder extends Component
                         }
                     }
 
+                    return $storage->url($file);
+
                 }
+
             });
 
         return $richEditor;
@@ -424,6 +427,8 @@ class SchemaFormBuilder extends Component
                             // This driver does not support creating temporary URLs.
                         }
                     }
+
+                    return $storage->url($file);
 
                 }
             })

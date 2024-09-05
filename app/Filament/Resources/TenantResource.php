@@ -126,6 +126,14 @@ class TenantResource extends Resource
                     ->columns(['md' => 4])
                     ->disabledOn('edit')
                     ->dehydrated(fn (string $context) => $context !== 'edit'),
+                Forms\Components\Section::make(trans('Mail Settings'))
+                    ->statePath('mail')
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\TextInput::make('from_address')
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('mail_from_address')))
+                            ->columnSpanFull(),
+                    ]),
                 Forms\Components\Section::make(trans('Domains'))
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
