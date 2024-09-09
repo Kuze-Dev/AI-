@@ -43,7 +43,7 @@ class ExtractDataAction
 
     public function mergeFields(array $firstField, array|string|null|bool $values, string $parentStatepath): array
     {
-      
+
         $mergedFields = [
             'type' => $firstField['type'],
             'statepath' => $parentStatepath,

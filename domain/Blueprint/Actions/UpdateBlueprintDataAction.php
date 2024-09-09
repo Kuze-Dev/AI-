@@ -65,7 +65,7 @@ class UpdateBlueprintDataAction
                 $data[] = $this->extractDataAction->processRepeaterField($field);
             }
         }
-        
+
         $flattenData = $this->extractDataAction->flattenArray($data);
         // dd($flattenData);
         $this->sanitizeBlueprintStatePaths($flattenData, $model);

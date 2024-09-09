@@ -104,19 +104,7 @@ class EditPage extends EditRecord
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    // ->record($this->getRecord())
                     ->action('createTranslation')
-                    // ->action(function (Page $record, Action $action, array $data) {
-
-                    //     $orginalContent = $record->parentTranslation ?? $record;
-
-                    //     $exist = Page::where('translation_id',$orginalContent->id)->where('locale',$data['locale'])->first();
-
-                    //     if ($exist) {
-                    //         # code...
-                    //     }
-
-                    // })
                     ->form([
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
@@ -335,21 +323,31 @@ class EditPage extends EditRecord
 
         $formData['locale'] = $data['locale'];
 
+        $code = $data['locale'];
+
+        $formData['route_url']['url'] = $this->changeUrlLocale($formData['route_url']['url'], $code);
+
         $record = $this->record;
 
         $orginalContent = $record->parentTranslation ?? $record;
 
         $exist = Page::where('translation_id', $orginalContent->id)->where('locale', $data['locale'])->first();
 
-        if ($exist) {
+        $locale = Locale::whereCode($data['locale'])->first();
 
-            $locale = Locale::whereCode($data['locale'])->first();
+        if ($exist) {
 
             Notification::make()
                 ->danger()
                 ->title(trans('Translation Already Exists'))
                 ->body(trans('Page :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
                 ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Page :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->sendToDatabase(auth()->user());
 
             return false;
         }
@@ -358,6 +356,36 @@ class EditPage extends EditRecord
 
         $pageTranslation = app(CreatePageTranslationAction::class)->execute($orginalContent, $pageData);
 
+        Notification::make()
+            ->success()
+            ->title(trans('Translation Created'))
+            ->body(trans('Page Translation :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+            ->sendToDatabase(auth()->user());
+
         return redirect(PageResource::getUrl('edit', ['record' => $pageTranslation]));
+    }
+
+    protected function changeUrlLocale($url, $locale)
+    {
+
+        $locales = Locale::pluck('code')->toArray();
+
+        // Remove leading and trailing slashes from the URL
+        $url = trim($url, '/');
+
+        // Split the URL by "/"
+        $segments = explode('/', $url);
+
+        // Check if the first segment is a valid locale code from the array
+        if (in_array($segments[0], $locales)) {
+            // Replace the existing locale with the new one
+            $segments[0] = $locale;
+        } else {
+            // Prepend the new locale to the URL
+            array_unshift($segments, $locale);
+        }
+
+        // Rebuild the URL and add a leading "/"
+        return '/'.implode('/', $segments);
     }
 }

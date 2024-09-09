@@ -12,10 +12,10 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-// use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Auth;
+// use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class PageTranslationRelationManager extends RelationManager
@@ -26,16 +26,16 @@ class PageTranslationRelationManager extends RelationManager
 
     public Model $ownerRecord;
 
-    public function getRelationship(): Relation | Builder
+    public function getRelationship(): Relation|Builder
     {
         if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0) {
             return $this->getOwnerRecord()->{static::getRelationshipName()}();
         }
 
         return $this->getOwnerRecord()->{static::getRelationshipName()}()
-            ->orwhere('id',$this->ownerRecord->translation_id)
-            ->orwhere('translation_id',$this->ownerRecord->translation_id)
-            ->where('id','!=',$this->ownerRecord->id);
+            ->orwhere('id', $this->ownerRecord->translation_id)
+            ->orwhere('translation_id', $this->ownerRecord->translation_id)
+            ->where('id', '!=', $this->ownerRecord->id);
     }
 
     public static function table(Table $table): Table
@@ -87,12 +87,12 @@ class PageTranslationRelationManager extends RelationManager
 
             ->actions([
                 Tables\Actions\Action::make('edit')
-                ->url(
-                    fn (Page $record) => PageResource::getUrl('edit', ['record' => $record]) 
-                ),
+                    ->url(
+                        fn (Page $record) => PageResource::getUrl('edit', ['record' => $record])
+                    ),
                 // ->redirect(function (){
                 //     dd(func_get_args());
-                // }), 
+                // }),
                 // ->redirect(fn () => PageResource::getUrl('edit', ['record' => $this->record]) ),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
