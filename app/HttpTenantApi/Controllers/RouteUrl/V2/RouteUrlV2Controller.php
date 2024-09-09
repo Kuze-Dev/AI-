@@ -66,10 +66,17 @@ class RouteUrlV2Controller
 
         return match ($routeUrl->model::class) {
             Page::class => PageResource::make($routeUrl->model),
-            ContentEntry::class => ContentEntryResource::make($routeUrl->model),
+            ContentEntry::class => $this->handleContentEntryResource($routeUrl->model),
             Taxonomy::class => TaxonomyResource::make($routeUrl->model),
             TaxonomyTerm::class => TaxonomyTermResource::make($routeUrl->model),
             default => throw new InvalidArgumentException('No resource found for model '.$routeUrl->model::class),
         };
+    }
+
+    private function handleContentEntryResource(ContentEntry $contentEntry): ContentEntryResource
+    {
+        abort_if($contentEntry->status == false, 404);
+
+        return ContentEntryResource::make($contentEntry);
     }
 }
