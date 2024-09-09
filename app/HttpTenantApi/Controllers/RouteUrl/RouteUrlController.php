@@ -93,6 +93,8 @@ class RouteUrlController
 
         abort_if($content->visibility === Visibility::AUTHENTICATED->value, 403);
 
+        abort_if($contentEntry->status == false, 404);
+
         return ContentEntryResource::make($contentEntry);
     }
 }
