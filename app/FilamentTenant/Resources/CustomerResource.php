@@ -82,7 +82,7 @@ class CustomerResource extends Resource
                         ->string()
                         ->rules([
                             fn () => function (string $attribute, mixed $value, Closure $fail) {
-                                if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                if (preg_match('/[^\pL\s]/u', $value)) {
                                     $fail('Input must not contain numerical characters.');
                                 }
                             },
@@ -93,7 +93,7 @@ class CustomerResource extends Resource
                         ->required()
                         ->rules([
                             fn () => function (string $attribute, mixed $value, Closure $fail) {
-                                if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                if (preg_match('/[^\pL\s]/u', $value)) {
                                     $fail('Input must not contain numerical characters.');
                                 }
                             },
