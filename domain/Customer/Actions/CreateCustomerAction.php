@@ -15,7 +15,6 @@ use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Mail\CustomerRegisteredNotification;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
@@ -77,7 +76,6 @@ class CreateCustomerAction
 
     private function create(CustomerData $customerData): Customer
     {
-
         if (
             $customerData->through_api_registration &&
             ($customer = self::createThroughRegistrationAPI($customerData)) !== null
@@ -85,7 +83,7 @@ class CreateCustomerAction
             return $customer;
         }
 
-        $customerDetails = array_filter([
+        return Customer::create([
             'tier_id' => $customerData->tier_id,
             'cuid' => $this->generateCustomerID->execute(),
             'email' => $customerData->email,
@@ -102,11 +100,6 @@ class CreateCustomerAction
             'tier_approval_status' => $customerData->tier_approval_status,
             'data' => $customerData->data,
         ]);
-
-        /** @phpstan-ignore-next-line */
-        Log::info(json_encode($customerDetails));
-
-        return Customer::create($customerDetails);
     }
 
     private static function createThroughRegistrationAPI(CustomerData $customerData): ?Customer
