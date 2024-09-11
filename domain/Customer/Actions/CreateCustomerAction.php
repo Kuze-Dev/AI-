@@ -15,7 +15,6 @@ use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Mail\CustomerRegisteredNotification;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
@@ -77,7 +76,6 @@ class CreateCustomerAction
 
     private function create(CustomerData $customerData): Customer
     {
-
         if (
             $customerData->through_api_registration &&
             ($customer = self::createThroughRegistrationAPI($customerData)) !== null
@@ -85,27 +83,24 @@ class CreateCustomerAction
             return $customer;
         }
 
-        $customerDetails = array_filter([
-            'tier_id' => $customerData->tier_id,
-            'cuid' => $this->generateCustomerID->execute(),
-            'email' => $customerData->email,
-            'username' => $customerData->username,
-            'first_name' => $customerData->first_name,
-            'last_name' => $customerData->last_name,
-            'mobile' => $customerData->mobile,
-            'status' => $customerData->status,
-            'gender' => $customerData->gender,
-            'birth_date' => $customerData->birth_date,
-            'password' => $customerData->password,
-            'email_verification_type' => $customerData->email_verification_type,
-            'register_status' => $customerData->register_status,
-            'tier_approval_status' => $customerData->tier_approval_status,
-            'data' => $customerData->data,
-        ]);
-
-        Log::info(json_encode($customerDetails));
-
-        return Customer::create($customerDetails);
+        return Customer::create(
+            array_filter([
+                'tier_id' => $customerData->tier_id,
+                'cuid' => $this->generateCustomerID->execute(),
+                'email' => $customerData->email,
+                'username' => $customerData->username,
+                'first_name' => $customerData->first_name,
+                'last_name' => $customerData->last_name,
+                'mobile' => $customerData->mobile,
+                'status' => $customerData->status,
+                'gender' => $customerData->gender,
+                'birth_date' => $customerData->birth_date,
+                'password' => $customerData->password,
+                'email_verification_type' => $customerData->email_verification_type,
+                'register_status' => $customerData->register_status,
+                'tier_approval_status' => $customerData->tier_approval_status,
+                'data' => $customerData->data,
+            ]));
     }
 
     private static function createThroughRegistrationAPI(CustomerData $customerData): ?Customer
