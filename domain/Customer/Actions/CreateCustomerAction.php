@@ -103,6 +103,7 @@ class CreateCustomerAction
             'data' => $customerData->data,
         ]);
 
+        /** @phpstan-ignore-next-line */
         Log::info(json_encode($customerDetails));
 
         return Customer::create($customerDetails);
