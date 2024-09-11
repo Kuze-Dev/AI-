@@ -24,7 +24,7 @@ class EditCustomerAction
 
     public function execute(Customer $customer, CustomerData $customerData): mixed
     {
-        /** @phpstan-ignore-next-line */
+
         Log::info(json_encode(
             array_filter([
                 'tier_id' => $customerData->tier_id,
