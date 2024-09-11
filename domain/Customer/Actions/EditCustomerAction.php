@@ -9,6 +9,7 @@ use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
+use Illuminate\Support\Facades\Log;
 use Support\Common\Actions\SyncMediaCollectionAction;
 use Support\Common\DataTransferObjects\MediaCollectionData;
 use Support\Common\DataTransferObjects\MediaData;
@@ -23,9 +24,26 @@ class EditCustomerAction
 
     public function execute(Customer $customer, CustomerData $customerData): mixed
     {
-        $customer->update([
+        /** @phpstan-ignore-next-line */
+        Log::info(json_encode(
+            array_filter([
+                'tier_id' => $customerData->tier_id,
+                'email' => $customerData->email,
+                'username' => $customerData->username,
+                'first_name' => $customerData->first_name,
+                'last_name' => $customerData->last_name,
+                'mobile' => $customerData->mobile,
+                'status' => $customerData->status,
+                'gender' => $customerData->gender,
+                'birth_date' => $customerData->birth_date,
+                'password' => $customerData->password,
+                'tier_approval_status' => $customerData->tier_approval_status,
+                'register_status' => $customerData->register_status,
+                'data' => $customerData->data,
+            ])));
+
+        $customer->update(array_filter([
             'tier_id' => $customerData->tier_id,
-            'cuid' => $customer->cuid,
             'email' => $customerData->email,
             'username' => $customerData->username,
             'first_name' => $customerData->first_name,
@@ -38,7 +56,7 @@ class EditCustomerAction
             'tier_approval_status' => $customerData->tier_approval_status,
             'register_status' => $customerData->register_status,
             'data' => $customerData->data,
-        ]);
+        ]));
 
         if (app(CustomerSettings::class)->blueprint_id) {
             $this->updateBlueprintDataAction->execute($customer);
