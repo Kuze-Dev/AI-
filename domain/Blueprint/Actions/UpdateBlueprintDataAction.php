@@ -51,7 +51,7 @@ class UpdateBlueprintDataAction
         }
 
         $extractedDatas = $this->extractDataAction->extractStatePathAndFieldTypes($blueprintfieldtype->sections);
-        // dd($extractedDatas);
+
         $combinedArray = [];
         $data = [];
         foreach ($extractedDatas as $sectionKey => $sectionValue) {
@@ -59,7 +59,7 @@ class UpdateBlueprintDataAction
                 $combinedArray[$sectionKey][$fieldKey] = $this->extractDataAction->mergeFields($fieldValue, $model->data[$sectionKey][$fieldKey], $fieldValue['statepath']);
             }
         }
-        // dump($combinedArray);
+
         foreach ($combinedArray as $section) {
             foreach ($section as $field) {
                 $data[] = $this->extractDataAction->processRepeaterField($field);
@@ -67,7 +67,7 @@ class UpdateBlueprintDataAction
         }
 
         $flattenData = $this->extractDataAction->flattenArray($data);
-        // dd($flattenData);
+
         $this->sanitizeBlueprintStatePaths($flattenData, $model);
 
         foreach ($flattenData as $arrayData) {
@@ -76,7 +76,7 @@ class UpdateBlueprintDataAction
 
     }
 
-    private function updateBlueprintData(Model $model, BlueprintDataData $blueprintDataData): BlueprintData
+    public function updateBlueprintData(Model $model, BlueprintDataData $blueprintDataData): BlueprintData
     {
 
         $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)
@@ -130,6 +130,7 @@ class UpdateBlueprintDataAction
                     if (Storage::disk(config('filament.default_filesystem_disk'))->exists($image)) {
 
                         $blueprintData->addMediaFromDisk($image, config('filament.default_filesystem_disk'))
+                            ->preservingOriginal()
                             ->toMediaCollection('blueprint_media');
                     }
 

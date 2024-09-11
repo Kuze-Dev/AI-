@@ -271,6 +271,8 @@ class BlueprintResource extends Resource
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
                 Forms\Components\Toggle::make('can_download'),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
@@ -340,8 +342,9 @@ class BlueprintResource extends Resource
             ],
             FieldType::SELECT => [
                 Forms\Components\Toggle::make('multiple')
-                    ->reactive()
-                    ->columnSpanFull(),
+                    ->reactive(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\TextInput::make('min')
                     ->numeric()
                     ->integer()
@@ -364,13 +367,12 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('label')
                             ->required(),
                     ]),
-                Forms\Components\Toggle::make('translatable')
-                    ->default(true),
             ],
             FieldType::CHECKBOX => [
                 Forms\Components\Toggle::make('bulk_toggleable')
-                    ->reactive()
-                    ->columnSpanFull(),
+                    ->reactive(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -383,8 +385,7 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('label')
                             ->required(),
                     ]),
-                Forms\Components\Toggle::make('translatable')
-                    ->default(true),
+
             ],
             FieldType::TEXTAREA => [
                 Forms\Components\TextInput::make('min_length')
@@ -415,9 +416,9 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
-                 Forms\Components\Toggle::make('translatable')
+                Forms\Components\Toggle::make('translatable')
                     ->default(true),
-                ],
+            ],
             FieldType::EMAIL,
             FieldType::TEL,
             FieldType::URL,
@@ -445,8 +446,13 @@ class BlueprintResource extends Resource
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
-            FieldType::TOGGLE => [],
+            FieldType::TOGGLE => [
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
+            ],
             FieldType::RELATED_RESOURCE => [
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
                     ->lazy()
@@ -631,8 +637,9 @@ class BlueprintResource extends Resource
 
             ],
             FieldType::RADIO => [
-                Forms\Components\Toggle::make('inline')
-                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('inline'),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -645,8 +652,7 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('label')
                             ->required(),
                     ]),
-                Forms\Components\Toggle::make('translatable')
-                    ->default(true),
+
                 Forms\Components\Repeater::make('descriptions')
                     ->collapsible()
                     ->orderable()

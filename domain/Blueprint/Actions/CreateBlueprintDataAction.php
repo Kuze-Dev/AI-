@@ -24,7 +24,7 @@ class CreateBlueprintDataAction
     ) {
     }
 
-    private function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
+    public function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
 
         $blueprintData = BlueprintData::create([
