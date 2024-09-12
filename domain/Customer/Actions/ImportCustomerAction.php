@@ -18,7 +18,7 @@ readonly class ImportCustomerAction
 {
     public function __construct(
         private CreateCustomerAction $createCustomerAction,
-        private EditCustomerAction $editCustomerAction,
+        // private EditCustomerAction $editCustomerAction,
     ) {
     }
 
