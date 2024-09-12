@@ -71,6 +71,7 @@ readonly class ImportCustomerAction
             }
         }
 
-        return $this->editCustomerAction->execute($customer, $data);
+        return $customer;
+        // return $this->editCustomerAction->execute($customer, $data);
     }
 }
