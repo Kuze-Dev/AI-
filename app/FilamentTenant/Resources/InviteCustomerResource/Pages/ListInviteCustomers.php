@@ -38,7 +38,7 @@ class ListInviteCustomers extends ListCustomers
                     'tenant:'.(tenant('id') ?? 'central'),
                 ])
                 ->processRowsUsing(
-                    fn (array $row): Customer => app(ImportCustomerAction::class)
+                    fn (array $row) => app(ImportCustomerAction::class)
                         ->execute(array_filter($row))
                 )
                 ->withValidation(
