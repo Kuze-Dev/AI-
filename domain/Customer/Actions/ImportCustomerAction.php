@@ -22,7 +22,7 @@ readonly class ImportCustomerAction
     ) {
     }
 
-    public function execute(array $row): Customer
+    public function execute(array $row): void
     {
 
         $customer = Customer::whereEmail($row['email'])
@@ -33,7 +33,7 @@ readonly class ImportCustomerAction
 
             unset($row);
 
-            return $customer;
+            return;
         }
 
         $data = CustomerData::fromArrayImportByAdmin(
@@ -67,10 +67,12 @@ readonly class ImportCustomerAction
                     }
                 }
 
-                return $customer;
+                return;
+
             }
         }
 
-        return $this->editCustomerAction->execute($customer, $data);
+        $this->editCustomerAction->execute($customer, $data);
+
     }
 }
