@@ -39,16 +39,13 @@ class Kernel extends ConsoleKernel
     private static function tenantsSchedules(Schedule $schedule): void
     {
         $schedule->command(NotifyCustomerServiceBillDueDateCommand::class)
-            ->daily()
-            ->sentryMonitor();
+            ->daily();
 
         $schedule->command(CreateServiceBillCommand::class)
-            ->daily()
-            ->sentryMonitor();
+            ->daily();
 
         $schedule->command(InactivateServiceOrderCommand::class)
-            ->daily()
-            ->sentryMonitor();
+            ->daily();
 
         $schedule->command(PruneExportTenancyAwareSchedulerCommand::class)
             ->daily();
