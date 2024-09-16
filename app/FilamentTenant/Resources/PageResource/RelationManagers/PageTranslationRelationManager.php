@@ -26,16 +26,15 @@ class PageTranslationRelationManager extends RelationManager
 
     public Model $ownerRecord;
 
+    /** @phpstan-ignore-next-line */
     public function getRelationship(): Relation|Builder
     {
         if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0) {
             return $this->getOwnerRecord()->{static::getRelationshipName()}();
         }
 
-        return $this->getOwnerRecord()->{static::getRelationshipName()}()
-            ->orwhere('id', $this->ownerRecord->translation_id)
-            ->orwhere('translation_id', $this->ownerRecord->translation_id)
-            ->where('id', '!=', $this->ownerRecord->id);
+        /** @phpstan-ignore-next-line */
+        return $this->getOwnerRecord()->{static::getRelationshipName()}()->orwhere('id', $this->ownerRecord->translation_id)->orwhere('translation_id', $this->ownerRecord->translation_id)->where('id', '!=', $this->ownerRecord->id);
     }
 
     public static function table(Table $table): Table

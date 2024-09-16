@@ -333,7 +333,11 @@ class EditPage extends EditRecord
 
         $exist = Page::where('translation_id', $orginalContent->id)->where('locale', $data['locale'])->first();
 
+        /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();
+
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = auth()->user();
 
         if ($exist) {
 
@@ -347,7 +351,7 @@ class EditPage extends EditRecord
                 ->danger()
                 ->title(trans('Translation Already Exists'))
                 ->body(trans('Page :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
-                ->sendToDatabase(auth()->user());
+                ->sendToDatabase($admin);
 
             return false;
         }
@@ -360,12 +364,12 @@ class EditPage extends EditRecord
             ->success()
             ->title(trans('Translation Created'))
             ->body(trans('Page Translation :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
-            ->sendToDatabase(auth()->user());
+            ->sendToDatabase($admin);
 
         return redirect(PageResource::getUrl('edit', ['record' => $pageTranslation]));
     }
 
-    protected function changeUrlLocale($url, $locale)
+    protected function changeUrlLocale(string $url, string $locale): string
     {
 
         $locales = Locale::pluck('code')->toArray();

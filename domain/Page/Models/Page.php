@@ -181,6 +181,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         return $this->hasMany(self::class, 'translation_id');
     }
 
+    /** @return BelongsTo<Page, Page> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

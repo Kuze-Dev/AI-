@@ -46,13 +46,20 @@ class UpdateBlockContentAction
         return $blockContent;
     }
 
-    private function handleBlockContentTranslations(BlockContent $blockContent, BlockContentData $blockContentData)
+    private function handleBlockContentTranslations(BlockContent $blockContent, BlockContentData $blockContentData): void
     {
+
+        if (! $blockContent->data) {
+            return;
+        }
 
         $extractedDatas = app(ExtractDataAction::class)->extractStatePathAndFieldTypes($blockContent->block->blueprint->schema->sections);
 
+        /** @var array */
         $combinedArray = [];
+
         $data = [];
+
         foreach ($extractedDatas as $sectionKey => $sectionValue) {
             foreach ($sectionValue as $fieldKey => $fieldValue) {
                 $combinedArray[$sectionKey][$fieldKey] = app(ExtractDataAction::class)->mergeFields($fieldValue, $blockContent->data[$sectionKey][$fieldKey], $fieldValue['statepath']);
@@ -74,7 +81,7 @@ class UpdateBlockContentAction
         if (
             count($filtered) > 0
         ) {
-
+            /** @var \Domain\Page\Models\Page */
             $pageModel = $blockContent->page;
 
             //check page if page has translation
@@ -123,7 +130,7 @@ class UpdateBlockContentAction
 
     }
 
-    private function updateJsonByStatePaths(BlockContent $item, array $updates, BlockContent $source): array
+    private function updateJsonByStatePaths(BlockContent $item, array $updates, BlockContent $source): ?array
     {
 
         $arrayData = $item->data;
@@ -135,7 +142,7 @@ class UpdateBlockContentAction
 
             if ($item->id != $source->id &&
                 $update['type'] == \Domain\Blueprint\Enums\FieldType::MEDIA &&
-                !is_null($update['value'])
+                ! is_null($update['value'])
             ) {
                 $newValue = [];
 
@@ -148,6 +155,8 @@ class UpdateBlockContentAction
                     if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
                         $newValue[] = $media_item;
                     } else {
+
+                        /** @var Media */
                         $media = Media::where('uuid', $media_item)->first();
 
                         $newValue[] = $media->getPath();
