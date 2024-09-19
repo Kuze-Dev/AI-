@@ -57,6 +57,9 @@ class FormSubmissionsRelationManager extends RelationManager
                         },
                         function (FormSubmission $record) {
 
+                            /** @var \Domain\Admin\Models\Admin */
+                            $user = Auth::user();
+
                             $statepaths = $record->form->blueprint->schema->getFieldStatePaths();
 
                             $data = [];
@@ -65,8 +68,8 @@ class FormSubmissionsRelationManager extends RelationManager
                                 $data[$key] = data_get($record->data, $key);
                             }
 
-                            $data['main.submission_date'] = $record->created_at->timezone(
-                                auth()->user()->timezone
+                            $data['main.submission_date'] = $record->created_at?->timezone(
+                                $user->timezone
                             )->format('Y-m-d H:i a');
 
                             return $data;
