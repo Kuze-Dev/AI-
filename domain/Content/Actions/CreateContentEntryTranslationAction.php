@@ -8,80 +8,63 @@ use Domain\Blueprint\Actions\CreateBlueprintDataAction;
 use Domain\Blueprint\Actions\ExtractDataAction;
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
-use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Content\DataTransferObjects\ContentEntryData;
+use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Models\Locale;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Actions\CreateMetaDataAction;
-use Support\MetaData\Actions\UpdateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
-class UpdateContentEntryAction
+class CreateContentEntryTranslationAction
 {
-    use SanitizeBlueprintDataTrait;
-
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
-        protected UpdateMetaDataAction $updateMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+        protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
     ) {
     }
 
-    /**
-     * Execute operations for updating
-     * and save content entry query.
-     */
-    public function execute(ContentEntry $contentEntry, ContentEntryData $contentEntryData): ContentEntry
+    /** Execute create content entry query. */
+    public function execute(ContentEntry $content, ContentEntryData $contentEntryData): ContentEntry
     {
-        $sanitizeData = $this->sanitizeBlueprintData(
-            $contentEntryData->data,
-            $contentEntry->content->blueprint->schema->getFieldStatekeys(),
-        );
+        /** @var ContentEntry $contentEntryTranslation */
+        $contentEntryTranslation = $content->contentEntryTranslation()
+            ->create([
+                'title' => $contentEntryData->title,
+                'data' => $contentEntryData->data,
+                'content_id' => $content->content_id,
+                'published_at' => $contentEntryData->published_at,
+                'author_id' => $contentEntryData->author_id,
+                'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
+                'status' => $contentEntryData->status,
+            ]);
 
-        $contentEntry->update([
-            'author_id' => $contentEntryData->author_id,
-            'title' => $contentEntryData->title,
-            'published_at' => $contentEntryData->published_at,
-            'data' => $sanitizeData,
-            'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
-            'status' => $contentEntryData->status,
-        ]);
+        $this->createBlueprintDataAction->execute($contentEntryTranslation);
 
-        $contentEntry->metaData()->exists()
-            ? $this->updateMetaData->execute($contentEntry, $contentEntryData->meta_data)
-            : $this->createMetaData->execute($contentEntry, $contentEntryData->meta_data);
+        $this->createMetaData->execute($contentEntryTranslation, $contentEntryData->meta_data);
 
-        $contentEntry->taxonomyTerms()
-            ->sync($contentEntryData->taxonomy_terms);
+        $contentEntryTranslation->taxonomyTerms()
+            ->attach($contentEntryData->taxonomy_terms);
 
-        $this->createOrUpdateRouteUrl->execute($contentEntry, $contentEntryData->route_url_data);
+        $this->createOrUpdateRouteUrl->execute($contentEntryTranslation, $contentEntryData->route_url_data);
 
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
 
-            $contentEntry->sites()->sync($contentEntryData->sites);
+            $contentEntryTranslation->sites()->sync($contentEntryData->sites);
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+        $this->handleContentEntryDataTranslation($content, $contentEntryTranslation);
 
-            $this->handleContentEntryTranslations($contentEntry, $contentEntryData);
+        $contentEntryTranslation->refresh();
 
-            return $contentEntry;
-        }
+        return $contentEntryTranslation;
 
-        $this->updateBlueprintDataAction->execute($contentEntry);
-
-        return $contentEntry;
     }
 
-    private function handleContentEntryTranslations(ContentEntry $contentEntry, ContentEntryData $contentEntryData): void
+    private function handleContentEntryDataTranslation(ContentEntry $contentEntry, ContentEntry $translatedContentEntry): void
     {
-
-        if (! $contentEntry->data) {
-            return;
-        }
-
         $extractedDatas = app(ExtractDataAction::class)->extractStatePathAndFieldTypes($contentEntry->content->blueprint->schema->sections);
 
         /** @var array */
@@ -110,48 +93,16 @@ class UpdateContentEntryAction
         if (
             count($filtered) > 0
         ) {
+            $data = $this->updateJsonByStatePaths($translatedContentEntry, $filtered);
 
-            //check page if page has translation
-
-            if ($contentEntry->translation_id) {
-
-                $contentEntry_collection = $contentEntry->contentEntryTranslation()
-                    ->orwhere('id', $contentEntry->translation_id)
-                    ->orwhere('translation_id', $contentEntry->translation_id)
-                    ->get();
-                // ->pluck('id')
-                // ->toArray();
-            } else {
-                $contentEntry_collection = $contentEntry->contentEntryTranslation()
-                    ->orwhere('id', $contentEntry->id)
-                    ->get();
-                // ->pluck('id')
-                // ->toArray();
-            }
-
-            foreach ($contentEntry_collection as $item) {
-
-                $updated_version = $this->updateJsonByStatePaths($item, $filtered, $contentEntry);
-
-                $sanitizeUpdatedData = $this->sanitizeBlueprintData(
-                    $updated_version,
-                    $contentEntry->content->blueprint->schema->getFieldStatekeys()
-                );
-
-                $item->update([
-                    'data' => $sanitizeUpdatedData,
-                ]);
-
-                $this->updateBlueprintDataAction->execute($item);
-            }
+            $translatedContentEntry->update([
+                'data' => $data,
+            ]);
 
         }
-
-        $this->updateBlueprintDataAction->execute($contentEntry);
-
     }
 
-    private function updateJsonByStatePaths(ContentEntry $item, array $updates, ContentEntry $source): array
+    private function updateJsonByStatePaths(ContentEntry $item, array $updates): array
     {
 
         $arrayData = $item->data;
@@ -161,7 +112,7 @@ class UpdateContentEntryAction
             $statePath = $update['statepath'];
             $newValue = $update['value'];
 
-            if ($item->id != $source->id &&
+            if (
                 $update['type'] == \Domain\Blueprint\Enums\FieldType::MEDIA &&
                 ! is_null($update['value'])
             ) {
@@ -181,16 +132,14 @@ class UpdateContentEntryAction
 
                     } else {
 
-                        
+                        /** @var Media */
                         $media = Media::where('uuid', $media_item)->first();
 
-                        $newValue[] = $media?->getPath();
+                        $newValue[] = $media->getPath();
                     }
 
                 }
 
-                $newValue = array_filter($newValue, fn($value) => !is_null($value));
-                
                 if (! $blueprint_data) {
 
                     $blueprint_data = app(CreateBlueprintDataAction::class)->storeBlueprintData(
