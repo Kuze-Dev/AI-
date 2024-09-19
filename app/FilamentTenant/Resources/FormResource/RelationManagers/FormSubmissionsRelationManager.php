@@ -49,7 +49,11 @@ class FormSubmissionsRelationManager extends RelationManager
                     ->query(fn (Builder $query) => $query)
                     ->mapUsing(
                         function ($livewire) {
-                            return $livewire->ownerRecord->blueprint->schema->getFieldPathLabels();
+                            $headers = $livewire->ownerRecord->blueprint->schema->getFieldPathLabels();
+
+                            $headers['main.submission_date'] = 'Submission Date';
+
+                            return $headers;
                         },
                         function (FormSubmission $record) {
 
@@ -60,6 +64,10 @@ class FormSubmissionsRelationManager extends RelationManager
                             foreach ($statepaths as $key) {
                                 $data[$key] = data_get($record->data, $key);
                             }
+
+                            $data['main.submission_date'] = $record->created_at->timezone(
+                                auth()->user()->timezone
+                            )->format('Y-m-d H:i a');
 
                             return $data;
                         }
