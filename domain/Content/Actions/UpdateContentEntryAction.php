@@ -119,14 +119,12 @@ class UpdateContentEntryAction
                     ->orwhere('id', $contentEntry->translation_id)
                     ->orwhere('translation_id', $contentEntry->translation_id)
                     ->get();
-                // ->pluck('id')
-                // ->toArray();
+
             } else {
                 $contentEntry_collection = $contentEntry->contentEntryTranslation()
                     ->orwhere('id', $contentEntry->id)
                     ->get();
-                // ->pluck('id')
-                // ->toArray();
+
             }
 
             foreach ($contentEntry_collection as $item) {
@@ -143,8 +141,10 @@ class UpdateContentEntryAction
                 ]);
 
                 $this->updateBlueprintDataAction->execute($item);
+
             }
 
+            return;
         }
 
         $this->updateBlueprintDataAction->execute($contentEntry);
@@ -181,7 +181,6 @@ class UpdateContentEntryAction
 
                     } else {
 
-                        
                         $media = Media::where('uuid', $media_item)->first();
 
                         $newValue[] = $media?->getPath();
@@ -189,8 +188,8 @@ class UpdateContentEntryAction
 
                 }
 
-                $newValue = array_filter($newValue, fn($value) => !is_null($value));
-                
+                $newValue = array_filter($newValue, fn ($value) => ! is_null($value));
+
                 if (! $blueprint_data) {
 
                     $blueprint_data = app(CreateBlueprintDataAction::class)->storeBlueprintData(

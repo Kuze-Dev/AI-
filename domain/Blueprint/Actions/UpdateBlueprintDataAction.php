@@ -74,6 +74,51 @@ class UpdateBlueprintDataAction
             $blueprintDataArray[] = $this->updateBlueprintData($model, BlueprintDataData::fromArray($model, $arrayData));
         }
 
+        $newData = $this->getUpdateBlueprintData($model, $blueprintDataArray);
+
+        $model->update(['data' => $newData]);
+
+    }
+
+    /**
+     * @param  ContentEntry|BlockContent|Customer|TaxonomyTerm|Globals  $model
+     * @param  BlueprintData[]  $blueprintDataArray  Array of BlueprintData models
+     */
+    public function getUpdateBlueprintData(Model $model, array $blueprintDataArray): array
+    {
+        $arrayData = $model->data;
+
+        foreach ($blueprintDataArray as $decopuledData) {
+            $statePath = $decopuledData->state_path;
+            $newValue = $decopuledData->value;
+
+            if ($decopuledData->type == FieldType::MEDIA->value) {
+
+                $newValue = $decopuledData->getMedia('blueprint_media')->pluck('uuid')->toArray();
+            }
+
+            $keys = explode('.', $statePath);
+
+            $temp = &$arrayData;
+
+            // Traverse the array using the keys from the state path
+            foreach ($keys as $key) {
+                // If the key doesn't exist, create it as an array
+                if (! isset($temp[$key])) {
+                    $temp[$key] = [];
+                }
+
+                // Move deeper into the array
+                $temp = &$temp[$key];
+            }
+
+            // Set the final key to the new value
+            $temp = $newValue;
+        }
+
+        // Return the updated array
+        return $arrayData;
+
     }
 
     public function updateBlueprintData(Model $model, BlueprintDataData $blueprintDataData): BlueprintData

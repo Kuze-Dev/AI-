@@ -6,11 +6,11 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\ContentEntryResource\RelationManagers\ContentEntryTranslationRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use App\FilamentTenant\Resources\ContentEntryResource\RelationManagers\ContentEntryTranslationRelationManager;
 use Closure;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\ContentEntry;

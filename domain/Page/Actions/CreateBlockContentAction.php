@@ -83,8 +83,6 @@ class CreateBlockContentAction
             ]);
         }
 
-       
-
     }
 
     private function updateJsonByStatePaths(BlockContent $item, array $updates): array
@@ -121,18 +119,16 @@ class CreateBlockContentAction
 
                 }
 
-                    $blueprint_data = $this->updateBlueprintDataAction->updateBlueprintData(
-                        $item,
-                        new BlueprintDataData(
-                            blueprint_id: $item->block->blueprint_id,
-                            model_id: $item->id,
-                            model_type: $item->getMorphClass(),
-                            state_path: $update['statepath'],
-                            value: $newValue,
-                            type: \Domain\Blueprint\Enums\FieldType::MEDIA
-                        ));
-
-                
+                $blueprint_data = $this->updateBlueprintDataAction->updateBlueprintData(
+                    $item,
+                    new BlueprintDataData(
+                        blueprint_id: $item->block->blueprint_id,
+                        model_id: $item->id,
+                        model_type: $item->getMorphClass(),
+                        state_path: $update['statepath'],
+                        value: $newValue,
+                        type: \Domain\Blueprint\Enums\FieldType::MEDIA
+                    ));
 
                 $newValue = $blueprint_data->getMedia('blueprint_media')->pluck('uuid')->toArray();
 
