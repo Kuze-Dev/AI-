@@ -7,15 +7,20 @@ namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\GlobalsResource;
+use Domain\Globals\Actions\CreateGlobalTranslationAction;
 use Domain\Globals\Actions\UpdateGlobalsAction;
 use Domain\Globals\DataTransferObjects\GlobalsData;
+use Domain\Globals\Models\Globals;
 use Domain\Internationalization\Models\Locale;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Livewire\Redirector;
 use Throwable;
 
 class EditGlobals extends EditRecord
@@ -70,5 +75,55 @@ class EditGlobals extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(fn () => app(UpdateGlobalsAction::class)->execute($record, GlobalsData::fromArray($data)));
+    }
+
+    public function createTranslation(array $data): RedirectResponse|Redirector|false
+    {
+
+        $formData = $this->form->getState();
+
+        $formData['locale'] = $data['locale'];
+
+        /** @var \Domain\Globals\Models\Globals */
+        $record = $this->record;
+
+        $orginalContent = $record->parentTranslation ?? $record;
+
+        $exist = Globals::where('translation_id', $orginalContent->id)->where('locale', $data['locale'])->first();
+
+        /** @var \Domain\Internationalization\Models\Locale */
+        $locale = Locale::whereCode($data['locale'])->first();
+
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = auth()->user();
+
+        if ($exist) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Globals :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Globals :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
+
+        $globalData = GlobalsData::fromArray($formData);
+
+        $globalTranslation = app(CreateGlobalTranslationAction::class)->execute($orginalContent, $globalData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Translation Created'))
+            ->body(trans('Page Translation :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+            ->sendToDatabase($admin);
+
+        return redirect(GlobalsResource::getUrl('edit', ['record' => $globalTranslation]));
     }
 }

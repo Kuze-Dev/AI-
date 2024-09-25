@@ -5,12 +5,19 @@ declare(strict_types=1);
 namespace Domain\Page\Actions;
 
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
+use Domain\Blueprint\Actions\ExtractDataAction;
+use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
+use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
+use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Page\DataTransferObjects\BlockContentData;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CreateBlockContentAction
 {
+    use SanitizeBlueprintDataTrait;
+
     public function __construct(
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
@@ -85,7 +92,7 @@ class CreateBlockContentAction
 
     }
 
-    private function updateJsonByStatePaths(BlockContent $item, array $updates): array
+    private function updateJsonByStatePaths(BlockContent $item, array $updates): ?array
     {
 
         $arrayData = $item->data;

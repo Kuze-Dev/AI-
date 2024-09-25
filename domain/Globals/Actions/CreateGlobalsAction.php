@@ -21,6 +21,7 @@ class CreateGlobalsAction
         /** @var Globals */
         $globals = Globals::create([
             'name' => $globalData->name,
+            'locale' => $globalData->locale,
             'blueprint_id' => $globalData->blueprint_id,
             'data' => $globalData->data,
         ]);

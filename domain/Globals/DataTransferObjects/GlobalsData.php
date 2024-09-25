@@ -9,6 +9,7 @@ class GlobalsData
     public function __construct(
         public readonly string $name,
         public readonly string $blueprint_id,
+        public readonly string $locale,
         public readonly array $data = [],
         public readonly array $sites = [],
     ) {
@@ -16,9 +17,11 @@ class GlobalsData
 
     public static function fromArray(array $data): self
     {
+
         return new self(
             name: $data['name'],
             blueprint_id: $data['blueprint_id'],
+            locale: $data['locale'] ?? 'en',
             data: $data['data'] ?? [],
             sites: $data['sites'] ?? [],
         );

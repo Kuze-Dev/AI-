@@ -8,75 +8,53 @@ use Domain\Blueprint\Actions\CreateBlueprintDataAction;
 use Domain\Blueprint\Actions\ExtractDataAction;
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
-use Domain\Blueprint\Models\Blueprint;
-use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
+use Domain\Content\Models\Content;
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Support\MetaData\Actions\CreateMetaDataAction;
+use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
-class UpdateGlobalsAction
+class CreateGlobalTranslationAction
 {
-    use SanitizeBlueprintDataTrait;
-
     public function __construct(
+        protected CreateMetaDataAction $createMetaData,
+        protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+        protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
     ) {
     }
 
-    /**
-     * Execute operations for updating
-     * collection and save collection query.
-     */
-    public function execute(Globals $globals, GlobalsData $globalData): Globals
+    /** Execute create content entry query. */
+    public function execute(Globals $global, GlobalsData $globalData): Globals
     {
-        /** @var Blueprint|null */
-        $blueprint = Blueprint::whereId($globals->blueprint_id)->first();
+        /** @var Globals $globalTranslation */
+        $globalTranslation = $global->globalsTranslation()
+            ->create([
+                'name' => $globalData->name,
+                'blueprint_id' => $globalData->blueprint_id,
+                'locale' => $globalData->locale,
+                'data' => $globalData->data,
+            ]);
 
-        if (! $blueprint) {
-            abort(422, 'Cannot Access Blueprint '.$globals->blueprint_id);
+        $this->createBlueprintDataAction->execute($globalTranslation);
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+            $globalTranslation->sites()->sync($globalData->sites);
         }
 
-        $sanitizeData = $this->sanitizeBlueprintData(
-            $globalData->data,
-            $blueprint->schema->getFieldStatekeys()
-        );
+        $this->handleGlobalTranslation($global, $globalTranslation);
 
-        $globals->update([
-            'name' => $globalData->name,
-            'data' => $sanitizeData,
-        ]);
+        $globalTranslation->refresh();
 
-        /** @var Globals */
-        $model = Globals::with('blueprint')->where('id', $globals->id)->first();
+        return $globalTranslation;
 
-        $this->updateBlueprintDataAction->execute($model);
-
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
-        ) {
-
-            $globals->sites()
-                ->sync($globalData->sites);
-
-        }
-
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
-
-            $this->handleTranslations($globals, $globalData);
-
-            return $globals;
-        }
-
-        return $globals;
     }
 
-    private function handleTranslations(Globals $globals, GlobalsData $globalTranslation): void
+    private function handleGlobalTranslation(Globals $global, Globals $translatedGlobals): void
     {
-
-        if (! $globals->data) {
-            return;
-        }
-
-        $extractedDatas = app(ExtractDataAction::class)->extractStatePathAndFieldTypes($globals->blueprint->schema->sections);
+        $extractedDatas = app(ExtractDataAction::class)->extractStatePathAndFieldTypes($global->blueprint->schema->sections);
 
         /** @var array */
         $combinedArray = [];
@@ -85,7 +63,7 @@ class UpdateGlobalsAction
 
         foreach ($extractedDatas as $sectionKey => $sectionValue) {
             foreach ($sectionValue as $fieldKey => $fieldValue) {
-                $combinedArray[$sectionKey][$fieldKey] = app(ExtractDataAction::class)->mergeFields($fieldValue, $globals->data[$sectionKey][$fieldKey], $fieldValue['statepath']);
+                $combinedArray[$sectionKey][$fieldKey] = app(ExtractDataAction::class)->mergeFields($fieldValue, $global->data[$sectionKey][$fieldKey], $fieldValue['statepath']);
             }
         }
 
@@ -104,48 +82,16 @@ class UpdateGlobalsAction
         if (
             count($filtered) > 0
         ) {
+            $data = $this->updateJsonByStatePaths($translatedGlobals, $filtered);
 
-            //check page if page has translation
+            $translatedGlobals->update([
+                'data' => $data,
+            ]);
 
-            if ($globals->translation_id) {
-
-                $translation_collection = $globals->globalsTranslation()
-                    ->orwhere('id', $globals->translation_id)
-                    ->orwhere('translation_id', $globals->translation_id)
-                    ->get();
-
-            } else {
-                $translation_collection = $globals->globalsTranslation()
-                    ->orwhere('id', $globals->id)
-                    ->get();
-
-            }
-
-            foreach ($translation_collection as $item) {
-
-                $updated_version = $this->updateJsonByStatePaths($item, $filtered, $globals);
-
-                $sanitizeUpdatedData = $this->sanitizeBlueprintData(
-                    $updated_version,
-                    $globals->blueprint->schema->getFieldStatekeys()
-                );
-
-                $item->update([
-                    'data' => $sanitizeUpdatedData,
-                ]);
-
-                $this->updateBlueprintDataAction->execute($item);
-
-            }
-
-            return;
         }
-
-        $this->updateBlueprintDataAction->execute($globals);
-
     }
 
-    private function updateJsonByStatePaths(Globals $item, array $updates, Globals $source): array
+    private function updateJsonByStatePaths(Globals $item, array $updates): array
     {
 
         $arrayData = $item->data;
@@ -155,7 +101,7 @@ class UpdateGlobalsAction
             $statePath = $update['statepath'];
             $newValue = $update['value'];
 
-            if ($item->id != $source->id &&
+            if (
                 $update['type'] == \Domain\Blueprint\Enums\FieldType::MEDIA &&
                 ! is_null($update['value'])
             ) {
@@ -175,14 +121,13 @@ class UpdateGlobalsAction
 
                     } else {
 
+                        /** @var Media */
                         $media = Media::where('uuid', $media_item)->first();
 
-                        $newValue[] = $media?->getPath();
+                        $newValue[] = $media->getPath();
                     }
 
                 }
-
-                $newValue = array_filter($newValue, fn ($value) => ! is_null($value));
 
                 if (! $blueprint_data) {
 
