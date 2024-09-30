@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ContentEntryTranslationRelationManager extends RelationManager
 {
-    protected static string $relationship = 'contentEntryTranslation';
+    protected static string $relationship = 'dataTranslation';
 
     protected static ?string $recordTitleAttribute = 'title';
 

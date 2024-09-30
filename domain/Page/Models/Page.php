@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use Domain\Admin\Models\Admin;
+use Domain\Internationalization\Concerns\HasInternationalizationInterface;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Site\Traits\Sites;
@@ -69,7 +70,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['blockContents', 'metaData', 'routeUrls'])]
-class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
+class Page extends Model implements HasInternationalizationInterface, HasMetaDataContract, HasRouteUrlContact
 {
     use ConstraintsRelationships;
     use HasMetaData;
@@ -176,7 +177,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     }
 
     /** @return HasMany<Page> */
-    public function pageTranslation(): HasMany
+    public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }

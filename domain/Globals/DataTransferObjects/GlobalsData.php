@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Domain\Globals\DataTransferObjects;
 
-class GlobalsData
+use Domain\Internationalization\DataTransferObjects\TranslationDTO;
+
+class GlobalsData extends TranslationDTO
 {
     public function __construct(
         public readonly string $name,
         public readonly string $blueprint_id,
         public readonly string $locale,
-        public readonly array $data = [],
+        public readonly ?array $data = [],
         public readonly array $sites = [],
     ) {
     }

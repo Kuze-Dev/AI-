@@ -6,6 +6,7 @@ namespace Domain\Globals\Models;
 
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
+use Domain\Internationalization\Concerns\HasInternationalizationInterface;
 use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,7 +49,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @mixin \Eloquent
  */
 #[ OnDeleteCascade(['blueprintData']) ]
-class Globals extends Model
+class Globals extends Model implements HasInternationalizationInterface
 {
     use ConstraintsRelationships;
     use HasSlug;
@@ -118,7 +119,7 @@ class Globals extends Model
     }
 
     /** @return HasMany<Globals> */
-    public function globalsTranslation(): HasMany
+    public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }

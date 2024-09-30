@@ -20,7 +20,7 @@ use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class PageTranslationRelationManager extends RelationManager
 {
-    protected static string $relationship = 'pageTranslation';
+    protected static string $relationship = 'dataTranslation';
 
     protected static ?string $recordTitleAttribute = 'pageTranslation';
 

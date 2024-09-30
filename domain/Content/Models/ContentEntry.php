@@ -7,6 +7,7 @@ namespace Domain\Content\Models;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Domain\Internationalization\Concerns\HasInternationalizationInterface;
 use Domain\Site\Traits\Sites;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
@@ -77,7 +78,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls', 'blueprintData'])]
-class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlContact
+class ContentEntry extends Model implements HasInternationalizationInterface, HasMetaDataContract, HasRouteUrlContact
 {
     use ConstraintsRelationships;
     use HasMetaData;
@@ -217,7 +218,7 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     }
 
     /** @return HasMany<ContentEntry> */
-    public function contentEntryTranslation(): HasMany
+    public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }

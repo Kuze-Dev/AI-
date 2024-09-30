@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 class GlobalsTranslationRelationManager extends RelationManager
 {
-    protected static string $relationship = 'globalsTranslation';
+    protected static string $relationship = 'dataTranslation';
 
     protected static ?string $recordTitleAttribute = 'name';
 

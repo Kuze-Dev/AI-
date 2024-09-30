@@ -22,7 +22,7 @@ class CreatePageTranslationAction
     public function execute(Page $page, PageData $pageData): Page
     {
         /** @var Page */
-        $pageTranslation = $page->pageTranslation()->create([
+        $pageTranslation = $page->dataTranslation()->create([
             'author_id' => $pageData->author_id,
             'name' => $pageData->name,
             'visibility' => $pageData->visibility,
