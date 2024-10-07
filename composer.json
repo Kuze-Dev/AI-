@@ -7,6 +7,7 @@
         "php": "^8.2.11",
         "artificertech/filament-multi-context": "^2.0",
         "awcodes/drop-in-action": "^0.2.2",
+        "awcodes/filament-tiptap-editor": "2.6.8",
         "aws/aws-sdk-php": "^3.252",
         "bacon/bacon-qr-code": "^2.0",
         "barryvdh/laravel-dompdf": "^2.0",

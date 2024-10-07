@@ -21,6 +21,7 @@ use Domain\Blueprint\DataTransferObjects\SelectFieldData;
 use Domain\Blueprint\DataTransferObjects\TextareaFieldData;
 use Domain\Blueprint\DataTransferObjects\TextFieldData;
 use Domain\Blueprint\DataTransferObjects\TinyEditorData;
+use Domain\Blueprint\DataTransferObjects\TipTapEditorData;
 use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
@@ -39,6 +40,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
@@ -128,6 +130,7 @@ class SchemaFormBuilder extends Component
             RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
             MediaFieldData::class => $this->makeMediaComponent($field),
             TinyEditorData::class => $this->makeTinyEditorComponent($field),
+            TipTapEditorData::class => $this->makeTiptapEditorComponent($field),
 
             default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
         };
@@ -443,5 +446,20 @@ class SchemaFormBuilder extends Component
         }
 
         return $tinyEditor;
+    }
+
+    public function makeTiptapEditorComponent(TiptapEditorData $tiptapEditorData): TiptapEditor
+    {
+        $tiptapEditor = TiptapEditor::make($tiptapEditorData->state_name)
+            ->acceptedFileTypes($tiptapEditorData->accept)
+            ->tools(
+                $tiptapEditorData->tools
+            )
+            ->directory('attachments')
+            ->extraInputAttributes(['style' => 'min-height: 12rem;'])
+            ->maxContentWidth('full')
+            ->output(\FilamentTiptapEditor\Enums\TiptapOutput::Html->value); // optional, change the format for saved data, default is html
+
+        return $tiptapEditor;
     }
 }
