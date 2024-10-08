@@ -170,7 +170,7 @@ class UpdateBlueprintDataAction
 
         foreach ($flattenData as $item) {
 
-             /** @phpstan-ignore-next-line */
+            /** @phpstan-ignore-next-line */
             $blueprint_data_entity = $model->BlueprintData()->where('state_path', $item['statepath'])->get();
 
             if ($blueprint_data_entity->count() > 1) {
