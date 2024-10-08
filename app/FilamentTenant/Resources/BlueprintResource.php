@@ -17,6 +17,7 @@ use Domain\Blueprint\Enums\ManipulationFormat;
 use Domain\Blueprint\Enums\ManipulationType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
+use Domain\Blueprint\Enums\TiptapTools;
 use Domain\Blueprint\Models\Blueprint;
 use ErrorException;
 use Filament\Forms;
@@ -675,6 +676,39 @@ class BlueprintResource extends Resource
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
+            ],
+
+            FieldType::TIPTAPEDITOR => [
+                Forms\Components\TextInput::make('accept')
+                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                        $set('accept', implode(',', $state ?? []));
+                    })
+                    ->dehydrateStateUsing(function (?string $state): array {
+                        if ($state === null) {
+                            return [];
+                        }
+
+                        return Str::contains($state, ',')
+                            ? Str::of($state)->split('/\,/')
+                                ->map(fn (string $rule) => trim($rule))
+                                ->toArray()
+                            : [$state];
+                    })
+                    ->columnSpanFull(),
+
+                Forms\Components\CheckboxList::make('tools')
+                    ->options(
+                        collect(TiptapTools::cases())
+                            ->mapWithKeys(fn (TiptapTools $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                            ->toArray()
+                    )
+                    ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
+                    ->columns([
+                        'sm' => 2,
+                        'md' => 4,
+                    ])
+                    ->columnSpanFull(),
+
             ],
             default => [],
         };

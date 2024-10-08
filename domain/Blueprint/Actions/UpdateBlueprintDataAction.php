@@ -215,6 +215,25 @@ class UpdateBlueprintDataAction
         /** @phpstan-ignore-next-line */
         $removeBlueprintData = $model->blueprintData()->whereNotIn('state_path', $statepaths)->get();
 
+        foreach ($flattenData as $item) {
+
+            /** @phpstan-ignore-next-line */
+            $blueprint_data_entity = $model->BlueprintData()->where('state_path', $item['statepath'])->get();
+
+            if ($blueprint_data_entity->count() > 1) {
+                $blueprint_entity_id = $blueprint_data_entity->pluck('id')->toArray();
+
+                $minValue = min($blueprint_entity_id);
+
+                $key = array_search($minValue, $blueprint_entity_id);
+
+                unset($blueprint_entity_id[$key]);
+
+                BlueprintData::whereIN('id', $blueprint_entity_id)->delete();
+            }
+
+        }
+
         if ($removeBlueprintData->count()) {
 
             $toRemove = [];
