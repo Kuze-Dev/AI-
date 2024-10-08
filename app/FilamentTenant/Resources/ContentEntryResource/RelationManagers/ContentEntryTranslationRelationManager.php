@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\RelationManagers;
 
+use App\FilamentTenant\Resources\ContentEntryResource;
 use Domain\Content\Models\ContentEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
@@ -22,11 +23,11 @@ class ContentEntryTranslationRelationManager extends RelationManager
     public function getRelationship(): Relation|Builder
     {
         if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0) {
-            return $this->getOwnerRecord()->{static::getRelationshipName()}();
+            return $this->getOwnerRecord()->{static::getRelationshipName()}()->with('content');
         }
 
         /** @phpstan-ignore-next-line */
-        return $this->getOwnerRecord()->{static::getRelationshipName()}()->orwhere('id', $this->ownerRecord->translation_id)->orwhere('translation_id', $this->ownerRecord->translation_id)->where('id', '!=', $this->ownerRecord->id);
+        return $this->getOwnerRecord()->{static::getRelationshipName()}()->orwhere('id', $this->ownerRecord->translation_id)->orwhere('translation_id', $this->ownerRecord->translation_id)->where('id', '!=', $this->ownerRecord->id)->with('content');
     }
 
     public static function table(Table $table): Table
@@ -74,11 +75,13 @@ class ContentEntryTranslationRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+              
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('edit')
+                ->url(
+                    fn (ContentEntry $record) => ContentEntryResource::getUrl('edit', [$record->content,$record])
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
