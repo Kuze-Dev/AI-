@@ -47,14 +47,14 @@ class CountrySeeder extends Seeder
 
         // $this->command->getOutput()->newLine();
 
-        $pathCountry = database_path('/seeders/Tenant/Country/countries.sql');
-        $pathCountryState = database_path('/seeders/Tenant/Country/states.sql');
-        // Load the SQL file content
-        $sql_c = File::get($pathCountry);
-        $sql_s = File::get($pathCountryState);
-        // Execute the SQL
-        DB::unprepared($sql_c);
-        DB::unprepared($sql_s);
+        // $pathCountry = database_path('/seeders/Tenant/Country/countries.sql');
+        // $pathCountryState = database_path('/seeders/Tenant/Country/states.sql');
+        // // Load the SQL file content
+        // $sql_c = File::get($pathCountry);
+        // $sql_s = File::get($pathCountryState);
+        // // Execute the SQL
+        // DB::unprepared($sql_c);
+        // DB::unprepared($sql_s);
     }
 
     /** @throws Exception */
