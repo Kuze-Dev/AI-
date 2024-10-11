@@ -35,9 +35,9 @@ class CountrySeeder extends Seeder
         foreach ($states as $state) {
 
             State::create([
-                'code' => $countryData['code'],
-                'name' => $countryData['name'],
-                'country_id' => $countryData['country_id'],
+                'code' => $state['code'],
+                'name' => $state['name'],
+                'country_id' => $state['country_id'],
             ]);
         }
 
