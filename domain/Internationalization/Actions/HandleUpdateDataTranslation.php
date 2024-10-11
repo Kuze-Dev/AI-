@@ -212,6 +212,7 @@ class HandleUpdateDataTranslation
         $blueprint_id = match ($model::class) {
             ContentEntry::class => $model->content->blueprint_id,
             BlockContent::class => $model->block->blueprint_id,
+            TaxonomyTerm::class => $model->taxonomy->blueprint_id,
             default => $model->blueprint_id,
         };
 

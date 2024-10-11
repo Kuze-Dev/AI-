@@ -49,6 +49,7 @@ class CreateBlueprintDataAction
         }
 
         if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
+
             if (is_array($blueprintDataData->value)) {
                 foreach ($blueprintDataData->value as $value) {
                     if (Storage::disk(config('filament.default_filesystem_disk'))->exists($value)) {

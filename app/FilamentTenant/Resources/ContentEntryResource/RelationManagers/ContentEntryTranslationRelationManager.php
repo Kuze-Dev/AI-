@@ -75,13 +75,13 @@ class ContentEntryTranslationRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-              
+
             ])
             ->actions([
                 Tables\Actions\Action::make('edit')
-                ->url(
-                    fn (ContentEntry $record) => ContentEntryResource::getUrl('edit', [$record->content,$record])
-                ),
+                    ->url(
+                        fn (ContentEntry $record) => ContentEntryResource::getUrl('edit', [$record->content, $record])
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

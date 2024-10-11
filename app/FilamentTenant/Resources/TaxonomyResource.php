@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
@@ -87,7 +88,18 @@ class TaxonomyResource extends Resource
                                 ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                 ?->dispatchEvent('route_url::update');
                         })
-                        ->unique(ignoreRecord: true),
+                        ->unique(
+                            ignoreRecord: true,
+                            callback: function (Unique $rule, $state, $livewire) {
+
+                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                    return false;
+                                }
+
+                                return $rule;
+                            }
+                        )
+                        ->lazy(),
                     Forms\Components\Select::make('blueprint_id')
                         ->label(trans('Blueprint'))
                         ->required()
