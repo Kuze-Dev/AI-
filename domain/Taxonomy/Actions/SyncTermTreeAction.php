@@ -72,21 +72,28 @@ class SyncTermTreeAction
             tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
         ) {
             $i = 0;
+            
             foreach ($termIds as $term_id) {
                 $i++;
                 $taxTerm = TaxonomyTerm::find($term_id);
 
-                $taxTermCollection = $taxTerm->dataTranslation()
-                    ->orwhere('id', $taxTerm->translation_id)
-                    ->orwhere('translation_id', $taxTerm->translation_id)
-                    ->get();
-    
+                if ($taxTerm->translation_id) {
+                    $taxTermCollection = $taxTerm->dataTranslation()
+                        ->orwhere('id', $taxTerm->translation_id)
+                        ->orwhere('translation_id', $taxTerm->translation_id)
+                        ->get();
+                }else{
+                    $taxTermCollection = $taxTerm->dataTranslation()
+                        ->orwhere('id', $taxTerm->translation_id)
+                        ->get();
+                }
+               
+                
 
                 foreach ($taxTermCollection as $tax_term_item) {
                     
                     $tax_term_item->order = $taxTerm->order;
                     $tax_term_item->save();
-
                 } 
 
             }

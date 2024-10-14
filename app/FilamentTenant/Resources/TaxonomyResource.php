@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\TaxonomyResource\RelationManagers\TaxonomyTranslationRelationManager;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\Tree;
@@ -313,6 +314,7 @@ class TaxonomyResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            TaxonomyTranslationRelationManager::class,
         ];
     }
 
