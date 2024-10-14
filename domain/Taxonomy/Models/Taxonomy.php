@@ -30,6 +30,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @property string $blueprint_id
  * @property string $name
  * @property string $slug
+ * @property string $locale
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
@@ -55,7 +56,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @mixin \Eloquent
  */
 #[
-    OnDeleteCascade(['taxonomyTerms']),
+    OnDeleteCascade(['taxonomyTerms', 'routeUrls', 'dataTranslation']),
     OnDeleteRestrict(['contents'])
 ]
 class Taxonomy extends Model implements HasRouteUrlContract
@@ -69,7 +70,10 @@ class Taxonomy extends Model implements HasRouteUrlContract
     protected $fillable = [
         'name',
         'slug',
+        'locale',
+        'has_route',
         'blueprint_id',
+        'translation_id',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -121,6 +125,18 @@ class Taxonomy extends Model implements HasRouteUrlContract
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    /** @return HasMany<Taxonomy> */
+    public function dataTranslation(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_id');
+    }
+
+    /** @return BelongsTo<Taxonomy, Taxonomy> */
+    public function parentTranslation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_id');
     }
 
     public static function generateRouteUrl(Model $model, array $attributes): string

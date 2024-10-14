@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\TaxonomyResource\Pages;
 
+use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TaxonomyResource;
+use Domain\Internationalization\Models\Locale;
+use Domain\Taxonomy\Actions\CreateTaxonomyTranslationAction;
 use Domain\Taxonomy\Actions\UpdateTaxonomyAction;
 use Domain\Taxonomy\DataTransferObjects\TaxonomyData;
+use Domain\Taxonomy\Models\Taxonomy;
+use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Livewire\Redirector;
 
 class EditTaxonomy extends EditRecord
 {
@@ -23,10 +32,33 @@ class EditTaxonomy extends EditRecord
     protected function getActions(): array
     {
         return [
-            Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->action('save')
-                ->keyBindings(['mod+s']),
+            // Action::make('save')
+            //     ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+            //     ->action('save')
+            //     ->keyBindings(['mod+s']),
+
+            'page_actions' => CustomPageActionGroup::make([
+                Action::make('createTranslation')
+                    ->color('secondary')
+                    ->slideOver(true)
+                    ->action('createTranslation')
+                    ->form([
+                        Forms\Components\Select::make('locale')
+                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                            ->default((string) Locale::where('is_default', true)->first()?->code)
+                            ->searchable()
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->reactive()
+                            ->required(),
+                    ]),
+                Action::make('save')
+                    ->label(trans('Save and Continue Editing'))
+                    ->action('save')
+                    ->keyBindings(['mod+s']),
+            ])
+                ->view('filament.pages.actions.custom-action-group.index')
+                ->setName('page_draft_actions')
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
             Actions\DeleteAction::make(),
         ];
     }
@@ -39,7 +71,105 @@ class EditTaxonomy extends EditRecord
     /** @param  \Domain\Taxonomy\Models\Taxonomy  $record */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        // dd($data);
         return DB::transaction(fn () => app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data)));
+    }
+
+    public function createTranslation(array $data): RedirectResponse|Redirector|false
+    {
+
+        $formData = $this->form->getState();
+
+        $formData['locale'] = $data['locale'];
+
+        $code = $data['locale'];
+
+        if ($formData['has_route']) {
+            $formData['route_url']['url'] = $this->changeUrlLocale($formData['route_url']['url'], $code);
+        }
+
+        $formData['terms'] = array_map(function ($term) use ($formData) {
+
+            $term['translation_id'] = $term['id'];
+
+            $term['id'] = null;
+
+            if ($formData['has_route']) {
+                if ($term['url']) {
+                    $term['url'] = '/'.$formData['locale'].$term['url'];
+                } else {
+                    $term['url'] = $formData['route_url']['url'].'/'.Str::of($term['name'])->slug();
+                }
+            }
+
+            return $term;
+        }, $formData['terms']);
+
+        /** @var Taxonomy */
+        $record = $this->record;
+
+        $orginalContent = $record->parentTranslation ?? $record;
+
+        $exist = Taxonomy::where('translation_id', $orginalContent->id)->where('locale', $data['locale'])->first();
+
+        /** @var \Domain\Internationalization\Models\Locale */
+        $locale = Locale::whereCode($data['locale'])->first();
+
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = auth()->user();
+
+        if ($exist) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Page :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Page :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
+
+        $taxonomyData = TaxonomyData::fromArray($formData);
+
+        $taxonomyTranslation = app(CreateTaxonomyTranslationAction::class)->execute($orginalContent, $taxonomyData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Translation Created'))
+            ->body(trans('Page Translation :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+            ->sendToDatabase($admin);
+
+        return redirect(TaxonomyResource::getUrl('edit', ['record' => $taxonomyTranslation]));
+    }
+
+    protected function changeUrlLocale(string $url, string $locale): string
+    {
+
+        $locales = Locale::pluck('code')->toArray();
+
+        // Remove leading and trailing slashes from the URL
+        $url = trim($url, '/');
+
+        // Split the URL by "/"
+        $segments = explode('/', $url);
+
+        // Check if the first segment is a valid locale code from the array
+        if (in_array($segments[0], $locales)) {
+            // Replace the existing locale with the new one
+            $segments[0] = $locale;
+        } else {
+            // Prepend the new locale to the URL
+            array_unshift($segments, $locale);
+        }
+
+        // Rebuild the URL and add a leading "/"
+        return '/'.implode('/', $segments);
     }
 
     protected function getRedirectUrl(): ?string

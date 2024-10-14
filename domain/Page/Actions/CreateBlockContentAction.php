@@ -5,14 +5,20 @@ declare(strict_types=1);
 namespace Domain\Page\Actions;
 
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
+use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
+use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
+use Domain\Internationalization\Actions\HandleDataTranslation;
 use Domain\Page\DataTransferObjects\BlockContentData;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
 
 class CreateBlockContentAction
 {
+    use SanitizeBlueprintDataTrait;
+
     public function __construct(
         protected CreateBlueprintDataAction $createBlueprintDataAction,
+        protected UpdateBlueprintDataAction $updateBlueprintDataAction,
     ) {
     }
 
@@ -24,6 +30,13 @@ class CreateBlockContentAction
         ]);
 
         $this->createBlueprintDataAction->execute($blockContent);
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+
+            app(HandleDataTranslation::class)->execute($blockContent, $blockContent);
+
+            return $blockContent;
+        }
 
         return $blockContent;
     }

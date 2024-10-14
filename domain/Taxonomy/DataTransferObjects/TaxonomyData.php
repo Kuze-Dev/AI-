@@ -13,6 +13,7 @@ class TaxonomyData
         public readonly string $name,
         public readonly RouteUrlData $route_url_data,
         public readonly string $blueprint_id,
+        public readonly string $locale,
         public readonly array $terms = [],
         public readonly array $sites = [],
         public readonly bool $has_route = false,
@@ -27,6 +28,7 @@ class TaxonomyData
             blueprint_id: $data['blueprint_id'],
             terms: array_map(fn (array $termDate) => TaxonomyTermData::fromArray($termDate), $data['terms'] ?? []),
             sites: $data['sites'] ?? [],
+            locale: $data['locale'] ?? 'en',
             has_route: $data['has_route'] ?? false,
         );
     }
