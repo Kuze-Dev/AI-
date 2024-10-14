@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\TaxonomyResource\RelationManagers;
 
-use App\FilamentTenant\Resources\GlobalsResource;
 use App\FilamentTenant\Resources\TaxonomyResource;
-use Domain\Globals\Models\Globals;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
@@ -37,18 +35,18 @@ class TaxonomyTranslationRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                ->sortable()
-                ->searchable()
-                ->truncate('max-w-xs 2xl:max-w-xl', true),
-            Tables\Columns\TextColumn::make('locale')
-                ->searchable()
-                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-            Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
-                ->counts('taxonomyTerms')
-                ->sortable(),
-            Tables\Columns\TextColumn::make('updated_at')
-                ->dateTime(timezone: Auth::user()?->timezone)
-                ->sortable(),
+                    ->sortable()
+                    ->searchable()
+                    ->truncate('max-w-xs 2xl:max-w-xl', true),
+                Tables\Columns\TextColumn::make('locale')
+                    ->searchable()
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
+                    ->counts('taxonomyTerms')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->sortable(),
             ])
             ->filters([
                 //

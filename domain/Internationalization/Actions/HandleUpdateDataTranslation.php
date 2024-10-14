@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Internationalization\Actions;
 
-use App\FilamentTenant\Pages\Settings\CustomerSettings;
+use App\Settings\CustomerSettings;
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
 use Domain\Blueprint\Actions\ExtractDataAction;
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
@@ -18,6 +18,7 @@ use Domain\Internationalization\DataTransferObjects\TranslationDTO;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use ErrorException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -213,7 +214,10 @@ class HandleUpdateDataTranslation
             ContentEntry::class => $model->content->blueprint_id,
             BlockContent::class => $model->block->blueprint_id,
             TaxonomyTerm::class => $model->taxonomy->blueprint_id,
-            default => $model->blueprint_id,
+            Globals::class => $model->blueprint_id,
+            default => throw new ErrorException(
+                'Model '.$model::class.'::'.' doest not support data translation.'
+            ),
         };
 
         return new BlueprintDataData(
@@ -230,6 +234,7 @@ class HandleUpdateDataTranslation
      * @param  ContentEntry|BlockContent|Customer|TaxonomyTerm|Globals  $model,
      * @param  mixed  $modelDTO
      */
+    /** @phpstan-ignore-next-line */
     protected function getTranslatableModelCollection($model, $modelDTO): Collection
     {
 
@@ -240,7 +245,7 @@ class HandleUpdateDataTranslation
 
             if ($pageModel->translation_id) {
 
-                $pageIds = $model->dataTranslation()
+                $pageIds = $pageModel->dataTranslation()
                     ->orwhere('id', $pageModel->translation_id)
                     ->orwhere('translation_id', $pageModel->translation_id)
                     ->get()

@@ -105,6 +105,7 @@ class EditTaxonomy extends EditRecord
             return $term;
         }, $formData['terms']);
 
+        /** @var Taxonomy */
         $record = $this->record;
 
         $orginalContent = $record->parentTranslation ?? $record;

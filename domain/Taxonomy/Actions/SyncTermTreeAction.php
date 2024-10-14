@@ -71,10 +71,10 @@ class SyncTermTreeAction
         if (
             tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
         ) {
-            $i = 0;
-            
+
             foreach ($termIds as $term_id) {
-                $i++;
+
+                /** @var TaxonomyTerm */
                 $taxTerm = TaxonomyTerm::find($term_id);
 
                 if ($taxTerm->translation_id) {
@@ -82,22 +82,19 @@ class SyncTermTreeAction
                         ->orwhere('id', $taxTerm->translation_id)
                         ->orwhere('translation_id', $taxTerm->translation_id)
                         ->get();
-                }else{
+                } else {
                     $taxTermCollection = $taxTerm->dataTranslation()
                         ->orwhere('id', $taxTerm->translation_id)
                         ->get();
                 }
-               
-                
 
                 foreach ($taxTermCollection as $tax_term_item) {
-                    
+
                     $tax_term_item->order = $taxTerm->order;
                     $tax_term_item->save();
-                } 
+                }
 
             }
-
 
         }
     }
@@ -131,7 +128,8 @@ class SyncTermTreeAction
 
                 if ($term->translation_id) {
 
-                    $parentModel = TaxonomyTerm::find($term->translation_id)->firstorFail();
+                    /** @var TaxonomyTerm */
+                    $parentModel = TaxonomyTerm::find($term->translation_id);
 
                     $termTranslation = $term;
 
@@ -158,16 +156,24 @@ class SyncTermTreeAction
                             continue;
                         }
 
-                        $termUrl = $termData->is_custom ?
-                                '/'.$taxonomy_item->locale.$termData->url :
-                              '/'.implode('/', array_diff(
-                                  explode('/', trim(parse_url($termData->url, PHP_URL_PATH), '/')), $listLocaleCodes));
+                        if ($termData->url) {
+                            /** @var string */
+                            $url = parse_url($termData->url, PHP_URL_PATH);
+
+                            $termUrl = $termData->is_custom ?
+                            '/'.$taxonomy_item->locale.$termData->url :
+                          '/'.implode('/', array_diff(
+                              explode('/', trim($url, '/')), $listLocaleCodes));
+
+                        } else {
+                            $termUrl = null;
+                        }
 
                         $newTaxonomyTermData = new TaxonomyTermData(
                             name: $termData->name,
                             data: $termData->data,
                             is_custom: $termData->is_custom,
-                            url: $defaultLocale == $taxonomy_item->locale ? $termUrl : "/$taxonomy_item->locale$termUrl",
+                            url: $termUrl ? ($defaultLocale == $taxonomy_item->locale ? $termUrl : "/$taxonomy_item->locale$termUrl") : null,
                             translation_id: (string) $term->id
                             // children: $taxonomy
                         );
@@ -309,7 +315,10 @@ class SyncTermTreeAction
 
                 $taxonomy_item->load('taxonomyTerms');
 
+                /** @var TaxonomyTerm */
                 $translation_parent = $taxonomy_item->taxonomyTerms->whereIn('id', $parentTranslationClusterIds)->first();
+
+                /** @var TaxonomyTerm */
                 $translation_term = $taxonomy_item->taxonomyTerms->whereIn('id', $termTranslationClusterIds)->first();
 
                 $translation_term->update([
