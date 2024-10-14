@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\ContentEntryResource\RelationManagers\ContentEntryTranslationRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -385,6 +386,7 @@ class ContentEntryResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            ContentEntryTranslationRelationManager::class,
         ];
     }
 

@@ -65,7 +65,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @mixin \Eloquent
  */
 #[
-    OnDeleteCascade(['contentEntries', 'children', 'blueprintData']),
+    OnDeleteCascade(['contentEntries', 'children', 'blueprintData', 'routeUrls', 'dataTranslation']),
     OnDeleteRestrict(['products'])
 ]
 class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
@@ -78,6 +78,7 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
     protected $fillable = [
         'taxonomy_id',
         'parent_id',
+        'translation_id',
         'name',
         'slug',
         'data',
@@ -165,5 +166,17 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
         $taxonomy = $model->load('taxonomy');
 
         return $taxonomy->taxonomy->activeRouteUrl?->url.'/'.Str::of($attributes['name'])->slug()->toString();
+    }
+
+    /** @return HasMany<TaxonomyTerm> */
+    public function dataTranslation(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_id');
+    }
+
+    /** @return BelongsTo<TaxonomyTerm, TaxonomyTerm> */
+    public function parentTranslation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_id');
     }
 }

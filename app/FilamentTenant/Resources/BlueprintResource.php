@@ -264,12 +264,16 @@ class BlueprintResource extends Resource
                     ->helperText(new HtmlString(<<<'HTML'
                             See <a href="https://www.php.net/manual/en/datetime.format.php" class="text-primary-500" target="_blank" rel="noopener noreferrer">PHP's Date/Time Format</a> for available options.
                         HTML)),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
             FieldType::FILE => [
                 Forms\Components\Toggle::make('multiple')
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
                 Forms\Components\Toggle::make('can_download'),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (Closure $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
@@ -318,6 +322,8 @@ class BlueprintResource extends Resource
                         'md' => 4,
                     ])
                     ->columnSpanFull(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
             FieldType::RICHTEXT => [
                 Forms\Components\CheckboxList::make('buttons')
@@ -332,11 +338,14 @@ class BlueprintResource extends Resource
                         'md' => 4,
                     ])
                     ->columnSpanFull(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
             FieldType::SELECT => [
                 Forms\Components\Toggle::make('multiple')
-                    ->reactive()
-                    ->columnSpanFull(),
+                    ->reactive(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\TextInput::make('min')
                     ->numeric()
                     ->integer()
@@ -362,8 +371,9 @@ class BlueprintResource extends Resource
             ],
             FieldType::CHECKBOX => [
                 Forms\Components\Toggle::make('bulk_toggleable')
-                    ->reactive()
-                    ->columnSpanFull(),
+                    ->reactive(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -376,6 +386,7 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('label')
                             ->required(),
                     ]),
+
             ],
             FieldType::TEXTAREA => [
                 Forms\Components\TextInput::make('min_length')
@@ -394,8 +405,21 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
-            FieldType::TEXT,
+            FieldType::TEXT, => [
+                Forms\Components\TextInput::make('min_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
+            ],
             FieldType::EMAIL,
             FieldType::TEL,
             FieldType::URL,
@@ -423,8 +447,13 @@ class BlueprintResource extends Resource
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
-            FieldType::TOGGLE => [],
+            FieldType::TOGGLE => [
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
+            ],
             FieldType::RELATED_RESOURCE => [
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
                     ->lazy()
@@ -543,6 +572,8 @@ class BlueprintResource extends Resource
                     ->integer()
                     ->when(fn (Closure $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Repeater::make('conversions')
                     ->schema([
                         Forms\Components\TextInput::make('name')->required(),
@@ -607,8 +638,9 @@ class BlueprintResource extends Resource
 
             ],
             FieldType::RADIO => [
-                Forms\Components\Toggle::make('inline')
-                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('inline'),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -621,6 +653,7 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('label')
                             ->required(),
                     ]),
+
                 Forms\Components\Repeater::make('descriptions')
                     ->collapsible()
                     ->orderable()
@@ -641,6 +674,8 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
 
             FieldType::TIPTAPEDITOR => [

@@ -9,6 +9,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
+use Domain\Internationalization\Actions\HandleUpdateDataTranslation;
 
 class UpdateGlobalsAction
 {
@@ -53,6 +54,13 @@ class UpdateGlobalsAction
             $globals->sites()
                 ->sync($globalData->sites);
 
+        }
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+
+            app(HandleUpdateDataTranslation::class)->execute($globals, $globalData);
+
+            return $globals;
         }
 
         return $globals;

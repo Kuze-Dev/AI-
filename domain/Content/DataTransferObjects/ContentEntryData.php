@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Content\DataTransferObjects;
 
+use Domain\Internationalization\DataTransferObjects\TranslationDTO;
 use Illuminate\Support\Carbon;
 use Support\MetaData\DataTransferObjects\MetaDataData;
 use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
-class ContentEntryData
+class ContentEntryData extends TranslationDTO
 {
     public function __construct(
         public readonly string $title,
@@ -19,7 +20,7 @@ class ContentEntryData
         public readonly bool $published_draft = false,
         public readonly bool $status = false,
         public readonly ?Carbon $published_at = null,
-        public readonly array $data = [],
+        public readonly ?array $data = [],
         public readonly ?int $author_id = null,
         public readonly array $sites = [],
     ) {

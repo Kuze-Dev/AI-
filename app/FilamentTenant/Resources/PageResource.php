@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\PageResource\RelationManagers\PageTranslationRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -364,6 +365,7 @@ class PageResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            PageTranslationRelationManager::class,
         ];
     }
 

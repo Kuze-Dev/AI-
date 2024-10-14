@@ -638,4 +638,168 @@ it('can published existing content entry draft', function () {
         'url' => ContentEntry::generateRouteUrl($contentEntry, $contentEntry->toArray()),
         'is_override' => false,
     ]);
+
+});
+
+it('can create content entry translation', function () {
+
+    tenancy()->tenant->features()->activate(
+        \App\Features\CMS\Internationalization::class
+    );
+
+    LocaleFactory::createDefault();
+
+    LocaleFactory::new([
+        'code' => 'es',
+        'name' => 'spanish',
+        'is_default' => false,
+    ])->createOne();
+
+    $content = ContentFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT, 'translatable' => true])
+        )
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
+        ->createOne([
+            'name' => 'Test Content',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
+        ]);
+
+    $contentEntry = ContentEntryFactory::new()
+        ->for($content)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['description' => 'test']])
+                ->for($content->taxonomies->first())
+                ->count(2)
+        )
+        ->has(MetaDataFactory::new(['title' => 'Foo']))
+        ->createOne([
+            'title' => 'Foo',
+            'locale' => 'en',
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
+        ->call('createTranslation', ['locale' => 'es'])
+        ->assertOk()
+        ->assertHasNoFormErrors();
+
+    assertDatabaseHas(ContentEntry::class, [
+        'title' => $contentEntry->title,
+        'locale' => 'en',
+    ]);
+
+    assertDatabaseHas(ContentEntry::class, [
+        'title' => $contentEntry->title,
+        'locale' => 'es',
+    ]);
+
+});
+
+it('can update all non translatable Field in translation relation', function () {
+
+    tenancy()->tenant->features()->activate(
+        \App\Features\CMS\Internationalization::class
+    );
+
+    LocaleFactory::createDefault();
+
+    LocaleFactory::new([
+        'code' => 'es',
+        'name' => 'spanish',
+        'is_default' => false,
+    ])->createOne();
+
+    $content = ContentFactory::new()
+        ->for(
+            BlueprintFactory::new()
+                ->addSchemaSection(['title' => 'Main'])
+                ->addSchemaField(['title' => 'Header', 'type' => FieldType::TEXT, 'translatable' => false])
+        )
+        ->has(
+            TaxonomyFactory::new()
+                ->for(
+                    BlueprintFactory::new()
+                        ->addSchemaSection(['title' => 'Main'])
+                        ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
+                )
+        )
+        ->createOne([
+            'name' => 'Test Content',
+            'future_publish_date_behavior' => 'public',
+            'past_publish_date_behavior' => 'unlisted',
+        ]);
+
+    $contentEntry = ContentEntryFactory::new()
+        ->for($content)
+        ->has(
+            TaxonomyTermFactory::new(['data' => ['description' => 'test']])
+                ->for($content->taxonomies->first())
+                ->count(2)
+        )
+        ->has(MetaDataFactory::new(['title' => 'Foo']))
+        ->createOne([
+            'title' => 'Foo',
+            'locale' => 'en',
+            'data' => ['main' => ['header' => 'Foo']],
+        ]);
+
+    livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->getRouteKey()])
+        ->fillForm([
+            'title' => 'New Foo v2',
+            'data' => ['main' => ['header' => 'Foo updated']],
+            'taxonomies' => [
+                $content->taxonomies->first()->id => $contentEntry->taxonomyTerms->pluck('id'),
+            ],
+            'meta_data' => [
+                'title' => '',
+                'description' => '',
+                'author' => '',
+                'keywords' => '',
+            ],
+        ])
+        ->call('createTranslation', ['locale' => 'es'])
+        ->assertOk()
+        ->assertHasNoFormErrors();
+
+    $translation = livewire(EditContentEntry::class, ['ownerRecord' => $content->getRouteKey(), 'record' => $contentEntry->dataTranslation->first()->getRouteKey()])
+        ->fillForm([
+            'title' => 'New Foo v2',
+            'data' => ['main' => ['header' => 'Foo updated']],
+            'taxonomies' => [
+                $content->taxonomies->first()->id => $contentEntry->taxonomyTerms->pluck('id'),
+            ],
+            'meta_data' => [
+                'title' => '',
+                'description' => '',
+                'author' => '',
+                'keywords' => '',
+            ],
+        ])
+        ->call('save')
+        ->assertOk()
+        ->assertHasNoFormErrors();
+
+    $contentEntry->refresh();
+
+    assertDatabaseHas(ContentEntry::class, [
+        'data' => json_encode($contentEntry->data),
+        'locale' => 'en',
+    ]);
+
+    assertDatabaseHas(ContentEntry::class, [
+        'data' => json_encode($contentEntry->data),
+        'locale' => 'es',
+    ]);
+
 });
