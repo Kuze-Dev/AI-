@@ -93,6 +93,14 @@ class HandleUpdateDataTranslation
                     $blueprintfieldtype->getFieldStatekeys()
                 );
 
+                if (
+                    tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+                    property_exists($modelDTO, 'sites')
+                ) {
+
+                    $item->sites()->sync($modelDTO->sites);
+                }
+
                 $item->update([
                     'data' => $sanitizeUpdatedData,
                 ]);

@@ -6,6 +6,9 @@ namespace Domain\Internationalization\DataTransferObjects;
 
 /**
  * FOR IDE SUPPORT
+ *
+ * @property array $data
+ * @property array $sites
  */
 class TranslationDTO
 {

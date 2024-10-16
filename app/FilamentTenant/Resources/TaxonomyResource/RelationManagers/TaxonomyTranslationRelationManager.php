@@ -52,7 +52,7 @@ class TaxonomyTranslationRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+
             ])
             ->actions([
                 Tables\Actions\Action::make('edit')
