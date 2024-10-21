@@ -32,11 +32,11 @@ class EditTaxonomy extends EditRecord
     protected function getActions(): array
     {
         return [
-            // Action::make('save')
-            //     ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
-            //     ->action('save')
-            //     ->keyBindings(['mod+s']),
-
+            Action::make('save')
+                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s']),
+            Actions\DeleteAction::make(),
             'page_actions' => CustomPageActionGroup::make([
                 Action::make('createTranslation')
                     ->color('secondary')
@@ -51,15 +51,14 @@ class EditTaxonomy extends EditRecord
                             ->reactive()
                             ->required(),
                     ]),
-                Action::make('save')
-                    ->label(trans('Save and Continue Editing'))
-                    ->action('save')
-                    ->keyBindings(['mod+s']),
+
             ])
                 ->view('filament.pages.actions.custom-action-group.index')
-                ->setName('page_draft_actions')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
-            Actions\DeleteAction::make(),
+                ->setName('other_page_actions')
+                ->color('secondary')
+                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                ->label(trans('More Actions')),
+
         ];
     }
 
