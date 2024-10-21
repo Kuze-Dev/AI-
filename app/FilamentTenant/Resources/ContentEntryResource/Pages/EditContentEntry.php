@@ -355,7 +355,8 @@ class EditContentEntry extends EditRecord
 
         $orginalContent = $record->parentTranslation ?? $record;
 
-        $exist = ContentEntry::where('translation_id', $orginalContent->id)->where('locale', $data['locale'])->first();
+        $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $orginalContent->id)->orWhere('id', $orginalContent->id)
+        )->where('locale', $data['locale'])->first();
 
         /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();
