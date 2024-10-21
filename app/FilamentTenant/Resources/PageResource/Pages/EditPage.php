@@ -331,7 +331,8 @@ class EditPage extends EditRecord
 
         $orginalContent = $record->parentTranslation ?? $record;
 
-        $exist = Page::where('translation_id', $orginalContent->id)->where('locale', $data['locale'])->first();
+        $exist = Page::where(fn ($query) => $query->where('translation_id', $orginalContent->id)->orWhere('id', $orginalContent->id)
+        )->where('locale', $data['locale'])->first();
 
         /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();

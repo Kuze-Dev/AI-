@@ -110,7 +110,8 @@ class EditTaxonomy extends EditRecord
 
         $orginalContent = $record->parentTranslation ?? $record;
 
-        $exist = Taxonomy::where('translation_id', $orginalContent->id)->where('locale', $data['locale'])->first();
+        $exist = Taxonomy::where(fn ($query) => $query->where('translation_id', $orginalContent->id)->orWhere('id', $orginalContent->id)
+        )->where('locale', $data['locale'])->first();
 
         /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();
