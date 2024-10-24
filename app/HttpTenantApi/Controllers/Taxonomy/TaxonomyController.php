@@ -28,6 +28,10 @@ class TaxonomyController
                     'parentTerms.taxonomy',
                     'taxonomyTerms.children',
                     'taxonomyTerms.taxonomy',
+                    'dataTranslation',
+                    'parentTranslation',
+                    'taxonomyTerms.dataTranslation',
+                    'taxonomyTerms.parentTranslation',
                 ])
                 ->jsonPaginate()
         );
@@ -48,6 +52,10 @@ class TaxonomyController
                     'taxonomyTerms.children',
                     'taxonomyTerms.taxonomy',
                     'taxonomyTerms.blueprintData',
+                    'dataTranslation',
+                    'parentTranslation',
+                    'taxonomyTerms.dataTranslation',
+                    'taxonomyTerms.parentTranslation',
                 ])
                 ->firstOrFail()
         );

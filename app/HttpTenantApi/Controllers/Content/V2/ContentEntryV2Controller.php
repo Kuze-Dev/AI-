@@ -80,6 +80,8 @@ class ContentEntryV2Controller
                     'routeUrls',
                     'metaData',
                     'blueprintData.media',
+                    'dataTranslation',
+                    'parentTranslation',
                 ])
                 ->jsonPaginate()
         );
@@ -100,6 +102,8 @@ class ContentEntryV2Controller
                     'routeUrls',
                     'metaData',
                     'blueprintData',
+                    'dataTranslation',
+                    'parentTranslation',
                 ])
                 ->firstOrFail()
         );

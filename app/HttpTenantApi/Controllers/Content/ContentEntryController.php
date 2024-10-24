@@ -114,6 +114,8 @@ class ContentEntryController
                     'routeUrls',
                     'metaData',
                     'blueprintData',
+                    'dataTranslation',
+                    'parentTranslation',
                 ])
                 ->firstOrFail()
         );
