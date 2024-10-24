@@ -60,6 +60,8 @@ class PageController
                 ->allowedIncludes([
                     'blockContents.block',
                     'blockContents.blueprintData',
+                    'dataTranslation',
+                    'parentTranslation',
                     'routeUrls',
                     'metaData',
                 ])
@@ -73,6 +75,8 @@ class PageController
         $page = QueryBuilder::for(Page::whereSlug($page))
             ->allowedIncludes([
                 'blockContents.block',
+                'dataTranslation',
+                'parentTranslation',
                 'routeUrls',
                 'metaData',
             ])
