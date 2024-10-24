@@ -4,15 +4,23 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\MenuResource\Pages;
 
+use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\MenuResource;
+use Domain\Internationalization\Models\Locale;
+use Domain\Menu\Actions\CreateMenuTranslationAction;
 use Domain\Menu\Actions\UpdateMenuAction;
 use Domain\Menu\DataTransferObjects\MenuData;
+use Domain\Menu\Models\Menu;
+use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Livewire\Redirector;
 
 class EditMenu extends EditRecord
 {
@@ -28,6 +36,26 @@ class EditMenu extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
+            'other_page_actions' => CustomPageActionGroup::make([
+
+                Action::make('createTranslation')
+                    ->color('secondary')
+                    ->slideOver(true)
+                    ->action('createTranslation')
+                    ->form([
+                        Forms\Components\Select::make('locale')
+                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                            ->default((string) Locale::where('is_default', true)->first()?->code)
+                            ->searchable()
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->reactive()
+                            ->required(),
+                    ]),
+            ])
+                ->view('filament.pages.actions.custom-action-group.index')
+                ->setName('other_page_actions')
+                ->color('secondary')
+                ->label(trans('More Actions')),
         ];
     }
 
@@ -45,5 +73,65 @@ class EditMenu extends EditRecord
     protected function getRedirectUrl(): ?string
     {
         return MenuResource::getUrl('edit', $this->record);
+    }
+
+    public function createTranslation(array $data): RedirectResponse|Redirector|false
+    {
+
+        $formData = $this->form->getState();
+
+        $formData['locale'] = $data['locale'];
+
+        $formData['nodes'] = array_map(function ($term) {
+
+            $term['translation_id'] = $term['id'];
+
+            $term['id'] = null;
+
+            return $term;
+        }, $formData['nodes']);
+
+        /** @var \Domain\Menu\Models\Menu */
+        $record = $this->record;
+
+        $orginalContent = $record->parentTranslation ?? $record;
+
+        $exist = Menu::where(fn ($query) => $query->where('translation_id', $orginalContent->id)->orWhere('id', $orginalContent->id)
+        )->where('locale', $data['locale'])->first();
+
+        /** @var \Domain\Internationalization\Models\Locale */
+        $locale = Locale::whereCode($data['locale'])->first();
+
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = auth()->user();
+
+        if ($exist) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Menu :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Menu :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
+
+        $menuData = MenuData::fromArray($formData);
+
+        $menuTranslation = app(CreateMenuTranslationAction::class)->execute($orginalContent, $menuData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Translation Created'))
+            ->body(trans('Menu Translation :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+            ->sendToDatabase($admin);
+
+        return redirect(MenuResource::getUrl('edit', ['record' => $menuTranslation]));
     }
 }
