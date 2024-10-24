@@ -33,6 +33,8 @@ class MenuController
                     'nodes.children',
                     'nodes.model',
                     'parentNodes.children',
+                    'dataTranslation',
+                    'parentTranslation',
                 ])
                 ->jsonPaginate()
         );
@@ -46,6 +48,8 @@ class MenuController
                     'nodes.children',
                     'nodes.model',
                     'parentNodes.children',
+                    'dataTranslation',
+                    'parentTranslation',
                 ])
                 ->firstOrFail()
         );
