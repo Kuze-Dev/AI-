@@ -95,6 +95,27 @@ class PageResource extends Resource
                                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                                 ->default((string) Locale::where('is_default', true)->first()?->code)
                                 ->searchable()
+                                ->rules([
+                                    function (?Page $record, Closure $get) {
+
+                                        return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                            if ($record) {
+                                                $selectedLocale = $value;
+
+                                                $originalContentId = $record->translation_id ?: $record->id;
+
+                                                $exist = Page::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                                )->where('locale', $selectedLocale)->first();
+
+                                                if ($exist && $exist->id != $record->id) {
+                                                    $fail("Page {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                                }
+                                            }
+
+                                        };
+                                    },
+                                ])
                                 ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                                 ->reactive()
                                 ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
