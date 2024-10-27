@@ -8,6 +8,7 @@ use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
 use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Actions\HandleUpdateDataTranslation;
 use Domain\Internationalization\Models\Locale;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
@@ -57,6 +58,13 @@ class UpdateContentEntryAction
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
 
             $contentEntry->sites()->sync($contentEntryData->sites);
+        }
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+
+            app(HandleUpdateDataTranslation::class)->execute($contentEntry, $contentEntryData);
+
+            return $contentEntry;
         }
 
         $this->updateBlueprintDataAction->execute($contentEntry);

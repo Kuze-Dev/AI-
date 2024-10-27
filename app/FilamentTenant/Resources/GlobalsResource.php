@@ -8,6 +8,7 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\GlobalsResource\Pages\CreateGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\EditGlobals;
 use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
+use App\FilamentTenant\Resources\GlobalsResource\RelationManagers\GlobalsTranslationRelationManager;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
@@ -49,7 +50,10 @@ class GlobalsResource extends Resource
                     ->unique(
                         callback: function ($livewire, Unique $rule) {
 
-                            if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                            if (
+                                tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) ||
+                                tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+                            ) {
                                 return false;
                             }
 
@@ -71,6 +75,27 @@ class GlobalsResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
+                    ->rules([
+                        function (?Globals $record, Closure $get) {
+
+                            return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                if ($record) {
+                                    $selectedLocale = $value;
+
+                                    $originalContentId = $record->translation_id ?: $record->id;
+
+                                    $exist = Globals::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                    )->where('locale', $selectedLocale)->first();
+
+                                    if ($exist && $exist->id != $record->id) {
+                                        $fail("Global {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                    }
+                                }
+
+                            };
+                        },
+                    ])
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
                 Forms\Components\Card::make([
@@ -178,6 +203,12 @@ class GlobalsResource extends Resource
                     Tables\Actions\DeleteAction::make(),
                 ]),
             ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('locale')
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                    ->hidden((bool) (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->default(Locale::where('is_default', 1)->first()?->code),
+            ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize(fn () => Auth::user()?->hasRole(config('domain.role.super_admin'))),
@@ -209,6 +240,7 @@ class GlobalsResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            GlobalsTranslationRelationManager::class,
         ];
     }
 

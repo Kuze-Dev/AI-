@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\TaxonomyResource\RelationManagers\TaxonomyTranslationRelationManager;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\Tree;
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
 use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
@@ -87,7 +89,18 @@ class TaxonomyResource extends Resource
                                 ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
                                 ?->dispatchEvent('route_url::update');
                         })
-                        ->unique(ignoreRecord: true),
+                        ->unique(
+                            ignoreRecord: true,
+                            callback: function (Unique $rule, $state, $livewire) {
+
+                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                    return false;
+                                }
+
+                                return $rule;
+                            }
+                        )
+                        ->lazy(),
                     Forms\Components\Select::make('blueprint_id')
                         ->label(trans('Blueprint'))
                         ->required()
@@ -115,6 +128,27 @@ class TaxonomyResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
+                    ->rules([
+                        function (?Taxonomy $record, Closure $get) {
+
+                            return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                if ($record) {
+                                    $selectedLocale = $value;
+
+                                    $originalContentId = $record->translation_id ?: $record->id;
+
+                                    $exist = Taxonomy::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                    )->where('locale', $selectedLocale)->first();
+
+                                    if ($exist && $exist->id != $record->id) {
+                                        $fail("Taxonomy {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                    }
+                                }
+
+                            };
+                        },
+                    ])
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
 
@@ -301,6 +335,7 @@ class TaxonomyResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            TaxonomyTranslationRelationManager::class,
         ];
     }
 

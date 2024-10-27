@@ -6,6 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\ContentEntryResource\RelationManagers\ContentEntryTranslationRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -126,6 +127,27 @@ class ContentEntryResource extends Resource
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
+                            ->rules([
+                                function (?ContentEntry $record, Closure $get) {
+
+                                    return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                        if ($record) {
+                                            $selectedLocale = $value;
+
+                                            $originalContentId = $record->translation_id ?: $record->id;
+
+                                            $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                            )->where('locale', $selectedLocale)->first();
+
+                                            if ($exist && $exist->id != $record->id) {
+                                                $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                            }
+                                        }
+
+                                    };
+                                },
+                            ])
                             ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->afterStateUpdated(function (Forms\Components\Select $component, Closure $get) {
@@ -385,6 +407,7 @@ class ContentEntryResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            ContentEntryTranslationRelationManager::class,
         ];
     }
 

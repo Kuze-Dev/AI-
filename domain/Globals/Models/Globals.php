@@ -6,9 +6,11 @@ namespace Domain\Globals\Models;
 
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
+use Domain\Internationalization\Concerns\HasInternationalizationInterface;
 use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -25,7 +27,8 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $name
  * @property string $slug
  * @property string $blueprint_id
- * @property array|null $data
+ * @property string $locale
+ * @property mixed|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
@@ -46,7 +49,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @mixin \Eloquent
  */
 #[ OnDeleteCascade(['blueprintData']) ]
-class Globals extends Model
+class Globals extends Model implements HasInternationalizationInterface
 {
     use ConstraintsRelationships;
     use HasSlug;
@@ -64,6 +67,8 @@ class Globals extends Model
         'blueprint_id',
         'slug',
         'data',
+        'locale',
+        'translation_id',
     ];
 
     protected $casts = [
@@ -111,5 +116,17 @@ class Globals extends Model
             ->preventOverwrite()
             ->doNotGenerateSlugsOnUpdate()
             ->saveSlugsTo($this->getRouteKeyName());
+    }
+
+    /** @return HasMany<Globals> */
+    public function dataTranslation(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_id');
+    }
+
+    /** @return BelongsTo<Globals, Globals> */
+    public function parentTranslation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_id');
     }
 }

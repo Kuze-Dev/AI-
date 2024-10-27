@@ -11,7 +11,7 @@ class ExtractDataAction
     public function extractStatePathAndFieldTypes(array $data): array
     {
         $fieldTypes = [];
-
+        // dd($data);
         foreach ($data as $section) {
             // dd($section->state_name);
             $fieldTypes[$section->state_name] = $this->recursivelyExtractFields($section->fields, $section->state_name);
@@ -33,6 +33,7 @@ class ExtractDataAction
                 $fieldTypes[$field->state_name] = [
                     'type' => $field->type,
                     'statepath' => $newPath,
+                    'translatable' => $field->translatable ?? true,
                 ];
             }
         }
@@ -42,10 +43,12 @@ class ExtractDataAction
 
     public function mergeFields(array $firstField, array|string|null|bool $values, string $parentStatepath): array
     {
+
         $mergedFields = [
             'type' => $firstField['type'],
             'statepath' => $parentStatepath,
             'value' => $values,
+            'translatable' => isset($firstField['translatable']) ? $firstField['translatable'] : true,
         ];
         $statepath = $mergedFields['statepath'];
         if ($firstField['type'] == FieldType::REPEATER) {

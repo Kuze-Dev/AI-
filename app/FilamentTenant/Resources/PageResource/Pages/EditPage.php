@@ -10,7 +10,9 @@ use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
 use Closure;
+use Domain\Internationalization\Models\Locale;
 use Domain\Page\Actions\CreatePageDraftAction;
+use Domain\Page\Actions\CreatePageTranslationAction;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Actions\PublishedPageDraftAction;
 use Domain\Page\Actions\UpdatePageAction;
@@ -18,6 +20,7 @@ use Domain\Page\DataTransferObjects\PageData;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Exception;
+use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
@@ -98,6 +101,19 @@ class EditPage extends EditRecord
             }),
             Actions\DeleteAction::make(),
             'other_page_actions' => CustomPageActionGroup::make([
+                Action::make('createTranslation')
+                    ->color('secondary')
+                    ->slideOver(true)
+                    ->action('createTranslation')
+                    ->form([
+                        Forms\Components\Select::make('locale')
+                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                            ->default((string) Locale::where('is_default', true)->first()?->code)
+                            ->searchable()
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->reactive()
+                            ->required(),
+                    ]),
                 Action::make('preview')
                     ->color('secondary')
                     ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
@@ -298,5 +314,83 @@ class EditPage extends EditRecord
         $draftpage = app(CreatePageDraftAction::class)->execute($record, $pageData);
 
         return redirect(PageResource::getUrl('edit', ['record' => $draftpage]));
+    }
+
+    public function createTranslation(array $data): RedirectResponse|Redirector|false
+    {
+
+        $formData = $this->form->getState();
+
+        $formData['locale'] = $data['locale'];
+
+        $code = $data['locale'];
+
+        $formData['route_url']['url'] = $this->changeUrlLocale($formData['route_url']['url'], $code);
+
+        $record = $this->record;
+
+        $orginalContent = $record->parentTranslation ?? $record;
+
+        $exist = Page::where(fn ($query) => $query->where('translation_id', $orginalContent->id)->orWhere('id', $orginalContent->id)
+        )->where('locale', $data['locale'])->first();
+
+        /** @var \Domain\Internationalization\Models\Locale */
+        $locale = Locale::whereCode($data['locale'])->first();
+
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = auth()->user();
+
+        if ($exist) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Page :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Page :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
+
+        $pageData = PageData::fromArray($formData);
+
+        $pageTranslation = app(CreatePageTranslationAction::class)->execute($orginalContent, $pageData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Translation Created'))
+            ->body(trans('Page Translation :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+            ->sendToDatabase($admin);
+
+        return redirect(PageResource::getUrl('edit', ['record' => $pageTranslation]));
+    }
+
+    protected function changeUrlLocale(string $url, string $locale): string
+    {
+
+        $locales = Locale::pluck('code')->toArray();
+
+        // Remove leading and trailing slashes from the URL
+        $url = trim($url, '/');
+
+        // Split the URL by "/"
+        $segments = explode('/', $url);
+
+        // Check if the first segment is a valid locale code from the array
+        if (in_array($segments[0], $locales)) {
+            // Replace the existing locale with the new one
+            $segments[0] = $locale;
+        } else {
+            // Prepend the new locale to the URL
+            array_unshift($segments, $locale);
+        }
+
+        // Rebuild the URL and add a leading "/"
+        return '/'.implode('/', $segments);
     }
 }

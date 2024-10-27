@@ -42,6 +42,8 @@ class ContentEntryResource extends JsonApiResource
             'metaData' => fn () => MetaDataResource::make($this->metaData),
             'content' => fn () => ContentResource::make($this->content),
             'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
+            'dataTranslation' => fn () => self::collection($this->dataTranslation),
+            'parentTranslation' => fn () => self::make($this->parentTranslation),
         ];
     }
 
