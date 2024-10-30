@@ -83,7 +83,7 @@ class HandleUpdateDataTranslation
         ) {
 
             $translation_collection = $this->getTranslatableModelCollection($model, $modelDTO);
-            dd($translation_collection);
+
             foreach ($translation_collection as $item) {
 
                 $updated_version = $this->updateJsonByStatePaths($item, $filtered, $model);
