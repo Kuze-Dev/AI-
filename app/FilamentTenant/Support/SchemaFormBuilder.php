@@ -253,6 +253,13 @@ class SchemaFormBuilder extends Component
                 if ($media) {
                     return $media->getUrl();
                 }
+
+                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                if ($storage->exists($file)) {
+                    return $storage->url($file);
+                }
+
             }
 
             return [];

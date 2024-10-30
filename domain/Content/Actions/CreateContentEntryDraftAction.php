@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
+use Domain\Blueprint\Actions\CreateBlueprintDataAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
@@ -16,6 +17,7 @@ class CreateContentEntryDraftAction
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+        protected CreateBlueprintDataAction $createBlueprintDataAction,
     ) {
     }
 
@@ -45,6 +47,8 @@ class CreateContentEntryDraftAction
 
             $contentEntry->sites()->sync($contentEntryData->sites);
         }
+
+        $this->createBlueprintDataAction->execute($contentEntry);
 
         return $contentEntry;
     }
