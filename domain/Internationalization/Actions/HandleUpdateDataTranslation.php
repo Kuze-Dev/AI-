@@ -77,13 +77,13 @@ class HandleUpdateDataTranslation
         $filtered = array_filter($flattenData, function ($item) {
             return isset($item['translatable']) && $item['translatable'] === false;
         });
-
+      
         if (
             count($filtered) > 0
         ) {
 
             $translation_collection = $this->getTranslatableModelCollection($model, $modelDTO);
-
+            dd($translation_collection);
             foreach ($translation_collection as $item) {
 
                 $updated_version = $this->updateJsonByStatePaths($item, $filtered, $model);
@@ -112,6 +112,8 @@ class HandleUpdateDataTranslation
             return;
 
         }
+
+        $this->updateBlueprintDataAction->execute($model);
     }
 
     /**
