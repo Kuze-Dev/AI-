@@ -77,7 +77,7 @@ class HandleUpdateDataTranslation
         $filtered = array_filter($flattenData, function ($item) {
             return isset($item['translatable']) && $item['translatable'] === false;
         });
-      
+
         if (
             count($filtered) > 0
         ) {
