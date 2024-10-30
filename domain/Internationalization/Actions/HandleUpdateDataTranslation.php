@@ -112,6 +112,8 @@ class HandleUpdateDataTranslation
             return;
 
         }
+
+        $this->updateBlueprintDataAction->execute($model);
     }
 
     /**
