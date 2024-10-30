@@ -7,6 +7,7 @@ namespace Domain\Content\Actions;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Actions\HandleUpdateDataTranslation;
 use Domain\Internationalization\Models\Locale;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
@@ -46,6 +47,15 @@ class PublishedContentEntryDraftAction
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
 
             $contentEntry->sites()->sync($contentEntryData->sites);
+        }
+
+        if (
+            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            is_null($contentEntry->draftable_id)
+        ) {
+
+            app(HandleUpdateDataTranslation::class)->execute($contentEntry, $contentEntryData);
+
         }
 
         $this->deleteContentEntry->execute($draft_content_entry);

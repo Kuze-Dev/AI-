@@ -31,7 +31,10 @@ class CreateBlockContentAction
 
         $this->createBlueprintDataAction->execute($blockContent);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+        if (
+            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            is_null($page->draftable_id)
+        ) {
 
             app(HandleDataTranslation::class)->execute($blockContent, $blockContent);
 

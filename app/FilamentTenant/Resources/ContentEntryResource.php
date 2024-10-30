@@ -137,10 +137,20 @@ class ContentEntryResource extends Resource
 
                                             $originalContentId = $record->translation_id ?: $record->id;
 
+                                            if ($record->draftable_id) {
+                                                /** @var \Domain\Content\Models\ContentEntry */
+                                                $baseRecord = ContentEntry::find($record->draftable_id);
+
+                                                $originalContentId = $baseRecord->translation_id ?: $baseRecord->id;
+
+                                            }
+
                                             $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
                                             )->where('locale', $selectedLocale)->first();
 
-                                            if ($exist && $exist->id != $record->id) {
+                                            if (is_null($record->draftable_id) && $exist && $exist->id != $record->id) {
+                                                $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                            } elseif ($record->draftable_id != null && $exist && $exist->id != $record->draftable_id) {
                                                 $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
                                             }
                                         }
@@ -264,9 +274,17 @@ class ContentEntryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                // Tables\Columns\TextColumn::make('title')
+                //     ->sortable()
+                //     ->searchable()
+                //     ->truncate('xs', true),
+                Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|ContentEntry $query */
+                        return $query->where('title', 'like', "%{$search}%");
+
+                    })
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('routeUrls.url')
                     ->label('URL')
