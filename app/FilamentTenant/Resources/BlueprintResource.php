@@ -695,7 +695,8 @@ class BlueprintResource extends Resource
                             : [$state];
                     })
                     ->columnSpanFull(),
-
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\CheckboxList::make('tools')
                     ->options(
                         collect(TiptapTools::cases())
