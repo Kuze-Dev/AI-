@@ -342,7 +342,27 @@ class EditContentEntry extends EditRecord
 
     public function createTranslation(array $data): RedirectResponse|Redirector|false
     {
+        $record = $this->record;
 
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = auth()->user();
+
+        if ($record->draftable_id) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Invalid Action'))
+                ->body(trans('Cannot Create Translation base on Draft Content'))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Invalid Action'))
+                ->body(trans('Cannot Create Translation base on Draft Content'))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
         $formData = $this->form->getState();
 
         $formData['locale'] = $data['locale'];
@@ -351,8 +371,6 @@ class EditContentEntry extends EditRecord
 
         $formData['route_url']['url'] = $this->changeUrlLocale($formData['route_url']['url'], $code);
 
-        $record = $this->record;
-
         $orginalContent = $record->parentTranslation ?? $record;
 
         $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $orginalContent->id)->orWhere('id', $orginalContent->id)
@@ -360,9 +378,6 @@ class EditContentEntry extends EditRecord
 
         /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();
-
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = auth()->user();
 
         if ($exist) {
 

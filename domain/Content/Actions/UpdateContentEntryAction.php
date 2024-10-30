@@ -60,7 +60,10 @@ class UpdateContentEntryAction
             $contentEntry->sites()->sync($contentEntryData->sites);
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+        if (
+            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            is_null($contentEntry->draftable_id)
+        ) {
 
             app(HandleUpdateDataTranslation::class)->execute($contentEntry, $contentEntryData);
 
