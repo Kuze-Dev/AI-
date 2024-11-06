@@ -18,4 +18,11 @@ class CMSSettings extends Settings
     {
         return 'cms';
     }
+
+    public static function encrypted(): array
+    {
+        return [
+            'deploy_hook',
+        ];
+    }
 }
