@@ -148,6 +148,7 @@ class EditContentEntry extends EditRecord
                     ->color('secondary')
                     ->slideOver(true)
                     ->action('createTranslation')
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
