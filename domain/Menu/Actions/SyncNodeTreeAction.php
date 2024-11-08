@@ -251,15 +251,17 @@ class SyncNodeTreeAction
 
                 $menu_item->load('nodes');
 
-                /** @var Node */
+                /** @var Node|null */
                 $translation_parent = $menu_item->nodes->whereIn('id', $parentTranslationClusterIds)->first();
 
-                /** @var Node */
+                /** @var Node|null */
                 $translation_node = $menu_item->nodes->whereIn('id', $nodeTranslationClusterIds)->first();
 
-                $translation_node->update([
-                    'parent_id' => $translation_parent->id,
-                ]);
+                if ($translation_node) {
+                    $translation_node->update([
+                        'parent_id' => $translation_parent?->id,
+                    ]);
+                }
 
             }
 
