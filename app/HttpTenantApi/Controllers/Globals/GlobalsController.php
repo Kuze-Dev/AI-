@@ -27,6 +27,7 @@ class GlobalsController
                 ->allowedIncludes(
                     [
                         'blueprint',
+                        'blueprintData',
                         'dataTranslation',
                         'parentTranslation',
                     ])
@@ -41,6 +42,7 @@ class GlobalsController
                 ->allowedIncludes(
                     [
                         'blueprint',
+                        'blueprintData',
                         'dataTranslation',
                         'parentTranslation',
                     ])
