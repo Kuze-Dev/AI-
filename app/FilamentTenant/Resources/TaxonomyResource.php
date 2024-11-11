@@ -56,8 +56,10 @@ class TaxonomyResource extends Resource
     /** @param  Taxonomy  $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        /** @phpstan-ignore-next-line */
-        return [trans('Total terms') => $record->taxonomy_terms_count];
+        return array_filter([
+            'Total terms' => $record->taxonomy_terms_count,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     /** @return Builder<Taxonomy> */

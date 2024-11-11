@@ -55,8 +55,10 @@ class ContentResource extends Resource
     /** @param  Content  $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        /** @phpstan-ignore-next-line */
-        return [trans('Total Entries') => $record->content_entries_count];
+        return array_filter([
+            'Total Entries' => $record->content_entries_count,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     public static function form(Form $form): Form

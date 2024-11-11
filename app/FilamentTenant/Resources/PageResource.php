@@ -51,6 +51,16 @@ class PageResource extends Resource
         return trans('CMS');
     }
 
+    /** @param  Page  $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+
+        return array_filter([
+            'Page' => $record->name,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
+    }
+
     /** @var Collection<int, Block> */
     public static ?Collection $cachedBlocks = null;
 

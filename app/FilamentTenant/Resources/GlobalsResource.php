@@ -22,6 +22,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Unique;
 
@@ -40,6 +41,16 @@ class GlobalsResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
+    }
+
+    /** @param  Globals  $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+
+        return array_filter([
+            'Global' => $record->name,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     public static function form(Form $form): Form
