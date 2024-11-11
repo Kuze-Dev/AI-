@@ -70,8 +70,11 @@ class ContentEntryResource extends Resource
     /** @param  ContentEntry  $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        /** @phpstan-ignore-next-line */
-        return [trans('Content') => $record->content->name];
+
+        return array_filter([
+            'Content' => $record->content->name,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     /** @param  ContentEntry  $record */
