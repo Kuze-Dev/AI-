@@ -59,8 +59,11 @@ class MenuResource extends Resource
     /** @param  Menu  $record */
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        /** @phpstan-ignore-next-line */
-        return [trans('Total Nodes') => $record->nodes_count];
+
+        return array_filter([
+            'Total Nodes' => $record->nodes_count,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     public static function resolveRecordRouteBinding(mixed $key): ?Model
