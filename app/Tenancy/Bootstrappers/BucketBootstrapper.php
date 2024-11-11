@@ -26,6 +26,8 @@ class BucketBootstrapper implements TenancyBootstrapper
 
     protected ?string $originalBucketEndpoint;
 
+    protected ?string $originalHalcyonImportDisk;
+
     protected ?bool $originalBucketStyleEndpoint;
 
     public function __construct(protected Application $app)
@@ -34,6 +36,8 @@ class BucketBootstrapper implements TenancyBootstrapper
         $this->originalMediaDisk = $this->app->make('config')['media-library.disk_name'];
 
         $this->orignalBucket = $this->app->make('config')['filesystems.disks.s3.bucket'];
+
+        $this->originalHalcyonImportDisk = $this->app->make('config')['filament-import.temporary_files.disk'];
 
         $this->originalBucketKey = $this->app->make('config')['filesystems.disks.s3.key'];
         $this->originalBucketSecret = $this->app->make('config')['filesystems.disks.s3.secret'];
@@ -73,6 +77,7 @@ class BucketBootstrapper implements TenancyBootstrapper
             $this->app->make('config')->set('filesystems.disks.s3.bucket', $tenant->getInternal('bucket'));
         }
 
+        $this->app->make('config')->set('filament-import.temporary_files.disk', $tenant->getInternal('bucket_driver'));
     }
 
     public function revert(): void
@@ -94,5 +99,6 @@ class BucketBootstrapper implements TenancyBootstrapper
         $this->app->make('config')->set('filesystems.disks.s3.endpoint', $this->originalBucketEndpoint);
         $this->app->make('config')->set('filesystems.disks.s3.url', $this->originalBucketUrl);
         $this->app->make('config')->set('filesystems.disks.s3.use_path_style_endpoint', $this->originalBucketStyleEndpoint);
+        $this->app->make('config')->set('filament-import.temporary_files.disk', $this->originalHalcyonImportDisk);
     }
 }
