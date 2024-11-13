@@ -326,7 +326,16 @@ class PageResource extends Resource
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
-                    ->relationship('sites', 'name'),
+                    ->relationship('sites', 'name', function (Builder $query) {
+
+                        if (Auth::user()?->can('site.siteManager') &&
+                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        }
+
+                        return $query;
+
+                    }),
                 Tables\Filters\TernaryFilter::make('published_at')
                     ->label(trans('Published'))
                     ->nullable(),
