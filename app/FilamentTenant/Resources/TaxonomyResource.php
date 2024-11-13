@@ -68,6 +68,26 @@ class TaxonomyResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('taxonomyTerms');
     }
 
+    /** @return Builder<\Domain\Taxonomy\Models\Taxonomy> */
+    public static function getEloquentQuery(): Builder
+    {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return static::getModel()::query();
+        }
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return static::getModel()::query()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
+        return static::getModel()::query();
+
+    }
+
     public static function resolveRecordRouteBinding(mixed $key): ?Model
     {
         return app(static::getModel())
@@ -312,8 +332,21 @@ class TaxonomyResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\SelectFilter::make('sites')
+                    ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name', function (Builder $query) {
 
+                        if (Auth::user()?->can('site.siteManager') &&
+                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        }
+
+                        return $query;
+
+                    }),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([

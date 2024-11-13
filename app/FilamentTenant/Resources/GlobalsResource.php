@@ -200,7 +200,16 @@ class GlobalsResource extends Resource
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
-                    ->relationship('sites', 'name'),
+                    ->relationship('sites', 'name', function (Builder $query) {
+
+                        if (Auth::user()?->can('site.siteManager') &&
+                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        }
+
+                        return $query;
+
+                    }),
                 Tables\Filters\SelectFilter::make('blueprint')
                     ->relationship('blueprint', 'name')
                     ->hidden((bool) ! Auth::user()?->can('blueprint.viewAny'))
