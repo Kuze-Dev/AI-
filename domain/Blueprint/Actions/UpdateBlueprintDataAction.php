@@ -185,10 +185,19 @@ class UpdateBlueprintDataAction
                 $existingMedia = $blueprintData->getMedia('blueprint_media')->pluck('uuid')->toArray();
 
                 $updatedMedia = array_intersect($existingMedia, $currentMedia);
+                /**
+                 *  $exceptedMedia = Media::whereIN('uuid', $updatedMedia)->get();
+                 *  temporary disabled causing coversions to disappear only in production but working in local environment.
+                 *
+                 *  $blueprintData->clearMediaCollectionExcept('blueprint_media', $exceptedMedia);
+                 ***/
 
-                $exceptedMedia = Media::whereIN('uuid', $updatedMedia)->get();
-
-                $blueprintData->clearMediaCollectionExcept('blueprint_media', $exceptedMedia);
+                /**
+                 *  handle manual deletion of remove medias
+                 * **/
+                $blueprintData->getMedia('blueprint_media')
+                    ->whereNotIn('uuid', $updatedMedia)
+                    ->each(fn ($media) => $media->delete());
 
                 $blueprintData->update([
                     'model_id' => $blueprintDataData->model_id,

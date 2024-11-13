@@ -73,6 +73,8 @@ class ContentEntryV2Controller
                 ->allowedSorts([
                     'order',
                     'title',
+                    'created_at',
+                    'updated_at',
                     'published_at',
                 ])
                 ->allowedIncludes([
