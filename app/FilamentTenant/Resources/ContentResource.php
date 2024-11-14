@@ -88,7 +88,52 @@ class ContentResource extends Resource
                         ->string()
                         ->maxLength(255)
                         ->alphaDash()
-                        ->unique(ignoreRecord: true)
+                        ->rules([
+                            function (?Content $record, Closure $get) {
+
+                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                    $prefix = $value;
+
+                                    if (
+                                        tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
+                                    ) {
+                                        $siteIDs = $get('sites');
+
+                                        if ($record) {
+                                            $content = Content::where('prefix', $prefix)
+                                                ->where('id', '!=', $record->id)
+                                                ->whereHas(
+                                                    'sites',
+                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                                )->count();
+
+                                        } else {
+                                            $content = Content::where('prefix', $prefix)
+                                                ->whereHas(
+                                                    'sites',
+                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                                )->count();
+                                        }
+                                    } else {
+
+                                        if ($record) {
+                                            $content = Content::where('prefix', $prefix)
+                                                ->where('id', '!=', $record->id)
+                                                ->count();
+                                        } else {
+                                            $content = Content::where('prefix', $prefix)->count();
+                                        }
+
+                                    }
+
+                                    if ($content > 0) {
+                                        $fail("Content prefix {$get('name')} has already been taken.");
+                                    }
+
+                                };
+                            },
+                        ])
                         ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
