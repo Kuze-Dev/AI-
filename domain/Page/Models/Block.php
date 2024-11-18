@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -55,6 +56,7 @@ class Block extends Model implements HasMedia
     use ConstraintsRelationships;
     use InteractsWithMedia;
     use LogsActivity;
+    use Sites;
 
     protected $fillable = [
         'blueprint_id',

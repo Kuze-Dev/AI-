@@ -46,6 +46,9 @@ class UpdateBlockAction
             $block->clearMediaCollection('image');
         }
 
+        $block->sites()
+        ->sync($blockData->sites);
+
         return $block;
     }
 }

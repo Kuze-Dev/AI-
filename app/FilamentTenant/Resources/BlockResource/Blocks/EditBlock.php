@@ -57,6 +57,7 @@ class EditBlock extends EditRecord
                         blueprint_id: $data['blueprint_id'],
                         is_fixed_content: $data['is_fixed_content'],
                         data: $data['data'] ?? null,
+                        sites: $data['sites'] ?? [],
                     )
                 )
         );
