@@ -40,8 +40,9 @@
                 </button>
             </div>
         </div>
-
+        {{-- {{dd($getdataFilter())}} --}}
         @foreach ($blocks as $id => $block)
+        @if (in_array($id,$getdataFilter()))
             <div wire:key="{{ $getId() }}.{{ $id }}" x-show="!state || {{ $id }} === state">
                 <button
                     class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
@@ -56,6 +57,7 @@
                 </button>
                 <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
             </div>
+            @endif
         @endforeach
     </div>
 </x-dynamic-component>
