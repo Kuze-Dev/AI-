@@ -26,6 +26,9 @@
         }"
         x-bind:class="{ 'justify-center': state }"
     >
+    @php
+        $block_ids = $getdataFilter();
+    @endphp
 
         <div x-show="showModal" class="w-full fixed top-0 right-0 h-full flex items-center justify-center z-10" style="background-color: #00000066;">
             <div @click.outside="showModal = false" class="relative" style="background-color: #262626; border-radius: 10px; box-shadow: 0px 0px 4px 1px #494949; padding-top:40px; padding-bottom:20px;">
@@ -40,9 +43,25 @@
                 </button>
             </div>
         </div>
-        {{-- {{dd($getdataFilter())}} --}}
         @foreach ($blocks as $id => $block)
-        @if (in_array($id,$getdataFilter()))
+            @if (count($block_ids) > 0)   
+                @if (in_array($id,$block_ids) && tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                    <div wire:key="{{ $getId() }}.{{ $id }}" x-show="!state || {{ $id }} === state">
+                        <button
+                            class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
+                            type="button"
+                            @click="blockEvent({{$id}})"
+                        >
+                            @if($block['image'])
+                                <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
+                            @else
+                                <p class="text-sm text-white">@lang('No preview available')</p>
+                            @endif
+                        </button>
+                        <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
+                    </div>
+                @endif
+            @elseif(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
             <div wire:key="{{ $getId() }}.{{ $id }}" x-show="!state || {{ $id }} === state">
                 <button
                     class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
@@ -58,6 +77,7 @@
                 <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
             </div>
             @endif
+            
         @endforeach
     </div>
 </x-dynamic-component>

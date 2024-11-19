@@ -70,66 +70,66 @@ class BlockResource extends Resource
                         ->reactive(),
                 ])
                     ->disabled(fn () => ! Auth::user()?->hasRole(config('domain.role.super_admin'))),
-                    Forms\Components\Card::make([
-                        // Forms\Components\CheckboxList::make('sites')
-                        \App\FilamentTenant\Support\CheckBoxList::make('sites')
-                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                            ->rules([
-                                function (?Block $record, Closure $get) {
+                Forms\Components\Card::make([
+                    // Forms\Components\CheckboxList::make('sites')
+                    \App\FilamentTenant\Support\CheckBoxList::make('sites')
+                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->rules([
+                            function (?Block $record, Closure $get) {
 
-                                    return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                        $siteIDs = $value;
+                                    $siteIDs = $value;
 
-                                        if ($record) {
-                                            $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
+                                    if ($record) {
+                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
 
-                                            $content = Block::where('name', $get('name'))
-                                                ->where('id', '!=', $record->id)
-                                                ->whereHas(
-                                                    'sites',
-                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                                )->count();
-
-                                        } else {
-
-                                            $content = Block::where('name', $get('name'))->whereHas(
+                                        $content = Block::where('name', $get('name'))
+                                            ->where('id', '!=', $record->id)
+                                            ->whereHas(
                                                 'sites',
                                                 fn ($query) => $query->whereIn('site_id', $siteIDs)
                                             )->count();
-                                        }
 
-                                        if ($content > 0) {
-                                            $fail("Block {$get('name')} is already available in selected sites.");
-                                        }
+                                    } else {
 
-                                    };
-                                },
-                            ])
-                            ->options(
-                                fn () => Site::orderBy('name')
-                                    ->pluck('name', 'id')
-                                    ->toArray()
-                            )
-                            ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+                                        $content = Block::where('name', $get('name'))->whereHas(
+                                            'sites',
+                                            fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                        )->count();
+                                    }
 
-                                /** @var \Domain\Admin\Models\Admin */
-                                $user = Auth::user();
+                                    if ($content > 0) {
+                                        $fail("Block {$get('name')} is already available in selected sites.");
+                                    }
 
-                                if ($user->hasRole(config('domain.role.super_admin'))) {
-                                    return false;
-                                }
+                                };
+                            },
+                        ])
+                        ->options(
+                            fn () => Site::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
-                                $user_sites = $user->userSite->pluck('id')->toArray();
+                            /** @var \Domain\Admin\Models\Admin */
+                            $user = Auth::user();
 
-                                $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+                            if ($user->hasRole(config('domain.role.super_admin'))) {
+                                return false;
+                            }
 
-                                return ! in_array($value, $intersect);
-                            })
-                            ->formatStateUsing(fn (?Block $record) => $record ? $record->sites->pluck('id')->toArray() : []),
+                            $user_sites = $user->userSite->pluck('id')->toArray();
 
-                    ])
-                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
+                            $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                            return ! in_array($value, $intersect);
+                        })
+                        ->formatStateUsing(fn (?Block $record) => $record ? $record->sites->pluck('id')->toArray() : []),
+
+                ])
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->hidden(fn (Closure $get) => $get('is_fixed_content') ? false : true)

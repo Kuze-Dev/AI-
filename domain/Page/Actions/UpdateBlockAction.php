@@ -47,7 +47,7 @@ class UpdateBlockAction
         }
 
         $block->sites()
-        ->sync($blockData->sites);
+            ->sync($blockData->sites);
 
         return $block;
     }

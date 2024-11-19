@@ -163,7 +163,38 @@ class PageResource extends Resource
                             \App\FilamentTenant\Support\CheckBoxList::make('sites')
                                 ->reactive()
                                 ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                                ->rule(fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                                ->rules([
+                                    fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')),
+                                    function (?Page $record, Closure $get) {
+
+                                        return function (string $attribute, $value, Closure $fail) use ($get) {
+
+                                            if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+                                                $block_ids = array_values(
+                                                    array_filter(array_map(fn ($item) => $item['block_id'] ?? null, $get('block_contents'))
+                                                    ));
+
+                                                $siteIDs = $value;
+
+                                                $block_siteIds = self::getCachedBlocks()
+                                                    ->filter(function ($block) use ($siteIDs) {
+                                                        return $block->sites->pluck('id')->intersect($siteIDs)->isNotEmpty();
+
+                                                    })->pluck('id')->toArray();
+
+                                                foreach ($block_ids as $block_id) {
+
+                                                    if (! in_array($block_id, $block_siteIds)) {
+                                                        $fail("A block doesn't belong to the sites is selected, please double check your selected sites and blocks list.");
+                                                    }
+                                                }
+
+                                            }
+
+                                        };
+                                    },
+                                ])
                                 ->options(function () {
                                     return Site::orderBy('name')
                                         ->pluck('name', 'id')
@@ -190,7 +221,7 @@ class PageResource extends Resource
 
                                         return;
                                     }
-                                    
+
                                     $component->state(
                                         $record->sites->pluck('id')
                                             ->intersect(array_keys($component->getOptions()))
@@ -230,14 +261,13 @@ class PageResource extends Resource
                                     ->label('Block')
                                     ->required()
                                     ->view('filament.forms.components.block-picker')
-                                    ->datafilter(fn (Closure $get) => 
-                                        self::getCachedBlocks()
+                                    ->datafilter(fn (Closure $get) => self::getCachedBlocks()
                                         ->filter(function ($block) use ($get) {
-                                          return $block->sites->pluck('id')->intersect($get('../../sites'))->isNotEmpty();;
-                                         
-                                        } )
+                                            return $block->sites->pluck('id')->intersect($get('../../sites'))->isNotEmpty();
+
+                                        })
                                         ->pluck('id')->toArray()
-                                    )     
+                                    )
                                     ->viewData(fn () => [
                                         'blocks' => self::getCachedBlocks()
                                             ->sortBy('name')
@@ -249,7 +279,7 @@ class PageResource extends Resource
                                                     ],
                                                 ];
                                             })
-                                            ->toArray() ])
+                                            ->toArray()])
                                     // ->viewData([
                                     //     'blocks' => self::getCachedBlocks()
                                     //         ->sortBy('name')
@@ -444,11 +474,10 @@ class PageResource extends Resource
     /** @return Collection<int, Block> $cachedBlocks */
     protected static function getCachedBlocks(): Collection
     {
-    
 
         if (! isset(self::$cachedBlocks)) {
-            
-            self::$cachedBlocks = Block::with(['blueprint', 'media','sites'])->get();
+
+            self::$cachedBlocks = Block::with(['blueprint', 'media', 'sites'])->get();
         }
 
         // if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
@@ -456,17 +485,15 @@ class PageResource extends Resource
         //     if($site_ids){
         //         return self::$cachedBlocks
         //         ->filter(function ($block) use($site_ids){
-                    
+
         //             // dd($site_ids);
         //             // dd($block->sites->contains('id',$site_ids));
         //             return $block->sites->contains($site_ids);
         //         } );
         //     }
 
-
         // return self::$cachedBlocks;
         //     // dd($site_ids);
-            
 
         //     // dd($test);
         // }
@@ -476,10 +503,10 @@ class PageResource extends Resource
         return self::$cachedBlocks;
     }
 
-    protected static function getcachedSelectedSites(array $state): array 
-    {
-        self::$cachedSelectedSites = $state;
-      
-        return self::$cachedSelectedSites;
-    }
+    // protected static function getcachedSelectedSites(array $state): array
+    // {
+    //     self::$cachedSelectedSites = $state;
+
+    //     return self::$cachedSelectedSites;
+    // }
 }
