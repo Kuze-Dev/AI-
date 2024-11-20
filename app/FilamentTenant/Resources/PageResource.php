@@ -186,7 +186,7 @@ class PageResource extends Resource
                                                 foreach ($block_ids as $block_id) {
 
                                                     if (! in_array($block_id, $block_siteIds)) {
-                                                        $fail("A block doesn't belong to the sites is selected, please double check your selected sites and blocks list.");
+                                                        $fail("A block added to the page is not available with the selected sites. Please review the sites field or ensure that only blocks available for the selected sites are added.");
                                                     }
                                                 }
 
