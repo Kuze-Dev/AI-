@@ -145,3 +145,28 @@
         </div>
     </div>
 </div>
+
+<script>
+       
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('filepond--open-icon')) {
+                event.preventDefault();
+
+                let url = event.target.href;
+            
+                // Use a regular expression to capture the ID after `/media/`
+                let match = url.match(/\/media\/(\d+)\//);
+                let id = match ? match[1] : null; // Get the first captured group
+
+                let redirectUrl = `/admin/media/${id}/edit`;
+
+                // Redirect to the new URL
+                window.open(redirectUrl, '_blank');
+
+
+            }
+        });
+    });
+</script>

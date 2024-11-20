@@ -12,11 +12,12 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 
 /**
- * Domain\Globals\Models\Globals
+ * Domain\Internationalization\Models\Locale
  *
  * @property int $id
  * @property string $code
  * @property string $name
+ * @property bool $is_default
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|Activity[] $activities

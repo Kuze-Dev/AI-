@@ -36,13 +36,13 @@ class CreateFormSubmissionAction
 
                     if (! is_null($value)) {
 
-                        if (! Storage::disk('s3')->exists($value)) {
+                        if (! Storage::disk(config('filament.default_filesystem_disk'))->exists($value)) {
                             abort(422, 'File '.$value.' Not Found');
                         } else {
 
                             $objectkey = 'uploads/forms/'.$form->id.'/'.basename((string) $value);
 
-                            Storage::disk('s3')->move($value, $objectkey);
+                            Storage::disk(config('filament.default_filesystem_disk'))->move($value, $objectkey);
 
                             $data[$field_key][$fieldkey] = $objectkey;
 

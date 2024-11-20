@@ -8,7 +8,9 @@ use App\Features\Customer\TierBase;
 use App\Features\ECommerce\RewardPoints;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\CustomerResource\RelationManagers\AddressesRelationManager;
+use App\FilamentTenant\Support\SchemaFormBuilder;
 use Closure;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
@@ -76,7 +78,7 @@ class CustomerResource extends Resource
                         ->string()
                         ->rule(
                             fn () => function (string $attribute, mixed $value, Closure $fail) {
-                                if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                if (preg_match('/[^\pL\s]/u', $value)) {
                                     $fail('Input must not contain numerical characters.');
                                 }
                             },
@@ -87,7 +89,7 @@ class CustomerResource extends Resource
                         ->required()
                         ->rule(
                             fn () => function (string $attribute, mixed $value, Closure $fail) {
-                                if (preg_match('/[^a-zA-Z\s]/', $value)) {
+                                if (preg_match('/[^\pL\s]/u', $value)) {
                                     $fail('Input must not contain numerical characters.');
                                 }
                             },
@@ -100,6 +102,23 @@ class CustomerResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->email()
                         ->rule(Rule::email())
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('username')
+                        ->label(trans('Username'))
+                        ->required(fn ($state) => ! is_null($state))
+                        ->unique(ignoreRecord: true)
+                        ->formatStateUsing(fn ($state, Closure $get) => $get('email') == $state ? null : $state)
+                        ->rules([
+                            function () {
+                                return function (string $attribute, mixed $value, Closure $fail) {
+                                    if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+
+                                        $fail('email is not allowed.');
+                                    }
+                                };
+                            },
+                        ])
+                        ->reactive()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('mobile')
                         ->label(trans('Mobile Number'))
@@ -180,6 +199,12 @@ class CustomerResource extends Resource
                 ])
                     ->columns(2)
                     ->disabled(fn ($record) => $record?->trashed()),
+                SchemaFormBuilder::make(
+                    'data',
+                    fn () => Blueprint::where('id', app(\App\Settings\CustomerSettings::class)->blueprint_id)->first()?->schema
+                )->hidden(
+                    fn () => is_null(app(\App\Settings\CustomerSettings::class)->blueprint_id)
+                ),
             ]);
     }
 

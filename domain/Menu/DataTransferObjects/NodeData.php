@@ -17,6 +17,7 @@ class NodeData
         public readonly ?string $url = null,
         public readonly ?string $model_type = null,
         public readonly ?int $model_id = null,
+        public readonly ?string $translation_id = null,
         public readonly ?array $children = [],
     ) {
     }
@@ -31,6 +32,7 @@ class NodeData
             url: $data['url'] ?? null,
             model_type: $data['model_type'] ?? null,
             model_id: $data['model_id'] ?? null,
+            translation_id: array_key_exists('translation_id', $data) ? (string) $data['translation_id'] : null,
             children: array_map(fn (array $child) => self::fromArray($child), $data['children'] ?? [])
         );
     }

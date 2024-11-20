@@ -10,6 +10,7 @@ use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Page\Enums\Visibility;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -26,8 +27,17 @@ class ContentEntryController
 {
     public function index(Content $content): JsonApiResourceCollection
     {
+        abort_if(
+            $content->visibility === Visibility::AUTHENTICATED->value,
+            403
+        );
+
         return ContentEntryResource::collection(
-            QueryBuilder::for($content->contentEntries()->with(['content.blueprint', 'activeRouteUrl', 'blueprintData']))
+            QueryBuilder::for($content->contentEntries()
+                ->with(['content.blueprint', 'activeRouteUrl', 'blueprintData', 'content'])
+                ->where('status', true)
+                ->whereRelation('content', 'visibility', '!=', Visibility::AUTHENTICATED->value)
+            )
                 ->allowedFilters([
                     'title',
                     'slug',
@@ -69,6 +79,8 @@ class ContentEntryController
                 ->allowedSorts([
                     'order',
                     'title',
+                    'created_at',
+                    'updated_at',
                     'published_at',
                 ])
                 ->allowedIncludes([
@@ -83,9 +95,19 @@ class ContentEntryController
 
     public function show(string $content, string $contentEntry): ContentEntryResource
     {
+
+        $contentModel = Content::whereSlug($content)->firstOrFail();
+
+        abort_if(
+            $contentModel->visibility === Visibility::AUTHENTICATED->value,
+            403
+        );
+
         return ContentEntryResource::make(
             QueryBuilder::for(
                 ContentEntry::whereSlug($contentEntry)
+                    ->where('status', true)
+                    ->whereRelation('content', 'visibility', '!=', Visibility::AUTHENTICATED->value)
                     ->whereRelation('content', 'slug', $content)
             )
                 ->allowedIncludes([
@@ -94,6 +116,8 @@ class ContentEntryController
                     'routeUrls',
                     'metaData',
                     'blueprintData',
+                    'dataTranslation',
+                    'parentTranslation',
                 ])
                 ->firstOrFail()
         );

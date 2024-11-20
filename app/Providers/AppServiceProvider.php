@@ -65,6 +65,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Pennant\Feature;
 use Sentry\Laravel\Integration;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Stancl\Tenancy\Database\Models\Tenant;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
@@ -151,6 +152,7 @@ class AppServiceProvider extends ServiceProvider
             TenantApiCall::class,
             ProductOptionValue::class,
             ServiceTransaction::class,
+            Media::class,
         ]);
 
         Password::defaults(

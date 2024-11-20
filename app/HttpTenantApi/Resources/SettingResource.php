@@ -27,7 +27,12 @@ class SettingResource extends JsonApiResource
     {
         return $this->resource
             ->toCollection()
-            ->except($this->resource::encrypted())
+            ->except(
+                array_merge($this->resource::encrypted(),
+                    [
+                        'deploy_hook',
+                    ]
+                ))
             ->toArray();
     }
 }

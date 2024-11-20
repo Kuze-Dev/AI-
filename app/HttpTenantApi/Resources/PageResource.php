@@ -34,6 +34,8 @@ class PageResource extends JsonApiResource
             'blockContents' => fn () => BlockContentResource::collection($this->blockContents),
             'routeUrls' => fn () => RouteUrlResource::make($this->routeUrls),
             'metaData' => fn () => MetaDataResource::make($this->metaData),
+            'dataTranslation' => fn () => self::collection($this->dataTranslation),
+            'parentTranslation' => fn () => self::make($this->parentTranslation),
         ];
     }
 

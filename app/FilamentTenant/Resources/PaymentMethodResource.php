@@ -16,7 +16,10 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Flysystem\UnableToCheckFileExistence;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class PaymentMethodResource extends Resource
@@ -52,11 +55,28 @@ class PaymentMethodResource extends Resource
                         ->required(),
                     SpatieMediaLibraryFileUpload::make('logo')
                         ->image()
-                        ->collection('logo')
-                        ->preserveFilenames()
-                        ->customProperties(fn (Forms\Get $get) => [
-                            'alt_text' => $get('title'),
-                        ]),
+                        ->beforeStateDehydrated(null)
+                        ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
+                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                            $mediaClass = config('media-library.media_model', Media::class);
+
+                            /** @var ?Media $media */
+                            $media = $mediaClass::findByUuid($file);
+
+                            if (config('filament.default_filesystem_disk') === 'r2') {
+                                return $media?->getUrl();
+                            }
+
+                            if ($component->getVisibility() === 'private') {
+                                try {
+                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                } catch (Throwable) {
+                                    // This driver does not support creating temporary URLs.
+                                }
+                            }
+
+                            return $media?->getUrl();
+                        }),
                     Forms\Components\Toggle::make('status')
                         ->inline(false)
                         ->helperText('If enabled, message here')
@@ -68,7 +88,35 @@ class PaymentMethodResource extends Resource
                     Forms\Components\Textarea::make('description')
                         ->maxLength(fn (int $value = 250) => $value),
 
-                    Forms\Components\RichEditor::make('instruction'),
+                    Forms\Components\RichEditor::make('instruction')
+                        ->getUploadedAttachmentUrlUsing(function ($file) {
+
+                            $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                            try {
+                                if (! $storage->exists($file)) {
+                                    return null;
+                                }
+                            } catch (UnableToCheckFileExistence $exception) {
+                                return null;
+                            }
+
+                            if (config('filament.default_filesystem_disk') === 'r2') {
+                                return $storage->url($file);
+                            } else {
+                                if ($storage->getVisibility($file) === 'private') {
+                                    try {
+                                        return $storage->temporaryUrl(
+                                            $file,
+                                            now()->addMinutes(5),
+                                        );
+                                    } catch (\Throwable $exception) {
+                                        // This driver does not support creating temporary URLs.
+                                    }
+                                }
+
+                            }
+                        }),
 
                 ]),
             ]);

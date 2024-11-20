@@ -8,6 +8,7 @@ use App\Features\CMS\SitesManagement;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Actions\HandleUpdateDataTranslation;
 use Domain\Internationalization\Models\Locale;
 use Domain\Tenant\TenantFeatureSupport;
 use Support\MetaData\Actions\CreateMetaDataAction;
@@ -32,6 +33,7 @@ class PublishedContentEntryDraftAction
             'title' => $contentEntryData->title,
             'published_at' => $contentEntryData->published_at,
             'data' => $contentEntryData->data,
+            'status' => $contentEntryData->status,
             'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
         ]);
 
@@ -47,6 +49,15 @@ class PublishedContentEntryDraftAction
         if (TenantFeatureSupport::active(SitesManagement::class)) {
 
             $contentEntry->sites()->sync($contentEntryData->sites);
+        }
+
+        if (
+            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            is_null($contentEntry->draftable_id)
+        ) {
+
+            app(HandleUpdateDataTranslation::class)->execute($contentEntry, $contentEntryData);
+
         }
 
         $this->deleteContentEntry->execute($draft_content_entry);

@@ -15,6 +15,7 @@ class BlockData
         public readonly bool $is_fixed_content,
         public readonly UploadedFile|string|null $image = null,
         public readonly ?array $data = null,
+        public readonly array $sites = []
     ) {
     }
 }

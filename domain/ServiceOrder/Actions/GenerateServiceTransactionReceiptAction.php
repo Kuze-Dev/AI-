@@ -32,7 +32,7 @@ class GenerateServiceTransactionReceiptAction
             $customer->getKey().DIRECTORY_SEPARATOR.
             $filename.'.pdf';
 
-        $disk = config('domain.service-order.disks.receipt-files.driver');
+        $disk = config('filament.default_filesystem_disk');
 
         if (is_null($serviceTransaction->service_bill_id)) {
             Pdf::loadView(

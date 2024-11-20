@@ -31,6 +31,9 @@ class CreateBlockAction
             $block->clearMediaCollection('image');
         }
 
+        $block->sites()
+            ->attach($blockData->sites);
+
         return $block;
     }
 }

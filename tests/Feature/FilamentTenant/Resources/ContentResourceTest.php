@@ -18,6 +18,7 @@ it('can globally search', function () {
             'future_publish_date_behavior' => 'private',
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
+            'visibility' => 'public',
         ]);
 
     $result = Filament::getGlobalSearchProvider()

@@ -33,14 +33,17 @@ class CreateBlock extends CreateRecord
     #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
-        return app(CreateBlockAction::class)
-            ->execute(new BlockData(
-                name: $data['name'],
-                component: $data['component'],
-                blueprint_id: $data['blueprint_id'],
-                is_fixed_content: $data['is_fixed_content'],
-                image: $data['image'],
-                data: $data['data'] ?? null,
-            ));
+        return DB::transaction(
+            fn () => app(CreateBlockAction::class)
+                ->execute(new BlockData(
+                    name: $data['name'],
+                    component: $data['component'],
+                    image: $data['image'],
+                    blueprint_id: $data['blueprint_id'],
+                    is_fixed_content: $data['is_fixed_content'],
+                    data: $data['data'] ?? null,
+                    sites: $data['sites'] ?? [],
+                ))
+        );
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
+use Domain\Internationalization\Concerns\HasInternationalizationInterface;
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Eloquent;
@@ -26,6 +27,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string|null $model_type
  * @property int|null $model_id
  * @property string $label
+ * @property string $translation_id
  * @property Target $target
  * @property NodeType $type
  * @property string|null $url
@@ -56,8 +58,8 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  *
  * @mixin Eloquent
  */
-#[OnDeleteCascade(['children'])]
-class Node extends Model implements Sortable
+#[OnDeleteCascade(['children', 'dataTranslation'])]
+class Node extends Model implements HasInternationalizationInterface, Sortable
 {
     use ConstraintsRelationships;
     use SortableTrait;
@@ -72,6 +74,7 @@ class Node extends Model implements Sortable
         'type',
         'url',
         'order',
+        'translation_id',
     ];
 
     protected $with = [
@@ -105,5 +108,17 @@ class Node extends Model implements Sortable
     public function buildSortQuery(): Builder
     {
         return static::query()->whereMenuId($this->menu_id)->whereParentId($this->parent_id);
+    }
+
+    /** @return HasMany<Node> */
+    public function dataTranslation(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_id');
+    }
+
+    /** @return BelongsTo<Node, Node> */
+    public function parentTranslation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_id');
     }
 }

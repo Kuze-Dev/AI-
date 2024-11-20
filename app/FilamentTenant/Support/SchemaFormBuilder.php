@@ -21,6 +21,7 @@ use Domain\Blueprint\DataTransferObjects\SelectFieldData;
 use Domain\Blueprint\DataTransferObjects\TextareaFieldData;
 use Domain\Blueprint\DataTransferObjects\TextFieldData;
 use Domain\Blueprint\DataTransferObjects\TinyEditorData;
+use Domain\Blueprint\DataTransferObjects\TipTapEditorData;
 use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
@@ -39,8 +40,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
+use League\Flysystem\UnableToCheckFileExistence;
 use Mohamedsabil83\FilamentFormsTinyeditor\Components\TinyEditor;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -110,8 +114,7 @@ class SchemaFormBuilder extends Component
             FileFieldData::class => $this->makeFileUploadComponent($field),
             MarkdownFieldData::class => MarkdownEditor::make($field->state_name)
                 ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons)),
-            RichtextFieldData::class => RichEditor::make($field->state_name)
-                ->toolbarButtons(array_map(fn (RichtextButton $button) => $button->value, $field->buttons)),
+            RichtextFieldData::class => $this->makeRichTextComponent($field),
             SelectFieldData::class => Select::make($field->state_name)
                 ->options(Arr::pluck($field->options, 'label', 'value'))
                 ->multiple($field->multiple),
@@ -129,6 +132,7 @@ class SchemaFormBuilder extends Component
             RelatedResourceFieldData::class => $this->makeRelatedResourceComponent($field),
             MediaFieldData::class => $this->makeMediaComponent($field),
             TinyEditorData::class => $this->makeTinyEditorComponent($field),
+            TipTapEditorData::class => $this->makeTiptapEditorComponent($field),
 
             default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
         };
@@ -198,9 +202,9 @@ class SchemaFormBuilder extends Component
         return $fileUpload;
     }
 
-    private function makeMediaComponent(MediaFieldData $mediaFieldData): FileUpload
+    private function makeMediaComponent(MediaFieldData $mediaFieldData): MediaUploader
     {
-        $media = FileUpload::make($mediaFieldData->state_name);
+        $media = MediaUploader::make($mediaFieldData->state_name);
 
         if ($mediaFieldData->multiple) {
             $media->multiple($mediaFieldData->multiple)
@@ -211,9 +215,15 @@ class SchemaFormBuilder extends Component
                 ->imagePreviewHeight('256');
         }
 
+        if ($mediaFieldData->conversions) {
+            $media->image();
+        }
+
         if ($mediaFieldData->reorder) {
             $media->enableReordering($mediaFieldData->reorder);
         }
+
+        $media->enableOpen();
 
         $media->formatStateUsing(function (?array $state): array {
 
@@ -235,6 +245,7 @@ class SchemaFormBuilder extends Component
         $media->getUploadedFileUsing(function ($file) {
 
             if (! is_null($file)) {
+<<<<<<< HEAD
                 $mediaModel = Media::where('uuid', $file)->first();
                 if ($mediaModel) {
 
@@ -244,7 +255,23 @@ class SchemaFormBuilder extends Component
                         'type' => $mediaModel->getAttributeValue('mime_type'),
                         'url' => $mediaModel->getUrl(),
                     ];
+=======
+
+                $media = Media::where('uuid', $file)
+                    ->orWhere('file_name', $file)
+                    ->first();
+
+                if ($media) {
+                    return $media->getUrl();
+>>>>>>> develop
                 }
+
+                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                if ($storage->exists($file)) {
+                    return $storage->url($file);
+                }
+
             }
 
             return [];
@@ -348,13 +375,85 @@ class SchemaFormBuilder extends Component
         return $component;
     }
 
+    private function makeRichTextComponent(RichtextFieldData $richtextFieldData): RichEditor
+    {
+        $richEditor = RichEditor::make($richtextFieldData->state_name)
+            ->toolbarButtons(
+                array_map(
+                    fn (RichtextButton $button) => $button->value, $richtextFieldData->buttons)
+            )
+            ->getUploadedAttachmentUrlUsing(function ($file) {
+
+                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                try {
+                    if (! $storage->exists($file)) {
+                        return null;
+                    }
+                } catch (UnableToCheckFileExistence $exception) {
+                    return null;
+                }
+
+                if (config('filament.default_filesystem_disk') === 'r2') {
+                    return $storage->url($file);
+                } else {
+                    if ($storage->getVisibility($file) === 'private') {
+                        try {
+                            return $storage->temporaryUrl(
+                                $file,
+                                now()->addMinutes(5),
+                            );
+                        } catch (\Throwable $exception) {
+                            // This driver does not support creating temporary URLs.
+                        }
+                    }
+
+                    return $storage->url($file);
+
+                }
+
+            });
+
+        return $richEditor;
+    }
+
     private function makeTinyEditorComponent(TinyEditorData $tinyEditorData): TinyEditor
     {
 
         $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
-            ->fileAttachmentsDisk('s3')
+            ->fileAttachmentsDisk(config('filament.default_filesystem_disk'))
             ->fileAttachmentsVisibility('public')
             ->showMenuBar()
+            ->getUploadedAttachmentUrlUsing(function ($file) {
+
+                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+
+                try {
+                    if (! $storage->exists($file)) {
+                        return null;
+                    }
+                } catch (UnableToCheckFileExistence $exception) {
+                    return null;
+                }
+
+                if (config('filament.default_filesystem_disk') === 'r2') {
+                    return $storage->url($file);
+                } else {
+                    if ($storage->getVisibility($file) === 'private') {
+                        try {
+                            return $storage->temporaryUrl(
+                                $file,
+                                now()->addMinutes(5),
+                            );
+                        } catch (\Throwable $exception) {
+                            // This driver does not support creating temporary URLs.
+                        }
+                    }
+
+                    return $storage->url($file);
+
+                }
+            })
             ->fileAttachmentsDirectory('tinyeditor_uploads');
 
         if ($tinyEditorData->min_length) {
@@ -366,5 +465,20 @@ class SchemaFormBuilder extends Component
         }
 
         return $tinyEditor;
+    }
+
+    public function makeTiptapEditorComponent(TiptapEditorData $tiptapEditorData): TiptapEditor
+    {
+        $tiptapEditor = TiptapEditor::make($tiptapEditorData->state_name)
+            ->acceptedFileTypes($tiptapEditorData->accept)
+            ->tools(
+                $tiptapEditorData->tools
+            )
+            ->directory('attachments')
+            ->extraInputAttributes(['style' => 'min-height: 12rem;'])
+            ->maxContentWidth('full')
+            ->output(\FilamentTiptapEditor\Enums\TiptapOutput::Html->value); // optional, change the format for saved data, default is html
+
+        return $tiptapEditor;
     }
 }

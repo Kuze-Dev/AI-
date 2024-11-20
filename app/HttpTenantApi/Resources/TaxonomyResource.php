@@ -27,6 +27,8 @@ class TaxonomyResource extends JsonApiResource
         return [
             'taxonomyTerms' => fn () => TaxonomyTermResource::collection($this->taxonomyTerms),
             'parentTerms' => fn () => TaxonomyTermResource::collection($this->parentTerms),
+            'dataTranslation' => fn () => self::collection($this->dataTranslation),
+            'parentTranslation' => fn () => self::make($this->parentTranslation),
         ];
     }
 }

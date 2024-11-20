@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
+<<<<<<< HEAD
 use App\Features\CMS\SitesManagement;
+=======
+use Domain\Blueprint\Actions\CreateBlueprintDataAction;
+>>>>>>> develop
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
@@ -18,6 +22,7 @@ class CreateContentEntryDraftAction
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
+        protected CreateBlueprintDataAction $createBlueprintDataAction,
     ) {
     }
 
@@ -33,6 +38,7 @@ class CreateContentEntryDraftAction
                 'published_at' => $contentEntryData->published_at,
                 'author_id' => $contentEntryData->author_id,
                 'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
+                'status' => $contentEntryData->status,
             ]);
 
         $this->createMetaData->execute($contentEntry, $contentEntryData->meta_data);
@@ -46,6 +52,8 @@ class CreateContentEntryDraftAction
 
             $contentEntry->sites()->sync($contentEntryData->sites);
         }
+
+        $this->createBlueprintDataAction->execute($contentEntry);
 
         return $contentEntry;
     }

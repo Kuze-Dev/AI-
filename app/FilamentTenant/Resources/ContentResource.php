@@ -12,6 +12,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Actions\DeleteContentAction;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Content;
+use Domain\Page\Enums\Visibility;
 use Domain\Site\Models\Site;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Tenant\TenantFeatureSupport;
@@ -57,8 +58,10 @@ class ContentResource extends Resource
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        /** @phpstan-ignore-next-line */
-        return [trans('Total Entries') => $record->content_entries_count];
+        return array_filter([
+            'Total Entries' => $record->content_entries_count,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     #[\Override]
@@ -89,8 +92,53 @@ class ContentResource extends Resource
                         ->string()
                         ->maxLength(255)
                         ->alphaDash()
-                        ->unique(ignoreRecord: true)
-                        ->dehydrateStateUsing(fn (\Filament\Forms\Get $get, $state) => Str::slug($state ?: $get('name'))),
+                        ->rules([
+                            function (?Content $record, Closure $get) {
+
+                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                    $prefix = $value;
+
+                                    if (
+                                        tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
+                                    ) {
+                                        $siteIDs = $get('sites');
+
+                                        if ($record) {
+                                            $content = Content::where('prefix', $prefix)
+                                                ->where('id', '!=', $record->id)
+                                                ->whereHas(
+                                                    'sites',
+                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                                )->count();
+
+                                        } else {
+                                            $content = Content::where('prefix', $prefix)
+                                                ->whereHas(
+                                                    'sites',
+                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                                )->count();
+                                        }
+                                    } else {
+
+                                        if ($record) {
+                                            $content = Content::where('prefix', $prefix)
+                                                ->where('id', '!=', $record->id)
+                                                ->count();
+                                        } else {
+                                            $content = Content::where('prefix', $prefix)->count();
+                                        }
+
+                                    }
+
+                                    if ($content > 0) {
+                                        $fail("Content prefix {$get('name')} has already been taken.");
+                                    }
+
+                                };
+                            },
+                        ])
+                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->preload()
@@ -137,10 +185,22 @@ class ContentResource extends Resource
                             ->helperText(trans('Grants option for ordering of content entries'))
                             ->reactive(),
                     ]),
+                    Forms\Components\Select::make('visibility')
+                        ->options(
+                            collect(Visibility::cases())
+                                ->mapWithKeys(fn (Visibility $visibility) => [
+                                    $visibility->value => Str::headline($visibility->value),
+                                ])
+                                ->toArray()
+                        )
+                        ->default(Visibility::PUBLIC->value)
+                        ->hidden(fn () => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class))
+                        ->required(),
 
-                    Forms\Components\Section::make([
-                        Forms\Components\CheckboxList::make('sites')
-                            ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
+                    Forms\Components\Card::make([
+                        // Forms\Components\CheckboxList::make('sites')
+                        \App\FilamentTenant\Support\CheckBoxList::make('sites')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
                                 fn (?Content $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -175,10 +235,25 @@ class ContentResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray()
                             )
+                            ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return false;
+                                }
+
+                                $user_sites = $user->userSite->pluck('id')->toArray();
+
+                                $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                                return ! in_array($value, $intersect);
+                            })
                             ->formatStateUsing(fn (?Content $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                     ])
-                        ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                 ]),
             ]);
     }
@@ -202,8 +277,17 @@ class ContentResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
-                    ->relationship('sites', 'name'),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name', function (Builder $query) {
+
+                        if (Auth::user()?->can('site.siteManager') &&
+                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        }
+
+                        return $query;
+
+                    }),
                 Tables\Filters\SelectFilter::make('blueprint')
                     ->relationship('blueprint', 'name')
                     ->hidden((bool) ! Auth::user()?->can('blueprint.viewAny'))

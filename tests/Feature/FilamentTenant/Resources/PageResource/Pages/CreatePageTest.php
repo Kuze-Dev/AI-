@@ -169,6 +169,9 @@ it('can clone page', function () {
 });
 
 it('can create page with meta data', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $blockId = BlockFactory::new()
         ->for(
             BlueprintFactory::new()
@@ -188,7 +191,10 @@ it('can create page with meta data', function () {
         'author' => 'Test Author',
         'description' => 'Test Description',
     ];
-    $metaDataImage = UploadedFile::fake()->image('preview.jpeg');
+
+    $metaDataImage = UploadedFile::fake()->image('preview.jpg');
+
+    $path = $metaDataImage->store('/', config('filament.default_filesystem_disk'));
 
     $page = livewire(CreatePage::class)
         ->fillForm([
@@ -200,7 +206,7 @@ it('can create page with meta data', function () {
                 ],
             ],
             'meta_data' => $metaData,
-            'meta_data.image.0' => $metaDataImage,
+            'meta_data.image.0' => $path,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -225,7 +231,6 @@ it('can create page with meta data', function () {
         )
     );
     assertDatabaseHas(Media::class, [
-        'file_name' => $metaDataImage->getClientOriginalName(),
         'mime_type' => $metaDataImage->getMimeType(),
     ]);
 });
@@ -342,7 +347,7 @@ it('can create page with media uploaded', function () {
     $file = UploadedFile::fake()->image('preview.jpeg');
 
     // Perform the upload to S3
-    Storage::disk('s3')->put('/', $file);
+    Storage::disk(config('filament.default_filesystem_disk'))->put('/', $file);
 
     $page = livewire(CreatePage::class)
         ->fillForm([
@@ -405,7 +410,7 @@ it('can create page with media uploaded inside repeater', function () {
     $file = UploadedFile::fake()->image('preview.jpeg');
 
     // Perform the upload to S3
-    Storage::disk('s3')->put('/', $file);
+    Storage::disk(config('filament.default_filesystem_disk'))->put('/', $file);
 
     $page = livewire(CreatePage::class)
         ->fillForm([

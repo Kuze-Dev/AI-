@@ -29,6 +29,7 @@ it('can render content', function () {
             'past_publish_date_behavior' => 'unlisted',
             'is_sortable' => true,
             'prefix' => 'my-content',
+            'visibility' => 'public',
         ]);
 
     livewire(EditContent::class, ['record' => $content->getRouteKey()])
@@ -63,6 +64,7 @@ it('can update content', function () {
             'is_sortable' => true,
             'prefix' => 'test-content',
             'taxonomies' => [$taxonomy->getKey()],
+            'visibility' => 'public',
         ])
         ->call('save')
         ->assertHasNoFormErrors()

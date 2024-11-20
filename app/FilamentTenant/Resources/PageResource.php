@@ -8,6 +8,7 @@ use App\Features\CMS\Internationalization;
 use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\PageResource\RelationManagers\PageTranslationRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -50,6 +51,16 @@ class PageResource extends Resource
         return trans('CMS');
     }
 
+    /** @param  Page  $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+
+        return array_filter([
+            'Page' => $record->name,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
+    }
+
     /** @var Collection<int, Block> */
     public static ?Collection $cachedBlocks = null;
 
@@ -79,10 +90,12 @@ class PageResource extends Resource
                                     }
                                 )
                                 ->lazy()
-                                ->afterStateUpdated(function (Forms\Components\TextInput $component) {
-                                    $component->getContainer()
-                                        ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
-                                        ?->dispatchEvent('route_url::update');
+                                ->afterStateUpdated(function (Forms\Components\TextInput $component, Closure $get) {
+                                    if (! $get('route_url.is_override')) {
+                                        $component->getContainer()
+                                            ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                            ?->dispatchEvent('route_url::update');
+                                    }
                                 })
                                 ->required()
                                 ->string()
@@ -93,7 +106,28 @@ class PageResource extends Resource
                                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                                 ->default((string) Locale::where('is_default', true)->first()?->code)
                                 ->searchable()
-                                ->hidden(TenantFeatureSupport::inactive(Internationalization::class))
+                                ->rules([
+                                    function (?Page $record, Closure $get) {
+
+                                        return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                            if ($record) {
+                                                $selectedLocale = $value;
+
+                                                $originalContentId = $record->translation_id ?: $record->id;
+
+                                                $exist = Page::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                                )->where('locale', $selectedLocale)->first();
+
+                                                if ($exist && $exist->id != $record->id) {
+                                                    $fail("Page {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                                }
+                                            }
+
+                                        };
+                                    },
+                                ])
+                                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                                 ->reactive()
                                 ->afterStateUpdated(function (Forms\Components\Select $component, \Filament\Forms\Get $get) {
                                     $component->getContainer()
@@ -124,22 +158,61 @@ class PageResource extends Resource
                                 ->default(Auth::id()),
                         ]),
                         Forms\Components\Card::make([
-                            Forms\Components\CheckboxList::make('sites')
+                            // Forms\Components\CheckboxList::make('sites')
+                            \App\FilamentTenant\Support\CheckBoxList::make('sites')
                                 ->reactive()
-                                ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
-                                ->rule(fn (?Page $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                                ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                                ->rules([
+                                    fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')),
+                                    function (?Page $record, Closure $get) {
+
+                                        return function (string $attribute, $value, Closure $fail) use ($get) {
+
+                                            if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+                                                $block_ids = array_values(
+                                                    array_filter(array_map(fn ($item) => $item['block_id'] ?? null, $get('block_contents'))
+                                                    ));
+
+                                                $siteIDs = $value;
+
+                                                $block_siteIds = self::getCachedBlocks()
+                                                    ->filter(function ($block) use ($siteIDs) {
+                                                        return $block->sites->pluck('id')->intersect($siteIDs)->isNotEmpty();
+
+                                                    })->pluck('id')->toArray();
+
+                                                foreach ($block_ids as $block_id) {
+
+                                                    if (! in_array($block_id, $block_siteIds)) {
+                                                        $fail("A block doesn't belong to the sites is selected, please double check your selected sites and blocks list.");
+                                                    }
+                                                }
+
+                                            }
+
+                                        };
+                                    },
+                                ])
                                 ->options(function () {
-
-                                    if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
-                                        return Site::orderBy('name')
-                                            ->pluck('name', 'id')
-                                            ->toArray();
-                                    }
-
                                     return Site::orderBy('name')
-                                        ->whereHas('siteManager', fn ($query) => $query->where('admin_id', Auth::user()?->id))
                                         ->pluck('name', 'id')
                                         ->toArray();
+                                })
+                                ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                                    /** @var \Domain\Admin\Models\Admin */
+                                    $user = Auth::user();
+
+                                    if ($user->hasRole(config('domain.role.super_admin'))) {
+                                        return false;
+                                    }
+
+                                    $user_sites = $user->userSite->pluck('id')->toArray();
+
+                                    $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                                    return ! in_array($value, $intersect);
                                 })
                                 ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Page $record): void {
                                     if (! $record) {
@@ -182,21 +255,43 @@ class PageResource extends Resource
                             ->collapsed(fn (string $context) => $context === 'edit')
                             ->orderable('order')
                             ->schema([
-                                Forms\Components\ViewField::make('block_id')
+                                // Forms\Components\ViewField::make('block_id')
+                                \App\Filament\Livewire\Forms\CustomViewField::make('block_id')
                                     ->label('Block')
                                     ->required()
                                     ->view('filament.forms.components.block-picker')
-                                    ->viewData([
+                                    ->datafilter(fn (Closure $get) => self::getCachedBlocks()
+                                        ->filter(function ($block) use ($get) {
+                                            return $block->sites->pluck('id')->intersect($get('../../sites'))->isNotEmpty();
+
+                                        })
+                                        ->pluck('id')->toArray()
+                                    )
+                                    ->viewData(fn () => [
                                         'blocks' => self::getCachedBlocks()
                                             ->sortBy('name')
-                                            ->mapWithKeys(fn (Block $block) => [
-                                                $block->id => [
-                                                    'name' => $block['name'],
-                                                    'image' => $block->getFirstMediaUrl('image'),
-                                                ],
-                                            ])
-                                            ->toArray(),
-                                    ])
+                                            ->mapWithKeys(function (Block $block) {
+                                                return [
+                                                    $block->id => [
+                                                        'name' => $block['name'],
+                                                        'image' => $block->getFirstMediaUrl('image'),
+                                                    ],
+                                                ];
+                                            })
+                                            ->toArray()])
+                                    // ->viewData([
+                                    //     'blocks' => self::getCachedBlocks()
+                                    //         ->sortBy('name')
+                                    //         ->mapWithKeys(function (Block $block) {
+                                    //             return [
+                                    //                 $block->id => [
+                                    //                     'name' => $block['name'],
+                                    //                     'image' => $block->getFirstMediaUrl('image'),
+                                    //                 ],
+                                    //             ];
+                                    //         })
+                                    //         ->toArray(),
+                                    // ])
                                     ->reactive()
                                     ->afterStateUpdated(function (Forms\Components\ViewField $component, $state) {
                                         $block = self::getCachedBlocks()->firstWhere('id', $state);
@@ -268,35 +363,44 @@ class PageResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('visibility')
-                        ->options(
-                            collect(Visibility::cases())
-                                ->mapWithKeys(fn (Visibility $visibility) => [
-                                    $visibility->value => Str::headline($visibility->value),
-                                ])
-                                ->toArray()
-                        ),
+                    ->options(
+                        collect(Visibility::cases())
+                            ->mapWithKeys(fn (Visibility $visibility) => [
+                                $visibility->value => Str::headline($visibility->value),
+                            ])
+                            ->toArray()
+                    ),
                 Tables\Filters\SelectFilter::make('locale')
-                        ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\SelectFilter::make('sites')
-                        ->multiple()
-                        ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
-                        ->relationship('sites', 'name'),
+                    ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name', function (Builder $query) {
+
+                        if (Auth::user()?->can('site.siteManager') &&
+                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        }
+
+                        return $query;
+
+                    }),
                 Tables\Filters\TernaryFilter::make('published_at')
-                        ->label(trans('Published'))
-                        ->nullable(),
+                    ->label(trans('Published'))
+                    ->nullable(),
             ])
 
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                        Tables\Actions\DeleteAction::make()
-                            ->using(function (Page $record) {
-                                try {
-                                    return app(DeletePageAction::class)->execute($record);
-                                } catch (DeleteRestrictedException) {
-                                    return false;
-                                }
-                            }),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Page $record) {
+                            try {
+                                return app(DeletePageAction::class)->execute($record);
+                            } catch (DeleteRestrictedException) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([
@@ -351,6 +455,7 @@ class PageResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            PageTranslationRelationManager::class,
         ];
     }
 
@@ -367,10 +472,39 @@ class PageResource extends Resource
     /** @return Collection<int, Block> $cachedBlocks */
     protected static function getCachedBlocks(): Collection
     {
+
         if (! isset(self::$cachedBlocks)) {
-            self::$cachedBlocks = Block::with(['blueprint', 'media'])->get();
+
+            self::$cachedBlocks = Block::with(['blueprint', 'media', 'sites'])->get();
         }
+
+        // if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+        //     if($site_ids){
+        //         return self::$cachedBlocks
+        //         ->filter(function ($block) use($site_ids){
+
+        //             // dd($site_ids);
+        //             // dd($block->sites->contains('id',$site_ids));
+        //             return $block->sites->contains($site_ids);
+        //         } );
+        //     }
+
+        // return self::$cachedBlocks;
+        //     // dd($site_ids);
+
+        //     // dd($test);
+        // }
+
+        // dd(self::$cachedBlocks);
 
         return self::$cachedBlocks;
     }
+
+    // protected static function getcachedSelectedSites(array $state): array
+    // {
+    //     self::$cachedSelectedSites = $state;
+
+    //     return self::$cachedSelectedSites;
+    // }
 }

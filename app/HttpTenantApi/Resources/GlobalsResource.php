@@ -26,11 +26,18 @@ class GlobalsResource extends JsonApiResource
         ];
     }
 
+<<<<<<< HEAD
     #[\Override]
+=======
+    /** @return array<string, callable> */
+>>>>>>> develop
     public function toRelationships(Request $request): array
     {
         return [
             'blueprint' => fn () => BlueprintResource::make($this->blueprint),
+            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
+            'dataTranslation' => fn () => self::collection($this->dataTranslation),
+            'parentTranslation' => fn () => self::make($this->parentTranslation),
         ];
     }
 

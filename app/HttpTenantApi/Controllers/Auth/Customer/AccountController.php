@@ -7,6 +7,8 @@ namespace App\HttpTenantApi\Controllers\Auth\Customer;
 use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CustomerResource;
+use App\Settings\CustomerSettings;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Actions\EditCustomerAction;
 use Domain\Customer\DataTransferObjects\CustomerData;
 use Domain\Customer\Enums\Gender;
@@ -44,7 +46,11 @@ class AccountController extends Controller
         /** @var \Domain\Customer\Models\Customer $customer */
         $customer = Auth::user();
 
-        $validated = $this->validate($request, [
+        // if (app(CustomerSettings::class)->blueprint_id) {
+        $customerBlueprint = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->first();
+        // }
+
+        $rules = [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => [
@@ -56,7 +62,25 @@ class AccountController extends Controller
             'gender' => ['required', Rule::enum(Gender::class)],
             'mobile' => ['required', 'string' => 'max:255',  Rule::unique(Customer::class)->ignoreModel($customer)],
             'birth_date' => 'required|date',
-        ]);
+        ];
+
+        if ($customerBlueprint) {
+            $bluprintRules = $customerBlueprint->schema->getValidationRules();
+
+            $rules = array_merge($rules, $bluprintRules);
+        }
+
+        $validated = $this->validate($request, $rules);
+
+        $customderBlueprintData = [];
+        if ($customerBlueprint) {
+
+            foreach ($customerBlueprint->schema->sections as $section) {
+                $customderBlueprintData[$section->state_name] = $validated[$section->state_name];
+            }
+        }
+
+        $validated['data'] = $customderBlueprintData;
 
         $customer = DB::transaction(
             fn () => app(EditCustomerAction::class)

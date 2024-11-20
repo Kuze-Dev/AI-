@@ -12,15 +12,18 @@ use App\FilamentTenant\Resources\ContentResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
 use Domain\Content\Actions\CreateContentEntryDraftAction;
+use Domain\Content\Actions\CreateContentEntryTranslationAction;
 use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
@@ -138,6 +141,20 @@ class EditContentEntry extends EditRecord
 
                         return "https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}";
                     }, true),
+                Action::make('createTranslation')
+                    ->color('secondary')
+                    ->slideOver(true)
+                    ->action('createTranslation')
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->form([
+                        Forms\Components\Select::make('locale')
+                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                            ->default((string) Locale::where('is_default', true)->first()?->code)
+                            ->searchable()
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->reactive()
+                            ->required(),
+                    ]),
                 Action::make('preview_microsite_action')
                     ->label('Preview Microsite')
                     ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
@@ -315,5 +332,98 @@ class EditContentEntry extends EditRecord
     {
         return app(UpdateContentEntryAction::class)
             ->execute($record, ContentEntryData::fromArray($data));
+    }
+
+    public function createTranslation(array $data): RedirectResponse|Redirector|false
+    {
+        $record = $this->record;
+
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = auth()->user();
+
+        if ($record->draftable_id) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Invalid Action'))
+                ->body(trans('Cannot Create Translation base on Draft Content'))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Invalid Action'))
+                ->body(trans('Cannot Create Translation base on Draft Content'))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
+        $formData = $this->form->getState();
+
+        $formData['locale'] = $data['locale'];
+
+        $code = $data['locale'];
+
+        $formData['route_url']['url'] = $this->changeUrlLocale($formData['route_url']['url'], $code);
+
+        $orginalContent = $record->parentTranslation ?? $record;
+
+        $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $orginalContent->id)->orWhere('id', $orginalContent->id)
+        )->where('locale', $data['locale'])->first();
+
+        /** @var \Domain\Internationalization\Models\Locale */
+        $locale = Locale::whereCode($data['locale'])->first();
+
+        if ($exist) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Content Entry :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Content Entry :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
+
+        $contentEntryData = ContentEntryData::fromArray($formData);
+
+        $contentEntryTranslation = app(CreateContentEntryTranslationAction::class)->execute($orginalContent, $contentEntryData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Translation Created'))
+            ->body(trans('Page Translation :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+            ->sendToDatabase($admin);
+
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntryTranslation]));
+    }
+
+    protected function changeUrlLocale(string $url, string $locale): string
+    {
+
+        $locales = Locale::pluck('code')->toArray();
+
+        // Remove leading and trailing slashes from the URL
+        $url = trim($url, '/');
+
+        // Split the URL by "/"
+        $segments = explode('/', $url);
+
+        // Check if the first segment is a valid locale code from the array
+        if (in_array($segments[0], $locales)) {
+            // Replace the existing locale with the new one
+            $segments[0] = $locale;
+        } else {
+            // Prepend the new locale to the URL
+            array_unshift($segments, $locale);
+        }
+
+        // Rebuild the URL and add a leading "/"
+        return '/'.implode('/', $segments);
     }
 }

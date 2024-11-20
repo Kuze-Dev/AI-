@@ -7,23 +7,33 @@ namespace App\FilamentTenant\Resources;
 use App\Features\CMS\Internationalization;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\TaxonomyResource\RelationManagers\TaxonomyTranslationRelationManager;
+use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use App\FilamentTenant\Support\Tree;
+use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Internationalization\Models\Locale;
+use Domain\Site\Models\Site;
 use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
+use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
+// use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Support\RouteUrl\Rules\MicroSiteUniqueRouteUrlRule;
+use Support\RouteUrl\Rules\UniqueActiveRouteUrlRule;
 
 class TaxonomyResource extends Resource
 {
@@ -49,8 +59,10 @@ class TaxonomyResource extends Resource
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        /** @phpstan-ignore-next-line */
-        return [trans('Total terms') => $record->taxonomy_terms_count];
+        return array_filter([
+            'Total terms' => $record->taxonomy_terms_count,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     /** @return Builder<Taxonomy> */
@@ -60,8 +72,31 @@ class TaxonomyResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('taxonomyTerms');
     }
 
+    // #[\Override]
+    // public static function resolveRecordRouteBinding(int|string $key): ?Model
+
+    /** @return Builder<\Domain\Taxonomy\Models\Taxonomy> */
+    public static function getEloquentQuery(): Builder
+    {
+        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+            return static::getModel()::query();
+        }
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            Auth::user()?->can('site.siteManager') &&
+            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        ) {
+            return static::getModel()::query()->wherehas('sites', function ($q) {
+                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+            });
+        }
+
+        return static::getModel()::query();
+
+    }
+
     #[\Override]
-    public static function resolveRecordRouteBinding(int|string $key): ?Model
+    public static function resolveRecordRouteBinding(mixed $key): ?Model
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())
@@ -78,21 +113,111 @@ class TaxonomyResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->string()
+                        ->reactive()
                         ->maxLength(255)
-                        ->unique(ignoreRecord: true),
+                        ->afterStateUpdated(function (Forms\Components\TextInput $component, $livewire) {
+                            $component->getContainer()
+                                ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                ?->dispatchEvent('route_url::update');
+                        })
+                        ->unique(
+                            ignoreRecord: true,
+                            callback: function (Unique $rule, $state, $livewire) {
+
+                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                    return false;
+                                }
+
+                                return $rule;
+                            }
+                        )
+                        ->lazy(),
                     Forms\Components\Select::make('blueprint_id')
                         ->label(trans('Blueprint'))
                         ->required()
                         ->preload()
                         ->optionsFromModel(Blueprint::class, 'name')
-                        ->disableOptionWhen(fn (?Taxonomy $record) => $record !== null),
+                        ->disabled(fn (?Taxonomy $record) => $record !== null),
+                    Forms\Components\Toggle::make('has_route')
+                        ->reactive()
+                        ->lazy()
+                        ->afterStateUpdated(function (Forms\Components\Toggle $component, $state) {
+                            if ($state) {
+                                $component->getContainer()
+                                    ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                    ?->dispatchEvent('route_url::update');
+                            }
+
+                        })
+                        ->formatStateUsing(fn (?Taxonomy $record) => $record?->activeRouteUrl ? true : false)
+                        ->label(trans('Has Route')),
+                    RouteUrlFieldset::make()
+                        ->disabled(fn (Closure $get) => ! $get('has_route'))
+                        ->hidden(fn (Closure $get) => ! $get('has_route')),
                 ]),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
-                    ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class))
+                    ->rules([
+                        function (?Taxonomy $record, Closure $get) {
+
+                            return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                if ($record) {
+                                    $selectedLocale = $value;
+
+                                    $originalContentId = $record->translation_id ?: $record->id;
+
+                                    $exist = Taxonomy::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                    )->where('locale', $selectedLocale)->first();
+
+                                    if ($exist && $exist->id != $record->id) {
+                                        $fail("Taxonomy {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                    }
+                                }
+
+                            };
+                        },
+                    ])
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
+
+                Forms\Components\Card::make([
+                    Forms\Components\CheckboxList::make('sites')
+                        ->reactive()
+                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->rule(fn (?Taxonomy $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                        ->options(function () {
+
+                            if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+                                return Site::orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            }
+
+                            return Site::orderBy('name')
+                                ->whereHas('siteManager', fn ($query) => $query->where('admin_id', Auth::user()?->id))
+                                ->pluck('name', 'id')
+                                ->toArray();
+                        })
+                        ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Taxonomy $record): void {
+                            if (! $record) {
+                                $component->state([]);
+
+                                return;
+                            }
+
+                            $component->state(
+                                $record->sites->pluck('id')
+                                    ->intersect(array_keys($component->getOptions()))
+                                    ->values()
+                                    ->toArray()
+                            );
+                        }),
+                ])
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+
                 Forms\Components\Section::make(trans('Terms'))->schema([
                     Tree::make('terms')
                         ->formatStateUsing(
@@ -104,9 +229,91 @@ class TaxonomyResource extends Resource
                         ->schema([
                             Forms\Components\Grid::make(['md' => 1])
                                 ->schema([
-                                    Forms\Components\TextInput::make('name')
-                                        ->required()
-                                        ->unique(ignoreRecord: true),
+                                    Forms\Components\Section::make('Term')
+                                        ->schema([
+                                            Forms\Components\Hidden::make('id'),
+                                            Forms\Components\TextInput::make('name')
+                                                ->required()
+                                                ->reactive()
+                                                ->lazy()
+                                                ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+                                                    $set('url', $livewire->data['route_url']['url'].'/'.Str::of($state)->slug());
+
+                                                    return $state;
+                                                })
+                                                ->unique(ignoreRecord: true),
+                                            Forms\Components\Group::make([
+                                                Forms\Components\Toggle::make('is_custom')
+                                                    ->formatStateUsing(function (Closure $get, $state) {
+
+                                                        if ($state) {
+                                                            return $state;
+                                                        }
+                                                        /** @var TaxonomyTerm|null */
+                                                        $term = TaxonomyTerm::with(
+                                                            'routeUrls'
+                                                        )->find($get('id'));
+
+                                                        return $term ? $term->routeUrls?->is_override : $state;
+
+                                                    })
+                                                    ->label(trans('Is Custom URL'))
+                                                    ->reactive(),
+                                                Forms\Components\TextInput::make('url')
+                                                    ->label(trans('URL'))
+                                                    ->reactive()
+                                                    // ->unique(ignoreRecord: true)
+                                                    ->disabled(fn ($livewire, Closure $get) => ! ($livewire->data['has_route'] && $get('is_custom')))
+                                                    ->hidden(fn ($livewire) => ! $livewire->data['has_route'])
+                                                    ->formatStateUsing(function (Closure $get, $state, $livewire) {
+
+                                                        if ($state) {
+                                                            return $state;
+                                                        }
+
+                                                        $term = TaxonomyTerm::with(
+                                                            'routeUrls'
+                                                        )->find($get('id'));
+
+                                                        return $term ? $term->ActiveRouteurl?->url : $state;
+
+                                                    })
+                                                    ->required()
+                                                    ->string()
+                                                    ->maxLength(255)
+                                                    ->startsWith('/')
+                                                    ->rules([
+                                                        function (Closure $get) {
+
+                                                            /** @var \Support\RouteUrl\Contracts\HasRouteUrl */
+                                                            $term = TaxonomyTerm::with(
+                                                                'routeUrls'
+                                                            )->find($get('id'));
+
+                                                            return new UniqueActiveRouteUrlRule($term);
+                                                        },
+                                                        function ($livewire, Closure $get) {
+
+                                                            $datas = $livewire->data['terms'];
+                                                            $current_item_id = $get('id');
+
+                                                            return function (string $attribute, $value, Closure $fail) use ($datas, $current_item_id) {
+
+                                                                $filtered = array_filter($datas, function ($item) use ($value, $current_item_id) {
+
+                                                                    return isset($item['url']) && $item['url'] === $value && $item['id'] != $current_item_id;
+                                                                });
+
+                                                                if (! empty($filtered)) {
+                                                                    $fail(trans('The :value is already been used.', ['value' => $value]));
+                                                                }
+                                                            };
+                                                        },
+                                                    ]),
+                                            ]),
+
+                                        ]),
+
                                     SchemaFormBuilder::make('data', fn (Taxonomy $record) => $record->blueprint->schema),
                                 ]),
                         ]),
@@ -135,8 +342,21 @@ class TaxonomyResource extends Resource
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
-            ->filters([])
+            ->filters([
+                Tables\Filters\SelectFilter::make('sites')
+                    ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name', function (Builder $query) {
 
+                        if (Auth::user()?->can('site.siteManager') &&
+                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        }
+
+                        return $query;
+
+                    }),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
@@ -161,6 +381,7 @@ class TaxonomyResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            TaxonomyTranslationRelationManager::class,
         ];
     }
 

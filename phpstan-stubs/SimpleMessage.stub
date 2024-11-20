@@ -1,0 +1,43 @@
+<?php
+
+namespace Illuminate\Notifications\Messages;
+
+use Illuminate\Contracts\Support\Htmlable;
+
+class SimpleMessage
+{
+    /**
+     * The notification's greeting.
+     *
+     * @var Htmlable|string
+     */
+    public $greeting;
+
+
+     /**
+     * The notification's salutation.
+     *
+     * @var Htmlable|string
+     */
+    public $salutation;
+
+     /**
+     * Set the greeting of the notification.
+     *
+     * @param  Htmlable|string  $greeting
+     * @return $this
+     */
+    public function greeting($greeting)
+    {
+    }
+
+    /**
+     * Set the greeting of the notification.
+     *
+     * @param  Htmlable|string  $greeting
+     * @return $this
+     */
+    public function salutation($greeting)
+    {
+    }
+}

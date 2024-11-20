@@ -24,7 +24,13 @@ class GlobalsController
         return GlobalsResource::collection(
             QueryBuilder::for(Globals::with('blueprint'))
                 ->allowedFilters(['name', 'slug', AllowedFilter::exact('locale'), AllowedFilter::exact('sites.id')])
-                ->allowedIncludes('blueprint')
+                ->allowedIncludes(
+                    [
+                        'blueprint',
+                        'blueprintData',
+                        'dataTranslation',
+                        'parentTranslation',
+                    ])
                 ->jsonPaginate()
         );
     }
@@ -33,7 +39,13 @@ class GlobalsController
     {
         return GlobalsResource::make(
             QueryBuilder::for(Globals::whereSlug($global))
-                ->allowedIncludes('blueprint')
+                ->allowedIncludes(
+                    [
+                        'blueprint',
+                        'blueprintData',
+                        'dataTranslation',
+                        'parentTranslation',
+                    ])
                 ->firstOrFail()
         );
     }

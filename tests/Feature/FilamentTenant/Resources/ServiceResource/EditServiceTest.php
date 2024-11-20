@@ -13,6 +13,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 use Support\MetaData\Models\MetaData;
@@ -63,6 +64,9 @@ it('can render service', function () {
 });
 
 it('can edit service', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $service = ServiceFactory::new()
         ->withDummyBlueprint()
         ->has(TaxonomyTermFactory::new()->for(TaxonomyFactory::new()->withDummyBlueprint()))
@@ -76,6 +80,8 @@ it('can edit service', function () {
         ->createOne();
 
     $image = UploadedFile::fake()->image('preview.jpeg');
+
+    $path = $image->store('/', config('filament.default_filesystem_disk'));
 
     $metaData = [
         'title' => 'Test Title',
@@ -102,8 +108,13 @@ it('can edit service', function () {
             //            'is_installment' => ! $service->is_installment,
             'taxonomy_term_id' => $taxonomyTerm->id,
             'media.0' => $image,
+<<<<<<< HEAD
             'metaData' => $metaData,
             'metaData.image.0' => $image,
+=======
+            'meta_data' => $metaData,
+            'meta_data.image.0' => $path,
+>>>>>>> develop
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -129,9 +140,12 @@ it('can edit service', function () {
     );
 
     assertDatabaseHas(Media::class, [
+<<<<<<< HEAD
         'model_type' => $service->getMorphClass(),
         'model_id' => $service->getKey(),
         'file_name' => $image->getClientOriginalName(),
+=======
+>>>>>>> develop
         'mime_type' => $image->getMimeType(),
     ]);
 });

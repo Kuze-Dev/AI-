@@ -28,6 +28,10 @@ class TaxonomyController
                     'parentTerms.taxonomy',
                     'taxonomyTerms.children',
                     'taxonomyTerms.taxonomy',
+                    'dataTranslation',
+                    'parentTranslation',
+                    'taxonomyTerms.dataTranslation',
+                    'taxonomyTerms.parentTranslation',
                 ])
                 ->jsonPaginate()
         );
@@ -36,12 +40,22 @@ class TaxonomyController
     public function show(string $taxonomy): TaxonomyResource
     {
         return TaxonomyResource::make(
-            QueryBuilder::for(Taxonomy::whereSlug($taxonomy))
+            QueryBuilder::for(Taxonomy::with([
+                'parentTerms.children',
+                'parentTerms.taxonomy',
+                'taxonomyTerms.children',
+                'taxonomyTerms.taxonomy',
+            ])->whereSlug($taxonomy))
                 ->allowedIncludes([
                     'parentTerms.children',
                     'parentTerms.taxonomy',
                     'taxonomyTerms.children',
                     'taxonomyTerms.taxonomy',
+                    'taxonomyTerms.blueprintData',
+                    'dataTranslation',
+                    'parentTranslation',
+                    'taxonomyTerms.dataTranslation',
+                    'taxonomyTerms.parentTranslation',
                 ])
                 ->firstOrFail()
         );

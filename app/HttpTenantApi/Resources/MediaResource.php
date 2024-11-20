@@ -16,6 +16,7 @@ class MediaResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
+            'uuid' => $this->uuid,
             'collection_name' => $this->collection_name,
             'file_name' => $this->file_name,
             'custom_properties' => $this->custom_properties,
