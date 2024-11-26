@@ -40,6 +40,7 @@ class ListBlueprints extends ListRecords
 
                     ],
                 ),
+            
             Actions\CreateAction::make(),
         ];
     }

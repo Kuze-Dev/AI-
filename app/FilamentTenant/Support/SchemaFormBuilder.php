@@ -245,8 +245,9 @@ class SchemaFormBuilder extends Component
         $media->getUploadedFileUsing(function ($file) {
 
             if (! is_null($file)) {
-<<<<<<< HEAD
-                $mediaModel = Media::where('uuid', $file)->first();
+                $mediaModel = Media::where('uuid', $file)
+                    ->orWhere('file_name', $file)
+                    ->first();
                 if ($mediaModel) {
 
                     return [
@@ -255,16 +256,14 @@ class SchemaFormBuilder extends Component
                         'type' => $mediaModel->getAttributeValue('mime_type'),
                         'url' => $mediaModel->getUrl(),
                     ];
-=======
 
-                $media = Media::where('uuid', $file)
-                    ->orWhere('file_name', $file)
-                    ->first();
+                // $media = Media::where('uuid', $file)
+                //     ->orWhere('file_name', $file)
+                //     ->first();
 
-                if ($media) {
-                    return $media->getUrl();
->>>>>>> develop
-                }
+                // if ($media) {
+                //     return $media->getUrl();
+                // }
 
                 $storage = Storage::disk(config('filament.default_filesystem_disk'));
 
@@ -275,7 +274,7 @@ class SchemaFormBuilder extends Component
             }
 
             return [];
-
+        }
         });
 
         if (! empty($mediaFieldData->accept)) {

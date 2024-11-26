@@ -80,7 +80,9 @@
             "Domain\\": "domain/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Support\\": "support/"
+            "Support\\": "support/",
+            "HalcyonAgile\\FilamentImport\\": "packages/halcyon-agile/filament-import/src/",
+            "HalcyonAgile\\FilamentExport\\": "packages/halcyon-agile/filament-export/src/"
         }
     },
     "autoload-dev": {
@@ -186,6 +188,6 @@
             "phpstan/extension-installer": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
