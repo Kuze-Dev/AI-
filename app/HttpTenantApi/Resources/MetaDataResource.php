@@ -18,10 +18,11 @@ class MetaDataResource extends JsonApiResource
 
         return [
             'title' => $this->title,
-            'author' => $this->description,
+            'author' => $this->author,
             'keywords' => $this->keywords,
             'description' => $this->description,
             'image' => $image?->getUrl('original'),
+            'original_image' => $image?->getUrl(),
             'image_alt_text' => $image?->getCustomProperty('alt_text'),
         ];
     }
