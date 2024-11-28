@@ -176,7 +176,7 @@ trait ExportsRecords
             ->title(trans('Export queued'))
             ->body(trans('The export was queued. You will be notified when it is ready for download.'))
             ->success()
-            ->icon('heroicon-o-inbox-in')
+            ->icon('heroicon-o-inbox-arrow-down')
             ->send();
 
         return null;

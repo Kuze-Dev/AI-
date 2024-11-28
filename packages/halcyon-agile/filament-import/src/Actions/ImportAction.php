@@ -72,7 +72,7 @@ class ImportAction extends Action
                     Notification::make()
                         ->title(trans('Import queued'))
                         ->body(trans('The import was queued. You will be notified when it is finished.'))
-                        ->icon('heroicon-o-upload')
+                        // ->icon('heroicon-o-upload')
                         ->success()
                         ->send();
 
@@ -85,7 +85,7 @@ class ImportAction extends Action
                     ->icon('heroicon-o-check')
                     ->send();
             })
-            ->icon('heroicon-o-upload')
+            // ->icon('heroicon-o-upload')
             ->form([
                 Forms\Components\FileUpload::make('file')
                     ->translateLabel()

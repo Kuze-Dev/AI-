@@ -36,7 +36,7 @@ class ExportFinishedNotification extends Notification implements ShouldQueue
             ->success()
             ->title('Export finished')
             ->body($this->line())
-            ->icon('heroicon-o-download')
+            ->icon('heroicon-o-arrow-down-tray')
             ->actions([
                 Action::make('download')
                     ->translateLabel()

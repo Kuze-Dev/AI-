@@ -23,7 +23,7 @@ class ExportBulkAction extends BulkAction
         $this
             ->translateLabel()
             ->action(fn (array $data) => $this->processExport($data['writer_type']))
-            // ->icon('heroicon-o-download')
+            ->icon('heroicon-o-arrow-down-tray')
             ->form($this->buildExportForm(...))
             ->deselectRecordsAfterCompletion();
     }

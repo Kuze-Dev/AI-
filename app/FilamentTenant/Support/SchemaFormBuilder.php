@@ -476,7 +476,7 @@ class SchemaFormBuilder extends Component
             ->directory('attachments')
             ->extraInputAttributes(['style' => 'min-height: 12rem;'])
             ->maxContentWidth('full')
-            ->output(\FilamentTiptapEditor\Enums\TiptapOutput::Html->value); // optional, change the format for saved data, default is html
+            ->output(\FilamentTiptapEditor\Enums\TiptapOutput::Html); // optional, change the format for saved data, default is html
 
         return $tiptapEditor;
     }

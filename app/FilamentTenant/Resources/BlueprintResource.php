@@ -17,6 +17,7 @@ use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Enums\TiptapTools;
 use Domain\Blueprint\Models\Blueprint;
+use Closure;
 use ErrorException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
@@ -686,7 +687,7 @@ class BlueprintResource extends Resource
 
             FieldType::TIPTAPEDITOR => [
                 Forms\Components\TextInput::make('accept')
-                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
                     })
                     ->dehydrateStateUsing(function (?string $state): array {

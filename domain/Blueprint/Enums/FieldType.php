@@ -65,10 +65,7 @@ enum FieldType: string
             self::CHECKBOX => CheckBoxFieldData::class,
             self::RADIO => RadioFieldData::class,
             self::TINYEDITOR => TinyEditorData::class,
-<<<<<<< HEAD
-=======
             self::TIPTAPEDITOR => TipTapEditorData::class,
->>>>>>> develop
         };
     }
 }
