@@ -31,10 +31,10 @@ class CreateBlockAction
             $block->clearMediaCollection('image');
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        // if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
             $block->sites()
                 ->attach($blockData->sites);
-        }
+        // }
 
         return $block;
     }
