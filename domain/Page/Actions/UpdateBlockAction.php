@@ -46,6 +46,11 @@ class UpdateBlockAction
             $block->clearMediaCollection('image');
         }
 
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+            $block->sites()
+                ->sync($blockData->sites);
+        }
+
         return $block;
     }
 }

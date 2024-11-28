@@ -15,6 +15,7 @@ class BlockData
         public readonly string $blueprint_id,
         public readonly bool $is_fixed_content,
         public readonly ?array $data = null,
+        public readonly array $sites = []
     ) {
     }
 }
