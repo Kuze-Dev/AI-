@@ -280,19 +280,6 @@ class PageResource extends Resource
                                                 ];
                                             })
                                             ->toArray()])
-                                    // ->viewData([
-                                    //     'blocks' => self::getCachedBlocks()
-                                    //         ->sortBy('name')
-                                    //         ->mapWithKeys(function (Block $block) {
-                                    //             return [
-                                    //                 $block->id => [
-                                    //                     'name' => $block['name'],
-                                    //                     'image' => $block->getFirstMediaUrl('image'),
-                                    //                 ],
-                                    //             ];
-                                    //         })
-                                    //         ->toArray(),
-                                    // ])
                                     ->reactive()
                                     ->afterStateUpdated(function ($component, $state) {
                                         $block = self::getCachedBlocks()->firstWhere('id', $state);
@@ -480,33 +467,6 @@ class PageResource extends Resource
             self::$cachedBlocks = Block::with(['blueprint', 'media', 'sites'])->get();
         }
 
-        // if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
-
-        //     if($site_ids){
-        //         return self::$cachedBlocks
-        //         ->filter(function ($block) use($site_ids){
-
-        //             // dd($site_ids);
-        //             // dd($block->sites->contains('id',$site_ids));
-        //             return $block->sites->contains($site_ids);
-        //         } );
-        //     }
-
-        // return self::$cachedBlocks;
-        //     // dd($site_ids);
-
-        //     // dd($test);
-        // }
-
-        // dd(self::$cachedBlocks);
-
         return self::$cachedBlocks;
     }
-
-    // protected static function getcachedSelectedSites(array $state): array
-    // {
-    //     self::$cachedSelectedSites = $state;
-
-    //     return self::$cachedSelectedSites;
-    // }
 }
