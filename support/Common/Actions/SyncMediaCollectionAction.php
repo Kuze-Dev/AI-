@@ -64,8 +64,20 @@ class SyncMediaCollectionAction
                 return $this->copyMedia($model, Media::whereUuid($mediaData->media)->firstOrFail(), $mediaCollectionData->collection, $mediaData->custom_properties);
             })
             ->pipe(fn (Collection $items) => MediaCollection::make($items));
+        /**
+         * Causing Vapor to Lost Image Conversions need more research why it is happening..
+         */
+        // $model->clearMediaCollectionExcept($mediaCollectionData->collection, $media);
 
-        $model->clearMediaCollectionExcept($mediaCollectionData->collection, $media);
+        // $medias_uuid = $media->pluck('uuid')->toArray();
+        $excludedMedia = $media;
+        /**
+         * handle deletion of media manualy.
+         */
+        $model->getMedia($mediaCollectionData->collection)
+            ->reject(fn (Media $media) => $excludedMedia->where($media->getKeyName(), $media->getKey())->count())
+            // ->whereNotIn('uuid', $medias_uuid)
+            ->each(fn ($media_item) => $media_item->delete());
 
         return $media;
     }

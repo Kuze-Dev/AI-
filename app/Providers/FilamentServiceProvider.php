@@ -58,6 +58,7 @@ class FilamentServiceProvider extends ServiceProvider
                 new HtmlString('<link rel="mask-icon" href="'.asset('/safari-pinned-tab.svg').'" color="#5bbad5">'),
                 new HtmlString('<meta name="msapplication-TileColor" content="#da532c">'),
                 new HtmlString('<meta name="theme-color" content="#ffffff">'),
+                new HtmlString('<meta name="robots" content="noindex, nofollow">'),
             ]);
 
             Filament::registerViteTheme('resources/css/filament/app.css');
