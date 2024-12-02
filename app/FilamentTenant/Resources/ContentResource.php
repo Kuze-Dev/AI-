@@ -93,7 +93,7 @@ class ContentResource extends Resource
                         ->maxLength(255)
                         ->alphaDash()
                         ->rules([
-                            function (?Content $record, Closure $get) {
+                            function (?Content $record, \Filament\Forms\Get $get) {
 
                                 return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -138,7 +138,7 @@ class ContentResource extends Resource
                                 };
                             },
                         ])
-                        ->dehydrateStateUsing(fn (Closure $get, $state) => Str::slug($state ?: $get('name'))),
+                        ->dehydrateStateUsing(fn (\Filament\Forms\Get $get, $state) => Str::slug($state ?: $get('name'))),
                     Forms\Components\Select::make('taxonomies')
                         ->multiple()
                         ->preload()
@@ -352,6 +352,9 @@ class ContentResource extends Resource
             'index' => Resources\ContentResource\Pages\ListContent::route('/'),
             'create' => Resources\ContentResource\Pages\CreateContent::route('/create'),
             'edit' => Resources\ContentResource\Pages\EditContent::route('/{record}/edit'),
+            'entries.index' => Resources\ContentEntryResource\Pages\ListContentEntry::route('{ownerRecord}/entries'),
+            'entries.create' => Resources\ContentEntryResource\Pages\CreateContentEntry::route('{ownerRecord}/entries/create'),
+            'entries.edit' => Resources\ContentEntryResource\Pages\EditContentEntry::route('{ownerRecord}/entries/{record}/edit'),
         ];
     }
 }

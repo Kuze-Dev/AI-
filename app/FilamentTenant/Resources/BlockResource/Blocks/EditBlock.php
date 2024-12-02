@@ -46,7 +46,7 @@ class EditBlock extends EditRecord
                     new BlockData(
                         name: $data['name'],
                         component: $data['component'],
-                        image: $data['image'],
+                        image: $data['image'] ?? null,
                         blueprint_id: $data['blueprint_id'],
                         is_fixed_content: $data['is_fixed_content'],
                         data: $data['data'] ?? null,

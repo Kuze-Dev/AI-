@@ -13,7 +13,7 @@ class BlockData
         public readonly string $component,
         public readonly string $blueprint_id,
         public readonly bool $is_fixed_content,
-        public readonly UploadedFile|string|null $image = null,
+        public readonly UploadedFile|string|array|null $image = null,
         public readonly ?array $data = null,
         public readonly array $sites = []
     ) {

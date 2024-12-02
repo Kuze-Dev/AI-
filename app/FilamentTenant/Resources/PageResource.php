@@ -90,7 +90,7 @@ class PageResource extends Resource
                                     }
                                 )
                                 ->lazy()
-                                ->afterStateUpdated(function (Forms\Components\TextInput $component, Closure $get) {
+                                ->afterStateUpdated(function (Forms\Components\TextInput $component, \Filament\Forms\Get $get) {
                                     if (! $get('route_url.is_override')) {
                                         $component->getContainer()
                                             ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
@@ -107,7 +107,7 @@ class PageResource extends Resource
                                 ->default((string) Locale::where('is_default', true)->first()?->code)
                                 ->searchable()
                                 ->rules([
-                                    function (?Page $record, Closure $get) {
+                                    function (?Page $record, \Filament\Forms\Get $get) {
 
                                         return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -163,8 +163,8 @@ class PageResource extends Resource
                                 ->reactive()
                                 ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                                 ->rules([
-                                    fn (?Page $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')),
-                                    function (?Page $record, Closure $get) {
+                                    fn (?Page $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')),
+                                    function (?Page $record, \Filament\Forms\Get $get) {
 
                                         return function (string $attribute, $value, Closure $fail) use ($get) {
 
@@ -237,10 +237,18 @@ class PageResource extends Resource
 
                                     return;
                                 }
-
+                     
                                 $component->state(
                                     $record->blockContents->sortBy('order')
-                                        ->mapWithKeys(fn (BlockContent $item) => ["record-{$item->getKey()}" => $item])
+                                        ->mapWithKeys(function (BlockContent $item) {
+                                            // $test = $item->toArray();
+                                            $test = $item;
+                                            $test->data = (array) $item->data;
+                                            return [
+                                                "record-{$item->getKey()}" 
+                                                // (string) Str::uuid() 
+                                                => $test->toArray()];
+                                        })
                                         ->toArray()
                                 );
 
@@ -260,7 +268,7 @@ class PageResource extends Resource
                                     ->label('Block')
                                     ->required()
                                     ->view('filament.forms.components.block-picker')
-                                    ->datafilter(fn (Closure $get) => self::getCachedBlocks()
+                                    ->datafilter(fn (\Filament\Forms\Get $get) => self::getCachedBlocks()
                                         ->filter(function ($block) use ($get) {
                                             return $block->sites->pluck('id')->intersect($get('../../sites'))->isNotEmpty();
 

@@ -7,17 +7,15 @@ namespace Domain\Content\Actions;
 use App\Features\CMS\SitesManagement;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Models\Content;
-<<<<<<< HEAD
 use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Facades\Auth;
-=======
->>>>>>> develop
 
 class CreateContentAction
 {
     /** Execute create content query. */
     public function execute(ContentData $contentData): Content
     {
+
         $content = Content::create([
             'name' => $contentData->name,
             'prefix' => $contentData->prefix,
@@ -31,13 +29,8 @@ class CreateContentAction
         $content->taxonomies()
             ->attach($contentData->taxonomies);
 
-<<<<<<< HEAD
         if (TenantFeatureSupport::active(SitesManagement::class) &&
         Auth::user()?->hasRole(config('domain.role.super_admin'))
-=======
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
-
->>>>>>> develop
         ) {
 
             $content->sites()

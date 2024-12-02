@@ -13,6 +13,7 @@ use Domain\Page\Enums\Visibility;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class CreateContent extends CreateRecord
 {

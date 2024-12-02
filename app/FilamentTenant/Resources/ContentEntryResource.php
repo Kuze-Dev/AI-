@@ -48,8 +48,10 @@ class ContentEntryResource extends Resource
 
     // public static function getRouteBaseName(?string $panel = null): string
     // {
-    //     return Filament::currentContext().'.resources.contents.entries';
+    //     return 'filament.tenant.resources.contents.entries';
     // }
+
+    public static string $parentResource = ContentResource::class; 
 
     public static function getRoutes(): Closure
     {
@@ -102,7 +104,7 @@ class ContentEntryResource extends Resource
                     Forms\Components\Card::make([
                         Forms\Components\TextInput::make('title')
                             ->unique(
-                                callback: function ($livewire, Unique $rule) {
+                                modifyRuleUsing: function ($livewire, Unique $rule) {
 
                                     if (TenantFeatureSupport::someAreActive([SitesManagement::class,
                                         Internationalization::class])) {
@@ -115,7 +117,7 @@ class ContentEntryResource extends Resource
                                 ignoreRecord: true
                             )
                             ->lazy()
-                            ->afterStateUpdated(function (Forms\Components\TextInput $component, Closure $get) {
+                            ->afterStateUpdated(function (Forms\Components\TextInput $component, \Filament\Forms\Get $get) {
                                 if (! $get('route_url.is_override')) {
                                     $component->getContainer()
                                         ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
@@ -134,7 +136,7 @@ class ContentEntryResource extends Resource
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
                             ->rules([
-                                function (?ContentEntry $record, Closure $get) {
+                                function (?ContentEntry $record, \Filament\Forms\Get $get) {
 
                                     return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -179,7 +181,7 @@ class ContentEntryResource extends Resource
                         // Forms\Components\CheckboxList::make('sites')
                         \App\FilamentTenant\Support\CheckBoxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                            ->rule(fn (?ContentEntry $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                            ->rule(fn (?ContentEntry $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(function ($livewire) {
 
                                 /** @var \Domain\Admin\Models\Admin */
@@ -251,13 +253,20 @@ class ContentEntryResource extends Resource
                             Forms\Components\Hidden::make('taxonomy_terms')
                                 ->dehydrateStateUsing(fn (\Filament\Forms\Get $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                         ])
-                        ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())),
+                        ->hidden(
+                            // fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())
+                            // function (?ContentEntry $record) {
+                            //     dd(func_get_args());
+                            // }
+                        ),
                     Forms\Components\Section::make(trans('Publishing'))
                         ->schema([
                             Forms\Components\DateTimePicker::make('published_at')
                                 ->timezone(Auth::user()?->timezone),
                         ])
-                        ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        ->hidden(
+                            // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                        ),
                     SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                 ])->columnSpan(2),
                 Forms\Components\Group::make()
@@ -318,7 +327,9 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    ->visible(
+                        // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                    ),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -344,7 +355,9 @@ class ContentEntryResource extends Resource
 
                         return $query;
                     })
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
+                    ->visible(
+                        // fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()
+                    ),
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
@@ -376,7 +389,9 @@ class ContentEntryResource extends Resource
                             filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
                         )
                     ))
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    ->visible(
+                        // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                    ),
                 Tables\Filters\Filter::make('published_at_range')
                     ->form([
                         Forms\Components\DatePicker::make('published_at_from'),
@@ -386,7 +401,9 @@ class ContentEntryResource extends Resource
                         filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
                         filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
                     ))
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    ->visible(
+                        // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                    ),
             ])
             ->reorderable('order')
 

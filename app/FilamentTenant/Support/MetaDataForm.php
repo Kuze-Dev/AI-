@@ -38,13 +38,6 @@ class MetaDataForm extends Section
                 ->maxLength(fn (int $value = 160) => $value)
                 ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
-<<<<<<< HEAD
-                ->formatStateUsing(fn ($record) => $record?->metaData?->getMedia('image')
-                    ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                    ->toArray() ?? [])
-                ->image()
-                ->beforeStateDehydrated(null)
-=======
                 ->formatStateUsing(function ($record) {
                     return $record?->metaData?->getMedia('image')
                         ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
@@ -59,7 +52,6 @@ class MetaDataForm extends Section
                     'image/tiff',
                 ])
                 // ->beforeStateDehydrated(null)
->>>>>>> develop
                 ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
                 ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
                     $mediaClass = config('media-library.media_model', Media::class);
