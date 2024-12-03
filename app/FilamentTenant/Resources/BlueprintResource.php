@@ -82,7 +82,7 @@ class BlueprintResource extends Resource
                                     ->string()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('state_name')
-                                    ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
+                                    ->readOnly(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
                                         $record->schema->sections,
                                         fn (SectionData $section) => $section->state_name === $state
                                     ))),

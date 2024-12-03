@@ -27,6 +27,6 @@ it('can globally search', function () {
         ->first();
 
     expect($result->url)->toEqual(
-        route('filament-tenant.resources.contents.edit', $content->getRouteKey())
+        route('filament.tenant.resources.contents.edit', $content->getRouteKey())
     );
 });

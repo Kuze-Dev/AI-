@@ -86,7 +86,7 @@ class ContentResource extends Resource
                         ->required()
                         ->preload()
                         ->optionsFromModel(Blueprint::class, 'name')
-                        ->disabled(fn (?Content $record) => $record !== null),
+                        ->disableOptionWhen(fn (?Content $record) => $record !== null),
                     Forms\Components\TextInput::make('prefix')
                         ->required()
                         ->string()
@@ -298,11 +298,20 @@ class ContentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
+                    
+                    // Tables\Actions\Action::make('view-entries')
+                    //     ->icon('heroicon-s-eye')
+                    //     ->color('gray')
+                    //     ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
                     Tables\Actions\Action::make('view-entries')
-                        ->icon('heroicon-s-eye')
                         ->color('gray')
-                        ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
-                    Tables\Actions\DeleteAction::make()
+                        ->icon('heroicon-m-academic-cap')
+                        ->url(
+                            fn (Content $record): string => static::getUrl('entries.index', [
+                                'ownerRecord' => $record,
+                            ])
+                        ),
+                        Tables\Actions\DeleteAction::make()
                         ->using(function (Content $record) {
                             try {
                                 return app(DeleteContentAction::class)->execute($record);

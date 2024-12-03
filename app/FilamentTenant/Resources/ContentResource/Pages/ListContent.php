@@ -19,7 +19,7 @@ class ListContent extends ListRecords
     protected function getTableRecordUrlUsing(): ?Closure
     {
         if (self::$resource::canViewAny()) {
-            return fn (Content $record) => ContentEntryResource::getUrl('index', [$record]);
+            return fn (Content $record) => ContentResource::getUrl('entries.index', [$record]);
         }
 
         return parent::getTableRecordUrlUsing();
