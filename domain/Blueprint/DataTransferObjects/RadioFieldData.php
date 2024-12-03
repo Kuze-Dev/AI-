@@ -21,6 +21,7 @@ class RadioFieldData extends FieldData
         public readonly array $options = [],
         public readonly array $descriptions = [],
         public readonly bool $inline = false,
+        public readonly bool $translatable = true,
         public readonly ?string $helper_text = null,
     ) {
     }
@@ -46,6 +47,7 @@ class RadioFieldData extends FieldData
             options: $data['options'] ?? [],
             descriptions: $data['descriptions'] ?? [],
             inline: $data['inline'] ?? false,
+            translatable: isset($data['translatable']) ? $data['translatable'] : true,
             helper_text: $data['helper_text'] ?? null,
         );
     }

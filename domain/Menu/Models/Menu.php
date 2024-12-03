@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Menu\Models;
 
+use Domain\Internationalization\Concerns\HasInternationalizationInterface;
 use Domain\Site\Traits\Sites;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -22,6 +24,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $name
  * @property string $slug
  * @property string $locale
+ * @property string $translation_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
@@ -42,8 +45,8 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  *
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['parentNodes'])]
-class Menu extends Model
+#[OnDeleteCascade(['parentNodes', 'dataTranslation'])]
+class Menu extends Model implements HasInternationalizationInterface
 {
     use ConstraintsRelationships;
     use HasSlug;
@@ -54,6 +57,7 @@ class Menu extends Model
         'name',
         'slug',
         'locale',
+        'translation_id',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -80,6 +84,18 @@ class Menu extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /** @return HasMany<Menu> */
+    public function dataTranslation(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_id');
+    }
+
+    /** @return BelongsTo<Menu, Menu> */
+    public function parentTranslation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_id');
     }
 
     public function getSlugOptions(): SlugOptions

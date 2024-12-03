@@ -10,14 +10,12 @@ use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Exception;
 use Filament\Forms;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class ShippingMethodResource extends Resource
 {
@@ -44,14 +42,43 @@ class ShippingMethodResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('subtitle')
                         ->required(),
-                    Forms\Components\RichEditor::make('description'),
-                    SpatieMediaLibraryFileUpload::make('logo')
-                        ->image()
-                        ->collection('logo')
-                        ->preserveFilenames()
-                        ->customProperties(fn (Forms\Get $get) => [
-                            'alt_text' => Str::slug($get('title')),
+                    Forms\Components\RichEditor::make('description')
+                        ->toolbarButtons([
+                            'bold',
+                            'italic',
+                            'link',
+                            'redo',
+                            'undo',
                         ]),
+                    Forms\Components\FileUpload::make('logo')
+                        ->formatStateUsing(function ($record) {
+                            return $record?->getMedia('logo')
+                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                                ->toArray() ?? [];
+                        })
+                        ->image()
+                        ->beforeStateDehydrated(null)
+                        ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
+                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                            $mediaClass = config('media-library.media_model', Media::class);
+
+                            /** @var ?Media $media */
+                            $media = $mediaClass::findByUuid($file);
+
+                            if (config('filament.default_filesystem_disk') === 'r2') {
+                                return $media?->getUrl();
+                            }
+
+                            if ($component->getVisibility() === 'private') {
+                                try {
+                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                } catch (Throwable) {
+                                    // This driver does not support creating temporary URLs.
+                                }
+                            }
+
+                            return $media?->getUrl();
+                        }),
                     Forms\Components\Toggle::make('active')
                         ->label('Status')
                         ->inline(false)

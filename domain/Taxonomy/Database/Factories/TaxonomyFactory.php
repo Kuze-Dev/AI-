@@ -20,6 +20,7 @@ class TaxonomyFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
+            'has_route' => false,
         ];
     }
 

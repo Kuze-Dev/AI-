@@ -8,7 +8,9 @@ use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\FilamentTenant\Support\Concerns\AuthorizeCMSSettings;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\Settings\CMSSettings as SettingsCMSSettings;
+use Domain\Blueprint\Models\Blueprint;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 
 class CMSSettings extends TenantBaseSettings
@@ -45,6 +47,14 @@ class CMSSettings extends TenantBaseSettings
                     ->rules([new FullyQualifiedDomainNameRule()])
                     ->maxLength(100)
                     ->columnSpan('full'),
+            ]),
+
+            Card::make([
+                Select::make('media_blueprint_id')
+                    ->label(trans('Blueprint'))
+                    ->preload()
+                    ->reactive()
+                    ->optionsFromModel(Blueprint::class, 'name'),
             ]),
         ];
     }

@@ -58,6 +58,13 @@ class ProductResource extends Resource
                             ->required(),
                         Forms\Components\RichEditor::make('description')
                             ->translateLabel()
+                            ->toolbarButtons([
+                                'bold',
+                                'italic',
+                                'link',
+                                'redo',
+                                'undo',
+                            ])
                             ->maxLength(255),
                     ]),
                     Forms\Components\Section::make('Media')

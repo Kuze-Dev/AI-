@@ -28,6 +28,8 @@ class MenuResource extends JsonApiResource
         return [
             'nodes' => fn () => NodeResource::collection($this->nodes),
             'parentNodes' => fn () => NodeResource::collection($this->parentNodes),
+            'dataTranslation' => fn () => self::collection($this->dataTranslation),
+            'parentTranslation' => fn () => self::make($this->parentTranslation),
         ];
     }
 }

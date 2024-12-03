@@ -9,21 +9,25 @@ use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
+use App\FilamentTenant\Support\Traits\HasParentResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
 use Domain\Content\Actions\CreateContentEntryDraftAction;
+use Domain\Content\Actions\CreateContentEntryTranslationAction;
 use Domain\Content\Actions\PublishedContentEntryDraftAction;
 use Domain\Content\Actions\UpdateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -40,10 +44,11 @@ use Livewire\Redirector;
 class EditContentEntry extends EditRecord
 {
     use LogsFormActivity;
+    use HasParentResource;
 
     protected static string $resource = ContentEntryResource::class;
 
-    public mixed $ownerRecord;
+    // public mixed $ownerRecord;
 
     /**
      * Override mount and
@@ -51,160 +56,191 @@ class EditContentEntry extends EditRecord
      *
      * @param  mixed  $record
      */
-    #[\Override]
-    public function mount(int|string $record, string $ownerRecord = ''): void
+    // #[\Override]
+    // public function mount(int|string $record, string $ownerRecord = ''): void
+    // {
+    //     $this->ownerRecord = app(Content::class)
+    //         ->resolveRouteBinding($ownerRecord)
+    //         ?->load('taxonomies.taxonomyTerms');
+
+    //     if ($this->ownerRecord === null) {
+    //         throw (new ModelNotFoundException())->setModel(Content::class, ['']);
+    //     }
+
+    //     parent::mount($record);
+    // }
+
+    // /** @param  string  $key */
+    // #[\Override]
+    // protected function resolveRecord($key): Model
+    // {
+    //     $record = $this->ownerRecord->resolveChildRouteBinding('contentEntries', $key, null);
+
+    //     if ($record === null) {
+    //         throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+    //     }
+
+    //     return $record;
+    // }
+
+    protected function getRedirectUrl(): string
     {
-        $this->ownerRecord = app(Content::class)
-            ->resolveRouteBinding($ownerRecord)
-            ?->load('taxonomies.taxonomyTerms');
-
-        if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel(Content::class, ['']);
-        }
-
-        parent::mount($record);
+        return $this->previousUrl ?? static::getParentResource()::getUrl('lessons.index', [
+            'parent' => $this->parent,
+        ]);
     }
-
-    /** @param  string  $key */
-    #[\Override]
-    protected function resolveRecord($key): Model
+ 
+    protected function configureDeleteAction(Actions\DeleteAction $action): void
     {
-        $record = $this->ownerRecord->resolveChildRouteBinding('contentEntries', $key, null);
-
-        if ($record === null) {
-            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
-        }
-
-        return $record;
+        $resource = static::getResource();
+ 
+        $action->authorize($resource::canDelete($this->getRecord()))
+            ->successRedirectUrl(static::getParentResource()::getUrl('lessons.index', [
+                'parent' => $this->parent,
+            ]));
     }
 
     #[\Override]
     protected function getHeaderActions(): array
     {
         return [
-            'content_entries_group_actions' => CustomPageActionGroup::make([
-                Action::make('published')
-                    ->label(trans('Published Draft'))
-                    ->action('published')
-                    ->hidden(fn () => $this->record->draftable_id == null ? true : false),
-                Action::make('draft')
-                    ->label(trans('Save As Draft'))
-                    ->action('draft')
-                    ->hidden(function () {
+            // 'content_entries_group_actions' => CustomPageActionGroup::make([
+            //     Action::make('published')
+            //         ->label(trans('Published Draft'))
+            //         ->action('published')
+            //         ->hidden(fn () => $this->record->draftable_id == null ? true : false),
+            //     Action::make('draft')
+            //         ->label(trans('Save As Draft'))
+            //         ->action('draft')
+            //         ->hidden(function () {
 
-                        if ($this->record->draftable_id != null) {
-                            return true;
-                        }
+            //             if ($this->record->draftable_id != null) {
+            //                 return true;
+            //             }
 
-                        return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
-                    }),
-                Action::make('overwriteDraft')
-                    ->label(trans('Save As Draft'))
-                    ->action('overwriteDraft')
-                    ->requiresConfirmation()
-                    ->modalHeading('Draft for this content already exists')
-                    ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
-                    ->modalCancelAction(fn () => Action::makeModalAction('redirect')
-                        ->label(trans('Edit Existing Draft'))
-                        ->color('gray')
-                        ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft])))
-                    ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true),
-                Action::make('save')
-                    ->label(trans('Save and Continue Editing'))
-                    ->action('save')
-                    ->keyBindings(['mod+s']),
-            ])
-                ->view('filament.pages.actions.custom-action-group.index')
-                ->setName('page_draft_actions')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
+            //             return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
+            //         }),
+            //     Action::make('overwriteDraft')
+            //         ->label(trans('Save As Draft'))
+            //         ->action('overwriteDraft')
+            //         ->requiresConfirmation()
+            //         ->modalHeading('Draft for this content already exists')
+            //         ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
+            //         ->modalCancelAction(fn () => Action::makeModalAction('redirect')
+            //             ->label(trans('Edit Existing Draft'))
+            //             ->color('gray')
+            //             ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft])))
+            //         ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true),
+            //     Action::make('save')
+            //         ->label(trans('Save and Continue Editing'))
+            //         ->action('save')
+            //         ->keyBindings(['mod+s']),
+            // ])
+            //     ->view('filament.pages.actions.custom-action-group.index')
+            //     ->setName('page_draft_actions')
+            //     ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
             // Action::make('save')
             //     ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
             //     ->action('save')
             //     ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
-            'other_page_actions' => CustomPageActionGroup::make([
-                Action::make('preview')
-                    ->color('gray')
-                    ->hidden(TenantFeatureSupport::active(SitesManagement::class))
-                    ->label(trans('Preview Page'))
-                    ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
-                        $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
+            // 'other_page_actions' => CustomPageActionGroup::make([
+            //     Action::make('preview')
+            //         ->color('gray')
+            //         ->hidden(TenantFeatureSupport::active(SitesManagement::class))
+            //         ->label(trans('Preview Page'))
+            //         ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
+            //             $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
 
-                        if (! $domain) {
-                            return null;
-                        }
+            //             if (! $domain) {
+            //                 return null;
+            //             }
 
-                        $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
+            //             $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
 
-                        return "https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}";
-                    }, true),
-                Action::make('preview_microsite_action')
-                    ->label('Preview Microsite')
-                    ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
-                    ->color('gray')
-                    ->record($this->getRecord())
-                    ->modalHeading('Preview Microsite')
-                    ->slideOver(true)
-                    ->action(function (ContentEntry $record, Action $action, array $data): void {
+            //             return "https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}";
+            //         }, true),
+            //     Action::make('createTranslation')
+            //         ->color('secondary')
+            //         ->slideOver(true)
+            //         ->action('createTranslation')
+            //         ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+            //         ->form([
+            //             Forms\Components\Select::make('locale')
+            //                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+            //                 ->default((string) Locale::where('is_default', true)->first()?->code)
+            //                 ->searchable()
+            //                 ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+            //                 ->reactive()
+            //                 ->required(),
+            //         ]),
+            //     Action::make('preview_microsite_action')
+            //         ->label('Preview Microsite')
+            //         ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
+            //         ->color('gray')
+            //         ->record($this->getRecord())
+            //         ->modalHeading('Preview Microsite')
+            //         ->slideOver(true)
+            //         ->action(function (ContentEntry $record, Action $action, array $data): void {
 
-                        /** @var Site */
-                        $site = Site::find($data['preview_microsite']);
+            //             /** @var Site */
+            //             $site = Site::find($data['preview_microsite']);
 
-                        if ($site->domain == null) {
+            //             if ($site->domain == null) {
 
-                            Notification::make()
-                                ->danger()
-                                ->title(trans('No Domain Set'))
-                                ->body(trans('Please set a domain for :value to preview.', ['value' => $site->name]))
-                                ->send();
-                        }
-                    })
-                    ->form([
-                        Radio::make('preview_microsite')
-                            ->required()
-                            ->options(function () {
+            //                 Notification::make()
+            //                     ->danger()
+            //                     ->title(trans('No Domain Set'))
+            //                     ->body(trans('Please set a domain for :value to preview.', ['value' => $site->name]))
+            //                     ->send();
+            //             }
+            //         })
+            //         ->form([
+            //             Radio::make('preview_microsite')
+            //                 ->required()
+            //                 ->options(function () {
 
-                                /** @var ContentEntry */
-                                $site = $this->getRecord();
+            //                     /** @var ContentEntry */
+            //                     $site = $this->getRecord();
 
-                                return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
-                            })
-                            ->descriptions(function () {
+            //                     return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
+            //                 })
+            //                 ->descriptions(function () {
 
-                                /** @var ContentEntry */
-                                $site = $this->getRecord();
+            //                     /** @var ContentEntry */
+            //                     $site = $this->getRecord();
 
-                                return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
-                            })
-                            ->reactive()
-                            ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
+            //                     return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
+            //                 })
+            //                 ->reactive()
+            //                 ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
 
-                                /** @var Site */
-                                $site = Site::find($state);
+            //                     /** @var Site */
+            //                     $site = Site::find($state);
 
-                                $domain = $site->domain;
+            //                     $domain = $site->domain;
 
-                                /** @var CustomPageActionGroup */
-                                $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
+            //                     /** @var CustomPageActionGroup */
+            //                     $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
 
-                                $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
+            //                     $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
 
-                                $modelAction->modalSubmitAction(function () use ($domain) {
+            //                     $modelAction->modalSubmitAction(function () use ($domain) {
 
-                                    $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
+            //                         $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
 
-                                    return Action::makeModalAction('preview')->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
-                                });
+            //                         return Action::makeModalAction('preview')->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
+            //                     });
 
-                                $set('domain', $domain);
-                            }),
+            //                     $set('domain', $domain);
+            //                 }),
 
-                    ]),
+            //         ]),
 
-            ])->view('filament.pages.actions.custom-action-group.index')
-                ->setName('other_page_draft')
-                ->color('gray')
-                ->label(trans('More Actions')),
+            // ])->view('filament.pages.actions.custom-action-group.index')
+            //     ->setName('other_page_draft')
+            //     ->color('gray')
+            //     ->label(trans('More Actions')),
         ];
     }
 
@@ -279,17 +315,17 @@ class EditContentEntry extends EditRecord
         return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }
 
-    #[\Override]
-    protected function configureDeleteAction(DeleteAction $action): void
-    {
-        $resource = static::getResource();
+    // #[\Override]
+    // protected function configureDeleteAction(DeleteAction $action): void
+    // {
+    //     $resource = static::getResource();
 
-        $action
-            ->authorize($resource::canDelete($this->getRecord()))
-            ->record($this->getRecord())
-            ->recordTitle($this->getRecord()->getAttribute($this->getResource()::getRecordTitleAttribute()))
-            ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
-    }
+    //     $action
+    //         ->authorize($resource::canDelete($this->getRecord()))
+    //         ->record($this->getRecord())
+    //         ->recordTitle($this->getRecord()->getAttribute($this->getResource()::getRecordTitleAttribute()))
+    //         ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
+    // }
 
     #[\Override]
     public function getBreadcrumbs(): array
@@ -315,5 +351,98 @@ class EditContentEntry extends EditRecord
     {
         return app(UpdateContentEntryAction::class)
             ->execute($record, ContentEntryData::fromArray($data));
+    }
+
+    public function createTranslation(array $data): RedirectResponse|Redirector|false
+    {
+        $record = $this->record;
+
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = auth()->user();
+
+        if ($record->draftable_id) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Invalid Action'))
+                ->body(trans('Cannot Create Translation base on Draft Content'))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Invalid Action'))
+                ->body(trans('Cannot Create Translation base on Draft Content'))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
+        $formData = $this->form->getState();
+
+        $formData['locale'] = $data['locale'];
+
+        $code = $data['locale'];
+
+        $formData['route_url']['url'] = $this->changeUrlLocale($formData['route_url']['url'], $code);
+
+        $orginalContent = $record->parentTranslation ?? $record;
+
+        $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $orginalContent->id)->orWhere('id', $orginalContent->id)
+        )->where('locale', $data['locale'])->first();
+
+        /** @var \Domain\Internationalization\Models\Locale */
+        $locale = Locale::whereCode($data['locale'])->first();
+
+        if ($exist) {
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Content Entry :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->send();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Translation Already Exists'))
+                ->body(trans('Content Entry :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+                ->sendToDatabase($admin);
+
+            return false;
+        }
+
+        $contentEntryData = ContentEntryData::fromArray($formData);
+
+        $contentEntryTranslation = app(CreateContentEntryTranslationAction::class)->execute($orginalContent, $contentEntryData);
+
+        Notification::make()
+            ->success()
+            ->title(trans('Translation Created'))
+            ->body(trans('Page Translation :title has a existing ( :code ) translation', ['title' => $record->name, 'code' => $locale->name]))
+            ->sendToDatabase($admin);
+
+        return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntryTranslation]));
+    }
+
+    protected function changeUrlLocale(string $url, string $locale): string
+    {
+
+        $locales = Locale::pluck('code')->toArray();
+
+        // Remove leading and trailing slashes from the URL
+        $url = trim($url, '/');
+
+        // Split the URL by "/"
+        $segments = explode('/', $url);
+
+        // Check if the first segment is a valid locale code from the array
+        if (in_array($segments[0], $locales)) {
+            // Replace the existing locale with the new one
+            $segments[0] = $locale;
+        } else {
+            // Prepend the new locale to the URL
+            array_unshift($segments, $locale);
+        }
+
+        // Rebuild the URL and add a leading "/"
+        return '/'.implode('/', $segments);
     }
 }

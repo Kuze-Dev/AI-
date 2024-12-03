@@ -7,11 +7,13 @@ namespace Domain\Content\Models;
 use Domain\Admin\Models\Admin;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
+use Domain\Internationalization\Concerns\HasInternationalizationInterface;
 use Domain\Site\Traits\Sites;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
@@ -39,6 +41,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @property string|null $draftable_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
+ * @property bool $status
  * @property int|null $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -74,8 +77,8 @@ use Support\RouteUrl\HasRouteUrl;
  *
  * @mixin \Eloquent
  */
-#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls'])]
-class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlContact
+#[OnDeleteCascade(['taxonomyTerms', 'metaData', 'routeUrls', 'blueprintData'])]
+class ContentEntry extends Model implements HasInternationalizationInterface, HasMetaDataContract, HasRouteUrlContact
 {
     use ConstraintsRelationships;
     use HasMetaData;
@@ -96,6 +99,8 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
         'author_id',
         'published_at',
         'locale',
+        'status',
+        'translation_id',
     ];
 
     /**
@@ -214,5 +219,17 @@ class ContentEntry extends Model implements HasMetaDataContract, HasRouteUrlCont
     public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
+    }
+
+    /** @return HasMany<ContentEntry> */
+    public function dataTranslation(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_id');
+    }
+
+    /** @return BelongsTo<ContentEntry, ContentEntry> */
+    public function parentTranslation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_id');
     }
 }

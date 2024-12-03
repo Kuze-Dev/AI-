@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Page\Models;
 
 use Domain\Admin\Models\Admin;
+use Domain\Internationalization\Concerns\HasInternationalizationInterface;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Site\Traits\Sites;
@@ -69,7 +70,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @mixin \Eloquent
  */
 #[OnDeleteCascade(['blockContents', 'metaData', 'routeUrls'])]
-class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
+class Page extends Model implements HasInternationalizationInterface, HasMetaDataContract, HasRouteUrlContact
 {
     use ConstraintsRelationships;
     use HasMetaData;
@@ -85,6 +86,7 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
         'published_at',
         'locale',
         'draftable_id',
+        'translation_id',
     ];
 
     /**
@@ -176,6 +178,18 @@ class Page extends Model implements HasMetaDataContract, HasRouteUrlContact
     public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
+    }
+
+    /** @return HasMany<Page> */
+    public function dataTranslation(): HasMany
+    {
+        return $this->hasMany(self::class, 'translation_id');
+    }
+
+    /** @return BelongsTo<Page, Page> */
+    public function parentTranslation(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'translation_id');
     }
 
     public function isPublished(): bool

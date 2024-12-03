@@ -10,6 +10,7 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Page\Actions\DeleteBlockAction;
 use Domain\Page\Models\Block;
+use Domain\Site\Models\Site;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -19,6 +20,8 @@ use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class BlockResource extends Resource
@@ -56,6 +59,61 @@ class BlockResource extends Resource
                     ->optionsFromModel(Blueprint::class, 'name')
                     ->disabled(fn (?Block $record) => $record !== null)
                     ->reactive(),
+                // Forms\Components\FileUpload::make('image'),
+                // \App\FilamentTenant\Support\MediaUploader::make('image')
+                //     ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? []) ?: null)
+                //     ->getUploadedFileUsing(function (\App\FilamentTenant\Support\MediaUploader $component) {
+
+                //         $block = $component->getRecord();
+
+                //         if(!$block){
+                //             return [];
+                //         }
+
+                        
+                //         $mediaCollections = $block->load('media')->getMedia('image');
+
+                //         $list = [];
+
+                //         $mediaCollections->each(function ($item) use (&$list) {
+                //             $list[] = [
+                //                 'name' => $mediaModel->getAttributeValue('name') ?? $mediaModel->getAttributeValue('file_name'),
+                //                         'size' => $mediaModel->getAttributeValue('size'),
+                //                         'type' => $mediaModel->getAttributeValue('mime_type'),
+                //                         'url' => $mediaModel->getUrl(),
+                //             ];
+                //         });
+
+                        // dd($block->media);
+                        // $file = array_map(function ($media) {},$block->getMedia('image'));
+                        // dump($file);
+                    //     if (! is_null($file)) {
+                    //         $mediaModel = Media::where('uuid', $file)
+                    //             ->orWhere('file_name', $file)
+                    //             ->first();
+                    //         if ($mediaModel) {
+            
+                    //             return [
+                    //                 'name' => $mediaModel->getAttributeValue('name') ?? $mediaModel->getAttributeValue('file_name'),
+                    //                 'size' => $mediaModel->getAttributeValue('size'),
+                    //                 'type' => $mediaModel->getAttributeValue('mime_type'),
+                    //                 'url' => $mediaModel->getUrl(),
+                    //             ];
+            
+
+            
+                    //         $storage = Storage::disk(config('filament.default_filesystem_disk'));
+            
+                    //         if ($storage->exists($file)) {
+                    //             return $storage->url($file);
+                    //         }
+            
+                    //     }
+                    // }
+                    //     return [];
+                    
+                    // })
+                    // ->image(),
                 SpatieMediaLibraryFileUpload::make('image')
                     ->image()
                     ->collection('image')
@@ -68,12 +126,166 @@ class BlockResource extends Resource
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') ? false : true)
                     ->helperText('If enabled, the content below will serve as the default for all related pages')
                     ->reactive(),
+                Forms\Components\Card::make([
+                    \App\FilamentTenant\Support\CheckBoxList::make('sites')
+                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->rules([
+                            function (?Block $record, \Filament\Forms\Get $get) {
+
+                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                    $siteIDs = $value;
+
+                                    if ($record) {
+                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
+
+                                        $content = Block::where('name', $get('name'))
+                                            ->where('id', '!=', $record->id)
+                                            ->whereHas(
+                                                'sites',
+                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                            )->count();
+
+                                    } else {
+
+                                        $content = Block::where('name', $get('name'))->whereHas(
+                                            'sites',
+                                            fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                        )->count();
+                                    }
+
+                                    if ($content > 0) {
+                                        $fail("Block {$get('name')} is already available in selected sites.");
+                                    }
+
+                                };
+                            },
+                        ])
+                        ->options(
+                            fn () => Site::orderBy('name')
+                                ->pluck('name', 'id')
+                                ->toArray()
+                        )
+                        ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                            /** @var \Domain\Admin\Models\Admin */
+                            $user = Auth::user();
+
+                            if ($user->hasRole(config('domain.role.super_admin'))) {
+                                return false;
+                            }
+
+                            $user_sites = $user->userSite->pluck('id')->toArray();
+
+                            $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                            return ! in_array($value, $intersect);
+                        })
+                        ->formatStateUsing(fn (?Block $record) => $record ? $record->sites->pluck('id')->toArray() : []),
+
+                ])
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->hidden(fn (?Block $record, \Filament\Forms\Get $get) => $get('is_fixed_content') && $record ? false : true)
                     ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
+        // return $form
+        //     ->schema([
+        //         Forms\Components\Card::make([
+        //             Forms\Components\TextInput::make('name')
+        //                 ->unique(ignoreRecord: true)
+        //                 ->string()
+        //                 ->maxLength(255)
+        //                 ->required(),
+        //             Forms\Components\TextInput::make('component')
+        //                 ->required()
+        //                 ->string()
+        //                 ->maxLength(255),
+        //             Forms\Components\Select::make('blueprint_id')
+        //                 ->label(trans('Blueprint'))
+        //                 ->required()
+        //                 ->preload()
+        //                 ->optionsFromModel(Blueprint::class, 'name')
+        //                 ->disabled(fn (?Block $record) => $record !== null)
+        //                 ->reactive(),
+        //             \App\FilamentTenant\Support\MediaUploader::make('image')
+        //                 ->mediaLibraryCollection('image')
+        //                 ->enableOpen()
+        //                 ->image(),
+        //             Forms\Components\Toggle::make('is_fixed_content')
+        //                 ->inline(false)
+        //                 ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
+        //                 ->helperText('If enabled, the content below will serve as the default for all related pages')
+        //                 ->reactive(),
+        //         ])
+        //             ->disabled(fn () => ! Auth::user()?->hasRole(config('domain.role.super_admin'))),
+        //         Forms\Components\Card::make([
+        //             // Forms\Components\CheckboxList::make('sites')
+        //             \App\FilamentTenant\Support\CheckBoxList::make('sites')
+        //                 ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+        //                 ->rules([
+        //                     function (?Block $record, Closure $get) {
+
+        //                         return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+        //                             $siteIDs = $value;
+
+        //                             if ($record) {
+        //                                 $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
+
+        //                                 $content = Block::where('name', $get('name'))
+        //                                     ->where('id', '!=', $record->id)
+        //                                     ->whereHas(
+        //                                         'sites',
+        //                                         fn ($query) => $query->whereIn('site_id', $siteIDs)
+        //                                     )->count();
+
+        //                             } else {
+
+        //                                 $content = Block::where('name', $get('name'))->whereHas(
+        //                                     'sites',
+        //                                     fn ($query) => $query->whereIn('site_id', $siteIDs)
+        //                                 )->count();
+        //                             }
+
+        //                             if ($content > 0) {
+        //                                 $fail("Block {$get('name')} is already available in selected sites.");
+        //                             }
+
+        //                         };
+        //                     },
+        //                 ])
+        //                 ->options(
+        //                     fn () => Site::orderBy('name')
+        //                         ->pluck('name', 'id')
+        //                         ->toArray()
+        //                 )
+        //                 ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+        //                     /** @var \Domain\Admin\Models\Admin */
+        //                     $user = Auth::user();
+
+        //                     if ($user->hasRole(config('domain.role.super_admin'))) {
+        //                         return false;
+        //                     }
+
+        //                     $user_sites = $user->userSite->pluck('id')->toArray();
+
+        //                     $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+        //                     return ! in_array($value, $intersect);
+        //                 })
+        //                 ->formatStateUsing(fn (?Block $record) => $record ? $record->sites->pluck('id')->toArray() : []),
+
+        //         ])
+        //             ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
+        //         SchemaFormBuilder::make('data')
+        //             ->id('schema-form')
+        //             ->hidden(fn (Closure $get) => $get('is_fixed_content') ? false : true)
+        //             ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
+        //     ]);
     }
 
     /** @throws Exception */

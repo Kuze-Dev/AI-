@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Domain\Blueprint\Actions;
 
+use App\Settings\CustomerSettings;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
+use Domain\Customer\Models\Customer;
+use Domain\Globals\Models\Globals;
 use Domain\Page\Models\BlockContent;
+use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class CreateBlueprintDataAction
 {
@@ -18,7 +24,7 @@ class CreateBlueprintDataAction
     ) {
     }
 
-    private function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
+    public function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
 
         $blueprintData = BlueprintData::create([
@@ -43,15 +49,27 @@ class CreateBlueprintDataAction
         }
 
         if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
+
             if (is_array($blueprintDataData->value)) {
                 foreach ($blueprintDataData->value as $value) {
-                    $blueprintData->addMediaFromDisk($value, 's3')
-                        ->toMediaCollection('blueprint_media');
+                    if (Storage::disk(config('filament.default_filesystem_disk'))->exists($value)) {
+                        $blueprintData->addMediaFromDisk($value, config('filament.default_filesystem_disk'))
+                            ->toMediaCollection('blueprint_media');
+                    }
                 }
             } else {
-                $blueprintData->addMediaFromDisk($blueprintData->value, 's3')
+                $blueprintData->addMediaFromDisk($blueprintData->value, config('filament.default_filesystem_disk'))
                     ->toMediaCollection('blueprint_media');
             }
+
+            $existingMedia = $blueprintData->getMedia('blueprint_media')->pluck('uuid')->toArray();
+
+            $blueprintData->update([
+                'model_id' => $blueprintDataData->model_id,
+                'value' => json_encode($existingMedia),
+            ]);
+
+            $blueprintData->refresh();
         }
 
         return $blueprintData;
@@ -65,6 +83,12 @@ class CreateBlueprintDataAction
             $blueprintfieldtype = $model->content->blueprint->schema;
         } elseif ($model instanceof BlockContent) {
             $blueprintfieldtype = $model->block->blueprint->schema;
+        } elseif ($model instanceof TaxonomyTerm) {
+            $blueprintfieldtype = $model->taxonomy->blueprint->schema;
+        } elseif ($model instanceof Customer) {
+            $blueprintfieldtype = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->firstorfail()->schema;
+        } elseif ($model instanceof Globals) {
+            $blueprintfieldtype = $model->blueprint->schema;
         } else {
             return;
         }

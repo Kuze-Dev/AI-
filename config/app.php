@@ -200,6 +200,16 @@ return [
         Support\Captcha\CaptchaServiceProvider::class,
         Domain\Payments\PaymentServiceProvider::class,
 
+        /**
+         * Self hosts packages
+         */
+
+         HalcyonAgile\FilamentImport\ImportEventServiceProvider::class,
+         HalcyonAgile\FilamentImport\ImportServiceProvider::class,
+
+         HalcyonAgile\FilamentExport\FilamentExportServiceProvider::class,
+         HalcyonAgile\FilamentExport\ExportEventServiceProvider::class,
+         
     ])->toArray(),
 
     /*

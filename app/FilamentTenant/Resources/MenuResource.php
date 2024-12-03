@@ -62,8 +62,11 @@ class MenuResource extends Resource
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        /** @phpstan-ignore-next-line */
-        return [trans('Total Nodes') => $record->nodes_count];
+
+        return array_filter([
+            'Total Nodes' => $record->nodes_count,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     #[\Override]
@@ -103,8 +106,9 @@ class MenuResource extends Resource
                         ->maxLength(255),
                 ]),
                 Forms\Components\Card::make([
-                    Forms\Components\CheckboxList::make('sites')
-                        ->required(fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
+                    // Forms\Components\CheckboxList::make('sites')
+                    \App\FilamentTenant\Support\CheckBoxList::make('sites')
+                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
                             fn (?Menu $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -138,15 +142,51 @@ class MenuResource extends Resource
                                 ->pluck('name', 'id')
                                 ->toArray()
                         )
+                        ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                            /** @var \Domain\Admin\Models\Admin */
+                            $user = Auth::user();
+
+                            if ($user->hasRole(config('domain.role.super_admin'))) {
+                                return false;
+                            }
+
+                            $user_sites = $user->userSite->pluck('id')->toArray();
+
+                            $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                            return ! in_array($value, $intersect);
+                        })
                         ->formatStateUsing(fn (?Menu $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                 ])
-                    ->hidden((bool) ! (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
-                    ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class))
+                    ->rules([
+                        function (?Menu $record, Closure $get) {
+
+                            return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                if ($record) {
+                                    $selectedLocale = $value;
+
+                                    $originalContentId = $record->translation_id ?: $record->id;
+
+                                    $exist = Menu::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                    )->where('locale', $selectedLocale)->first();
+
+                                    if ($exist && $exist->id != $record->id) {
+                                        $fail("Menu {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                    }
+                                }
+
+                            };
+                        },
+                    ])
+                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
@@ -257,8 +297,17 @@ class MenuResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
-                    ->relationship('sites', 'name'),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name', function (Builder $query) {
+
+                        if (Auth::user()?->can('site.siteManager') &&
+                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        }
+
+                        return $query;
+
+                    }),
             ])
 
             ->actions([

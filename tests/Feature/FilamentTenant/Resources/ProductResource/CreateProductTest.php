@@ -9,6 +9,7 @@ use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Support\MetaData\Models\MetaData;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -83,6 +84,9 @@ it('can not create product with same name', function () {
 });
 
 it('can create product with metadata', function () {
+
+    Storage::fake(config('filament.default_filesystem_disk'));
+
     $taxonomyTerm = TaxonomyTermFactory::new(['name' => 'Clothing'])
         ->for(TaxonomyFactory::new()->withDummyBlueprint())
         ->createOne();
@@ -94,6 +98,8 @@ it('can create product with metadata', function () {
         'description' => 'Test Description',
     ];
     $imageFaker = UploadedFile::fake()->image('preview.jpeg');
+
+    $path = $imageFaker->store('/', config('filament.default_filesystem_disk'));
 
     $product = livewire(CreateProduct::class)
         ->fillForm([
@@ -109,7 +115,7 @@ it('can create product with metadata', function () {
             'images.0' => $imageFaker,
             'taxonomy_terms.0' => $taxonomyTerm->id,
             'meta_data' => $metaData,
-            'meta_data.image.0' => $imageFaker,
+            'meta_data.image.0' => $path,
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -127,7 +133,6 @@ it('can create product with metadata', function () {
     ]);
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $imageFaker->getClientOriginalName(),
         'mime_type' => $imageFaker->getMimeType(),
     ]);
 

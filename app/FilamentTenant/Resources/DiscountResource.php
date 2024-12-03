@@ -79,7 +79,14 @@ class DiscountResource extends Resource
                     RichEditor::make('description')
                         ->label(trans('Description'))
                         ->translateLabel()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->toolbarButtons([
+                            'bold',
+                            'italic',
+                            'link',
+                            'redo',
+                            'undo',
+                        ]),
 
                     TextInput::make('code')
                         ->label(trans('Code'))

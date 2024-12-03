@@ -11,6 +11,7 @@ use Domain\Page\DataTransferObjects\BlockData;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class CreateBlock extends CreateRecord
 {
@@ -33,14 +34,17 @@ class CreateBlock extends CreateRecord
     #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
-        return app(CreateBlockAction::class)
-            ->execute(new BlockData(
-                name: $data['name'],
-                component: $data['component'],
-                blueprint_id: $data['blueprint_id'],
-                is_fixed_content: $data['is_fixed_content'],
-                image: $data['image'],
-                data: $data['data'] ?? null,
-            ));
+        return DB::transaction(
+            fn () => app(CreateBlockAction::class)
+                ->execute(new BlockData(
+                    name: $data['name'],
+                    component: $data['component'],
+                    image: $data['image'] ?? null,
+                    blueprint_id: $data['blueprint_id'],
+                    is_fixed_content: $data['is_fixed_content'],
+                    data: $data['data'] ?? null,
+                    sites: $data['sites'] ?? [],
+                ))
+        );
     }
 }

@@ -15,7 +15,9 @@ use Domain\Blueprint\Enums\ManipulationFormat;
 use Domain\Blueprint\Enums\ManipulationType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
+use Domain\Blueprint\Enums\TiptapTools;
 use Domain\Blueprint\Models\Blueprint;
+use Closure;
 use ErrorException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
@@ -23,6 +25,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -78,7 +82,7 @@ class BlueprintResource extends Resource
                                     ->string()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('state_name')
-                                    ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
+                                    ->readOnly(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
                                         $record->schema->sections,
                                         fn (SectionData $section) => $section->state_name === $state
                                     ))),
@@ -95,8 +99,8 @@ class BlueprintResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable()
-                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
+                    ->searchable(),
+                // ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -116,6 +120,27 @@ class BlueprintResource extends Resource
                         }),
                 ]),
 
+            ])
+            ->bulkActions([
+                ExportBulkAction::make()
+                    ->queue()
+                    ->query(fn (Builder $query) => $query)
+                    ->mapUsing(
+                        ['Id', 'Name', 'Schema'],
+                        fn (Blueprint $blueprint): array => [
+                            $blueprint->id,
+                            $blueprint->name,
+                            json_encode($blueprint->schema),
+                        ]
+                    )
+                    ->tags([
+                        'tenant:'.(tenant('id') ?? 'central'),
+                    ])
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
+                    ),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -247,12 +272,16 @@ class BlueprintResource extends Resource
                     ->helperText(new HtmlString(<<<'HTML'
                             See <a href="https://www.php.net/manual/en/datetime.format.php" class="text-primary-500" target="_blank" rel="noopener noreferrer">PHP's Date/Time Format</a> for available options.
                         HTML)),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
             FieldType::FILE => [
                 Forms\Components\Toggle::make('multiple')
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
                 Forms\Components\Toggle::make('can_download'),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
@@ -301,6 +330,8 @@ class BlueprintResource extends Resource
                         'md' => 4,
                     ])
                     ->columnSpanFull(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
             FieldType::RICHTEXT => [
                 Forms\Components\CheckboxList::make('buttons')
@@ -315,11 +346,14 @@ class BlueprintResource extends Resource
                         'md' => 4,
                     ])
                     ->columnSpanFull(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
             FieldType::SELECT => [
                 Forms\Components\Toggle::make('multiple')
-                    ->reactive()
-                    ->columnSpanFull(),
+                    ->reactive(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\TextInput::make('min')
                     ->numeric()
                     ->integer()
@@ -337,14 +371,17 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('value'),
-                        Forms\Components\TextInput::make('label'),
+                        Forms\Components\TextInput::make('value')
+                            ->required(),
+                        Forms\Components\TextInput::make('label')
+                            ->required(),
                     ]),
             ],
             FieldType::CHECKBOX => [
                 Forms\Components\Toggle::make('bulk_toggleable')
-                    ->reactive()
-                    ->columnSpanFull(),
+                    ->reactive(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -352,9 +389,12 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('value'),
-                        Forms\Components\TextInput::make('label'),
+                        Forms\Components\TextInput::make('value')
+                            ->required(),
+                        Forms\Components\TextInput::make('label')
+                            ->required(),
                     ]),
+
             ],
             FieldType::TEXTAREA => [
                 Forms\Components\TextInput::make('min_length')
@@ -373,8 +413,21 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
             ],
-            FieldType::TEXT,
+            FieldType::TEXT, => [
+                Forms\Components\TextInput::make('min_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('max_length')
+                    ->numeric()
+                    ->integer()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
+            ],
             FieldType::EMAIL,
             FieldType::TEL,
             FieldType::URL,
@@ -402,8 +455,13 @@ class BlueprintResource extends Resource
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
-            FieldType::TOGGLE => [],
+            FieldType::TOGGLE => [
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
+            ],
             FieldType::RELATED_RESOURCE => [
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
                     ->lazy()
@@ -521,6 +579,8 @@ class BlueprintResource extends Resource
                     ->integer()
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Repeater::make('conversions')
                     ->schema([
                         Forms\Components\TextInput::make('name')->required(),
@@ -560,6 +620,7 @@ class BlueprintResource extends Resource
                                             ManipulationType::FIT => Forms\Components\Group::make()->schema([
                                                 Forms\Components\Select::make('fit')
                                                     ->translateLabel()
+                                                    ->required()
                                                     ->options($Fitoptions)
                                                     ->formatStateUsing(fn () => $stateData($manipulationType))
                                                     ->hint(
@@ -584,8 +645,9 @@ class BlueprintResource extends Resource
 
             ],
             FieldType::RADIO => [
-                Forms\Components\Toggle::make('inline')
-                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('inline'),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
                     ->orderable()
@@ -593,9 +655,12 @@ class BlueprintResource extends Resource
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('value'),
-                        Forms\Components\TextInput::make('label'),
+                        Forms\Components\TextInput::make('value')
+                            ->required(),
+                        Forms\Components\TextInput::make('label')
+                            ->required(),
                     ]),
+
                 Forms\Components\Repeater::make('descriptions')
                     ->collapsible()
                     ->orderable()
@@ -616,6 +681,42 @@ class BlueprintResource extends Resource
                     ->numeric()
                     ->integer()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
+            ],
+
+            FieldType::TIPTAPEDITOR => [
+                Forms\Components\TextInput::make('accept')
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
+                        $set('accept', implode(',', $state ?? []));
+                    })
+                    ->dehydrateStateUsing(function (?string $state): array {
+                        if ($state === null) {
+                            return [];
+                        }
+
+                        return Str::contains($state, ',')
+                            ? Str::of($state)->split('/\,/')
+                                ->map(fn (string $rule) => trim($rule))
+                                ->toArray()
+                            : [$state];
+                    })
+                    ->columnSpanFull(),
+                Forms\Components\Toggle::make('translatable')
+                    ->default(true),
+                Forms\Components\CheckboxList::make('tools')
+                    ->options(
+                        collect(TiptapTools::cases())
+                            ->mapWithKeys(fn (TiptapTools $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                            ->toArray()
+                    )
+                    ->default(fn (Forms\Components\CheckboxList $component) => array_keys($component->getOptions()))
+                    ->columns([
+                        'sm' => 2,
+                        'md' => 4,
+                    ])
+                    ->columnSpanFull(),
+
             ],
             default => [],
         };

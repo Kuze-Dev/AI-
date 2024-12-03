@@ -31,6 +31,7 @@ class ContentFactory extends Factory
             'past_publish_date_behavior' => null,
             'future_publish_date_behavior' => null,
             'is_sortable' => false,
+            'visibility' => 'public',
         ];
     }
 

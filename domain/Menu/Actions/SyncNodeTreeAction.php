@@ -36,7 +36,21 @@ class SyncNodeTreeAction
             ->get();
 
         foreach ($nodesForPruning as $node) {
-            $node->delete();
+
+            if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+
+                if ($node->translation_id) {
+                    /** @var Node */
+                    $node_origin_translation = Node::find($node->translation_id);
+
+                    $node_origin_translation->delete();
+                }
+                $node->delete();
+                // $nodeTranslationCollections = $node
+            } else {
+                $node->delete();
+            }
+
         }
     }
 
@@ -46,18 +60,121 @@ class SyncNodeTreeAction
         $nodeIds = [];
 
         foreach ($nodeDataSet as $node) {
-            $nodeIds[] = $this->createOrUpdateNode($node, $parentNode)->id;
+            $nodeIds[] = $this->createOrUpdateNode($this->menu, $node, $parentNode)->id;
         }
 
         Node::setNewOrder($nodeIds);
+
+        if (
+            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+        ) {
+
+            foreach ($nodeIds as $node_id) {
+
+                /** @var Node */
+                $menuNode = Node::find($node_id);
+
+                if ($menuNode->translation_id) {
+                    $menuNodeCollection = $menuNode->dataTranslation()
+                        ->orwhere('id', $menuNode->translation_id)
+                        ->orwhere('translation_id', $menuNode->translation_id)
+                        ->get();
+                } else {
+                    $menuNodeCollection = $menuNode->dataTranslation()
+                        ->orwhere('id', $menuNode->translation_id)
+                        ->get();
+                }
+
+                foreach ($menuNodeCollection as $menu_node) {
+
+                    $menu_node->order = $menuNode->order;
+                    $menu_node->save();
+                }
+
+            }
+
+        }
     }
 
-    protected function createOrUpdateNode(NodeData $nodeData, ?Node $parentNode = null): Node
+    protected function createOrUpdateNode(Menu $menu, NodeData $nodeData, ?Node $parentNode = null): Node
     {
-        /** @var Node $node */
-        $node = $this->menu->nodes()->where('id', $nodeData->id)->firstOrNew();
 
-        $node->fill([
+        $node = $menu->nodes()->where('id', $nodeData->id)->first();
+
+        if ($node) {
+            // code...
+            $node = $this->updateNode($node, $nodeData, $parentNode);
+        } else {
+
+            $node = $this->createNode($menu, $nodeData, $parentNode);
+
+            if (
+                tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+                $node->translation_id == null
+            ) {
+
+                if ($menu->translation_id) {
+                    $menuCollection = $menu->dataTranslation()
+                        ->orwhere('id', $menu->translation_id)
+                        ->orwhere('translation_id', $menu->translation_id)
+                        ->get();
+                } else {
+
+                    $menuCollection = $menu->dataTranslation;
+                }
+
+                foreach ($menuCollection as $menu_item) {
+
+                    if ($menu->id == $menu_item->id) {
+
+                        continue;
+                    }
+
+                    $newMenuNodeData = new NodeData(
+                        label: $nodeData->label,
+                        target: $nodeData->target,
+                        type: $nodeData->type,
+                        id: $nodeData->id,
+                        url: $nodeData->url,
+                        model_type: $nodeData->model_type,
+                        model_id: $nodeData->model_id,
+                        translation_id: (string) $node->id,
+                        children: $nodeData->children,
+                    );
+
+                    $new_parent_node = $parentNode ?
+                    $menu_item->nodes()->where('translation_id', $parentNode->id)->first() :
+                    null;
+
+                    $this->createNode($menu_item, $newMenuNodeData, $new_parent_node);
+
+                }
+
+            }
+
+        }
+        // $node->fill([
+        //     'label' => $nodeData->label,
+        //     'target' => $nodeData->target,
+        //     'type' => $nodeData->type,
+        //     'parent_id' => $parentNode?->id,
+        //     'model_type' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_type : null,
+        //     'model_id' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_id : null,
+        //     'url' => $nodeData->type === NodeType::URL ? $nodeData->url : null,
+        // ])->save();
+
+        if (! empty($nodeData->children)) {
+            $this->syncNodes($nodeData->children, $node);
+        }
+
+        return $node;
+    }
+
+    protected function createNode(
+        Menu $menu, NodeData $nodeData, ?Node $parentNode = null
+    ): Node {
+
+        return $menu->nodes()->create([
             'label' => $nodeData->label,
             'target' => $nodeData->target,
             'type' => $nodeData->type,
@@ -65,10 +182,89 @@ class SyncNodeTreeAction
             'model_type' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_type : null,
             'model_id' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_id : null,
             'url' => $nodeData->type === NodeType::URL ? $nodeData->url : null,
-        ])->save();
+            'translation_id' => $nodeData->translation_id,
+        ]);
+    }
 
-        if (! empty($nodeData->children)) {
-            $this->syncNodes($nodeData->children, $node);
+    protected function updateNode(
+        Node $node, NodeData $nodeData, ?Node $parentNode = null
+    ): Node {
+        /** @var \Domain\Menu\Models\Menu */
+        $menu = $node->menu;
+
+        $node->update([
+            'label' => $nodeData->label,
+            'target' => $nodeData->target,
+            'type' => $nodeData->type,
+            'parent_id' => $parentNode?->id,
+            'model_type' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_type : null,
+            'model_id' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_id : null,
+            'url' => $nodeData->type === NodeType::URL ? $nodeData->url : null,
+            'translation_id' => $nodeData->translation_id,
+        ]);
+
+        if (
+            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            $parentNode) {
+
+        }
+
+        $node->refresh();
+
+        if (
+            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            $parentNode) {
+
+            if ($menu->translation_id) {
+                $menuCollection = $menu->dataTranslation()
+                    ->orwhere('id', $menu->translation_id)
+                    ->orwhere('translation_id', $menu->translation_id)
+                    ->get();
+            } else {
+
+                $menuCollection = $menu->dataTranslation;
+            }
+
+            $parentClusterIdentifier = array_filter(
+                [$parentNode->id, $parentNode->translation_id ?? null],
+                fn ($value) => ! (is_null($value) || empty($value))
+            );
+
+            $termClusterIdentifier = array_filter(
+                [$node->id, $node->translation_id ?? null],
+                fn ($value) => ! (is_null($value) || empty($value))
+            );
+
+            $parentTranslationClusterIds = Node::whereIN('id', $parentClusterIdentifier)
+                ->orWhereIN('translation_id', $parentClusterIdentifier)->get()->pluck('id');
+
+            $nodeTranslationClusterIds = Node::whereIN('id', $termClusterIdentifier)
+                ->orWhereIN('translation_id', $termClusterIdentifier)->get()->pluck('id');
+
+            foreach (
+                $menuCollection as $menu_item
+            ) {
+
+                if ($menu_item->id == $this->menu->id) {
+                    continue;
+                }
+
+                $menu_item->load('nodes');
+
+                /** @var Node|null */
+                $translation_parent = $menu_item->nodes->whereIn('id', $parentTranslationClusterIds)->first();
+
+                /** @var Node|null */
+                $translation_node = $menu_item->nodes->whereIn('id', $nodeTranslationClusterIds)->first();
+
+                if ($translation_node) {
+                    $translation_node->update([
+                        'parent_id' => $translation_parent?->id,
+                    ]);
+                }
+
+            }
+
         }
 
         return $node;

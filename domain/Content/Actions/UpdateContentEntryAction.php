@@ -6,8 +6,10 @@ namespace Domain\Content\Actions;
 
 use App\Features\CMS\SitesManagement;
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
+use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\ContentEntry;
+use Domain\Internationalization\Actions\HandleUpdateDataTranslation;
 use Domain\Internationalization\Models\Locale;
 use Domain\Tenant\TenantFeatureSupport;
 use Support\MetaData\Actions\CreateMetaDataAction;
@@ -16,6 +18,8 @@ use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
 
 class UpdateContentEntryAction
 {
+    use SanitizeBlueprintDataTrait;
+
     public function __construct(
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
@@ -30,12 +34,18 @@ class UpdateContentEntryAction
      */
     public function execute(ContentEntry $contentEntry, ContentEntryData $contentEntryData): ContentEntry
     {
+        $sanitizeData = $this->sanitizeBlueprintData(
+            $contentEntryData->data,
+            $contentEntry->content->blueprint->schema->getFieldStatekeys(),
+        );
+
         $contentEntry->update([
             'author_id' => $contentEntryData->author_id,
             'title' => $contentEntryData->title,
             'published_at' => $contentEntryData->published_at,
-            'data' => $contentEntryData->data,
+            'data' => $sanitizeData,
             'locale' => $contentEntryData->locale ?? Locale::where('is_default', true)->first()?->code,
+            'status' => $contentEntryData->status,
         ]);
 
         $contentEntry->metaData()->exists()
@@ -50,6 +60,16 @@ class UpdateContentEntryAction
         if (TenantFeatureSupport::active(SitesManagement::class)) {
 
             $contentEntry->sites()->sync($contentEntryData->sites);
+        }
+
+        if (
+            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            is_null($contentEntry->draftable_id)
+        ) {
+
+            app(HandleUpdateDataTranslation::class)->execute($contentEntry, $contentEntryData);
+
+            return $contentEntry;
         }
 
         $this->updateBlueprintDataAction->execute($contentEntry);

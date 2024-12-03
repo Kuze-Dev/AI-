@@ -8,6 +8,7 @@ use App\Features\CMS\Internationalization;
 use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
+use App\FilamentTenant\Resources\ContentEntryResource\RelationManagers\ContentEntryTranslationRelationManager;
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
@@ -47,8 +48,10 @@ class ContentEntryResource extends Resource
 
     // public static function getRouteBaseName(?string $panel = null): string
     // {
-    //     return Filament::currentContext().'.resources.contents.entries';
+    //     return 'filament.tenant.resources.contents.entries';
     // }
+
+    public static string $parentResource = ContentResource::class; 
 
     public static function getRoutes(): Closure
     {
@@ -70,8 +73,11 @@ class ContentEntryResource extends Resource
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-        /** @phpstan-ignore-next-line */
-        return [trans('Content') => $record->content->name];
+
+        return array_filter([
+            'Content' => $record->content->name,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
     }
 
     /** @param  ContentEntry  $record */
@@ -98,7 +104,7 @@ class ContentEntryResource extends Resource
                     Forms\Components\Card::make([
                         Forms\Components\TextInput::make('title')
                             ->unique(
-                                callback: function ($livewire, Unique $rule) {
+                                modifyRuleUsing: function ($livewire, Unique $rule) {
 
                                     if (TenantFeatureSupport::someAreActive([SitesManagement::class,
                                         Internationalization::class])) {
@@ -111,10 +117,12 @@ class ContentEntryResource extends Resource
                                 ignoreRecord: true
                             )
                             ->lazy()
-                            ->afterStateUpdated(function (Forms\Components\TextInput $component) {
-                                $component->getContainer()
-                                    ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
-                                    ?->dispatchEvent('route_url::update');
+                            ->afterStateUpdated(function (Forms\Components\TextInput $component, \Filament\Forms\Get $get) {
+                                if (! $get('route_url.is_override')) {
+                                    $component->getContainer()
+                                        ->getComponent(fn (Component $component) => $component->getId() === 'route_url')
+                                        ?->dispatchEvent('route_url::update');
+                                }
                             })
                             ->required()
                             ->string()
@@ -127,7 +135,38 @@ class ContentEntryResource extends Resource
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
-                            ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class))
+                            ->rules([
+                                function (?ContentEntry $record, \Filament\Forms\Get $get) {
+
+                                    return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+
+                                        if ($record) {
+                                            $selectedLocale = $value;
+
+                                            $originalContentId = $record->translation_id ?: $record->id;
+
+                                            if ($record->draftable_id) {
+                                                /** @var \Domain\Content\Models\ContentEntry */
+                                                $baseRecord = ContentEntry::find($record->draftable_id);
+
+                                                $originalContentId = $baseRecord->translation_id ?: $baseRecord->id;
+
+                                            }
+
+                                            $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                            )->where('locale', $selectedLocale)->first();
+
+                                            if (is_null($record->draftable_id) && $exist && $exist->id != $record->id) {
+                                                $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                            } elseif ($record->draftable_id != null && $exist && $exist->id != $record->draftable_id) {
+                                                $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                            }
+                                        }
+
+                                    };
+                                },
+                            ])
+                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->afterStateUpdated(function (Forms\Components\Select $component, \Filament\Forms\Get $get) {
                                 $component->getContainer()
@@ -139,8 +178,9 @@ class ContentEntryResource extends Resource
                             ->default(Auth::id()),
                     ]),
                     Forms\Components\Card::make([
-                        Forms\Components\CheckboxList::make('sites')
-                            ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
+                        // Forms\Components\CheckboxList::make('sites')
+                        \App\FilamentTenant\Support\CheckBoxList::make('sites')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rule(fn (?ContentEntry $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(function ($livewire) {
 
@@ -153,9 +193,24 @@ class ContentEntryResource extends Resource
                                 }
 
                                 return $livewire->ownerRecord->sites
-                                    ->whereIN('id', $user->userSite->pluck('id')->toArray())
+                                    // ->whereIN('id')
                                     ->pluck('name', 'id')
                                     ->toArray();
+                            })
+                            ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return false;
+                                }
+
+                                $user_sites = $user->userSite->pluck('id')->toArray();
+
+                                $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                                return ! in_array($value, $intersect);
                             })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
                                 if (! $record) {
@@ -198,18 +253,33 @@ class ContentEntryResource extends Resource
                             Forms\Components\Hidden::make('taxonomy_terms')
                                 ->dehydrateStateUsing(fn (\Filament\Forms\Get $get) => Arr::flatten($get('taxonomies') ?? [], 1)),
                         ])
-                        ->when(fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())),
+                        ->hidden(
+                            // fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())
+                            // function (?ContentEntry $record) {
+                            //     dd(func_get_args());
+                            // }
+                        ),
                     Forms\Components\Section::make(trans('Publishing'))
                         ->schema([
                             Forms\Components\DateTimePicker::make('published_at')
                                 ->timezone(Auth::user()?->timezone),
                         ])
-                        ->when(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                        ->hidden(
+                            // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                        ),
                     SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                 ])->columnSpan(2),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make(trans('Status'))
+                            ->schema([
+                                Forms\Components\Toggle::make('status')
+                                    ->default(true)
+                                    ->helperText('If disabled, this content will not be accessible on the website.'),
 
-                MetaDataForm::make('Meta Data')
-                    ->columnSpan(1),
+                            ]),
+                        MetaDataForm::make('Meta Data'),
+                    ])->columnSpan(1),
 
             ])
             ->columns(3);
@@ -220,9 +290,17 @@ class ContentEntryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                // Tables\Columns\TextColumn::make('title')
+                //     ->sortable()
+                //     ->searchable()
+                //     ->truncate('xs', true),
+                Tables\Columns\TextColumn::make('name')
                     ->sortable()
-                    ->searchable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        /** @var Builder|ContentEntry $query */
+                        return $query->where('title', 'like', "%{$search}%");
+
+                    })
                     ->truncate('xs', true),
                 Tables\Columns\TextColumn::make('routeUrls.url')
                     ->label('URL')
@@ -249,79 +327,91 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable()
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    ->visible(
+                        // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                    ),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('taxonomies')
-                        ->form(fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
-                            fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
-                                ->statePath($taxonomy->slug)
-                                ->multiple()
-                                ->options(
-                                    $taxonomy->taxonomyTerms->sortBy('name')
-                                        ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->slug => $term->name])
-                                        ->toArray()
-                                )
-                        )->toArray())
-                        ->query(function (ContentEntryBuilder $query, array $data): Builder {
-                            foreach ($data as $taxonomySlug => $taxonomyTermSlugs) {
-                                if (filled($taxonomyTermSlugs)) {
-                                    $query->whereTaxonomyTerms($taxonomySlug, $taxonomyTermSlugs);
-                                }
-                            }
-
-                            return $query;
-                        })
-                        ->visible(fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()),
-                Tables\Filters\Filter::make('published_at_year_month')
-                        ->form([
-                            Forms\Components\Select::make('published_at_year')
-                                ->placeholder('Select Year')
-                                ->searchable()
-                                ->options(
-                                    collect(range(1900, now()->addYears(10)->year))
-                                        ->mapWithKeys(fn (int $year) => [$year => $year])
-                                        ->toArray()
-                                )
-                                ->debounce(),
-                            Forms\Components\Select::make('published_at_month')
-                                ->options(
-                                    collect(range(1, 12))
-                                        ->mapWithKeys(fn (int $month) => [$month => now()->month($month)->format('F')])
-                                        ->toArray()
-                                )
-                                ->disabled(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')))
-                                ->helperText(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
-                        ])
-                        ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->when(
-                            filled($data['published_at_year']),
-                            fn (ContentEntryBuilder $query) => $query->wherePublishedAtYearMonth(
-                                (int) $data['published_at_year'],
-                                filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
+                    ->form(fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
+                        fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
+                            ->statePath($taxonomy->slug)
+                            ->multiple()
+                            ->options(
+                                $taxonomy->taxonomyTerms->sortBy('name')
+                                    ->mapWithKeys(fn (TaxonomyTerm $term) => [$term->slug => $term->name])
+                                    ->toArray()
                             )
-                        ))
-                        ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    )->toArray())
+                    ->query(function (ContentEntryBuilder $query, array $data): Builder {
+                        foreach ($data as $taxonomySlug => $taxonomyTermSlugs) {
+                            if (filled($taxonomyTermSlugs)) {
+                                $query->whereTaxonomyTerms($taxonomySlug, $taxonomyTermSlugs);
+                            }
+                        }
+
+                        return $query;
+                    })
+                    ->visible(
+                        // fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()
+                    ),
+                Tables\Filters\SelectFilter::make('sites')
+                    ->multiple()
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name'),
+                Tables\Filters\Filter::make('published_at_year_month')
+                    ->form([
+                        Forms\Components\Select::make('published_at_year')
+                            ->placeholder('Select Year')
+                            ->searchable()
+                            ->options(
+                                collect(range(1900, now()->addYears(10)->year))
+                                    ->mapWithKeys(fn (int $year) => [$year => $year])
+                                    ->toArray()
+                            )
+                            ->debounce(),
+                        Forms\Components\Select::make('published_at_month')
+                            ->options(
+                                collect(range(1, 12))
+                                    ->mapWithKeys(fn (int $month) => [$month => now()->month($month)->format('F')])
+                                    ->toArray()
+                            )
+                            ->disabled(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')))
+                            ->helperText(fn (\Filament\Forms\Get $get) => blank($get('published_at_year')) ? 'Enter a published at year first.' : null),
+                    ])
+                    ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->when(
+                        filled($data['published_at_year']),
+                        fn (ContentEntryBuilder $query) => $query->wherePublishedAtYearMonth(
+                            (int) $data['published_at_year'],
+                            filled($data['published_at_month']) ? (int) $data['published_at_month'] : null
+                        )
+                    ))
+                    ->visible(
+                        // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                    ),
                 Tables\Filters\Filter::make('published_at_range')
-                        ->form([
-                            Forms\Components\DatePicker::make('published_at_from'),
-                            Forms\Components\DatePicker::make('published_at_to'),
-                        ])
-                        ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
-                            filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
-                            filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
-                        ))
-                        ->visible(fn ($livewire) => $livewire->ownerRecord->hasPublishDates()),
+                    ->form([
+                        Forms\Components\DatePicker::make('published_at_from'),
+                        Forms\Components\DatePicker::make('published_at_to'),
+                    ])
+                    ->query(fn (ContentEntryBuilder $query, array $data): Builder => $query->wherePublishedAtRange(
+                        filled($data['published_at_from']) ? Carbon::parse($data['published_at_from']) : null,
+                        filled($data['published_at_to']) ? Carbon::parse($data['published_at_to']) : null,
+                    ))
+                    ->visible(
+                        // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                    ),
             ])
             ->reorderable('order')
 
             ->actions([
                 Tables\Actions\EditAction::make()
-                        ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
+                    ->url(fn ($livewire, ContentEntry $record) => self::getUrl('edit', [$livewire->ownerRecord, $record])),
                 Tables\Actions\ActionGroup::make([
-                        Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
 
             ])
@@ -358,6 +448,7 @@ class ContentEntryResource extends Resource
     {
         return [
             ActivitiesRelationManager::class,
+            ContentEntryTranslationRelationManager::class,
         ];
     }
 

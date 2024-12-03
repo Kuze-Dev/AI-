@@ -17,7 +17,7 @@ class CheckoutAction
         CartLine::whereIn((new CartLine())->getRouteKeyName(), $checkoutData->cart_line_ids)
             ->update([
                 'checkout_reference' => $checkoutReference,
-                'checkout_expiration' => now()->addMinutes(20),
+                'checkout_expiration' => now()->addHours(5),
             ]);
 
         return $checkoutReference;

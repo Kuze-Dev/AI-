@@ -25,6 +25,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
@@ -43,7 +44,22 @@ class FormResource extends Resource
         return trans('CMS');
     }
 
-    #[\Override]
+    // /** @return Builder<FormModel> */
+    // protected static function getGlobalSearchEloquentQuery(): Builder
+    // {
+    //     return parent::getGlobalSearchEloquentQuery()->withCount('formSubmissions');
+    // }
+
+    /** @param  FormModel  $record */
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+
+        return array_filter([
+            'Total Submissions' => $record->form_submissions_count,
+            'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
+        ]);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -79,8 +95,9 @@ class FormResource extends Resource
                         ->required(),
                     Forms\Components\Toggle::make('store_submission'),
                     Forms\Components\Card::make([
-                        Forms\Components\CheckboxList::make('sites')
-                            ->required(fn () => TenantFeatureSupport::active(SitesManagement::class))
+                        // Forms\Components\CheckboxList::make('sites')
+                        \App\FilamentTenant\Support\CheckBoxList::make('sites')
+                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
                                 fn (?FormModel $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -115,6 +132,21 @@ class FormResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray()
                             )
+                            ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                                /** @var \Domain\Admin\Models\Admin */
+                                $user = Auth::user();
+
+                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                    return false;
+                                }
+
+                                $user_sites = $user->userSite->pluck('id')->toArray();
+
+                                $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                                return ! in_array($value, $intersect);
+                            })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?FormModel $record): void {
                                 if (! $record) {
                                     $component->state([]);
@@ -130,7 +162,11 @@ class FormResource extends Resource
                                 );
                             }),
                     ])
-                        ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class) && Auth::user()?->hasRole(config('domain.role.super_admin')))),
+                        ->hidden((bool) ! (tenancy()->tenant?->features()
+                            ->active(
+                                \App\Features\CMS\SitesManagement::class)
+                            // && Auth::user()?->hasRole(config('domain.role.super_admin'))
+                        )),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
                         ->helperText(
@@ -276,8 +312,17 @@ class FormResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
-                    ->relationship('sites', 'name'),
+                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name', function (Builder $query) {
+
+                        if (Auth::user()?->can('site.siteManager') &&
+                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        }
+
+                        return $query;
+
+                    }),
             ])
 
             ->actions([

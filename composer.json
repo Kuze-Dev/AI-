@@ -7,6 +7,7 @@
         "php": "^8.3",
         "ext-pdo": "*",
         "akaunting/laravel-money": "^5.2.0",
+        "awcodes/filament-tiptap-editor": "^3.0",
         "aws/aws-sdk-php": "^3.304.3",
         "bacon/bacon-qr-code": "^2.0.8",
         "barryvdh/laravel-dompdf": "^2.1.1",
@@ -27,6 +28,7 @@
         "league/flysystem-aws-s3-v3": "^3.27.0",
         "lloricode/php-timezone": "^1.1.1",
         "lloricode/spatie-image-optimizer-health-check": "^2.0.3",
+        "maatwebsite/excel": "^3.1.50",
         "mohamedsabil83/filament-forms-tinyeditor": "^2.3.2",
         "pragmarx/google2fa": "^8.0.1",
         "sentry/sentry-laravel": "^4.4.1",
@@ -79,7 +81,9 @@
             "Domain\\": "domain/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Support\\": "support/"
+            "Support\\": "support/",
+            "HalcyonAgile\\FilamentImport\\": "packages/halcyon-agile/filament-import/src/",
+            "HalcyonAgile\\FilamentExport\\": "packages/halcyon-agile/filament-export/src/"
         }
     },
     "autoload-dev": {
@@ -185,6 +189,6 @@
             "phpstan/extension-installer": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

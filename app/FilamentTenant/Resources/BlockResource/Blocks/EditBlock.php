@@ -39,17 +39,20 @@ class EditBlock extends EditRecord
     #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return app(UpdateBlockAction::class)
-            ->execute(
-                $record,
-                new BlockData(
-                    name: $data['name'],
-                    component: $data['component'],
-                    blueprint_id: $data['blueprint_id'] ?? $record->blueprint_id,
-                    is_fixed_content: $data['is_fixed_content'],
-                    image: $data['image'],
-                    data: $data['data'] ?? null,
+        return DB::transaction(
+            fn () => app(UpdateBlockAction::class)
+                ->execute(
+                    $record,
+                    new BlockData(
+                        name: $data['name'],
+                        component: $data['component'],
+                        image: $data['image'] ?? null,
+                        blueprint_id: $data['blueprint_id'],
+                        is_fixed_content: $data['is_fixed_content'],
+                        data: $data['data'] ?? null,
+                        sites: $data['sites'] ?? [],
+                    )
                 )
-            );
+        );
     }
 }
