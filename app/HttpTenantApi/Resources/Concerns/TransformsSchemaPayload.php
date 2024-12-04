@@ -77,7 +77,7 @@ trait TransformsSchemaPayload
         if ($field instanceof FileFieldData) {
             return $field->multiple && is_array($value)
                 ? array_map(fn ($item) => Storage::url($item), $value)
-                : Storage::url($value);
+                : ((is_array($value) && count($value) == 0) ? null : Storage::url($value));
         }
 
         return $value;

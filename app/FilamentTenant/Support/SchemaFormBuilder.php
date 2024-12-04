@@ -23,6 +23,7 @@ use Domain\Blueprint\DataTransferObjects\TextFieldData;
 use Domain\Blueprint\DataTransferObjects\TinyEditorData;
 use Domain\Blueprint\DataTransferObjects\TipTapEditorData;
 use Domain\Blueprint\DataTransferObjects\ToggleFieldData;
+use Domain\Blueprint\Enums\ConditionEnum;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
@@ -57,6 +58,7 @@ class SchemaFormBuilder extends Component
     final public function __construct(string $name, SchemaData|Closure|null $schemaData)
     {
         $this->statePath($name);
+        $this->reactive();
         $this->schemaData($schemaData);
     }
 
@@ -113,16 +115,9 @@ class SchemaFormBuilder extends Component
             MarkdownFieldData::class => MarkdownEditor::make($field->state_name)
                 ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons)),
             RichtextFieldData::class => $this->makeRichTextComponent($field),
-            SelectFieldData::class => Select::make($field->state_name)
-                ->options(Arr::pluck($field->options, 'label', 'value'))
-                ->multiple($field->multiple),
-            CheckBoxFieldData::class => CheckboxList::make($field->state_name)
-                ->options(Arr::pluck($field->options, 'label', 'value'))
-                ->bulkToggleable($field->bulk_toggleable),
-            RadioFieldData::class => Radio::make($field->state_name)
-                ->options(Arr::pluck($field->options, 'label', 'value'))
-                ->inline($field->inline)
-                ->descriptions(Arr::pluck($field->descriptions, 'description', 'value')),
+            SelectFieldData::class => $this->makeSelectComponent($field),
+            CheckBoxFieldData::class => $this->makeCheckBoxListComponent($field),
+            RadioFieldData::class => $this->makeRadioComponent($field),
             TextareaFieldData::class => $this->makeTextAreaComponent($field),
             TextFieldData::class => $this->makeTextInputComponent($field),
             ToggleFieldData::class => Toggle::make($field->state_name),
@@ -195,6 +190,21 @@ class SchemaFormBuilder extends Component
 
         if ($fileFieldData->max_size) {
             $fileUpload->maxSize($fileFieldData->max_size);
+        }
+
+        if (count($fileFieldData->hidden_option)) {
+
+            $option = $fileFieldData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $fileUpload->reactive();
+            $fileUpload->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
         }
 
         return $fileUpload;
@@ -295,6 +305,21 @@ class SchemaFormBuilder extends Component
             $textarea->maxLength(fn () => $textareaFieldData->max_length);
         }
 
+        if (count($textareaFieldData->hidden_option)) {
+
+            $option = $textareaFieldData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $textarea->reactive();
+            $textarea->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
+
         return $textarea;
     }
 
@@ -319,6 +344,20 @@ class SchemaFormBuilder extends Component
                 ->password(),
             default => TextInput::make($textFieldData->state_name),
         };
+
+        if (count($textFieldData->hidden_option)) {
+            $option = $textFieldData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $textInput->reactive();
+            $textInput->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
 
         return $textInput
             ->minLength(fn () => $textFieldData->min_length)
@@ -402,6 +441,21 @@ class SchemaFormBuilder extends Component
 
             });
 
+        if (count($richtextFieldData->hidden_option)) {
+
+            $option = $richtextFieldData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $richEditor->reactive();
+            $richEditor->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
+
         return $richEditor;
     }
 
@@ -452,6 +506,21 @@ class SchemaFormBuilder extends Component
             $tinyEditor->maxLength(fn () => $tinyEditorData->max_length);
         }
 
+        if (count($tinyEditorData->hidden_option)) {
+
+            $option = $tinyEditorData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $tinyEditor->reactive();
+            $tinyEditor->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
+
         return $tinyEditor;
     }
 
@@ -467,6 +536,98 @@ class SchemaFormBuilder extends Component
             ->maxContentWidth('full')
             ->output(\FilamentTiptapEditor\Enums\TiptapOutput::Html->value); // optional, change the format for saved data, default is html
 
+        if (count($tiptapEditorData->hidden_option)) {
+
+            $option = $tiptapEditorData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $tiptapEditor->reactive();
+            $tiptapEditor->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
+
         return $tiptapEditor;
+    }
+
+    public function makeCheckBoxListComponent(CheckBoxFieldData $checkBoxFieldData): CheckboxList
+    {
+        $checkboxlist = CheckboxList::make($checkBoxFieldData->state_name)
+            ->options(Arr::pluck($checkBoxFieldData->options, 'label', 'value'))
+            ->bulkToggleable($checkBoxFieldData->bulk_toggleable);
+
+        if (count($checkBoxFieldData->hidden_option)) {
+
+            $option = $checkBoxFieldData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $checkboxlist->reactive();
+            $checkboxlist->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
+
+        return $checkboxlist;
+    }
+
+    public function makeSelectComponent(SelectFieldData $selectFieldData): Select
+    {
+
+        $select = Select::make($selectFieldData->state_name)
+            ->options(Arr::pluck($selectFieldData->options, 'label', 'value'))
+            ->multiple($selectFieldData->multiple);
+
+        if (count($selectFieldData->hidden_option)) {
+
+            $option = $selectFieldData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $select->reactive();
+            $select->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
+
+        return $select;
+
+    }
+
+    public function makeRadioComponent(RadioFieldData $radioFieldData): Radio
+    {
+
+        $radio = Radio::make($radioFieldData->state_name)
+            ->options(Arr::pluck($radioFieldData->options, 'label', 'value'))
+            ->inline($radioFieldData->inline)
+            ->descriptions(Arr::pluck($radioFieldData->descriptions, 'description', 'value'));
+
+        if (count($radioFieldData->hidden_option)) {
+
+            $option = $radioFieldData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $radio->reactive();
+            $radio->hidden(function (Closure $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
+
+        return $radio;
+
     }
 }
