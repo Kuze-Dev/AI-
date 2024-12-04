@@ -32,8 +32,8 @@ class CreateBlockAction
         }
 
         // if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
-            $block->sites()
-                ->attach($blockData->sites);
+        $block->sites()
+            ->attach($blockData->sites);
         // }
 
         return $block;

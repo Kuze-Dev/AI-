@@ -11,6 +11,7 @@ use Closure;
 use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
+use Domain\Blueprint\Enums\ConditionEnum;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Enums\ManipulationFit;
 use Domain\Blueprint\Enums\ManipulationFormat;
@@ -308,6 +309,29 @@ class BlueprintResource extends Resource
                     ->integer()
                     ->when(fn (Closure $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
+                    ]),
             ],
             FieldType::MARKDOWN => [
                 Forms\Components\CheckboxList::make('buttons')
@@ -340,6 +364,29 @@ class BlueprintResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
+                    ]),
             ],
             FieldType::SELECT => [
                 Forms\Components\Toggle::make('multiple')
@@ -368,6 +415,29 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('label')
                             ->required(),
                     ]),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
+                    ]),
             ],
             FieldType::CHECKBOX => [
                 Forms\Components\Toggle::make('bulk_toggleable')
@@ -384,6 +454,29 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('value')
                             ->required(),
                         Forms\Components\TextInput::make('label')
+                            ->required(),
+                    ]),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
                             ->required(),
                     ]),
 
@@ -407,6 +500,29 @@ class BlueprintResource extends Resource
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
+                    ]),
             ],
             FieldType::TEXT, => [
                 Forms\Components\TextInput::make('min_length')
@@ -419,6 +535,29 @@ class BlueprintResource extends Resource
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
+                    ]),
             ],
             FieldType::EMAIL,
             FieldType::TEL,
@@ -653,7 +792,6 @@ class BlueprintResource extends Resource
                         Forms\Components\TextInput::make('label')
                             ->required(),
                     ]),
-
                 Forms\Components\Repeater::make('descriptions')
                     ->collapsible()
                     ->orderable()
@@ -663,6 +801,29 @@ class BlueprintResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('value'),
                         Forms\Components\TextInput::make('description'),
+                    ]),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
                     ]),
             ],
             FieldType::TINYEDITOR => [
@@ -676,6 +837,29 @@ class BlueprintResource extends Resource
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
+                    ]),
             ],
 
             FieldType::TIPTAPEDITOR => [
@@ -709,6 +893,29 @@ class BlueprintResource extends Resource
                         'md' => 4,
                     ])
                     ->columnSpanFull(),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
+                    ]),
 
             ],
             default => [],

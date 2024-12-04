@@ -18,6 +18,8 @@ class SelectFieldData extends FieldData
         public readonly string $state_name,
         public readonly FieldType $type = FieldType::SELECT,
         public readonly array $rules = [],
+        public readonly array $hidden_option = [],
+
         public readonly array $options = [],
         public readonly bool $multiple = false,
         public readonly bool $translatable = true,
@@ -44,6 +46,7 @@ class SelectFieldData extends FieldData
             title: $data['title'],
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
+            hidden_option: $data['hidden_option'] ?? [],
             translatable: isset($data['translatable']) ? $data['translatable'] : true,
             options: $data['options'] ?? [],
             multiple: $data['multiple'] ?? false,
