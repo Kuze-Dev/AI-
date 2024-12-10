@@ -42,7 +42,7 @@ definitions:
     - step: &test
         <<: *common-step
         name: Test
-        size: 2x
+        size: 4x
         script:
           - *setup-script
           # TODO: remove test-no-timeout when using stancl/tenancy v4
