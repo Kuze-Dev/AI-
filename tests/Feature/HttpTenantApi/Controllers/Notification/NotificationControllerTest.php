@@ -21,7 +21,7 @@ beforeEach(function () {
 
     withHeader('Authorization', 'Bearer '.$customer
         ->createToken('testing-auth')
-    ->plainTextToken);
+        ->plainTextToken);
 
     $this->customer = $customer;
 
