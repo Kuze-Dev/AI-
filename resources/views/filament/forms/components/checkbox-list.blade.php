@@ -156,7 +156,7 @@
                     wire:key="{{ $this->id }}.{{ $getStatePath() }}.{{ $field::class }}.options.{{ $optionValue }}"
                 >
                     <label
-                        class="filament-forms-checkbox-list-component-option-label flex items-center space-x-3 rtl:space-x-reverse"
+                        class="filament-forms-checkbox-list-component-option-label flex items-center space-x-3 rtl:space-x-reverse {{ $isOptionDisabled($optionValue, $optionLabel) ? 'opacity-70' : null}} "
                         @if ($isSearchable())
                             x-show="
                                 $el.querySelector('.filament-forms-checkbox-list-component-option-label-text')

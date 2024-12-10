@@ -75,7 +75,7 @@ it('can create menu with sites', function () {
         ->assertHasNoFormErrors()
         ->assertOk()
         ->instance()
-         ->record;
+        ->record;
 
     expect($menu->sites->pluck('id'))->toContain($site->id);
 
