@@ -1,5 +1,5 @@
 image:
-  name: bitnami/laravel:9.5.2 # https://bitnami.com/stack/laravel - 10.3.3
+  name: bitnami/laravel:latest # https://bitnami.com/stack/laravel w- 9.5.2 - 10.3.3
   run-as-user: 1000
 
 definitions:
@@ -42,6 +42,7 @@ definitions:
     - step: &test
         <<: *common-step
         name: Test
+        size: 4x
         script:
           - *setup-script
           # TODO: remove test-no-timeout when using stancl/tenancy v4
