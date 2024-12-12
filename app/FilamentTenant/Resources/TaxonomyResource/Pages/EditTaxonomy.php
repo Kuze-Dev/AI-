@@ -42,28 +42,28 @@ class EditTaxonomy extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
-            'page_actions' => CustomPageActionGroup::make([
-                Action::make('createTranslation')
-                    ->color('secondary')
-                    ->slideOver(true)
-                    ->action('createTranslation')
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
-                    ->form([
-                        Forms\Components\Select::make('locale')
-                            ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                            ->default((string) Locale::where('is_default', true)->first()?->code)
-                            ->searchable()
-                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
-                            ->reactive()
-                            ->required(),
-                    ]),
+            // 'page_actions' => CustomPageActionGroup::make([
+            //     Action::make('createTranslation')
+            //         ->color('secondary')
+            //         ->slideOver(true)
+            //         ->action('createTranslation')
+            //         ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+            //         ->form([
+            //             Forms\Components\Select::make('locale')
+            //                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+            //                 ->default((string) Locale::where('is_default', true)->first()?->code)
+            //                 ->searchable()
+            //                 ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+            //                 ->reactive()
+            //                 ->required(),
+            //         ]),
 
-            ])
-                ->view('filament.pages.actions.custom-action-group.index')
-                ->setName('other_page_actions')
-                ->color('secondary')
-                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
-                ->label(trans('More Actions')),
+            // ])
+            //     ->view('filament.pages.actions.custom-action-group.index')
+            //     ->setName('other_page_actions')
+            //     ->color('secondary')
+            //     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+            //     ->label(trans('More Actions')),
 
         ];
     }

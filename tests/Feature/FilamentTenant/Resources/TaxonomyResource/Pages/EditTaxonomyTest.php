@@ -10,11 +10,8 @@ use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\Taxonomy;
-<<<<<<< HEAD
-=======
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
->>>>>>> develop
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;

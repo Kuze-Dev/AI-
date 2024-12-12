@@ -11,7 +11,8 @@
     <div
         @class([
             'bg-white border border-gray-300 shadow-sm rounded-xl flex items-center h-10 cursor-pointer',
-            'dark:bg-gray-800 dark:border-gray-600' => config('forms.dark_mode'),
+            'dark:bg-gray-800 dark:border-gray-600',
+            // 'dark:bg-gray-800 dark:border-gray-600' => config('forms.dark_mode'),
         ])
         wire:click.stop="dispatchFormEvent('tree::editItem', '{{ $statePath }}')"
     >
@@ -21,8 +22,9 @@
             data-sortable-handle
             x-on:click.stop
             @class([
-                'flex items-center justify-center flex-none w-10 h-10 text-gray-400 border-r hover:text-gray-500',
-                'dark:border-gray-700' => config('forms.dark_mode'),
+                'flex items-center justify-center flex-none w-10 h-10 text-gray-400 border-r hover:text-gray-500 ',
+                'dark:border-gray-700',
+                // 'dark:border-gray-700' => config('forms.dark_mode'),
             ])
         >
             <span class="sr-only">
@@ -41,7 +43,8 @@
 
         <p @class([
             'flex-none px-4 truncate',
-            'dark:text-gray-400' => config('forms.dark_mode'),
+            'dark:text-gray-400',
+            // 'dark:text-gray-400' => config('forms.dark_mode'),
         ])>
             {{ $getItemLabel($item) }}
         </p>
@@ -49,8 +52,9 @@
         <div class="flex-1"></div>
 
         <ul @class([
-            'flex divide-x rtl:divide-x-reverse',
-            'dark:divide-gray-700' => config('forms.dark_mode'),
+            'flex divide-x rtl:divide-x-reverse', 
+            'dark:divide-gray-700',
+            // 'dark:divide-gray-700' => config('forms.dark_mode'),
         ])>
             <li class="flex">
                 <button
@@ -59,7 +63,7 @@
                     type="button"
                     @class([
                         'flex items-center justify-center flex-none w-10 h-10 text-primary-600 transition hover:text-primary-500',
-                        'dark:text-primary-500 dark:hover:text-primary-400' => config('forms.dark_mode'),
+                        'dark:text-primary-500 dark:hover:text-primary-400',
                     ])
                 >
                 <x-filament::icon
@@ -76,7 +80,7 @@
                     type="button"
                     @class([
                         'flex items-center justify-center flex-none w-10 h-10 text-danger-600 transition hover:text-danger-500',
-                        'dark:text-danger-500 dark:hover:text-danger-400' => config('forms.dark_mode'),
+                        'dark:text-danger-500 dark:hover:text-danger-400',
                     ])
                 >
 
