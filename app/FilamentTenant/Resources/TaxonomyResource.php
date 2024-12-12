@@ -184,22 +184,30 @@ class TaxonomyResource extends Resource
                     ->required(),
 
                 Forms\Components\Card::make([
-                    Forms\Components\CheckboxList::make('sites')
+                    // Forms\Components\CheckboxList::make('sites')
+                    \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->reactive()
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rule(fn (?Taxonomy $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                         ->options(function () {
-
-                            if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
-                                return Site::orderBy('name')
-                                    ->pluck('name', 'id')
-                                    ->toArray();
-                            }
-
                             return Site::orderBy('name')
-                                ->whereHas('siteManager', fn ($query) => $query->where('admin_id', Auth::user()?->id))
                                 ->pluck('name', 'id')
                                 ->toArray();
+                        })
+                        ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                            /** @var \Domain\Admin\Models\Admin */
+                            $user = Auth::user();
+
+                            if ($user->hasRole(config('domain.role.super_admin'))) {
+                                return false;
+                            }
+
+                            $user_sites = $user->userSite->pluck('id')->toArray();
+
+                            $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                            return ! in_array($value, $intersect);
                         })
                         ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Taxonomy $record): void {
                             if (! $record) {

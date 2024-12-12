@@ -17,6 +17,7 @@ class TaxonomyResource extends JsonApiResource
     {
         return [
             'name' => $this->name,
+            'route_url' => $this->activeRouteUrl?->url,
         ];
     }
 
