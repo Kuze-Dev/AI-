@@ -458,7 +458,7 @@ class ContentEntryResource extends Resource
         return [
             'index' => Resources\ContentEntryResource\Pages\ListContentEntry::route('entries'),
             'create' => Resources\ContentEntryResource\Pages\CreateContentEntry::route('entries/create'),
-            'edit' => Resources\ContentEntryResource\Pages\EditContentEntry::route('entries/{record}/edit'),
+            'edit' => Resources\ContentEntryResource\Pages\EditContentEntry::route('{ownerRecord}/{record}/edit'),
         ];
     }
 }

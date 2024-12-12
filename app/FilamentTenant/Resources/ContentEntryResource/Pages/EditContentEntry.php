@@ -85,20 +85,20 @@ class EditContentEntry extends EditRecord
 
     protected function getRedirectUrl(): string
     {
-        return $this->previousUrl ?? static::getParentResource()::getUrl('lessons.index', [
-            'parent' => $this->parent,
+        return $this->previousUrl ?? static::getParentResource()::getUrl('content.index', [
+            'content' => $this->ownerRecord,
         ]);
     }
+  
+    // protected function configureDeleteAction(Actions\DeleteAction $action): void
+    // {
+    //     $resource = static::getResource();
  
-    protected function configureDeleteAction(Actions\DeleteAction $action): void
-    {
-        $resource = static::getResource();
- 
-        $action->authorize($resource::canDelete($this->getRecord()))
-            ->successRedirectUrl(static::getParentResource()::getUrl('lessons.index', [
-                'parent' => $this->parent,
-            ]));
-    }
+    //     $action->authorize($resource::canDelete($this->getRecord()))
+    //         ->successRedirectUrl(static::getParentResource()::getUrl('content.index', [
+    //             'parent' => $this->parent,
+    //         ]));
+    // }
 
     #[\Override]
     protected function getHeaderActions(): array
