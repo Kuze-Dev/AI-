@@ -72,13 +72,8 @@ it('can create service', function () {
             'due_date_every' => 20,
             'taxonomyTerms' => [$taxonomyTerm->id],
             'media.0' => $image,
-<<<<<<< HEAD
-            'metaData' => $metaData,
-            'metaData.image.0' => $image,
-=======
             'meta_data' => $metaData,
             'meta_data.image.0' => $path,
->>>>>>> develop
         ])
         ->call('create')
         ->assertHasNoFormErrors()

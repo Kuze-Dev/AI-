@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  */
 trait HasParentResource
 {
-    public Model|int|string|null $ownerRecord = null;
+    public Model|null $ownerRecord = null;
  
     public function bootHasParentResource(): void
     {

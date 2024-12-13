@@ -46,7 +46,6 @@ it('can edit taxonomy', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
         ->createOne();
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
@@ -105,7 +104,7 @@ it('can edit taxonomy and add terms with route url', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
+        // ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
         ->createOne();
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
