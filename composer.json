@@ -62,6 +62,7 @@
         "larastan/larastan": "^3.0.2",
         "laravel/pint": "^1.18.3",
         "laravel/sail": "^1.39.1",
+        "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.5.0",
         "pestphp/pest": "^3.7.1",
         "pestphp/pest-plugin-faker": "^3.0.0",
@@ -155,9 +156,14 @@
         "format": "vendor/bin/pint",
         "format-dirty": "vendor/bin/pint --dirty",
         "format-dry-run": "vendor/bin/pint --test",
-        "test": "vendor/bin/pest --parallel",
-        "test-no-timeout": ["Composer\\Config::disableProcessTimeout", "vendor/bin/pest --parallel"],
-        "test-coverage": "vendor/bin/pest --parallel --coverage-html build/coverage",
+        "test": "vendor/bin/pest -p --processes=6",
+        "test-no-timeout": ["Composer\\Config::disableProcessTimeout", "vendor/bin/pest --processes=6 --parallel"],
+        "test-stop-on-f": "vendor/bin/pest -p --processes=6 --stop-on-failure --stop-on-error",
+        "test-type-coverage": "vendor/bin/pest --processes=6 --type-coverage",
+        "test-coverage": [
+            "Composer\\Config::disableProcessTimeout",
+            "XDEBUG_MODE=coverage vendor/bin/pest -p --processes=6 --coverage --coverage-html build/coverage-html --coverage"
+        ],
         "refactor": "vendor/bin/rector process",
         "refactor-dry-run": "vendor/bin/rector process --dry-run",
         "remove-ray": [
