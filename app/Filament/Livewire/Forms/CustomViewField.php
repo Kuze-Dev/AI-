@@ -36,6 +36,7 @@ class CustomViewField extends ViewField
         return $dataFilter;
     }
 
+    #[\Override]
     public function viewData(array|Closure $data): static
     {
 

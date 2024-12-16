@@ -43,8 +43,8 @@ enum ConditionEnum: string
             self::GreaterThanOrEqual => $value >= $target,
             self::LessThan => $value < $target,
             self::LessThanOrEqual => $value <= $target,
-            self::InArray => in_array($value, explode(',', $target)),
-            self::NotInArray => ! in_array($value, explode(',', $target)),
+            self::InArray => in_array($value, explode(',', (string) $target)),
+            self::NotInArray => ! in_array($value, explode(',', (string) $target)),
         };
     }
 }

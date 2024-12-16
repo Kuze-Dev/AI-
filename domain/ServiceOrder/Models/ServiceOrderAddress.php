@@ -60,10 +60,13 @@ class ServiceOrderAddress extends Model
         'city',
     ];
 
-    protected $casts = [
-        'label_as' => AddressLabelAs::class,
-        'type' => ServiceOrderAddressType::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'label_as' => AddressLabelAs::class,
+            'type' => ServiceOrderAddressType::class,
+        ];
+    }
 
     /** @return Attribute<string, never> */
     protected function fullAddress(): Attribute
@@ -85,7 +88,7 @@ class ServiceOrderAddress extends Model
         );
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceOrderAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, $this> */
     public function serviceOrder(): BelongsTo
     {
         return $this->belongsTo(ServiceOrder::class);

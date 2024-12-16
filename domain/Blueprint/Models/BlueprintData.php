@@ -62,13 +62,15 @@ class BlueprintData extends Model implements HasMedia
         'value',
         'type',
     ];
+    protected function casts(): array
+    {
+        return [
+            // 'type' => BlueprintDataType::class,
+            'value' => 'array',
+        ];
+    }
 
-    protected $casts = [
-        // 'type' => BlueprintDataType::class,
-        'value' => 'array',
-    ];
-
-    /** @return BelongsTo<Blueprint, BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);

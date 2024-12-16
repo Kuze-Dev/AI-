@@ -103,19 +103,21 @@ class ContentEntry extends Model implements HasInternationalizationInterface, Ha
         'translation_id',
     ];
 
-    /**
-     * Columns that are converted
-     * to a specific data type.
-     */
-    protected $casts = [
-        'data' => 'array',
-        'published_at' => 'datetime',
-    ];
-
     protected $with = [
         'sites',
     ];
 
+    /**
+     * Columns that are converted
+     * to a specific data type.
+     */
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+            'published_at' => 'datetime',
+        ];
+    }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -146,14 +148,14 @@ class ContentEntry extends Model implements HasInternationalizationInterface, Ha
      * Declare relationship of
      * current model to contents.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Content\Models\Content, \Domain\Content\Models\ContentEntry>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Content\Models\Content, $this>
      */
     public function content(): BelongsTo
     {
         return $this->belongsTo(Content::class);
     }
 
-    /** @return MorphMany<BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Blueprint\Models\BlueprintData, $this> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class, 'model');
@@ -163,7 +165,7 @@ class ContentEntry extends Model implements HasInternationalizationInterface, Ha
      * Declare relationship of
      * current model to contents.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
      */
     public function taxonomyTerms(): BelongsToMany
     {
@@ -203,31 +205,31 @@ class ContentEntry extends Model implements HasInternationalizationInterface, Ha
         return Str::start($model->content->prefix, '/').Str::of($attributes['title'])->slug()->start('/');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Content\Models\ContentEntry, $this> */
     public function pageDraft(): HasOne
     {
         return $this->hasOne(ContentEntry::class, 'draftable_id');
     }
 
-    /** @return BelongsTo<self, ContentEntry> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Content\Models\ContentEntry, $this> */
     public function parentPage(): BelongsTo
     {
         return $this->belongsTo(ContentEntry::class, 'draftable_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Admin, ContentEntry> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, $this> */
     public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
     }
 
-    /** @return HasMany<ContentEntry> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Content\Models\ContentEntry, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<ContentEntry, ContentEntry> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Content\Models\ContentEntry, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

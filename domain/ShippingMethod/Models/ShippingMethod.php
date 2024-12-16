@@ -88,10 +88,13 @@ class ShippingMethod extends Model implements HasMedia
         'active',
     ];
 
-    protected $casts = [
-        'active' => 'bool',
-        'driver' => Driver::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'active' => 'bool',
+            'driver' => Driver::class,
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -107,7 +110,7 @@ class ShippingMethod extends Model implements HasMedia
         return 'slug';
     }
 
-    /** @return HasMany<\Domain\Shipment\Models\Shipment> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Shipment\Models\Shipment, $this> */
     public function shipments(): HasMany
     {
         return $this->hasMany(Shipment::class);
@@ -129,13 +132,13 @@ class ShippingMethod extends Model implements HasMedia
             ->singleFile();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, \Domain\ShippingMethod\Models\ShippingMethod> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, $this> */
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class, 'shipper_country_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\State, \Domain\ShippingMethod\Models\ShippingMethod> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\State, $this> */
     public function state(): BelongsTo
     {
         return $this->belongsTo(State::class, 'shipper_state_id');

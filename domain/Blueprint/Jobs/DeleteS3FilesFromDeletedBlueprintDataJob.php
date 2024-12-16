@@ -18,16 +18,13 @@ class DeleteS3FilesFromDeletedBlueprintDataJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    protected array $files;
-
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(array $files)
+    public function __construct(protected array $files)
     {
-        $this->files = $files;
     }
 
     /**

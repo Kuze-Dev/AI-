@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 trait HasPayments
 {
-    /** @return MorphMany<Payment> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Payments\Models\Payment, $this> */
     public function payments(): MorphMany
     {
         return $this->morphMany(Payment::class, 'payable');

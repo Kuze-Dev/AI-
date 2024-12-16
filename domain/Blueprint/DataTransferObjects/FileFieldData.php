@@ -44,7 +44,7 @@ class FileFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
             hidden_option: $data['hidden_option'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             multiple: $data['multiple'] ?? false,
             reorder: $data['reorder'] ?? false,
             can_download: $data['can_download'] ?? false,

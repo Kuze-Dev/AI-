@@ -46,7 +46,7 @@ class MediaFieldData extends FieldData
             multiple: $data['multiple'] ?? false,
             reorder: $data['reorder'] ?? false,
             accept: $data['accept'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             min_size: $data['min_size'] ?? null,
             max_size: $data['max_size'] ?? null,
             min_files: $data['min_files'] ?? null,

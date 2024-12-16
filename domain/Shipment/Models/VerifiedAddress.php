@@ -39,12 +39,15 @@ class VerifiedAddress extends Model
         'verified_address',
     ];
 
-    protected $casts = [
-        'address' => 'array',
-        'verified_address' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'address' => 'array',
+            'verified_address' => 'array',
+        ];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Shipment\Models\VerifiedAddress>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, $this>*/
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

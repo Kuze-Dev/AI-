@@ -96,18 +96,21 @@ class ServiceBill extends Model implements HasMedia, PayableInterface
         'status',
     ];
 
-    protected $casts = [
-        'bill_date' => 'datetime',
-        'due_date' => 'datetime',
-        'additional_charges' => 'array',
-        'service_price' => MoneyCast::class,
-        'sub_total' => MoneyCast::class,
-        'tax_percentage' => 'float',
-        'tax_total' => MoneyCast::class,
-        'total_amount' => MoneyCast::class,
-        'total_balance' => MoneyCast::class,
-        'status' => ServiceBillStatus::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'bill_date' => 'datetime',
+            'due_date' => 'datetime',
+            'additional_charges' => 'array',
+            'service_price' => MoneyCast::class,
+            'sub_total' => MoneyCast::class,
+            'tax_percentage' => 'float',
+            'tax_total' => MoneyCast::class,
+            'total_amount' => MoneyCast::class,
+            'total_balance' => MoneyCast::class,
+            'status' => ServiceBillStatus::class,
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName(): string
@@ -159,13 +162,13 @@ class ServiceBill extends Model implements HasMedia, PayableInterface
         );
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, \Domain\ServiceOrder\Models\ServiceBill> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ServiceOrder\Models\ServiceOrder, $this> */
     public function serviceOrder(): BelongsTo
     {
         return $this->belongsTo(ServiceOrder::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<ServiceTransaction> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceTransaction, $this> */
     public function serviceTransactions(): HasMany
     {
         return $this->hasMany(ServiceTransaction::class);

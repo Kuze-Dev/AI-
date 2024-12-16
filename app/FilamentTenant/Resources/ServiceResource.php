@@ -75,7 +75,7 @@ class ServiceResource extends Resource
                                         if (! $storage->exists($file)) {
                                             return null;
                                         }
-                                    } catch (UnableToCheckFileExistence $exception) {
+                                    } catch (UnableToCheckFileExistence) {
                                         return null;
                                     }
 
@@ -88,7 +88,7 @@ class ServiceResource extends Resource
                                                     $file,
                                                     now()->addMinutes(5),
                                                 );
-                                            } catch (\Throwable $exception) {
+                                            } catch (\Throwable) {
                                                 // This driver does not support creating temporary URLs.
                                             }
                                         }

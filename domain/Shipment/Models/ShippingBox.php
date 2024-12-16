@@ -68,10 +68,6 @@ class ShippingBox extends Model
         'package_type',
     ];
 
-    protected $casts = [
-
-    ];
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

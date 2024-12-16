@@ -70,7 +70,7 @@ it('cant checkout when product inactive', function () {
 
     postJson('api/carts/checkouts', [
         'cart_line_ids' => [$cartLine->uuid],
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it('cant checkout when product didnt meet the minimum order quantity', function () {
@@ -85,7 +85,7 @@ it('cant checkout when product didnt meet the minimum order quantity', function 
 
     postJson('api/carts/checkouts', [
         'cart_line_ids' => [$cartLine->uuid],
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it('can show checkout items', function () {

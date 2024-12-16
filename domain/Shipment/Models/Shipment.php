@@ -61,10 +61,13 @@ class Shipment extends Model
         'rate',
     ];
 
-    protected $casts = [
-        'shipping_details' => 'array',
-        'destination_address' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'shipping_details' => 'array',
+            'destination_address' => 'array',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -74,7 +77,7 @@ class Shipment extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<ShippingMethod, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ShippingMethod\Models\ShippingMethod, $this> */
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class);

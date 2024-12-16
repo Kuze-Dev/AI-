@@ -136,18 +136,21 @@ class Order extends Model implements HasMedia, PayableInterface
         'cancelled_at',
     ];
 
-    protected $casts = [
-        'tax_total' => 'float',
-        'tax_display' => PriceDisplay::class,
-        'tax_percentage' => 'float',
-        'sub_total' => 'float',
-        'discount_total' => 'float',
-        'shipping_total' => 'float',
-        'total' => 'float',
-        'is_paid' => 'boolean',
-        'status' => OrderStatuses::class,
-        'cancelled_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'tax_total' => 'float',
+            'tax_display' => PriceDisplay::class,
+            'tax_percentage' => 'float',
+            'sub_total' => 'float',
+            'discount_total' => 'float',
+            'shipping_total' => 'float',
+            'total' => 'float',
+            'is_paid' => 'boolean',
+            'status' => OrderStatuses::class,
+            'cancelled_at' => 'datetime',
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName(): string
@@ -155,13 +158,13 @@ class Order extends Model implements HasMedia, PayableInterface
         return 'reference';
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Order\Models\Order> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, $this> */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Order\Models\OrderLine>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Order\Models\OrderLine, $this>*/
     public function orderLines(): HasMany
     {
         return $this->hasMany(OrderLine::class);
@@ -179,7 +182,7 @@ class Order extends Model implements HasMedia, PayableInterface
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::BILLING);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ShippingMethod\Models\ShippingMethod, \Domain\Order\Models\Order> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ShippingMethod\Models\ShippingMethod, $this> */
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class, 'shipping_method_id');

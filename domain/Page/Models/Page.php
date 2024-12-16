@@ -89,18 +89,21 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
         'translation_id',
     ];
 
+    protected $with = [
+        'pageDraft',
+    ];
+
     /**
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [
-        'visibility' => Visibility::class,
-        'published_at' => 'datetime',
-    ];
-
-    protected $with = [
-        'pageDraft',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'visibility' => Visibility::class,
+            'published_at' => 'datetime',
+        ];
+    }
 
     /**
      * Define default reference
@@ -135,7 +138,7 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return HasMany<BlockContent> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Page\Models\BlockContent, $this> */
     public function blockContents(): HasMany
     {
         return $this->hasMany(BlockContent::class);
@@ -147,13 +150,13 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
         return 'slug';
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Page\Models\Page, $this> */
     public function pageDraft(): HasOne
     {
         return $this->hasOne(Page::class, 'draftable_id');
     }
 
-    /** @return BelongsTo<self, Page> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Page\Models\Page, $this> */
     public function parentPage(): BelongsTo
     {
         return $this->belongsTo(Page::class, 'draftable_id');
@@ -174,19 +177,19 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
         return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 
-    /** @return BelongsTo<Admin, Page> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, $this> */
     public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
     }
 
-    /** @return HasMany<Page> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Page\Models\Page, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<Page, Page> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Page\Models\Page, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

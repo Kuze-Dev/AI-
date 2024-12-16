@@ -31,7 +31,7 @@ readonly class ImportBlueprintAction
         }
 
         $data = $row;
-        $data['schema'] = json_decode($row['schema'], true);
+        $data['schema'] = json_decode((string) $row['schema'], true);
 
         unset($row);
 

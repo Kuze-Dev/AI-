@@ -142,17 +142,20 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         'password',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-        'birth_date' => 'date',
-        'data' => 'array',
-        'status' => Status::class,
-        'gender' => Gender::class,
-        'email_verification_type' => EmailVerificationType::class,
-        'register_status' => RegisterStatus::class,
-        'email_verified_at' => 'datetime',
-        'tier_approval_status' => TierApprovalStatus::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'birth_date' => 'date',
+            'data' => 'array',
+            'status' => Status::class,
+            'gender' => Gender::class,
+            'email_verification_type' => EmailVerificationType::class,
+            'register_status' => RegisterStatus::class,
+            'email_verified_at' => 'datetime',
+            'tier_approval_status' => TierApprovalStatus::class,
+        ];
+    }
 
     #[\Override]
     public function uniqueIds(): array
@@ -201,13 +204,13 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         return new CustomerQueryBuilder($query);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Customer\Models\Customer> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, $this> */
     public function tier(): BelongsTo
     {
         return $this->belongsTo(Tier::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\Address> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\Address, $this> */
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
@@ -225,31 +228,31 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         $this->notify(new ResetPassword($token));
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite, $this> */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit, $this> */
     public function discountLimits(): HasMany
     {
         return $this->hasMany(DiscountLimit::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Shipment\Models\VerifiedAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Shipment\Models\VerifiedAddress, $this> */
     public function verifiedAddress(): HasOne
     {
         return $this->hasOne(VerifiedAddress::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrder>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrder, $this>*/
     public function serviceOrders(): HasMany
     {
         return $this->hasMany(ServiceOrder::class);
     }
 
-    /** @return MorphMany<BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Blueprint\Models\BlueprintData, $this> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class, 'model');

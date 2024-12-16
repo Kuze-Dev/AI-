@@ -26,6 +26,7 @@ class TipTapEditorData extends FieldData
     ) {
     }
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -48,7 +49,7 @@ class TipTapEditorData extends FieldData
             rules: $data['rules'] ?? [],
             hidden_option: $data['hidden_option'] ?? [],
             tools: $data['tools'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             min_length: $data['min_length'] ?? null,
             max_length: $data['max_length'] ?? null,
             helper_text: $data['helper_text'] ?? null,

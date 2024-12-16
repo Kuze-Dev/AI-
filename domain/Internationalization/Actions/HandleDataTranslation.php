@@ -69,9 +69,7 @@ class HandleDataTranslation
 
         $flattenData = app(ExtractDataAction::class)->flattenArray($data);
 
-        $filtered = array_filter($flattenData, function ($item) {
-            return isset($item['translatable']) && $item['translatable'] === false;
-        });
+        $filtered = array_filter($flattenData, fn($item) => isset($item['translatable']) && $item['translatable'] === false);
 
         if (
             count($filtered) > 0
@@ -107,7 +105,7 @@ class HandleDataTranslation
 
                 foreach ($update['value'] as $media_item) {
 
-                    $pathInfo = pathinfo($media_item);
+                    $pathInfo = pathinfo((string) $media_item);
 
                     if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
 
@@ -154,7 +152,7 @@ class HandleDataTranslation
 
             }
 
-            $keys = explode('.', $statePath);
+            $keys = explode('.', (string) $statePath);
 
             $temp = &$arrayData;
 

@@ -70,11 +70,14 @@ class CartLine extends Model implements HasMedia
         'checked_out_at',
     ];
 
-    protected $casts = [
-        'remarks' => 'array',
-        'checkout_expiration' => 'datetime',
-        'checked_out_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'remarks' => 'array',
+            'checkout_expiration' => 'datetime',
+            'checked_out_at' => 'datetime',
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName(): string
@@ -82,7 +85,7 @@ class CartLine extends Model implements HasMedia
         return 'uuid';
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Cart\Models\Cart, \Domain\Cart\Models\CartLine> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Cart\Models\Cart, $this> */
     public function cart(): BelongsTo
     {
         return $this->belongsTo(Cart::class);

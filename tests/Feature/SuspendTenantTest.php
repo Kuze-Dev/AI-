@@ -16,6 +16,6 @@ it('tenant Can be Suspended test', function () {
 
     $tenant->save();
 
-    get('admin/login')->assertStatus(403);
+    get('admin/login')->assertForbidden();
 
 });

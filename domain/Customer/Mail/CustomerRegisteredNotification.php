@@ -55,6 +55,7 @@ class CustomerRegisteredNotification extends Mailable implements ShouldQueue
         return $string;
     }
 
+    #[\Override]
     protected function buildView(): array
     {
         return [
@@ -107,7 +108,7 @@ class CustomerRegisteredNotification extends Mailable implements ShouldQueue
             return $customTheme;
         }
 
-        if (str_contains($this->theme, '::')) {
+        if (str_contains((string) $this->theme, '::')) {
             return $this->theme;
         }
 
