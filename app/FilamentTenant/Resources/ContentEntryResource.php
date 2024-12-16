@@ -111,7 +111,11 @@ class ContentEntryResource extends Resource
 
                                         return false;
                                     }
-
+                                  
+                                    if($livewire->record->draftable_id &&
+                                        $livewire->record->title == $livewire->record->parentPage->title){
+                                        return false;
+                                    }   
                                     return $rule->where('content_id', $livewire->ownerRecord->id);
                                 },
                                 ignoreRecord: true
@@ -268,7 +272,7 @@ class ContentEntryResource extends Resource
                                 ->timezone(Auth::user()?->timezone),
                         ])
                         ->hidden(
-                            fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                            fn ($livewire) => ! $livewire->ownerRecord->hasPublishDates()
                         ),
                     SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                 ])->columnSpan(2),
