@@ -97,13 +97,13 @@ class MediaresourceResource extends Resource
                         ->url(function (Media $record) {
                             return match ($record->model_type) {
                                 app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
-                                app(Block::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.blocks.edit', Block::find($record->model_id)),
+                                app(Block::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.blocks.edit', Block::find($record->model_id)),
                                 app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
-                                app(Service::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.services.edit', Service::find($record->model_id)),
-                                app(Customer::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.customers.edit', Customer::find($record->model_id)),
-                                app(PaymentMethod::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.payment-methods.edit', PaymentMethod::find($record->model_id)),
-                                app(Product::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.products.edit', Product::find($record->model_id)),
-                                app(ShippingMethod::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.shipping-methods.edit', ShippingMethod::find($record->model_id)),
+                                app(Service::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.services.edit', Service::find($record->model_id)),
+                                app(Customer::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.customers.edit', Customer::find($record->model_id)),
+                                app(PaymentMethod::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.payment-methods.edit', PaymentMethod::find($record->model_id)),
+                                app(Product::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.products.edit', Product::find($record->model_id)),
+                                app(ShippingMethod::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.shipping-methods.edit', ShippingMethod::find($record->model_id)),
                                 default => '/admin',
                             };
                         })
@@ -143,15 +143,15 @@ class MediaresourceResource extends Resource
         $resource = $metaData?->resourceModel;
         if ($resource) {
             return match ($resource::class) {
-                ContentEntry::class => route('filament-tenant.resources.contents.entries.edit', [
+                ContentEntry::class => route('filament.tenant.resources.contents.entries.edit', [
                     'ownerRecord' => $resource->content,
                     'record' => $resource,
                 ]),
-                Page::class => route('filament-tenant.resources.pages.edit', ['record' => $resource]),
-                Product::class => route('filament-tenant.resources.products.edit', ['record' => $resource]),
-                Service::class => route('filament-tenant.resources.services.edit', ['record' => $resource]),
-                // TaxonomyTerm::class => route('filament-tenant.resources.taxonomies.edit', ['record' => $resource->taxonomy]),
-                // Globals::class => route('filament-tenant.resources.globals.edit', ['record' => $resource]),
+                Page::class => route('filament.tenant.resources.pages.edit', ['record' => $resource]),
+                Product::class => route('filament.tenant.resources.products.edit', ['record' => $resource]),
+                Service::class => route('filament.tenant.resources.services.edit', ['record' => $resource]),
+                // TaxonomyTerm::class => route('filament.tenant.resources.taxonomies.edit', ['record' => $resource->taxonomy]),
+                // Globals::class => route('filament.tenant.resources.globals.edit', ['record' => $resource]),
                 default => '/admin',
             };
         }
@@ -174,14 +174,14 @@ class MediaresourceResource extends Resource
         $resource = $blueprintData?->resourceModel;
         if ($resource) {
             return match ($resource::class) {
-                ContentEntry::class => route('filament-tenant.resources.contents.entries.edit', [
+                ContentEntry::class => route('filament.tenant.resources.contents.entries.edit', [
                     'ownerRecord' => $resource->content,
                     'record' => $resource,
                 ]),
-                BlockContent::class => self::resolveModelUrl('filament-tenant.resources.pages.edit', $resource->page),
-                TaxonomyTerm::class => self::resolveModelUrl('filament-tenant.resources.taxonomies.edit', $resource->taxonomy),
-                Globals::class => self::resolveModelUrl('filament-tenant.resources.globals.edit', $resource),
-                Customer::class => self::resolveModelUrl('filament-tenant.resources.customers.edit', $resource),
+                BlockContent::class => self::resolveModelUrl('filament.tenant.resources.pages.edit', $resource->page),
+                TaxonomyTerm::class => self::resolveModelUrl('filament.tenant.resources.taxonomies.edit', $resource->taxonomy),
+                Globals::class => self::resolveModelUrl('filament.tenant.resources.globals.edit', $resource),
+                Customer::class => self::resolveModelUrl('filament.tenant.resources.customers.edit', $resource),
                 default => '/admin',
             };
         }

@@ -9,7 +9,6 @@ use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
-use App\FilamentTenant\Support\Traits\HasParentResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
 use Domain\Content\Actions\CreateContentEntryDraftAction;
@@ -35,8 +34,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
+use Filament\Actions\StaticAction;
 use Illuminate\Support\Str;
-// use Livewire\Redirector;
 use Livewire\Features\SupportRedirects\Redirector;
 
 /** @method class-string<\Illuminate\Database\Eloquent\Model> getModel()
@@ -46,7 +45,6 @@ use Livewire\Features\SupportRedirects\Redirector;
 class EditContentEntry extends EditRecord
 {
     use LogsFormActivity;
-    // use HasParentResource;
 
     protected static string $resource = ContentEntryResource::class;
 
@@ -89,15 +87,6 @@ class EditContentEntry extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            // 'content_entries_group_actions' => CustomPageActionGroup::make([
-            Action::make('overwriteDraft')
-                ->label(trans('Save As Draft'))
-                // ->action('overwriteDraft')
-                ->action(function () {
-                    dd(func_get_args());  
-                })
-                ->requiresConfirmation()
-                ->modalHeading('Draft for this content already exists'),
             ActionGroup::make([
                 Action::make('published')
                     ->label(trans('Published Draft'))
@@ -116,14 +105,35 @@ class EditContentEntry extends EditRecord
                     }),
                 Action::make('overwriteDraft')
                     ->label(trans('Save As Draft'))
-                    ->action('overwriteDraft')
+                    ->action(function (Action $action) {
+                        $data = $this->form->getState();
+                           
+                        $record = $this->record;
+        
+                        $record->pageDraft?->delete();
+        
+                        $pageData = ContentEntryData::fromArray($data);
+        
+                        $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
+        
+                        Notification::make()
+                            ->success()
+                            ->title(trans('Overwritten Draft'))
+                            ->body(trans('Content Entry Draft has been overwritten'))
+                            ->send();
+        
+                        $action->redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+                       
+        
+              
+                        })
                     ->requiresConfirmation()
                     ->modalHeading('Draft for this content already exists')
-                    // ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
-                    // ->modalCancelAction(fn () => Action::makeModalAction('redirect')
-                    //     ->label(trans('Edit Existing Draft'))
-                    //     ->color('gray')
-                    //     ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft])))
+                    ->modalDescription('You have an existing draft for this content. Do you want to overwrite the existing draft?')
+                    ->modalCancelActionLabel('Redirect')
+                    ->modalCancelAction(fn (StaticAction $action) => $action->url(
+                        ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft])
+                    ))
                     ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true),
                 Action::make('save')
                     ->label(trans('Save and Continue Editing'))
@@ -131,16 +141,9 @@ class EditContentEntry extends EditRecord
                     ->keyBindings(['mod+s']),
             ])
             ->button()
-                // ->view('filament.pages.actions.custom-action-group.index')
-                // ->setName('page_draft_actions')
-                ->icon('')
-                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label')),
-            // Action::make('save')
-            //     ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
-            //     ->action('save')
-            //     ->keyBindings(['mod+s']),
+            ->icon('')
+            ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label')),
             Actions\DeleteAction::make(),
-            // 'other_page_actions' => CustomPageActionGroup::make([
             ActionGroup::make([
                 Action::make('preview')
                     ->color('gray')
@@ -226,7 +229,7 @@ class EditContentEntry extends EditRecord
 
                                     $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
 
-                                    return Action::makeModalAction('preview')->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
+                                    return StaticAction::makeModalAction('preview')->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
                                 });
 
                                 $set('domain', $domain);
@@ -238,10 +241,7 @@ class EditContentEntry extends EditRecord
             ->button()
             ->color('gray')
             ->icon('')
-            // ->view('filament.pages.actions.custom-action-group.index')
-            //     ->setName('other_page_draft')
-            //     ->color('gray')
-                ->label(trans('More Actions')),
+            ->label(trans('More Actions')),
         ];
     }
 

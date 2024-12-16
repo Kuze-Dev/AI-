@@ -57,7 +57,7 @@ class BlockResource extends Resource
                     ->required()
                     ->preload()
                     ->optionsFromModel(Blueprint::class, 'name')
-                    ->disabled(fn (?Block $record) => $record !== null)
+                    ->disableOptionWhen(fn (?Block $record) => $record !== null)
                     ->reactive(),
                 // Forms\Components\FileUpload::make('image'),
                 \App\FilamentTenant\Support\MediaUploader::make('image')
