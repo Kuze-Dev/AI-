@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c95180de199d4ec89ed573d28173e86",
+    "content-hash": "d5503cf6ae662ff8050ec334724e86c0",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -279,16 +279,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.334.6",
+            "version": "3.334.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "2b0be3aded849d3b7bb0b53ea3295c7cecdeeee7"
+                "reference": "8e0104e95a1edba209e077e6c4212b8cca04686f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2b0be3aded849d3b7bb0b53ea3295c7cecdeeee7",
-                "reference": "2b0be3aded849d3b7bb0b53ea3295c7cecdeeee7",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/8e0104e95a1edba209e077e6c4212b8cca04686f",
+                "reference": "8e0104e95a1edba209e077e6c4212b8cca04686f",
                 "shasum": ""
             },
             "require": {
@@ -371,9 +371,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.334.6"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.334.7"
             },
-            "time": "2024-12-13T19:18:29+00:00"
+            "time": "2024-12-16T19:09:36+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -7882,16 +7882,16 @@
         },
         {
             "name": "spatie/array-to-xml",
-            "version": "3.3.0",
+            "version": "3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/array-to-xml.git",
-                "reference": "f56b220fe2db1ade4c88098d83413ebdfc3bf876"
+                "reference": "7dcfc67d60b0272926dabad1ec01f6b8a5fb5e67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/array-to-xml/zipball/f56b220fe2db1ade4c88098d83413ebdfc3bf876",
-                "reference": "f56b220fe2db1ade4c88098d83413ebdfc3bf876",
+                "url": "https://api.github.com/repos/spatie/array-to-xml/zipball/7dcfc67d60b0272926dabad1ec01f6b8a5fb5e67",
+                "reference": "7dcfc67d60b0272926dabad1ec01f6b8a5fb5e67",
                 "shasum": ""
             },
             "require": {
@@ -7934,7 +7934,7 @@
                 "xml"
             ],
             "support": {
-                "source": "https://github.com/spatie/array-to-xml/tree/3.3.0"
+                "source": "https://github.com/spatie/array-to-xml/tree/3.4.0"
             },
             "funding": [
                 {
@@ -7946,7 +7946,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-05-01T10:20:27+00:00"
+            "time": "2024-12-16T12:45:15+00:00"
         },
         {
             "name": "spatie/color",
@@ -8531,16 +8531,16 @@
         },
         {
             "name": "spatie/laravel-json-api-paginate",
-            "version": "1.15.1",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-json-api-paginate.git",
-                "reference": "acdd4dfa94541f4667b30dfef0c07918f7764e53"
+                "reference": "aaee5929a1929c5a117947119eec6294538ac99f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-json-api-paginate/zipball/acdd4dfa94541f4667b30dfef0c07918f7764e53",
-                "reference": "acdd4dfa94541f4667b30dfef0c07918f7764e53",
+                "url": "https://api.github.com/repos/spatie/laravel-json-api-paginate/zipball/aaee5929a1929c5a117947119eec6294538ac99f",
+                "reference": "aaee5929a1929c5a117947119eec6294538ac99f",
                 "shasum": ""
             },
             "require": {
@@ -8584,7 +8584,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/laravel-json-api-paginate/tree/1.15.1"
+                "source": "https://github.com/spatie/laravel-json-api-paginate/tree/1.16.0"
             },
             "funding": [
                 {
@@ -8592,7 +8592,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2024-08-06T06:59:31+00:00"
+            "time": "2024-12-16T15:34:56+00:00"
         },
         {
             "name": "spatie/laravel-medialibrary",
@@ -9670,16 +9670,16 @@
         },
         {
             "name": "stancl/jobpipeline",
-            "version": "v1.7.1",
+            "version": "v1.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/archtechx/jobpipeline.git",
-                "reference": "59467693e6782d7f1995d19d2bf1558ec55d0afe"
+                "reference": "6b5aaa16a5c2b6ca32abcefd82c9c1320be8c2f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/archtechx/jobpipeline/zipball/59467693e6782d7f1995d19d2bf1558ec55d0afe",
-                "reference": "59467693e6782d7f1995d19d2bf1558ec55d0afe",
+                "url": "https://api.github.com/repos/archtechx/jobpipeline/zipball/6b5aaa16a5c2b6ca32abcefd82c9c1320be8c2f3",
+                "reference": "6b5aaa16a5c2b6ca32abcefd82c9c1320be8c2f3",
                 "shasum": ""
             },
             "require": {
@@ -9710,9 +9710,9 @@
             "description": "Turn any series of jobs into Laravel listeners.",
             "support": {
                 "issues": "https://github.com/archtechx/jobpipeline/issues",
-                "source": "https://github.com/archtechx/jobpipeline/tree/v1.7.1"
+                "source": "https://github.com/archtechx/jobpipeline/tree/v1.7.2"
             },
-            "time": "2024-11-09T19:58:45+00:00"
+            "time": "2024-12-16T15:45:18+00:00"
         },
         {
             "name": "stancl/tenancy",
