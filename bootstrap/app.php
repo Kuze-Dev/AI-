@@ -2,56 +2,95 @@
 
 declare(strict_types=1);
 
-/*
-|--------------------------------------------------------------------------
-| Create The Application
-|--------------------------------------------------------------------------
-|
-| The first thing we will do is create a new Laravel application instance
-| which serves as the "glue" for all the components of Laravel, and is
-| the IoC container for the system binding all of the various parts.
-|
-*/
+use App\Console\Commands\TenancyAwareScheduler\ClearResetsTenancyAwareSchedulerCommand;
+use App\Console\Commands\TenancyAwareScheduler\SanctumPruneExpiredTenancyAwareScheduler;
+use App\Http\Middleware\ApiCallTrackMiddleware;
+use App\Http\Middleware\EnsureAccountIsActive;
+use App\Http\Middleware\EnsureTenantFeaturesAreActive;
+use App\Http\Middleware\EnsureTenantIsNotSuspended;
+use Domain\ServiceOrder\Commands\CreateServiceBillCommand;
+use Domain\ServiceOrder\Commands\InactivateServiceOrderCommand;
+use Domain\ServiceOrder\Commands\NotifyCustomerServiceBillDueDateCommand;
+use Filament\Facades\Filament;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Sentry\Laravel\Integration;
+use Spatie\Health\Exceptions\CheckDidNotComplete;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
+use Spatie\QueryBuilder\Exceptions\InvalidFilterValue;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
-$app = new Illuminate\Foundation\Application(
-    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
-);
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        commands: __DIR__.'/../routes/console.php',
+        then: function () {
+            Route::middleware('web')
+                ->group(function () {
+                    Route::redirect('/', 'admin');
+                });
+        }
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware
+            ->redirectGuestsTo(fn () => Filament::getLoginUrl())
+            ->alias([
+                'active' => EnsureAccountIsActive::class,
+                'feature.tenant' => EnsureTenantFeaturesAreActive::class,
+                'tenant.suspended' => EnsureTenantIsNotSuspended::class,
+            ])
+            ->group( 'universal', [])
+            ->group( 'tenant', [
+                InitializeTenancyByDomain::class,
+                PreventAccessFromCentralDomains::class,
+                EnsureTenantIsNotSuspended::class,
+                ApiCallTrackMiddleware::class,
+            ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
 
-/*
-|--------------------------------------------------------------------------
-| Bind Important Interfaces
-|--------------------------------------------------------------------------
-|
-| Next, we need to bind some important interfaces into the container so
-| we will be able to resolve them when needed. The kernels serve the
-| incoming requests to this application from both the web and CLI.
-|
-*/
+        Integration::handles($exceptions);
 
-$app->singleton(
-    Illuminate\Contracts\Http\Kernel::class,
-    App\Http\Kernel::class
-);
+        $exceptions
+            ->dontReport([
+                CheckDidNotComplete::class,
+                FileIsTooBig::class,
+                InvalidFilterValue::class,
+            ])
+            ->render(function (InvalidFilterValue $e, Request $request) {
+                abort(400, $e->getMessage());
+            });
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command(NotifyCustomerServiceBillDueDateCommand::class)
+            ->daily();
 
-$app->singleton(
-    Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
-);
+        $schedule->command(CreateServiceBillCommand::class)
+            ->daily();
 
-$app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
-);
+        $schedule->command(InactivateServiceOrderCommand::class)
+            ->daily();
 
-/*
-|--------------------------------------------------------------------------
-| Return The Application
-|--------------------------------------------------------------------------
-|
-| This script returns the application instance. The instance is given to
-| the calling script so we can separate the building of the instances
-| from the actual running of the application and sending responses.
-|
-*/
+        $schedule->command(
+            ClearResetsTenancyAwareSchedulerCommand::class, [
+            'customer',
+        ])
+            ->everyFifteenMinutes();
 
-return $app;
+        $schedule->command(
+            SanctumPruneExpiredTenancyAwareScheduler::class, [
+            '--hours' => 24,
+        ])
+            ->daily();
+
+        // $schedule->command(DispatchQueueCheckJobsCommand::class)->everyMinute();
+
+        // We recommend to put this command as the very last command in your schedule.
+        // https://spatie.be/docs/laravel-health/available-checks/schedule
+        // $schedule->command(ScheduleCheckHeartbeatCommand::class)->everyMinute();
+    })
+    ->create();
