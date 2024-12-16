@@ -122,7 +122,7 @@ class TaxonomyResource extends Resource
                         })
                         ->unique(
                             ignoreRecord: true,
-                            callback: function (Unique $rule, $state, $livewire) {
+                            modifyRuleUsing: function (Unique $rule, $state, $livewire) {
 
                                 if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
                                     return false;
@@ -137,7 +137,7 @@ class TaxonomyResource extends Resource
                         ->required()
                         ->preload()
                         ->optionsFromModel(Blueprint::class, 'name')
-                        ->disabled(fn (?Taxonomy $record) => $record !== null),
+                        ->disableOptionWhen(fn (?Taxonomy $record) => $record !== null),
                     Forms\Components\Toggle::make('has_route')
                         ->reactive()
                         ->lazy()
@@ -152,15 +152,15 @@ class TaxonomyResource extends Resource
                         ->formatStateUsing(fn (?Taxonomy $record) => $record?->activeRouteUrl ? true : false)
                         ->label(trans('Has Route')),
                     RouteUrlFieldset::make()
-                        ->disabled(fn (Closure $get) => ! $get('has_route'))
-                        ->hidden(fn (Closure $get) => ! $get('has_route')),
+                        ->disabled(fn (\Filament\Forms\Get $get) => ! $get('has_route'))
+                        ->hidden(fn (\Filament\Forms\Get $get) => ! $get('has_route')),
                 ]),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        function (?Taxonomy $record, Closure $get) {
+                        function (?Taxonomy $record, \Filament\Forms\Get $get) {
 
                             return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -184,22 +184,30 @@ class TaxonomyResource extends Resource
                     ->required(),
 
                 Forms\Components\Card::make([
-                    Forms\Components\CheckboxList::make('sites')
+                    // Forms\Components\CheckboxList::make('sites')
+                    \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->reactive()
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
-                        ->rule(fn (?Taxonomy $record, Closure $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
+                        ->rule(fn (?Taxonomy $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                         ->options(function () {
-
-                            if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
-                                return Site::orderBy('name')
-                                    ->pluck('name', 'id')
-                                    ->toArray();
-                            }
-
                             return Site::orderBy('name')
-                                ->whereHas('siteManager', fn ($query) => $query->where('admin_id', Auth::user()?->id))
                                 ->pluck('name', 'id')
                                 ->toArray();
+                        })
+                        ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
+
+                            /** @var \Domain\Admin\Models\Admin */
+                            $user = Auth::user();
+
+                            if ($user->hasRole(config('domain.role.super_admin'))) {
+                                return false;
+                            }
+
+                            $user_sites = $user->userSite->pluck('id')->toArray();
+
+                            $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
+
+                            return ! in_array($value, $intersect);
                         })
                         ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Taxonomy $record): void {
                             if (! $record) {
@@ -236,7 +244,7 @@ class TaxonomyResource extends Resource
                                                 ->required()
                                                 ->reactive()
                                                 ->lazy()
-                                                ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+                                                ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
                                                     $set('url', $livewire->data['route_url']['url'].'/'.Str::of($state)->slug());
 
                                                     return $state;
@@ -244,7 +252,7 @@ class TaxonomyResource extends Resource
                                                 ->unique(ignoreRecord: true),
                                             Forms\Components\Group::make([
                                                 Forms\Components\Toggle::make('is_custom')
-                                                    ->formatStateUsing(function (Closure $get, $state) {
+                                                    ->formatStateUsing(function (\Filament\Forms\Get $get, $state) {
 
                                                         if ($state) {
                                                             return $state;
@@ -263,9 +271,9 @@ class TaxonomyResource extends Resource
                                                     ->label(trans('URL'))
                                                     ->reactive()
                                                     // ->unique(ignoreRecord: true)
-                                                    ->disabled(fn ($livewire, Closure $get) => ! ($livewire->data['has_route'] && $get('is_custom')))
+                                                    ->disabled(fn ($livewire, \Filament\Forms\Get $get) => ! ($livewire->data['has_route'] && $get('is_custom')))
                                                     ->hidden(fn ($livewire) => ! $livewire->data['has_route'])
-                                                    ->formatStateUsing(function (Closure $get, $state, $livewire) {
+                                                    ->formatStateUsing(function (\Filament\Forms\Get $get, $state, $livewire) {
 
                                                         if ($state) {
                                                             return $state;
@@ -283,7 +291,7 @@ class TaxonomyResource extends Resource
                                                     ->maxLength(255)
                                                     ->startsWith('/')
                                                     ->rules([
-                                                        function (Closure $get) {
+                                                        function (\Filament\Forms\Get $get) {
 
                                                             /** @var \Support\RouteUrl\Contracts\HasRouteUrl */
                                                             $term = TaxonomyTerm::with(
@@ -292,7 +300,7 @@ class TaxonomyResource extends Resource
 
                                                             return new UniqueActiveRouteUrlRule($term);
                                                         },
-                                                        function ($livewire, Closure $get) {
+                                                        function ($livewire, \Filament\Forms\Get $get) {
 
                                                             $datas = $livewire->data['terms'];
                                                             $current_item_id = $get('id');

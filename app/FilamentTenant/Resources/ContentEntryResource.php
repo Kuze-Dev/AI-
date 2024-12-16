@@ -46,13 +46,13 @@ class ContentEntryResource extends Resource
 
     protected static ?string $slug = 'entries';
 
-    // public static function getRouteBaseName(?string $panel = null): string
-    // {
-    //     return 'filament.tenant.resources.contents.entries';
-    // }
+    public static function getRouteBaseName(?string $panel = null): string
+    {
+        return 'filament.tenant.resources.contents.entries';
+    }
 
-    public static string $parentResource = ContentResource::class; 
-
+    // public static string $parentResource = ContentResource::class; 
+    // #[\Override]
     public static function getRoutes(): Closure
     {
         return function () {
@@ -233,6 +233,9 @@ class ContentEntryResource extends Resource
                             Forms\Components\Group::make()
                                 ->statePath('taxonomies')
                                 ->schema(
+                                    // function ($livewire) {
+                                    //     dd($livewire->ownerRecord);
+                                    // }
                                     fn ($livewire) => $livewire->ownerRecord->taxonomies->map(
                                         fn (Taxonomy $taxonomy) => Forms\Components\Select::make($taxonomy->name)
                                             ->statePath((string) $taxonomy->id)
@@ -255,9 +258,9 @@ class ContentEntryResource extends Resource
                         ])
                         ->hidden(
                             // fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())
-                            // function (?ContentEntry $record) {
-                            //     dd(func_get_args());
-                            // }
+                            function ($livewire) {
+                                return ( empty($livewire->ownerRecord->taxonomies->toArray()) );
+                            }
                         ),
                     Forms\Components\Section::make(trans('Publishing'))
                         ->schema([
@@ -265,7 +268,7 @@ class ContentEntryResource extends Resource
                                 ->timezone(Auth::user()?->timezone),
                         ])
                         ->hidden(
-                            // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
+                            fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
                         ),
                     SchemaFormBuilder::make('data', fn ($livewire) => $livewire->ownerRecord->blueprint->schema),
                 ])->columnSpan(2),
@@ -455,8 +458,9 @@ class ContentEntryResource extends Resource
     #[\Override]
     public static function getPages(): array
     {
+
         return [
-            'index' => Resources\ContentEntryResource\Pages\ListContentEntry::route('entries'),
+            'index' => Resources\ContentEntryResource\Pages\ListContentEntry::route('/entries'),
             'create' => Resources\ContentEntryResource\Pages\CreateContentEntry::route('entries/create'),
             'edit' => Resources\ContentEntryResource\Pages\EditContentEntry::route('entries/{record}/edit'),
         ];

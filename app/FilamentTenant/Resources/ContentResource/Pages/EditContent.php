@@ -35,7 +35,7 @@ class EditContent extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('Save Changes'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),

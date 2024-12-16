@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
-<<<<<<< HEAD
 use App\Features\CMS\SitesManagement;
-=======
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
->>>>>>> develop
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;

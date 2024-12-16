@@ -60,67 +60,48 @@ class BlockResource extends Resource
                     ->disabled(fn (?Block $record) => $record !== null)
                     ->reactive(),
                 // Forms\Components\FileUpload::make('image'),
-                // \App\FilamentTenant\Support\MediaUploader::make('image')
-                //     ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? []) ?: null)
-                //     ->getUploadedFileUsing(function (\App\FilamentTenant\Support\MediaUploader $component) {
-
-                //         $block = $component->getRecord();
-
-                //         if(!$block){
-                //             return [];
-                //         }
-
+                \App\FilamentTenant\Support\MediaUploader::make('image')
+                    ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? []) ?: null)
+                    ->formatStateUsing(function (?Block $record){
+                        if($record){
+                            return $record->media->pluck('uuid')->toArray();
+                        }
+                        return [];
+                    })
+                    ->getUploadedFileUsing( function ($file) {
                         
-                //         $mediaCollections = $block->load('media')->getMedia('image');
-
-                //         $list = [];
-
-                //         $mediaCollections->each(function ($item) use (&$list) {
-                //             $list[] = [
-                //                 'name' => $mediaModel->getAttributeValue('name') ?? $mediaModel->getAttributeValue('file_name'),
-                //                         'size' => $mediaModel->getAttributeValue('size'),
-                //                         'type' => $mediaModel->getAttributeValue('mime_type'),
-                //                         'url' => $mediaModel->getUrl(),
-                //             ];
-                //         });
-
-                        // dd($block->media);
-                        // $file = array_map(function ($media) {},$block->getMedia('image'));
-                        // dump($file);
-                    //     if (! is_null($file)) {
-                    //         $mediaModel = Media::where('uuid', $file)
-                    //             ->orWhere('file_name', $file)
-                    //             ->first();
-                    //         if ($mediaModel) {
+                        if (! is_null($file)) {
+                            $mediaModel = Media::where('uuid', $file)
+                                ->orWhere('file_name', $file)
+                                ->first();
+                            if ($mediaModel) {
             
-                    //             return [
-                    //                 'name' => $mediaModel->getAttributeValue('name') ?? $mediaModel->getAttributeValue('file_name'),
-                    //                 'size' => $mediaModel->getAttributeValue('size'),
-                    //                 'type' => $mediaModel->getAttributeValue('mime_type'),
-                    //                 'url' => $mediaModel->getUrl(),
-                    //             ];
+                                return [
+                                    'name' => $mediaModel->getAttributeValue('name') ?? $mediaModel->getAttributeValue('file_name'),
+                                    'size' => $mediaModel->getAttributeValue('size'),
+                                    'type' => $mediaModel->getAttributeValue('mime_type'),
+                                    'url' => $mediaModel->getUrl(),
+                                ];
             
-
+                            $storage = Storage::disk(config('filament.default_filesystem_disk'));
             
-                    //         $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                            if ($storage->exists($file)) {
+                                return $storage->url($file);
+                            }
             
-                    //         if ($storage->exists($file)) {
-                    //             return $storage->url($file);
-                    //         }
+                        }
+                    }
             
-                    //     }
-                    // }
-                    //     return [];
-                    
-                    // })
-                    // ->image(),
-                SpatieMediaLibraryFileUpload::make('image')
-                    ->image()
-                    ->collection('image')
-                    ->preserveFilenames()
-                    ->customProperties(fn (Forms\Get $get) => [
-                        'alt_text' => $get('name'),
-                    ]),
+                        return [];
+                    })
+                    ->image(),
+                // SpatieMediaLibraryFileUpload::make('image')
+                //     ->image()
+                //     ->collection('image')
+                //     ->preserveFilenames()
+                //     ->customProperties(fn (Forms\Get $get) => [
+                //         'alt_text' => $get('name'),
+                //     ]),
                 Forms\Components\Toggle::make('is_fixed_content')
                     ->inline(false)
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') ? false : true)

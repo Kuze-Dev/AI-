@@ -19,66 +19,66 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CreateContentEntry extends CreateRecord
 {
-    use HasParentResource;
+    // use HasParentResource;
     use LogsFormActivity;
 
     protected static string $resource = ContentEntryResource::class;
 
-    // public mixed $ownerRecord;
+    public mixed $ownerRecord;
 
-    // #[\Override]
-    // public function mount(string $ownerRecord = ''): void
-    // {
-    //     $this->ownerRecord = app(Content::class)->resolveRouteBinding($ownerRecord)?->load('taxonomies.taxonomyTerms');
+    #[\Override]
+    public function mount(string $ownerRecord = ''): void
+    {
+        $this->ownerRecord = app(Content::class)->resolveRouteBinding($ownerRecord)?->load('taxonomies.taxonomyTerms');
 
-    //     if ($this->ownerRecord === null) {
-    //         throw (new ModelNotFoundException())->setModel(Content::class, ['']);
-    //     }
+        if ($this->ownerRecord === null) {
+            throw (new ModelNotFoundException())->setModel(Content::class, ['']);
+        }
 
-    //     parent::mount();
-    // }
+        parent::mount();
+    }
 
-    // #[\Override]
-    // public function getBreadcrumb(): string
-    // {
-    //     return trans('Create :label Content Entry', ['label' => $this->ownerRecord->name]);
-    // }
+    #[\Override]
+    public function getBreadcrumb(): string
+    {
+        return trans('Create :label Content Entry', ['label' => $this->ownerRecord->name]);
+    }
 
-    // #[\Override]
-    // public function getBreadcrumbs(): array
-    // {
-    //     $resource = static::getResource();
+    #[\Override]
+    public function getBreadcrumbs(): array
+    {
+        $resource = static::getResource();
 
-    //     $breadcrumb = $this->getBreadcrumb();
+        $breadcrumb = $this->getBreadcrumb();
 
-    //     return array_merge(
-    //         [
-    //             ContentResource::getUrl('index') => ContentResource::getBreadcrumb(),
-    //             ContentResource::getUrl('edit', [$this->ownerRecord]) => $this->ownerRecord->name,
-    //             $resource::getUrl('index', [$this->ownerRecord]) => $resource::getBreadcrumb(),
-    //         ],
-    //         (filled($breadcrumb) ? [$breadcrumb] : []),
-    //     );
-    // }
+        return array_merge(
+            [
+                ContentResource::getUrl('index') => ContentResource::getBreadcrumb(),
+                ContentResource::getUrl('edit', [$this->ownerRecord]) => $this->ownerRecord->name,
+                $resource::getUrl('index', [$this->ownerRecord]) => $resource::getBreadcrumb(),
+            ],
+            (filled($breadcrumb) ? [$breadcrumb] : []),
+        );
+    }
 
-    // #[\Override]
-    // public function getTitle(): string
-    // {
-    //     return trans('Create :label Content Entry', [
-    //         'label' => $this->ownerRecord->name,
-    //     ]);
-    // }
+    #[\Override]
+    public function getTitle(): string
+    {
+        return trans('Create :label Content Entry', [
+            'label' => $this->ownerRecord->name,
+        ]);
+    }
 
-    // #[\Override]
-    // protected function getHeaderActions(): array
-    // {
-    //     return [
-    //         Action::make('create')
-    //             ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
-    //             ->action('create')
-    //             ->keyBindings(['mod+s']),
-    //     ];
-    // }
+    #[\Override]
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('create')
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
+                ->action('create')
+                ->keyBindings(['mod+s']),
+        ];
+    }
 
     #[\Override]
     protected function handleRecordCreation(array $data): Model

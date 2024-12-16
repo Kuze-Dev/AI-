@@ -307,7 +307,7 @@ class ContentResource extends Resource
                         ->color('gray')
                         ->icon('heroicon-m-academic-cap')
                         ->url(
-                            fn (Content $record): string => static::getUrl('entries.index', [
+                            fn (Content $record): string => ContentEntryResource::getUrl('index', [
                                 'ownerRecord' => $record,
                             ])
                         ),

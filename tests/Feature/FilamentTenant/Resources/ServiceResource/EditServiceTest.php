@@ -108,13 +108,8 @@ it('can edit service', function () {
             //            'is_installment' => ! $service->is_installment,
             'taxonomy_term_id' => $taxonomyTerm->id,
             'media.0' => $image,
-<<<<<<< HEAD
-            'metaData' => $metaData,
-            'metaData.image.0' => $image,
-=======
             'meta_data' => $metaData,
             'meta_data.image.0' => $path,
->>>>>>> develop
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -140,12 +135,6 @@ it('can edit service', function () {
     );
 
     assertDatabaseHas(Media::class, [
-<<<<<<< HEAD
-        'model_type' => $service->getMorphClass(),
-        'model_id' => $service->getKey(),
-        'file_name' => $image->getClientOriginalName(),
-=======
->>>>>>> develop
         'mime_type' => $image->getMimeType(),
     ]);
 });

@@ -177,7 +177,14 @@
                     ])
                 >
                     <label
-                        class="fi-fo-checkbox-list-option-label flex gap-x-3"
+                        class="filament-forms-checkbox-list-component-option-label flex items-center space-x-3 rtl:space-x-reverse {{ $isOptionDisabled($optionValue, $optionLabel) ? 'opacity-70' : null}} "
+                        @if ($isSearchable())
+                            x-show="
+                                $el.querySelector('.filament-forms-checkbox-list-component-option-label-text')
+                                    .innerText.toLowerCase()
+                                    .includes(search.toLowerCase())
+                            "
+                        @endif
                     >
                         <x-filament::input.checkbox
                             :valid="! $errors->has($statePath)"

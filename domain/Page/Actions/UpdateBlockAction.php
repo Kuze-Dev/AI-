@@ -47,8 +47,8 @@ class UpdateBlockAction
         }
 
         // if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
-            $block->sites()
-                ->sync($blockData->sites);
+        $block->sites()
+            ->sync($blockData->sites);
         // }
 
         return $block;

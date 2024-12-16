@@ -662,7 +662,7 @@ it('can edit page with media uploaded inside repeater', function () {
         ->assertHasNoFormErrors()
         ->assertOk()
         ->instance()
-    ->record;
+        ->record;
 
     assertDatabaseHas(Page::class, [
         'name' => 'Test',

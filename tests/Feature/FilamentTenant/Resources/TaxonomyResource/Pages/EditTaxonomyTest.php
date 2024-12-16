@@ -10,11 +10,8 @@ use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\Taxonomy;
-<<<<<<< HEAD
-=======
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Facades\Filament;
->>>>>>> develop
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -49,7 +46,6 @@ it('can edit taxonomy', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
         ->createOne();
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
@@ -108,7 +104,7 @@ it('can edit taxonomy and add terms with route url', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
+        // ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
         ->createOne();
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])

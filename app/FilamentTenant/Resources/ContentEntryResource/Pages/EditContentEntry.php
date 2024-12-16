@@ -44,11 +44,11 @@ use Livewire\Redirector;
 class EditContentEntry extends EditRecord
 {
     use LogsFormActivity;
-    use HasParentResource;
+    // use HasParentResource;
 
     protected static string $resource = ContentEntryResource::class;
 
-    // public mixed $ownerRecord;
+    public mixed $ownerRecord;
 
     /**
      * Override mount and
@@ -56,49 +56,49 @@ class EditContentEntry extends EditRecord
      *
      * @param  mixed  $record
      */
-    // #[\Override]
-    // public function mount(int|string $record, string $ownerRecord = ''): void
-    // {
-    //     $this->ownerRecord = app(Content::class)
-    //         ->resolveRouteBinding($ownerRecord)
-    //         ?->load('taxonomies.taxonomyTerms');
+    #[\Override]
+    public function mount(int|string $record, string $ownerRecord = ''): void
+    {
+        $this->ownerRecord = app(Content::class)
+            ->resolveRouteBinding($ownerRecord)
+            ?->load('taxonomies.taxonomyTerms');
 
-    //     if ($this->ownerRecord === null) {
-    //         throw (new ModelNotFoundException())->setModel(Content::class, ['']);
-    //     }
+        if ($this->ownerRecord === null) {
+            throw (new ModelNotFoundException())->setModel(Content::class, ['']);
+        }
 
-    //     parent::mount($record);
-    // }
+        parent::mount($record);
+    }
 
-    // /** @param  string  $key */
-    // #[\Override]
-    // protected function resolveRecord($key): Model
-    // {
-    //     $record = $this->ownerRecord->resolveChildRouteBinding('contentEntries', $key, null);
+    /** @param  string  $key */
+    #[\Override]
+    protected function resolveRecord($key): Model
+    {
+        $record = $this->ownerRecord->resolveChildRouteBinding('contentEntries', $key, null);
 
-    //     if ($record === null) {
-    //         throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
-    //     }
+        if ($record === null) {
+            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+        }
 
-    //     return $record;
-    // }
+        return $record;
+    }
 
     protected function getRedirectUrl(): string
     {
-        return $this->previousUrl ?? static::getParentResource()::getUrl('lessons.index', [
-            'parent' => $this->parent,
+        return $this->previousUrl ?? static::getParentResource()::getUrl('content.index', [
+            'content' => $this->ownerRecord,
         ]);
     }
+  
+    // protected function configureDeleteAction(Actions\DeleteAction $action): void
+    // {
+    //     $resource = static::getResource();
  
-    protected function configureDeleteAction(Actions\DeleteAction $action): void
-    {
-        $resource = static::getResource();
- 
-        $action->authorize($resource::canDelete($this->getRecord()))
-            ->successRedirectUrl(static::getParentResource()::getUrl('lessons.index', [
-                'parent' => $this->parent,
-            ]));
-    }
+    //     $action->authorize($resource::canDelete($this->getRecord()))
+    //         ->successRedirectUrl(static::getParentResource()::getUrl('content.index', [
+    //             'parent' => $this->parent,
+    //         ]));
+    // }
 
     #[\Override]
     protected function getHeaderActions(): array
@@ -315,17 +315,17 @@ class EditContentEntry extends EditRecord
         return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }
 
-    // #[\Override]
-    // protected function configureDeleteAction(DeleteAction $action): void
-    // {
-    //     $resource = static::getResource();
+    #[\Override]
+    protected function configureDeleteAction(DeleteAction $action): void
+    {
+        $resource = static::getResource();
 
-    //     $action
-    //         ->authorize($resource::canDelete($this->getRecord()))
-    //         ->record($this->getRecord())
-    //         ->recordTitle($this->getRecord()->getAttribute($this->getResource()::getRecordTitleAttribute()))
-    //         ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
-    // }
+        $action
+            ->authorize($resource::canDelete($this->getRecord()))
+            ->record($this->getRecord())
+            ->recordTitle($this->getRecord()->getAttribute($this->getResource()::getRecordTitleAttribute()))
+            ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
+    }
 
     #[\Override]
     public function getBreadcrumbs(): array
