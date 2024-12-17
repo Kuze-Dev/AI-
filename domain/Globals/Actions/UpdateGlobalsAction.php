@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Actions;
 
-<<<<<<< HEAD
+
 use App\Features\CMS\SitesManagement;
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
 use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Facades\Auth;
-=======
 use Domain\Blueprint\Actions\UpdateBlueprintDataAction;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
-use Domain\Globals\DataTransferObjects\GlobalsData;
-use Domain\Globals\Models\Globals;
 use Domain\Internationalization\Actions\HandleUpdateDataTranslation;
->>>>>>> develop
+
 
 class UpdateGlobalsAction
 {
@@ -51,17 +48,12 @@ class UpdateGlobalsAction
             'data' => $sanitizeData,
         ]);
 
-<<<<<<< HEAD
-        if (TenantFeatureSupport::active(SitesManagement::class) &&
-            Auth::user()?->hasRole(config('domain.role.super_admin'))
-=======
         /** @var Globals */
         $model = Globals::with('blueprint')->where('id', $globals->id)->first();
 
         $this->updateBlueprintDataAction->execute($model);
 
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
->>>>>>> develop
         ) {
 
             $globals->sites()
@@ -77,5 +69,6 @@ class UpdateGlobalsAction
         }
 
         return $globals;
+
     }
 }

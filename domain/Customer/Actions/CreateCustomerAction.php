@@ -25,11 +25,7 @@ class CreateCustomerAction
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
         private readonly CreateAddressAction $createAddress,
-<<<<<<< HEAD
-=======
-        private readonly GenerateCustomerIDAction $generateCustomerID,
-        protected CreateBlueprintDataAction $createBlueprintDataAction
->>>>>>> develop
+        protected CreateBlueprintDataAction $createBlueprintDataAction,
     ) {
     }
 
