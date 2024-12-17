@@ -112,8 +112,8 @@ class ContentEntryResource extends Resource
                                         return false;
                                     }
                                   
-                                    if($livewire->record->draftable_id &&
-                                        $livewire->record->title == $livewire->record->parentPage->title){
+                                    if($livewire->record?->draftable_id &&
+                                        $livewire->record?->title == $livewire->record?->parentPage->title){
                                         return false;
                                     }   
                                     return $rule->where('content_id', $livewire->ownerRecord->id);
