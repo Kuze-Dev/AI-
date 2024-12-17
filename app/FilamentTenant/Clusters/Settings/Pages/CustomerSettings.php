@@ -94,7 +94,7 @@ class CustomerSettings extends TenantBaseSettings
                     Forms\Components\Section::make('Available Values')
                         ->schema([
                             SchemaInterpolations::make('data')
-                                ->schemaData(fn (Closure $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
+                                ->schemaData(fn (Forms\Get $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
                             Divider::make(''),
                             Forms\Components\Placeholder::make('extra value')
                                 ->content(fn () => '$customer will be available as array'),
@@ -134,7 +134,7 @@ class CustomerSettings extends TenantBaseSettings
                                 ->columnSpanFull(),
                             MarkdownEditor::make('template')
                                 ->required()
-                                ->default(function (Closure $get) {
+                                ->default(function (Forms\Get $get) {
 
                                     $blueprint = Blueprint::whereId($get('../../blueprint_id'))->first();
 

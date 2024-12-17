@@ -319,7 +319,7 @@ class EditPage extends EditRecord
             //                     return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
             //                 })
             //                 ->reactive()
-            //                 ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+            //                 ->afterStateUpdated(function (Set $set, $state, $livewire) {
 
             //                     /** @var Site */
             //                     $site = Site::find($state);
@@ -542,10 +542,10 @@ class EditPage extends EditRecord
     }
 
     // protected function mutateFormDataBeforeFill(array $data): array
-    // {   
+    // {
     //     dd($this->getRecord());
     //     dd($data);
-    
+
     //     return $data;
     // }
 }

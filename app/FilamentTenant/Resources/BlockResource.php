@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources;
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Page\Actions\DeleteBlockAction;
 use Domain\Page\Models\Block;
@@ -69,29 +70,29 @@ class BlockResource extends Resource
                         return [];
                     })
                     ->getUploadedFileUsing( function ($file) {
-                        
+
                         if (! is_null($file)) {
                             $mediaModel = Media::where('uuid', $file)
                                 ->orWhere('file_name', $file)
                                 ->first();
                             if ($mediaModel) {
-            
+
                                 return [
                                     'name' => $mediaModel->getAttributeValue('name') ?? $mediaModel->getAttributeValue('file_name'),
                                     'size' => $mediaModel->getAttributeValue('size'),
                                     'type' => $mediaModel->getAttributeValue('mime_type'),
                                     'url' => $mediaModel->getUrl(),
                                 ];
-            
+
                             $storage = Storage::disk(config('filament.default_filesystem_disk'));
-            
+
                             if ($storage->exists($file)) {
                                 return $storage->url($file);
                             }
-            
+
                         }
                     }
-            
+
                         return [];
                     })
                     ->image(),
@@ -197,7 +198,7 @@ class BlockResource extends Resource
         //                 ->image(),
         //             Forms\Components\Toggle::make('is_fixed_content')
         //                 ->inline(false)
-        //                 ->hidden(fn (Closure $get) => $get('blueprint_id') ? false : true)
+        //                 ->hidden(fn (Forms\Get $get) => $get('blueprint_id') ? false : true)
         //                 ->helperText('If enabled, the content below will serve as the default for all related pages')
         //                 ->reactive(),
         //         ])
@@ -207,7 +208,7 @@ class BlockResource extends Resource
         //             \App\FilamentTenant\Support\CheckBoxList::make('sites')
         //                 ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
         //                 ->rules([
-        //                     function (?Block $record, Closure $get) {
+        //                     function (?Block $record, Forms\Get $get) {
 
         //                         return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -264,8 +265,8 @@ class BlockResource extends Resource
         //             ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
         //         SchemaFormBuilder::make('data')
         //             ->id('schema-form')
-        //             ->hidden(fn (Closure $get) => $get('is_fixed_content') ? false : true)
-        //             ->schemaData(fn (Closure $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
+        //             ->hidden(fn (Forms\Get $get) => $get('is_fixed_content') ? false : true)
+        //             ->schemaData(fn (Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
         //     ]);
     }
 

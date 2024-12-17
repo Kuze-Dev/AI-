@@ -166,7 +166,7 @@ class MenuResource extends Resource
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        function (?Menu $record, Closure $get) {
+                        function (?Menu $record, Forms\Get $get) {
 
                             return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
