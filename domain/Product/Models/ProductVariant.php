@@ -7,6 +7,7 @@ namespace Domain\Product\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Image\Enums\Fit;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -110,7 +111,7 @@ class ProductVariant extends Model implements HasMedia
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')
-                    ->fit(Manipulations::FIT_CROP, 300, 300);
+                    ->fit(Fit::Crop, 300, 300);
             });
 
         $this->addMediaCollection('video')

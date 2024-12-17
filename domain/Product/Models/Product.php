@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Image\Enums\Fit;
 use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -314,7 +315,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')
-                    ->fit(Manipulations::FIT_CROP, 300, 300);
+                    ->fit(Fit::Crop, 300, 300);
             });
 
         $this->addMediaCollection('video')
