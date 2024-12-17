@@ -29,7 +29,7 @@ it('can globally search', function () {
         ->first();
 
     expect($result->url)->toEqual(
-        route('filament-tenant.resources.contents.entries.edit', [
+        route('filament.tenant.resources.contents.entries.edit', [
             'ownerRecord' => $contentEntry->content,
             'record' => $contentEntry,
         ])
