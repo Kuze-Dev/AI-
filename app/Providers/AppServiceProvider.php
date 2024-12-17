@@ -61,6 +61,7 @@ use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -200,6 +201,8 @@ class AppServiceProvider extends ServiceProvider
         Feature::discover('App\\Features\\Shopconfiguration', app_path('Features/Shopconfiguration'));
         Feature::discover('App\\Features\\Shopconfiguration\PaymentGateway', app_path('Features/Shopconfiguration/PaymentGateway'));
         Feature::discover('App\\Features\\Shopconfiguration\Shipping', app_path('Features/Shopconfiguration/Shipping'));
+
+        ThrottleRequests::shouldHashKeys(false);
 
         RateLimiter::for('api', function (Request $request) {
             if (
