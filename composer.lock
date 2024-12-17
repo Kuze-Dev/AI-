@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe0c65ff46dd8b133fbbed83bd46c1b0",
+    "content-hash": "ade11ca3d8af7041cb950769f3250acc",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -17577,6 +17577,55 @@
             "time": "2024-03-03T12:36:25+00:00"
         },
         {
+            "name": "ticketswap/phpstan-error-formatter",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TicketSwap/phpstan-error-formatter.git",
+                "reference": "1a1f996ad53dc65c9276fd9d0be10b9a21ebf684"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TicketSwap/phpstan-error-formatter/zipball/1a1f996ad53dc65c9276fd9d0be10b9a21ebf684",
+                "reference": "1a1f996ad53dc65c9276fd9d0be10b9a21ebf684",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0",
+                "phpstan/phpstan": "^1.12.4|^2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.6"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "TicketSwap\\PHPStanErrorFormatter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A minimalistic error formatter for PHPStan",
+            "keywords": [
+                "PHPStan",
+                "dev"
+            ],
+            "support": {
+                "issues": "https://github.com/TicketSwap/phpstan-error-formatter/issues",
+                "source": "https://github.com/TicketSwap/phpstan-error-formatter/tree/1.1.4"
+            },
+            "time": "2024-11-11T07:38:37+00:00"
+        },
+        {
             "name": "worksome/request-factories",
             "version": "v3.3.0",
             "source": {
@@ -17858,8 +17907,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {},
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "timacdonald/json-api": 10
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
