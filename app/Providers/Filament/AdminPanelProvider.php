@@ -74,8 +74,8 @@ class AdminPanelProvider extends PanelProvider
             ->plugin(FilamentSpatieLaravelHealthPlugin::make())
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
-//            ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
-            ->spa()
+            ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
+            // ->spa()
             ->maxContentWidth(MaxWidth::Full)
             ->databaseTransactions()
             ->middleware([
