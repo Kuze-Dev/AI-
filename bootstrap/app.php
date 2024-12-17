@@ -26,12 +26,18 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 return Application::configure(basePath: dirname(__DIR__))
+    ->withEvents([
+        // __DIR__.'/../app/Listeners',
+        __DIR__.'/../domain/Order/Listeners',
+        __DIR__.'/../domain/ServiceOrder/Listeners',
+        __DIR__.'/../domain/Cart/Listeners',
+    ])
     ->withRouting(
         commands: __DIR__.'/../routes/console.php',
         then: function () {
             Route::middleware('web')
                 ->group(function () {
-                    Route::redirect('/', 'admin');
+                    Route::redirect('/', '/admin');
                 });
         }
     )
@@ -43,6 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'feature.tenant' => EnsureTenantFeaturesAreActive::class,
                 'tenant.suspended' => EnsureTenantIsNotSuspended::class,
             ])
+            ->throttleApi()
             ->group( 'universal', [])
             ->group( 'tenant', [
                 InitializeTenancyByDomain::class,

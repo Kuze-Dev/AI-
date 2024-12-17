@@ -56,9 +56,13 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\Models\TenantApiCall;
 use Domain\Tenant\TenantSupport;
 use Domain\Tier\Models\Tier;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -197,5 +201,18 @@ class AppServiceProvider extends ServiceProvider
         Feature::discover('App\\Features\\Shopconfiguration', app_path('Features/Shopconfiguration'));
         Feature::discover('App\\Features\\Shopconfiguration\PaymentGateway', app_path('Features/Shopconfiguration/PaymentGateway'));
         Feature::discover('App\\Features\\Shopconfiguration\Shipping', app_path('Features/Shopconfiguration/Shipping'));
+
+        ThrottleRequests::shouldHashKeys(false);
+
+        RateLimiter::for('api', function (Request $request) {
+            if (
+                $request->hasHeader('x-rate-key') &&
+                $request->header('x-rate-key') === config('custom.rate_limit_key')
+            ) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
     }
 }

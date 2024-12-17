@@ -50,7 +50,7 @@ class AddressesRelationManager extends RelationManager
                     ->preload()
                     ->optionsFromModel(Country::class, 'name', fn (Builder $query) => $query->where('active', true))
                     ->reactive()
-                    ->afterStateUpdated(function (callable $set) {
+                    ->afterStateUpdated(function (Forms\Set $set) {
                         $set('state_id', null);
                     })
                     ->dehydrated(false),
@@ -61,7 +61,7 @@ class AddressesRelationManager extends RelationManager
                     ->optionsFromModel(
                         State::class,
                         'name',
-                        fn (Builder $query, callable $get) => $query->where('country_id', $get('country_id'))
+                        fn (Builder $query, Forms\Get $get) => $query->where('country_id', $get('country_id'))
                     )
                     ->reactive(),
                 Forms\Components\TextInput::make('zip_code')

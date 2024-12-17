@@ -90,7 +90,7 @@ class GlobalsResource extends Resource
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        function (?Globals $record, Closure $get) {
+                        function (?Globals $record, Forms\Get $get) {
 
                             return function (string $attribute, $value, Closure $fail) use ($record, $get) {
 

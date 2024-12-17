@@ -41,6 +41,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
 use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -200,7 +201,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $fileUpload->reactive();
-            $fileUpload->hidden(function (Closure $get) use ($enum, $option) {
+            $fileUpload->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -322,7 +323,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $textarea->reactive();
-            $textarea->hidden(function (Closure $get) use ($enum, $option) {
+            $textarea->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -361,7 +362,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $textInput->reactive();
-            $textInput->hidden(function (Closure $get) use ($enum, $option) {
+            $textInput->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -458,7 +459,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $richEditor->reactive();
-            $richEditor->hidden(function (Closure $get) use ($enum, $option) {
+            $richEditor->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -523,7 +524,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $tinyEditor->reactive();
-            $tinyEditor->hidden(function (Closure $get) use ($enum, $option) {
+            $tinyEditor->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -553,7 +554,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $tiptapEditor->reactive();
-            $tiptapEditor->hidden(function (Closure $get) use ($enum, $option) {
+            $tiptapEditor->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -577,7 +578,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $checkboxlist->reactive();
-            $checkboxlist->hidden(function (Closure $get) use ($enum, $option) {
+            $checkboxlist->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -602,7 +603,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $select->reactive();
-            $select->hidden(function (Closure $get) use ($enum, $option) {
+            $select->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -629,7 +630,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $radio->reactive();
-            $radio->hidden(function (Closure $get) use ($enum, $option) {
+            $radio->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }

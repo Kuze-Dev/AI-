@@ -99,7 +99,7 @@ class ShippingMethodResource extends Resource
                                 ->preload()
                                 ->searchable()
                                 ->reactive()
-                                ->afterStateUpdated(function (callable $set) {
+                                ->afterStateUpdated(function (Forms\Set $set) {
                                     $set('shipper_state_id', null);
                                 }),
                             Forms\Components\Select::make('shipper_state_id')

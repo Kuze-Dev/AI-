@@ -90,7 +90,7 @@ parameters:
         - domain
         - support
 
-    # The level 9 is the highest level
+    # The level 10 is the highest level
     level: 8
 
     ignoreErrors:
@@ -105,5 +105,10 @@ parameters:
 
     checkOctaneCompatibility: true
     checkModelProperties: true
-    checkMissingIterableValueType: false
+
+    parallel:
+            maximumNumberOfProcesses: 6
+
+    errorFormat: ticketswap
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
 
