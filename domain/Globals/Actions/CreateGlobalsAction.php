@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Globals\Actions;
 
-<<<<<<< HEAD
 use App\Features\CMS\SitesManagement;
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
 use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Facades\Auth;
-=======
 use Domain\Blueprint\Actions\CreateBlueprintDataAction;
-use Domain\Globals\DataTransferObjects\GlobalsData;
-use Domain\Globals\Models\Globals;
->>>>>>> develop
+
 
 class CreateGlobalsAction
 {
@@ -34,15 +30,14 @@ class CreateGlobalsAction
             'data' => $globalData->data,
         ]);
 
-<<<<<<< HEAD
+
         if (TenantFeatureSupport::active(SitesManagement::class) &&
             Auth::user()?->hasRole(config('domain.role.super_admin'))
         ) {
-=======
+
         $this->createBlueprintDataAction->execute($globals);
 
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
->>>>>>> develop
 
             $globals->sites()
                 ->attach($globalData->sites);
