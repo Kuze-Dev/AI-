@@ -51,6 +51,7 @@ class FormResource extends Resource
     // }
 
     /** @param  FormModel  $record */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
 
@@ -60,6 +61,7 @@ class FormResource extends Resource
         ]);
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form

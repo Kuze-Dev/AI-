@@ -53,17 +53,20 @@ class TwoFactorAuthentication extends Model
 {
     use ConstraintsRelationships;
 
-    protected $casts = [
-        'secret' => 'encrypted',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'secret' => 'encrypted',
+        ];
+    }
 
-    /** @return HasMany<RecoveryCode> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Auth\Model\RecoveryCode, $this> */
     public function recoveryCodes(): HasMany
     {
         return $this->hasMany(RecoveryCode::class);
     }
 
-    /** @return HasMany<SafeDevice> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Auth\Model\SafeDevice, $this> */
     public function safeDevices(): HasMany
     {
         return $this->hasMany(SafeDevice::class);

@@ -62,11 +62,13 @@ class ProductVariant extends Model implements HasMedia
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [
-        'combination' => 'array',
-        'status' => 'boolean',
-    ];
-
+    protected function casts(): array
+    {
+        return [
+            'combination' => 'array',
+            'status' => 'boolean',
+        ];
+    }
     /**
      * Get the stringify combination (array)
      *
@@ -94,7 +96,7 @@ class ProductVariant extends Model implements HasMedia
      * Declare relationship of
      * current model to product.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Product\Models\ProductVariant>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, $this>
      */
     public function product(): BelongsTo
     {

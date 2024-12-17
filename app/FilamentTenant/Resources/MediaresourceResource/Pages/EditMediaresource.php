@@ -27,6 +27,7 @@ class EditMediaresource extends EditRecord
         ];
     }
 
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media */
@@ -35,6 +36,7 @@ class EditMediaresource extends EditRecord
         return app(SyncMediaCollectionAction::class)->updateMedia($media, $data['custom_properties']);
     }
 
+    #[\Override]
     protected function getFormActions(): array
     {
         return $this->getCachedActions();

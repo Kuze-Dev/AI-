@@ -100,19 +100,22 @@ class OrderLine extends Model implements HasMedia
         'reviewed_at',
     ];
 
-    protected $casts = [
-        'unit_price' => 'float',
-        'quantity' => 'integer',
-        'tax_total' => 'float',
-        'tax_display' => PriceDisplay::class,
-        'tax_percentage' => 'float',
-        'sub_total' => 'float',
-        'discount_total' => 'float',
-        'total' => 'float',
-        'remarks_data' => 'array',
-        'purchasable_data' => 'array',
-        'reviewed_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'unit_price' => 'float',
+            'quantity' => 'integer',
+            'tax_total' => 'float',
+            'tax_display' => PriceDisplay::class,
+            'tax_percentage' => 'float',
+            'sub_total' => 'float',
+            'discount_total' => 'float',
+            'total' => 'float',
+            'remarks_data' => 'array',
+            'purchasable_data' => 'array',
+            'reviewed_at' => 'datetime',
+        ];
+    }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderLine> */
     public function order()

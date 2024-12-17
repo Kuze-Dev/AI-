@@ -60,13 +60,13 @@ class BlockContent extends Model implements Sortable
         return $this->belongsTo(Block::class)->with(['blueprint']);
     }
 
-    /** @return BelongsTo<Page, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Page\Models\Page, $this> */
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class);
     }
 
-    /** @return MorphMany<BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Blueprint\Models\BlueprintData, $this> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class, 'model');

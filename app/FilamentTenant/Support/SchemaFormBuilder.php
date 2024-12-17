@@ -428,7 +428,7 @@ class SchemaFormBuilder extends Component
                     if (! $storage->exists($file)) {
                         return null;
                     }
-                } catch (UnableToCheckFileExistence $exception) {
+                } catch (UnableToCheckFileExistence) {
                     return null;
                 }
 
@@ -441,7 +441,7 @@ class SchemaFormBuilder extends Component
                                 $file,
                                 now()->addMinutes(5),
                             );
-                        } catch (\Throwable $exception) {
+                        } catch (\Throwable) {
                             // This driver does not support creating temporary URLs.
                         }
                     }
@@ -485,7 +485,7 @@ class SchemaFormBuilder extends Component
                     if (! $storage->exists($file)) {
                         return null;
                     }
-                } catch (UnableToCheckFileExistence $exception) {
+                } catch (UnableToCheckFileExistence) {
                     return null;
                 }
 
@@ -498,7 +498,7 @@ class SchemaFormBuilder extends Component
                                 $file,
                                 now()->addMinutes(5),
                             );
-                        } catch (\Throwable $exception) {
+                        } catch (\Throwable) {
                             // This driver does not support creating temporary URLs.
                         }
                     }

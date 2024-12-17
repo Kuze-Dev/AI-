@@ -48,7 +48,7 @@ class ExtractDataAction
             'type' => $firstField['type'],
             'statepath' => $parentStatepath,
             'value' => $values,
-            'translatable' => isset($firstField['translatable']) ? $firstField['translatable'] : true,
+            'translatable' => $firstField['translatable'] ?? true,
         ];
         $statepath = $mergedFields['statepath'];
         if ($firstField['type'] == FieldType::REPEATER) {

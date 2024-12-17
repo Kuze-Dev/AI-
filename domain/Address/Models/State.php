@@ -38,7 +38,7 @@ class State extends Model
         'code',
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, State>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\Country, $this>*/
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);

@@ -9,7 +9,7 @@ use Support\RouteUrl\Models\RouteUrl;
 
 trait HasRouteUrl
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl, $this> */
     public function routeUrls(): MorphOne
     {
         return $this->morphOne(RouteUrl::class, 'model');

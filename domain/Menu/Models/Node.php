@@ -81,12 +81,15 @@ class Node extends Model implements HasInternationalizationInterface, Sortable
         'model',
     ];
 
-    protected $casts = [
-        'target' => Target::class,
-        'type' => NodeType::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'target' => Target::class,
+            'type' => NodeType::class,
+        ];
+    }
 
-    /** @return BelongsTo<Menu, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Menu\Models\Menu, $this> */
     public function menu(): BelongsTo
     {
         return $this->belongsTo(Menu::class);
@@ -110,13 +113,13 @@ class Node extends Model implements HasInternationalizationInterface, Sortable
         return static::query()->whereMenuId($this->menu_id)->whereParentId($this->parent_id);
     }
 
-    /** @return HasMany<Node> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Menu\Models\Node, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<Node, Node> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Menu\Models\Node, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

@@ -49,7 +49,7 @@ class RadioFieldData extends FieldData
             options: $data['options'] ?? [],
             descriptions: $data['descriptions'] ?? [],
             inline: $data['inline'] ?? false,
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             helper_text: $data['helper_text'] ?? null,
         );
     }

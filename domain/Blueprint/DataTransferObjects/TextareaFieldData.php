@@ -37,7 +37,7 @@ class TextareaFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
             hidden_option: $data['hidden_option'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             min_length: $data['min_length'] ?? null,
             max_length: $data['max_length'] ?? null,
             rows: $data['rows'] ?? null,

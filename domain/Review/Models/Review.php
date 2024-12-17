@@ -74,10 +74,13 @@ class Review extends Model implements HasMedia
         'product_id',
     ];
 
-    protected $casts = [
-        'data' => 'array',
-        'is_anonymous' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+            'is_anonymous' => 'bool',
+        ];
+    }
 
     #[\Override]
     public function registerMediaCollections(): void

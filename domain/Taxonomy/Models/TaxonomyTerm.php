@@ -85,16 +85,19 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
         'order',
     ];
 
-    protected $casts = ['data' => 'array'];
-
     protected $appends = ['url'];
+
+    protected function casts(): array
+    {
+        return ['data' => 'array'];
+    }
 
     public function getUrlAttribute(): ?string
     {
         return $this->activeRouteUrl?->url ?: null;
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Taxonomy\Models\TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, $this> */
     public function taxonomy(): BelongsTo
     {
         return $this->belongsTo(Taxonomy::class);
@@ -110,7 +113,7 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
      * Declare relationship of
      * current model to content entries.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Content\Models\ContentEntry>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Content\Models\ContentEntry, $this>
      */
     public function contentEntries(): BelongsToMany
     {
@@ -121,25 +124,26 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
      * Declare relationship of
      * current model to products.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product, $this>
      */
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class);
     }
 
-    /** @return BelongsToMany<\Domain\Service\Models\Service> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Service\Models\Service, $this> */
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'service_taxonomy_terms');
     }
 
-    /** @return MorphMany<BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Blueprint\Models\BlueprintData, $this> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class, 'model');
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -168,13 +172,13 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
         return $taxonomy->taxonomy->activeRouteUrl?->url.'/'.Str::of($attributes['name'])->slug()->toString();
     }
 
-    /** @return HasMany<TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<TaxonomyTerm, TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

@@ -44,7 +44,7 @@ class RelatedResourceFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             type: $data['type'],
             rules: $data['rules'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             resource: $data['resource'],
             multiple: $data['multiple'] ?? false,
             relation_scopes: $data['relation_scopes'] ?? [],

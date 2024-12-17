@@ -45,7 +45,7 @@ class MarkdownFieldData extends FieldData
             title: $data['title'],
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             buttons: $data['buttons'] ?? [],
             helper_text: $data['helper_text'] ?? null,
         );

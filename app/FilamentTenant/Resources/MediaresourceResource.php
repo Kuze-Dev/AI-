@@ -42,11 +42,13 @@ class MediaresourceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -62,6 +64,7 @@ class MediaresourceResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -190,6 +193,7 @@ class MediaresourceResource extends Resource
 
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -197,6 +201,7 @@ class MediaresourceResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

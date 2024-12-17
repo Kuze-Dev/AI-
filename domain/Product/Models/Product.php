@@ -127,21 +127,24 @@ class Product extends Model implements HasMedia, HasMetaDataContract
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [
-        'dimension' => 'array',
-        'status' => 'boolean',
-        'is_digital_product' => 'boolean',
-        'is_featured' => 'boolean',
-        'is_special_offer' => 'boolean',
-        'allow_customer_remarks' => 'boolean',
-        'allow_stocks' => 'boolean',
-        'allow_guest_purchase' => 'boolean',
-        'retail_price' => 'float',
-        'selling_price' => 'float',
-        'weight' => 'float',
-        'minimum_order_quantity' => 'int',
-        'stock' => 'int',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'dimension' => 'array',
+            'status' => 'boolean',
+            'is_digital_product' => 'boolean',
+            'is_featured' => 'boolean',
+            'is_special_offer' => 'boolean',
+            'allow_customer_remarks' => 'boolean',
+            'allow_stocks' => 'boolean',
+            'allow_guest_purchase' => 'boolean',
+            'retail_price' => 'float',
+            'selling_price' => 'float',
+            'weight' => 'float',
+            'minimum_order_quantity' => 'int',
+            'stock' => 'int',
+        ];
+    }
 
     /**
      * Define default reference
@@ -180,7 +183,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
      * Declare relationship of
      * current model to taxonomy terms.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
      */
     public function taxonomyTerms(): BelongsToMany
     {
@@ -217,7 +220,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
      * Declare relationship of
      * current model to tiers.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier, $this>
      */
     public function tiers(): BelongsToMany
     {
@@ -235,13 +238,13 @@ class Product extends Model implements HasMedia, HasMetaDataContract
             ->withPivot(['id', 'tier_id', 'discount', 'discount_amount_type']);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductVariant> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductVariant, $this> */
     public function productVariants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOption> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOption, $this> */
     public function productOptions(): HasMany
     {
         return $this->hasMany(ProductOption::class);
@@ -250,20 +253,20 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     /**
      * Get all of the option values of product option.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Domain\Product\Models\ProductOptionValue>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Domain\Product\Models\ProductOptionValue, \Domain\Product\Models\ProductOption, $this>
      */
     public function productOptionValues(): HasManyThrough
     {
         return $this->hasManyThrough(ProductOptionValue::class, ProductOption::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite, $this> */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\Review> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\Review, $this> */
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

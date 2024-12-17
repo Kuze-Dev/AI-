@@ -51,18 +51,21 @@ class PointEarning extends Model
         'earned_points',
     ];
 
-    protected $casts = [
-        'earned_points' => 'float',
-        'date_earned' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'earned_points' => 'float',
+            'date_earned' => 'datetime',
+        ];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Customer\Models\Customer, \Domain\RewardPoint\Models\PointEarning>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Customer\Models\Customer, $this>*/
     public function customer(): MorphTo
     {
         return $this->morphTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Order\Models\Order, \Domain\RewardPoint\Models\PointEarning>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Order\Models\Order, $this>*/
     public function order(): MorphTo
     {
         return $this->morphTo(Order::class);

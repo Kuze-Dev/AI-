@@ -62,9 +62,12 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             ->dontSubmitEmptyLogs();
     }
 
-    protected $casts = [
-        'is_suspended' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_suspended' => 'boolean',
+        ];
+    }
 
     #[\Override]
     public static function getCustomColumns(): array

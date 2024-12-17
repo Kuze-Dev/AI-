@@ -32,10 +32,14 @@ class RecoveryCode extends Model
 {
     protected $fillable = ['code'];
 
-    protected $casts = [
-        'code' => 'encrypted',
-        'used_at' => 'timestamp',
-    ];
+
+    protected function casts(): array
+    {
+        return [
+            'code' => 'encrypted',
+            'used_at' => 'timestamp',
+        ];
+    }
 
     public function isUsed(): bool
     {

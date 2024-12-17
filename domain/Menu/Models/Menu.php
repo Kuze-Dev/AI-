@@ -74,7 +74,7 @@ class Menu extends Model implements HasInternationalizationInterface
         return $this->nodes()->whereNull('parent_id')->ordered();
     }
 
-    /** @return HasMany<Node> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Menu\Models\Node, $this> */
     public function nodes(): HasMany
     {
         return $this->hasMany(Node::class);
@@ -86,13 +86,13 @@ class Menu extends Model implements HasInternationalizationInterface
         return 'slug';
     }
 
-    /** @return HasMany<Menu> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Menu\Models\Menu, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<Menu, Menu> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Menu\Models\Menu, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

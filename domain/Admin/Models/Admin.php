@@ -112,14 +112,17 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         'remember_token',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-        'email_verified_at' => 'datetime',
-        'password_changed_at' => 'datetime',
-        'active' => 'boolean',
-        'last_login_at' => 'datetime',
-        'to_be_logged_out' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'email_verified_at' => 'datetime',
+            'password_changed_at' => 'datetime',
+            'active' => 'boolean',
+            'last_login_at' => 'datetime',
+            'to_be_logged_out' => 'boolean',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -151,7 +154,7 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         );
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site, $this> */
     public function userSite(): BelongsToMany
     {
         return $this->belongsToMany(Site::class);

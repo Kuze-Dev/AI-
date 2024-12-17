@@ -57,9 +57,12 @@ class ProductOption extends Model
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [
-        'is_custom' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_custom' => 'boolean',
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName(): string
@@ -76,7 +79,7 @@ class ProductOption extends Model
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOptionValue> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOptionValue, $this> */
     public function productOptionValues(): HasMany
     {
         return $this->hasMany(ProductOptionValue::class);
@@ -86,7 +89,7 @@ class ProductOption extends Model
      * Declare relationship of
      * current model to product.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Product\Models\ProductOption>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, $this>
      */
     public function product(): BelongsTo
     {

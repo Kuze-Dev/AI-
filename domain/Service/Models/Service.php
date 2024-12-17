@@ -118,20 +118,23 @@ class Service extends Model implements HasMedia, HasMetaDataContract
         //        'is_installment',
     ];
 
-    protected $casts = [
-        'billing_cycle' => BillingCycleEnum::class,
-        'is_featured' => 'bool',
-        'is_special_offer' => 'bool',
-        'pay_upfront' => 'bool',
-        'is_subscription' => 'bool',
-        'status' => 'bool',
-        'needs_approval' => 'bool',
-        'is_auto_generated_bill' => 'bool',
-        'is_partial_payment' => 'bool',
-        'is_installment' => 'bool',
-        'retail_price' => 'float',
-        'selling_price' => 'float',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'billing_cycle' => BillingCycleEnum::class,
+            'is_featured' => 'bool',
+            'is_special_offer' => 'bool',
+            'pay_upfront' => 'bool',
+            'is_subscription' => 'bool',
+            'status' => 'bool',
+            'needs_approval' => 'bool',
+            'is_auto_generated_bill' => 'bool',
+            'is_partial_payment' => 'bool',
+            'is_installment' => 'bool',
+            'retail_price' => 'float',
+            'selling_price' => 'float',
+        ];
+    }
 
     #[\Override]
     public function uniqueIds(): array
@@ -141,14 +144,13 @@ class Service extends Model implements HasMedia, HasMetaDataContract
     //    protected $with = [
     //        'taxonomyTerms',
     //    ];
-
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class, 'service_taxonomy_terms');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Service\Models\Service> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);

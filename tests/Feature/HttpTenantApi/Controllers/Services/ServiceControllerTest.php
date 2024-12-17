@@ -124,6 +124,5 @@ it("can't show an inactive service", function () {
         ->isActive(false)
         ->createOne();
 
-    getJson("api/services/{$service->getRouteKey()}")
-        ->assertStatus(404);
+    getJson("api/services/{$service->getRouteKey()}")->assertNotFound();
 });

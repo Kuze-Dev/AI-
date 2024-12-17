@@ -45,12 +45,10 @@ class CreateBlockAction
                 model: $block,
                 mediaCollectionData: MediaCollectionData::fromArray([
                     'collection' => 'image',
-                    'media' => array_map(function ($image) {
-                        return [
-                            'media' => $image,
-                            'custom_properties' => ['alt_text' => null],
-                        ];
-                    }, $images)
+                    'media' => array_map(fn($image) => [
+                        'media' => $image,
+                        'custom_properties' => ['alt_text' => null],
+                    ], $images)
 
                 ])
             );

@@ -71,13 +71,16 @@ class Discount extends Model
         'valid_end_at',
     ];
 
-    protected $casts = [
-        'type' => DiscountConditionType::class,
-        'status' => DiscountStatus::class,
-        'max_uses' => 'int',
-        'valid_start_at' => 'datetime',
-        'valid_end_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'type' => DiscountConditionType::class,
+            'status' => DiscountStatus::class,
+            'max_uses' => 'int',
+            'valid_start_at' => 'datetime',
+            'valid_end_at' => 'datetime',
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName(): string
@@ -94,19 +97,19 @@ class Discount extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Discount\Models\DiscountCondition> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Discount\Models\DiscountCondition, $this> */
     public function discountCondition(): HasOne
     {
         return $this->hasOne(DiscountCondition::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Discount\Models\DiscountRequirement> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Discount\Models\DiscountRequirement, $this> */
     public function discountRequirement(): HasOne
     {
         return $this->hasOne(DiscountRequirement::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit, $this> */
     public function discountLimits(): HasMany
     {
         return $this->hasMany(DiscountLimit::class);

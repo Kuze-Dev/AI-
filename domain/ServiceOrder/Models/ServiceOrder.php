@@ -177,28 +177,31 @@ class ServiceOrder extends Model implements PayableInterface
         'payment_type',
     ];
 
-    protected $casts = [
-        'schema' => 'json',
-        'customer_form' => 'json',
-        'service_price' => MoneyCast::class,
-        'additional_charges' => 'array',
-        'billing_cycle' => BillingCycleEnum::class,
-        'pay_upfront' => 'boolean',
-        'is_subscription' => 'boolean',
-        'needs_approval' => 'boolean',
-        'is_auto_generated_bill' => 'boolean',
-        'is_partial_payment' => 'boolean',
-        'schedule' => 'datetime',
-        'sub_total' => MoneyCast::class,
-        'tax_display' => PriceDisplay::class,
-        'tax_percentage' => 'float',
-        'tax_total' => MoneyCast::class,
-        'total_price' => MoneyCast::class,
-        'status' => ServiceOrderStatus::class,
-        'payment_plan' => 'json',
-        'payment_type' => PaymentPlanType::class,
-        'payment_value' => PaymentPlanValue::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'schema' => 'json',
+            'customer_form' => 'json',
+            'service_price' => MoneyCast::class,
+            'additional_charges' => 'array',
+            'billing_cycle' => BillingCycleEnum::class,
+            'pay_upfront' => 'boolean',
+            'is_subscription' => 'boolean',
+            'needs_approval' => 'boolean',
+            'is_auto_generated_bill' => 'boolean',
+            'is_partial_payment' => 'boolean',
+            'schedule' => 'datetime',
+            'sub_total' => MoneyCast::class,
+            'tax_display' => PriceDisplay::class,
+            'tax_percentage' => 'float',
+            'tax_total' => MoneyCast::class,
+            'total_price' => MoneyCast::class,
+            'status' => ServiceOrderStatus::class,
+            'payment_plan' => 'json',
+            'payment_type' => PaymentPlanType::class,
+            'payment_value' => PaymentPlanValue::class,
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName(): string
@@ -218,31 +221,31 @@ class ServiceOrder extends Model implements PayableInterface
         return new ServiceOrderQueryBuilder($query);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\ServiceOrder\Models\ServiceOrder> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, $this> */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Service\Models\Service, \Domain\ServiceOrder\Models\ServiceOrder> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Service\Models\Service, $this> */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceTransaction>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceTransaction, $this>*/
     public function serviceTransactions(): HasMany
     {
         return $this->hasMany(ServiceTransaction::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, \Domain\ServiceOrder\Models\ServiceOrder> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, $this> */
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrderAddress, $this>*/
     public function serviceOrderAddress(): HasMany
     {
         return $this->hasMany(ServiceOrderAddress::class);
@@ -262,7 +265,7 @@ class ServiceOrder extends Model implements PayableInterface
             ->whereType(ServiceOrderAddressType::BILLING_ADDRESS);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceBill>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceBill, $this>*/
     public function serviceBills(): HasMany
     {
         return $this->hasMany(ServiceBill::class);

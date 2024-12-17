@@ -52,9 +52,12 @@ class ProductOptionValue extends Model implements HasMedia
         'productOption',
     ];
 
-    protected $casts = [
-        'data' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName(): string

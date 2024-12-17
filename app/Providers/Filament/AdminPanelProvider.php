@@ -30,6 +30,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -70,6 +71,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => trans('Access')),
                 NavigationGroup::make()->label(fn () => trans('System')),
             ])
+            ->plugin(FilamentSpatieLaravelHealthPlugin::make())
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
 //            ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())

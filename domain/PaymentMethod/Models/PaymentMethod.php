@@ -71,10 +71,13 @@ class PaymentMethod extends Model implements HasMedia
         'instruction',
     ];
 
-    protected $casts = [
-        'credentials' => 'array',
-        'status' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'credentials' => 'array',
+            'status' => 'bool',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

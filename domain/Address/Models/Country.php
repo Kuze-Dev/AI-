@@ -47,9 +47,12 @@ class Country extends Model
         'active',
     ];
 
-    protected $casts = [
-        'active' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'active' => 'bool',
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName(): string
@@ -62,7 +65,7 @@ class Country extends Model
         return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\State>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\State, $this>*/
     public function states(): HasMany
     {
         return $this->hasMany(State::class);

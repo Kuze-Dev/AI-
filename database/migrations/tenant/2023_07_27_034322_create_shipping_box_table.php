@@ -21,13 +21,13 @@ return new class extends Migration
             $table->string('courier');
             $table->string('dimension_units');
 
-            $table->unsignedFloat('length');
-            $table->unsignedFloat('width');
-            $table->unsignedFloat('height');
-            $table->unsignedFloat('volume');
+            $table->float('length')->unsigned();
+            $table->float('width')->unsigned();
+            $table->float('height')->unsigned();
+            $table->float('volume')->unsigned();
 
             $table->string('weight_units')->nullable();
-            $table->unsignedFloat('max_weight')->default(0);
+            $table->float('max_weight')->unsigned()->default(0);
 
             $table->timestamps();
         });

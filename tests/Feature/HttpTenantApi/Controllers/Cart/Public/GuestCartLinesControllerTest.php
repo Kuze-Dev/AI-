@@ -57,7 +57,7 @@ it('cant add to cart when purchasable cant purchase as a guest', function () {
         'purchasable_id' => $invalidProduct->slug,
         'purchasable_type' => 'Product',
         'quantity' => 1,
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it('can add to cart a purchasable product with variant', function () {

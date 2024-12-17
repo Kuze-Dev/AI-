@@ -89,11 +89,14 @@ class Content extends Model
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [
-        'past_publish_date_behavior' => PublishBehavior::class,
-        'future_publish_date_behavior' => PublishBehavior::class,
-        'is_sortable' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'past_publish_date_behavior' => PublishBehavior::class,
+            'future_publish_date_behavior' => PublishBehavior::class,
+            'is_sortable' => 'boolean',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -107,7 +110,7 @@ class Content extends Model
      * Declare relationship of
      * current model to blueprint.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Content\Models\Content>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this>
      */
     public function blueprint(): BelongsTo
     {
@@ -118,7 +121,7 @@ class Content extends Model
      * Declare relationship of
      * current model to content entries.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Content\Models\ContentEntry>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Content\Models\ContentEntry, $this>
      */
     public function contentEntries(): HasMany
     {
@@ -129,7 +132,7 @@ class Content extends Model
      * Declare relationship of
      * current model to taxonomy.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\Taxonomy>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\Taxonomy, $this>
      */
     public function taxonomies(): BelongsToMany
     {
