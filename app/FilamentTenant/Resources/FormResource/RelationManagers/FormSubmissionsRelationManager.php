@@ -35,9 +35,13 @@ class FormSubmissionsRelationManager extends RelationManager
 
     public static function table(Table $table): Table
     {
+        /** @var \Domain\Admin\Models\Admin */
+        $admin = Auth::user();
+
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id'),
+                Tables\Columns\TextColumn::make('data.main.name'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime(timezone: Auth::user()?->timezone)
                     ->sortable(),
@@ -90,10 +94,7 @@ class FormSubmissionsRelationManager extends RelationManager
 
                             return $headers;
                         },
-                        function (FormSubmission $record) {
-
-                            /** @var \Domain\Admin\Models\Admin */
-                            $user = Auth::user();
+                        function (FormSubmission $record) use ($admin) {
 
                             $statepaths = $record->form->blueprint->schema->getFieldStatePaths();
 
@@ -104,7 +105,7 @@ class FormSubmissionsRelationManager extends RelationManager
                             }
 
                             $data['main.submission_date'] = $record->created_at?->timezone(
-                                $user->timezone
+                                $admin->timezone ?: config('domain.admin.default_timezone')
                             )->format('Y-m-d H:i a');
 
                             return $data;
