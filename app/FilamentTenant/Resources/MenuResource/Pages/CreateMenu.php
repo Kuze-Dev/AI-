@@ -8,7 +8,7 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\MenuResource;
 use Domain\Menu\Actions\CreateMenuAction;
 use Domain\Menu\DataTransferObjects\MenuData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,7 +23,7 @@ class CreateMenu extends CreateRecord
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];

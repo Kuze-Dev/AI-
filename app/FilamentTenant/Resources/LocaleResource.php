@@ -62,7 +62,7 @@ class LocaleResource extends Resource
             Forms\Components\TextInput::make('code')
                 ->unique(ignoreRecord: true)
                 ->dehydrateStateUsing(fn (\Filament\Forms\Get $get, $state) => $state ?: $get('code'))
-                ->disabled()
+                ->readonly()
                 ->required(),
             Forms\Components\Checkbox::make('is_default')
                 ->label('Set Default')

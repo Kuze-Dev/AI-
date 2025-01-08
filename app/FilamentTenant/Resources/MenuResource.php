@@ -87,7 +87,7 @@ class MenuResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(
-                            callback: function ($livewire, Unique $rule, $state, \Filament\Forms\Get $get, $record) {
+                            modifyRuleUsing: function ($livewire, Unique $rule, $state, \Filament\Forms\Get $get, $record) {
                                 if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
                                     return false;
                                 }

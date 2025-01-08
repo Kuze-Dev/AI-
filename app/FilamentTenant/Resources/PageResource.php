@@ -12,6 +12,7 @@ use App\FilamentTenant\Resources\PageResource\RelationManagers\PageTranslationRe
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use Closure;
 use Domain\Internationalization\Models\Locale;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Enums\Visibility;
@@ -237,18 +238,18 @@ class PageResource extends Resource
 
                                     return;
                                 }
-                     
+
                                 $component->state(
                                     $record->blockContents->sortBy('order')
-                                        ->mapWithKeys(function (BlockContent $item) {
-                                            // $test = $item->toArray();
-                                            $test = $item;
-                                            $test->data = (array) $item->data;
-                                            return [
-                                                "record-{$item->getKey()}" 
-                                                // (string) Str::uuid() 
-                                                => $test->toArray()];
-                                        })
+                                    ->mapWithKeys(fn (BlockContent $item) => [
+                                        "record-{$item->getKey()}" => array_merge(
+                                            $item->toArray(),
+                                            [
+                                                'data' => (array) $item->data,
+                                                'block' => [],
+                                            ]
+                                        ),
+                                    ])
                                         ->toArray()
                                 );
 
