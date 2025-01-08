@@ -11,11 +11,15 @@ use Domain\Internationalization\Models\Locale;
 use Domain\Menu\Actions\CreateMenuTranslationAction;
 use Domain\Menu\Actions\UpdateMenuAction;
 use Domain\Menu\DataTransferObjects\MenuData;
+use Livewire\Features\SupportRedirects\Redirector;
+use Illuminate\Http\RedirectResponse;
 use Domain\Menu\Models\Menu;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -30,16 +34,16 @@ class EditMenu extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
-            Actions\DeleteAction::make(),
-            'other_page_actions' => CustomPageActionGroup::make([
+            DeleteAction::make(),
+            ActionGroup::make([
 
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    ->action('createTranslation')
+                    ->action(fn (Action $action) => $this->createTranslation($action->getFormData()) )
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
@@ -51,10 +55,9 @@ class EditMenu extends EditRecord
                             ->required(),
                     ]),
             ])
-                ->view('filament.pages.actions.custom-action-group.index')
-                ->setName('other_page_actions')
-                ->color('secondary')
-                ->label(trans('More Actions')),
+            ->button()
+            ->icon('')
+            ->label(trans('More Actions')),
         ];
     }
 
@@ -63,12 +66,6 @@ class EditMenu extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateMenuAction::class)->execute($record, MenuData::fromArray($data));
-    }
-
-    #[\Override]
-    protected function getRedirectUrl(): ?string
-    {
-        return MenuResource::getUrl('edit', $this->record);
     }
 
     public function createTranslation(array $data): RedirectResponse|Redirector|false

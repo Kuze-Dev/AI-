@@ -69,7 +69,7 @@ class FormResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(
-                            callback: function ($livewire, Unique $rule) {
+                            modifyRuleUsing: function ($livewire, Unique $rule) {
 
                                 if (TenantFeatureSupport::active(SitesManagement::class)) {
                                     return false;

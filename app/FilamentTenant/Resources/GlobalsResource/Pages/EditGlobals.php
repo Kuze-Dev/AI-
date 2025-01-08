@@ -10,6 +10,7 @@ use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Actions\CreateGlobalTranslationAction;
 use Domain\Globals\Actions\UpdateGlobalsAction;
 use Domain\Globals\DataTransferObjects\GlobalsData;
+use Livewire\Features\SupportRedirects\Redirector;
 use Domain\Globals\Models\Globals;
 use Domain\Internationalization\Models\Locale;
 use Filament\Actions;
@@ -22,8 +23,8 @@ use Illuminate\Database\Eloquent\Model;
 // use Filament\Pages\Actions\Action;
 // use Filament\Resources\Pages\EditRecord;
 // use Illuminate\Database\Eloquent\Model;
+use Filament\Actions\ActionGroup;
 use Illuminate\Http\RedirectResponse;
-use Livewire\Redirector;
 
 class EditGlobals extends EditRecord
 {
@@ -40,12 +41,12 @@ class EditGlobals extends EditRecord
                 ->action('save')
                 ->keyBindings(['mod+s']),
 
-            'other_page_actions' => CustomPageActionGroup::make([
+            ActionGroup::make([
 
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    ->action('createTranslation')
+                    ->action(fn (Action $action) => $this->createTranslation($action->getFormData()))
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
@@ -57,9 +58,8 @@ class EditGlobals extends EditRecord
                             ->required(),
                     ]),
             ])
-                ->view('filament.pages.actions.custom-action-group.index')
-                ->setName('other_page_actions')
-                ->color('secondary')
+                ->button()
+                ->icon('')
                 ->label(trans('More Actions')),
             Actions\DeleteAction::make(),
 
