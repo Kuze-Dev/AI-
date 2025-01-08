@@ -241,15 +241,15 @@ class PageResource extends Resource
 
                                 $component->state(
                                     $record->blockContents->sortBy('order')
-                                        ->mapWithKeys(function (BlockContent $item) {
-                                            // $test = $item->toArray();
-                                            $test = $item;
-                                            $test->data = (array) $item->data;
-                                            return [
-                                                "record-{$item->getKey()}"
-                                                // (string) Str::uuid()
-                                                => $test->toArray()];
-                                        })
+                                    ->mapWithKeys(fn (BlockContent $item) => [
+                                        "record-{$item->getKey()}" => array_merge(
+                                            $item->toArray(),
+                                            [
+                                                'data' => (array) $item->data,
+                                                'block' => [],
+                                            ]
+                                        ),
+                                    ])
                                         ->toArray()
                                 );
 

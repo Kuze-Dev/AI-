@@ -163,7 +163,14 @@ class EditContentEntry extends EditRecord
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    ->action('createTranslation')
+                    ->action(function (Action $action) {
+                        /** @var array */
+                        $data = $action->getFormData();
+                        
+                        return $this->createTranslation($data);
+                       
+                    })
+                    // ->action('createTranslation')
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
@@ -378,7 +385,7 @@ class EditContentEntry extends EditRecord
             return false;
         }
         $formData = $this->form->getState();
-
+        dd($formData);
         $formData['locale'] = $data['locale'];
 
         $code = $data['locale'];
