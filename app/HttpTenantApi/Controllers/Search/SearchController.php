@@ -61,6 +61,15 @@ class SearchController
         return PageResource::collection(
             Page::query()
                 ->where('name', 'LIKE', "%{$searchQuery}%")
+                ->when(
+                    $filter['sites.id'] ?? null,
+                    function ($query, $siteIds) {
+
+                        return $query->wherehas('sites', function ($q) use ($siteIds) {
+                            return $q->whereIn('site_id', explode(',', $siteIds));
+                        });
+                    }
+                )
                 ->limit(20)
                 ->get()
         );
@@ -75,6 +84,15 @@ class SearchController
                 ->when(
                     $filter['content_ids'] ?? null,
                     fn ($query, $contentIds) => $query->whereIn('content_id', explode(',', (string) $contentIds))
+                )
+                ->when(
+                    $filter['sites.id'] ?? null,
+                    function ($query, $siteIds) {
+
+                        return $query->wherehas('sites', function ($q) use ($siteIds) {
+                            return $q->whereIn('site_id', explode(',', $siteIds));
+                        });
+                    }
                 )
                 ->limit(20)
                 ->get()
