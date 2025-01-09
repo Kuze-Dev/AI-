@@ -60,19 +60,19 @@ class TiersRelationManager extends RelationManager
                             ->label(trans('Amount Type')),
                         TextInput::make('discount')
                             ->translateLabel()
-                            ->mask(
-                                fn (TextInput\Mask $mask) => $mask
-                                    ->numeric()
-                                    ->decimalPlaces(3)
-                                    ->decimalSeparator('.')
-                                    ->minValue(0)
-                                    ->maxValue(100)
-                            )
+                            // ->mask(
+                            //     fn (TextInput\Mask $mask) => $mask
+                            //         ->numeric()
+                            //         ->decimalPlaces(3)
+                            //         ->decimalSeparator('.')
+                            //         ->minValue(0)
+                            //         ->maxValue(100)
+                            // )
                             ->required(),
                     ])
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['id', 'name'])
-                    ->using(fn (HasRelationshipTable $livewire, array $data): ?Model =>
+                    ->using(fn ($livewire, array $data): ?Model =>
                         /** @phpstan-ignore-next-line */
                         $livewire->getRelationship()
                             ->attach(
@@ -98,14 +98,14 @@ class TiersRelationManager extends RelationManager
                             ->label(trans('Amount Type')),
                         TextInput::make('discount')
                             ->label(trans('Discount (%)'))
-                            ->mask(
-                                fn (TextInput\Mask $mask) => $mask
-                                    ->numeric()
-                                    ->decimalPlaces(3)
-                                    ->decimalSeparator('.')
-                                    ->minValue(0)
-                                    ->maxValue(100)
-                            )
+                            // ->mask(
+                            //     fn (TextInput\Mask $mask) => $mask
+                            //         ->numeric()
+                            //         ->decimalPlaces(3)
+                            //         ->decimalSeparator('.')
+                            //         ->minValue(0)
+                            //         ->maxValue(100)
+                            // )
                             ->required(),
                     ])
                     ->using(function (Tier $record, array $data): Tier {
