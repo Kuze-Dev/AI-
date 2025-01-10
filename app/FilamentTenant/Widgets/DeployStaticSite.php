@@ -7,7 +7,9 @@ namespace App\FilamentTenant\Widgets;
 use App\Settings\CMSSettings;
 use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Http;
+use Livewire\Redirector;
 use Spatie\Activitylog\ActivityLogger;
 
 class DeployStaticSite extends Widget
@@ -19,8 +21,14 @@ class DeployStaticSite extends Widget
         return app(CMSSettings::class)->deploy_hook;
     }
 
-    public function deploy(): void
+    public function deploy(): RedirectResponse|Redirector|bool
     {
+
+        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+            return redirect()->away(route('filament-tenant.resources.sites.index'));
+        }
+
         if ($this->getDeployHook() === null) {
             Notification::make()
                 ->danger()
@@ -28,7 +36,7 @@ class DeployStaticSite extends Widget
                 ->body(trans('Please set a deploy hook first before trying to deploy.'))
                 ->send();
 
-            return;
+            return false;
         }
 
         /** @var \Illuminate\Http\Client\Response $response */
@@ -57,5 +65,7 @@ class DeployStaticSite extends Widget
             $notification->success()
                 ->title(trans('Deployment Request Sent'));
         })->send();
+
+        return true;
     }
 }
