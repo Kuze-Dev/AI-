@@ -8,6 +8,7 @@ use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
 use BadMethodCallException;
 use Domain\Content\Models\ContentEntry;
+use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -61,6 +62,7 @@ class SearchController
         return PageResource::collection(
             Page::query()
                 ->where('name', 'LIKE', "%{$searchQuery}%")
+                ->whereNotNull('published_at')
                 ->when(
                     $filter['sites.id'] ?? null,
                     function ($query, $siteIds) {
@@ -81,6 +83,8 @@ class SearchController
             ContentEntry::query()
                 ->with('blueprintData')
                 ->where('title', 'LIKE', "%{$searchQuery}%")
+                ->where('status', true)
+                ->whereRelation('content', 'visibility', '!=', Visibility::AUTHENTICATED->value)
                 ->when(
                     $filter['content_ids'] ?? null,
                     fn ($query, $contentIds) => $query->whereIn('content_id', explode(',', $contentIds))
