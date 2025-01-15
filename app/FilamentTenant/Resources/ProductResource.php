@@ -82,7 +82,7 @@ class ProductResource extends Resource
                                 ->acceptedFileTypes([
                                     'video/*',
                                 ])
-                                ->required()
+                                // ->required()
                                 ->maxSize(25_000),
                         ]),
 

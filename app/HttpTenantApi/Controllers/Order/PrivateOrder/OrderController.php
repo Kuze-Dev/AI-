@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 
 #[
-    Resource('orders', apiResource: true, except: 'destroy', names: 'guest.orders'),
+    Resource('orders', apiResource: true, except: 'destroy', names: 'customer.orders'),
     Middleware(['auth:sanctum'])
 ]
 class OrderController extends Controller

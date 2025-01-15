@@ -57,7 +57,7 @@ class PaymentMethodResource extends Resource
                         ->image()
                         ->beforeStateDehydrated(null)
                         ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                        ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
                             $mediaClass = config('media-library.media_model', Media::class);
 
                             /** @var ?Media $media */
@@ -75,7 +75,13 @@ class PaymentMethodResource extends Resource
                                 }
                             }
 
-                            return $media?->getUrl();
+                            return [
+                                'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                                'size' => $media->getAttributeValue('size'),
+                                'type' => $media->getAttributeValue('mime_type'),
+                                'url' => $media->getUrl(),
+                            ];
+                            // return $media?->getUrl();
                         }),
                     Forms\Components\Toggle::make('status')
                         ->inline(false)

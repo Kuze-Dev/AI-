@@ -9,11 +9,15 @@ use App\FilamentTenant\Resources\InviteCustomerResource;
 use App\Settings\CustomerSettings;
 use Domain\Customer\Actions\ImportCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
+use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
+use Domain\Tier\Models\Tier;
 use Filament\Actions;
-use Filament\Actions\ImportAction;
+// use Filament\Actions\ImportAction;
+use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Filament\Forms;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ListInviteCustomers extends ListCustomers
 {
