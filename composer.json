@@ -116,28 +116,6 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "clear-all": [
-            "composer dumpautoload -o",
-            "@php artisan optimize:clear --ansi",
-            "@php artisan settings:clear-discovered --ansi",
-            "@php artisan settings:clear-cache --ansi",
-            "@php artisan icons:clear --ansi",
-            "@php artisan filament:clear-cached-components --ansi"
-        ],
-        "cache-all": [
-            "composer dumpautoload -o",
-            "@php artisan event:cache --ansi",
-            "@php artisan config:cache --ansi",
-            "@php artisan route:cache --ansi",
-            "@php artisan view:cache --ansi",
-            "@php artisan settings:discover --ansi",
-            "@php artisan icons:cache --ansi",
-            "@php artisan filament:cache-components --ansi"
-        ],
-        "reset": [
-            "composer clear-all",
-            "composer cache-all"
-        ],
         "ide-helper": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate",
             "@php artisan ide-helper:generate --ansi",

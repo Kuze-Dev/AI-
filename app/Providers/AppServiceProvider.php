@@ -69,6 +69,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Pennant\Feature;
 use Sentry\Laravel\Integration;
+use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
+use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Stancl\Tenancy\Database\Models\Tenant;
 use Support\Captcha\CaptchaManager;
@@ -78,11 +80,6 @@ use TiMacDonald\JsonApi\JsonApiResource;
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
 {
-    #[\Override]
-    public function register(): void
-    {
-    }
-
     public function boot(): void
     {
         Model::shouldBeStrict($this->app->isLocal() || $this->app->runningUnitTests());
@@ -214,5 +211,11 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        $this->optimizes(
+            optimize: CacheDiscoveredSettingsCommand::class,
+            clear: ClearDiscoveredSettingsCacheCommand::class,
+            key: 'settings',
+        );
     }
 }
