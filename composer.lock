@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9a1f35929c444c3bcb04a097904ed2d9",
+    "content-hash": "ab596313cf918984b4fb407c5e902677",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -7806,16 +7806,16 @@
         },
         {
             "name": "shuvroroy/filament-spatie-laravel-health",
-            "version": "v2.3.3",
+            "version": "v2.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shuvroroy/filament-spatie-laravel-health.git",
-                "reference": "0c57ac7da80573658e83fe3db70d1523229089e4"
+                "reference": "0336e5a9ec0083b2484ff94a3a17519c70cdf15d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shuvroroy/filament-spatie-laravel-health/zipball/0c57ac7da80573658e83fe3db70d1523229089e4",
-                "reference": "0c57ac7da80573658e83fe3db70d1523229089e4",
+                "url": "https://api.github.com/repos/shuvroroy/filament-spatie-laravel-health/zipball/0336e5a9ec0083b2484ff94a3a17519c70cdf15d",
+                "reference": "0336e5a9ec0083b2484ff94a3a17519c70cdf15d",
                 "shasum": ""
             },
             "require": {
@@ -7869,7 +7869,7 @@
             ],
             "support": {
                 "issues": "https://github.com/shuvroroy/filament-spatie-laravel-health/issues",
-                "source": "https://github.com/shuvroroy/filament-spatie-laravel-health/tree/v2.3.3"
+                "source": "https://github.com/shuvroroy/filament-spatie-laravel-health/tree/v2.3.4"
             },
             "funding": [
                 {
@@ -7877,7 +7877,7 @@
                     "type": "buy_me_a_coffee"
                 }
             ],
-            "time": "2025-01-14T16:36:16+00:00"
+            "time": "2025-01-15T06:46:07+00:00"
         },
         {
             "name": "spatie/array-to-xml",
