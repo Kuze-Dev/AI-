@@ -220,6 +220,14 @@ class EditContentEntry extends EditRecord
                             }),
 
                     ]),
+                Action::make('clone-page')
+                    ->label(trans('Clone ContentEntry'))
+                    ->color('secondary')
+                    ->record($this->getRecord())
+                    ->url(fn (ContentEntry $record) => ContentEntryResource::getUrl('create', [
+                        $this->ownerRecord,
+                        'clone' => $record->slug,
+                    ])),
 
             ])->view('filament.pages.actions.custom-action-group.index')
                 ->setName('other_page_draft')
