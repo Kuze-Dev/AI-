@@ -221,7 +221,7 @@ class EditContentEntry extends EditRecord
 
                     ]),
                 Action::make('clone-page')
-                    ->label(trans('Clone ContentEntry'))
+                    ->label(trans('Clone Entry'))
                     ->color('secondary')
                     ->record($this->getRecord())
                     ->url(fn (ContentEntry $record) => ContentEntryResource::getUrl('create', [
