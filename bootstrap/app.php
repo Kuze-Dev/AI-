@@ -73,26 +73,31 @@ return Application::configure(basePath: dirname(__DIR__))
             });
     })
     ->withSchedule(function (Schedule $schedule) {
-        $schedule->command(NotifyCustomerServiceBillDueDateCommand::class)
-            ->daily();
 
-        $schedule->command(CreateServiceBillCommand::class)
-            ->daily();
+        $schedule
+            ->daily()
+            ->group(function (Schedule $schedule) {
 
-        $schedule->command(InactivateServiceOrderCommand::class)
-            ->daily();
+                $schedule->command(NotifyCustomerServiceBillDueDateCommand::class);
 
-        $schedule->command(
-            ClearResetsTenancyAwareSchedulerCommand::class, [
-            'customer',
-        ])
-            ->everyFifteenMinutes();
+                $schedule->command(CreateServiceBillCommand::class);
 
-        $schedule->command(
-            SanctumPruneExpiredTenancyAwareScheduler::class, [
-            '--hours' => 24,
-        ])
-            ->daily();
+                $schedule->command(InactivateServiceOrderCommand::class);
+
+                $schedule->command(SanctumPruneExpiredTenancyAwareScheduler::class, [
+                    '--hours' => 24,
+                ]);
+            });
+
+        $schedule
+            ->everyFifteenMinutes()
+            ->group(function (Schedule $schedule) {
+
+                $schedule->command(
+                    ClearResetsTenancyAwareSchedulerCommand::class, [
+                    'customer',
+                ]);
+            });
 
         // $schedule->command(DispatchQueueCheckJobsCommand::class)->everyMinute();
 
