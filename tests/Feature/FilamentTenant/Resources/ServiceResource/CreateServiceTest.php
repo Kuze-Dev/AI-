@@ -72,7 +72,7 @@ it('can create service', function () {
             'due_date_every' => 20,
             'taxonomyTerms' => [$taxonomyTerm->id],
             'media.0' => $image,
-            'meta_data' => $metaData,
+            'metaData' => $metaData,
             'meta_data.image.0' => $path,
         ])
         ->call('create')
@@ -85,7 +85,7 @@ it('can create service', function () {
         'name' => 'Test',
         'blueprint_id' => $blueprint->getKey(),
     ]);
-
+  
     assertDatabaseHas(TaxonomyTerm::class, [
         'name' => 'category',
     ]);
