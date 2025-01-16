@@ -71,7 +71,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => trans('Access')),
                 NavigationGroup::make()->label(fn () => trans('System')),
             ])
-            ->plugin(FilamentSpatieLaravelHealthPlugin::make())
+            ->plugin(FilamentSpatieLaravelHealthPlugin::make()->navigationGroup(trans('System')))
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
             ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())

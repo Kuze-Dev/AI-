@@ -106,10 +106,10 @@ it('can edit service', function () {
             'is_auto_generated_bill' => ! $service->is_auto_generated_bill,
             'is_partial_payment' => ! $service->is_partial_payment,
             //            'is_installment' => ! $service->is_installment,
-            'taxonomy_term_id' => $taxonomyTerm->id,
+            'taxonomyTerms' => [$taxonomyTerm->id],
             'media.0' => $image,
-            'meta_data' => $metaData,
-            'meta_data.image.0' => $path,
+            'metaData' => $metaData,
+            'metaData.image.0' => $path,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
