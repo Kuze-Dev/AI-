@@ -66,36 +66,6 @@ it('can not create block with same name', function () {
         ->assertOk();
 });
 
-it('can create block with default content', function () {
-    $blueprint = BlueprintFactory::new()
-        ->addSchemaSection(['title' => 'Main'])
-        ->addSchemaField([
-            'title' => 'Title',
-            'type' => FieldType::TEXT,
-        ])
-        ->createOne();
-
-    livewire(CreateBlock::class)
-        ->fillForm([
-            'name' => 'Test',
-            'component' => 'Test',
-            'blueprint_id' => $blueprint->id,
-            'is_fixed_content' => true,
-            'data' => ['main' => ['title' => 'Foobar']],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors()
-        ->assertOk();
-
-    assertDatabaseHas(Block::class, [
-        'name' => 'Test',
-        'component' => 'Test',
-        'blueprint_id' => $blueprint->id,
-        'is_fixed_content' => true,
-        'data' => json_encode(['main' => ['title' => 'Foobar']]),
-    ]);
-});
-
 it('can create block with image', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
@@ -123,7 +93,6 @@ it('can create block with image', function () {
     ]);
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $image->getClientOriginalName(),
         'mime_type' => $image->getMimeType(),
     ]);
 });

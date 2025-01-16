@@ -385,7 +385,7 @@ class EditContentEntry extends EditRecord
             return false;
         }
         $formData = $this->form->getState();
-        dd($formData);
+
         $formData['locale'] = $data['locale'];
 
         $code = $data['locale'];

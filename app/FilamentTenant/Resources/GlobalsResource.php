@@ -112,7 +112,7 @@ class GlobalsResource extends Resource
                     ])
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     // Forms\Components\CheckboxList::make('sites')
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
@@ -171,7 +171,7 @@ class GlobalsResource extends Resource
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
-                    ->hidden(fn (?Globals $record) => ! $record)
+                    // ->hidden(fn (?Globals $record) => ! $record)
                     ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
