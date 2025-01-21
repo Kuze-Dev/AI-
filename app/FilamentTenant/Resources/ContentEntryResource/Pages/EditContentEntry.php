@@ -227,7 +227,6 @@ class EditContentEntry extends EditRecord
 
                                 $domain = $site->domain;
 
-                                /** @var CustomPageActionGroup */
                                 $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
 
                                 $modelAction = $other_page_actions->getActions()['preview_microsite_action'];

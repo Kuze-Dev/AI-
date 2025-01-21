@@ -37,7 +37,7 @@ it('can render product', function () {
         ->assertSuccessful()
         ->assertFormSet([
             'name' => $product->name,
-            'images.0' => $product->getMedia()->first(),
+            'image.0' => $product->getMedia()->first(),
             'dimension' => $product->dimension,
             'sku' => $product->sku,
             'retail_price' => $product->retail_price,
@@ -72,10 +72,10 @@ it('can edit product', function () {
         ->fillForm([
             'name' => 'Test Title Updated',
             'description' => 'Test Description Updated',
-            'images.0' => $dataImage,
+            'image.0' => $dataImage,
             'status' => ! $product->status,
-            'meta_data' => $metaData,
-            'meta_data.image.0' => $path,
+            'metaData' => $metaData,
+            'metaData.image.0' => $path,
         ])
         ->call('save')
         ->assertHasNoFormErrors()

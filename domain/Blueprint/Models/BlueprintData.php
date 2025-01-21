@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Image\Enums\Fit;
 
 /**
  * Domain\Blueprint\Models\BlueprintData
@@ -132,7 +133,8 @@ class BlueprintData extends Model implements HasMedia
                     $width = null;
                     $height = null;
                     $type = null;
-                    $fit = 'contain';
+                    // $fit = 'contain';
+                    $fit = Fit::Contain;
                     if (isset($conversion->manipulations)) {
                         foreach ($conversion->manipulations as $manipulation) {
                             if ($manipulation->type == ManipulationType::WIDTH) {
@@ -147,7 +149,15 @@ class BlueprintData extends Model implements HasMedia
                                 }
                             }
                             if ($manipulation->type == ManipulationType::FIT) {
-                                $fit = $manipulation->params[0];
+                                // $fit = $manipulation->params[0];
+                                $fit = match ($manipulation->params[0]) {
+                                    'contain' => Fit::Contain,
+                                    'max' => Fit::Max,
+                                    'fill' => Fit::Fill,
+                                    'fill-max' => Fit::FillMax,
+                                    'stretch' => Fit::Stretch,
+                                    'crop' => Fit::Crop,
+                                };
                             }
                         }
 
