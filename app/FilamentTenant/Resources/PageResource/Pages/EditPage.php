@@ -32,7 +32,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use Livewire\Redirector;
+// use Livewire\Redirector;
+use Livewire\Features\SupportRedirects\Redirector;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Throwable;
 
@@ -209,6 +210,7 @@ class EditPage extends EditRecord
 
                             return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
                         }),
+                   
                     Action::make('overwriteDraft')
                         ->label(trans('Save As Draft'))
                         ->action('overwriteDraft')
@@ -234,6 +236,11 @@ class EditPage extends EditRecord
                 ->label('Save Changes'),
             ActionGroup::make([
                 ActionGroup::make([
+                    Action::make('clone-page')
+                        ->label(trans('Clone Page'))
+                        ->color('secondary')
+                        ->record($this->getRecord())
+                        ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => $record->slug])),
                     // Array of actions
                     Action::make('published'),
                 ])->dropdown(false),

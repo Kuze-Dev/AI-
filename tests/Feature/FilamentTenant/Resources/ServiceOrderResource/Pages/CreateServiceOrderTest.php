@@ -44,7 +44,7 @@ it('can create product', function () {
             'last_name' => $customer->last_name,
             'email' => $customer->email,
             'mobile' => $customer->mobile,
-            'service_address_id' => $customer->addresses
+            'service_address' => $customer->addresses
                 ->first()
                 ->id,
             'service_id' => $service->id,
@@ -55,3 +55,7 @@ it('can create product', function () {
         ->instance()
         ->record;
 });
+
+
+
+

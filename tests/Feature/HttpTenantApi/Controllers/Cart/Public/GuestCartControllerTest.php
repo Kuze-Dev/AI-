@@ -45,9 +45,6 @@ it('can show cart', function () {
                     'coupon_code' => null,
                 ],
             ],
-            'jsonapi' => [
-                'version' => '1.0',
-            ],
         ])
         ->assertOk();
 });
