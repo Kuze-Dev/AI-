@@ -66,7 +66,7 @@ class AdminResource extends Resource
                     Forms\Components\TextInput::make('email')
                         ->translateLabel()
                         ->email()
-                        ->rules(Rule::email())
+                        ->rules( fn () => Rule::email())
                         ->unique(ignoreRecord: true)
                         ->required()
                         ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')

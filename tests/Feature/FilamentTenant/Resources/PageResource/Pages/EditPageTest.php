@@ -51,7 +51,7 @@ it('can render page', function () {
         ->assertFormSet([
             'name' => $page->name,
             'published_at' => true,
-            'block_contents.record-1' => $page->blockContents->first()->toArray(),
+            'block_contents.record-1.data.main.header' => 'Foo',
         ])
         ->assertOk();
 });

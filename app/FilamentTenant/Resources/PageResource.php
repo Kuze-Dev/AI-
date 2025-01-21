@@ -471,7 +471,7 @@ class PageResource extends Resource
 
         if (! isset(self::$cachedBlocks)) {
 
-            self::$cachedBlocks = Block::with(['blueprint', 'media', 'sites'])->get();
+            self::$cachedBlocks = Block::with([ 'media', 'sites'])->get();
         }
 
         return self::$cachedBlocks;

@@ -57,7 +57,7 @@ class BlockContent extends Model implements Sortable
     /** @return BelongsTo<Block, self> */
     public function block(): BelongsTo
     {
-        return $this->belongsTo(Block::class)->with(['blueprint']);
+        return $this->belongsTo(Block::class);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Page\Models\Page, $this> */

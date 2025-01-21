@@ -66,7 +66,7 @@ class FormResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(
                             modifyRuleUsing: function ($livewire, Unique $rule) {
@@ -87,7 +87,7 @@ class FormResource extends Resource
                         ->required()
                         ->preload()
                         ->optionsFromModel(Blueprint::class, 'name')
-                        ->disabled(fn (?FormModel $record) => $record !== null)
+                        ->disableOptionWhen(fn (?FormModel $record) => $record !== null)
                         ->reactive(),
                     Forms\Components\Select::make('locale')
                         ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
@@ -96,7 +96,7 @@ class FormResource extends Resource
                         ->hidden(TenantFeatureSupport::inactive(Internationalization::class))
                         ->required(),
                     Forms\Components\Toggle::make('store_submission'),
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         // Forms\Components\CheckboxList::make('sites')
                         \App\FilamentTenant\Support\CheckBoxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
@@ -167,7 +167,7 @@ class FormResource extends Resource
                         ->hidden((bool) ! (tenancy()->tenant?->features()
                             ->active(
                                 \App\Features\CMS\SitesManagement::class)
-                            // && Auth::user()?->hasRole(config('domain.role.super_admin'))
+                            && Auth::user()?->hasRole(config('domain.role.super_admin'))
                         )),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
@@ -177,7 +177,7 @@ class FormResource extends Resource
                                 : null
                         ),
                 ]),
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\Section::make('Available Values')
                         ->schema([
                             SchemaInterpolations::make('data')
@@ -284,6 +284,7 @@ class FormResource extends Resource
                         ])
                         ->columnSpan(['md' => 3]),
                 ])->columns(4),
+                
             ]);
     }
 

@@ -11,7 +11,8 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use function Pest\Laravel\getJson;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
+    testInTenantContext(ServiceBase::class);
+    // testInTenantContext(ServiceBase::class);
 });
 
 it('can list services', function () {

@@ -10,6 +10,7 @@ use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Exception;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -50,16 +51,11 @@ class ShippingMethodResource extends Resource
                             'redo',
                             'undo',
                         ]),
-                    Forms\Components\FileUpload::make('logo')
-                        ->formatStateUsing(function ($record) {
-                            return $record?->getMedia('logo')
-                                ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                                ->toArray() ?? [];
-                        })
+                    SpatieMediaLibraryFileUpload::make('logo')
                         ->image()
                         ->beforeStateDehydrated(null)
                         ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                        ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                        ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
                             $mediaClass = config('media-library.media_model', Media::class);
 
                             /** @var ?Media $media */
@@ -77,7 +73,13 @@ class ShippingMethodResource extends Resource
                                 }
                             }
 
-                            return $media?->getUrl();
+                            return [
+                                'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                                'size' => $media->getAttributeValue('size'),
+                                'type' => $media->getAttributeValue('mime_type'),
+                                'url' => $media->getUrl(),
+                            ];
+                            // return $media?->getUrl();
                         }),
                     Forms\Components\Toggle::make('active')
                         ->label('Status')

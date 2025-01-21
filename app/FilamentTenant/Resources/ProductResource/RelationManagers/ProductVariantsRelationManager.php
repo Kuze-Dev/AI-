@@ -13,6 +13,7 @@ use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -65,12 +66,13 @@ class ProductVariantsRelationManager extends RelationManager
                                 Forms\Components\TextInput::make('retail_price')
                                     ->translateLabel()
                                     // Put custom rule to validate minimum value
-                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                        prefix: '$',
-                                        thousandsSeparator: ',',
-                                        decimalPlaces: 2,
-                                        isSigned: false
-                                    ))
+                                    ->mask(RawJs::make('$money($input)'))
+                                    // ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    //     prefix: '$',
+                                    //     thousandsSeparator: ',',
+                                    //     decimalPlaces: 2,
+                                    //     isSigned: false
+                                    // ))
                                     ->rules([
                                         fn () => function (string $attribute, mixed $value, Closure $fail) {
                                             if ($value <= 0) {
@@ -84,12 +86,13 @@ class ProductVariantsRelationManager extends RelationManager
                                 Forms\Components\TextInput::make('selling_price')
                                     ->translateLabel()
                                     // Put custom rule to validate minimum value
-                                    ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
-                                        prefix: '$',
-                                        thousandsSeparator: ',',
-                                        decimalPlaces: 2,
-                                        isSigned: false
-                                    ))
+                                    // ->mask(fn (Forms\Components\TextInput\Mask $mask) => $mask->money(
+                                    //     prefix: '$',
+                                    //     thousandsSeparator: ',',
+                                    //     decimalPlaces: 2,
+                                    //     isSigned: false
+                                    // ))
+                                    ->mask(RawJs::make('$money($input)'))
                                     ->rules([
                                         fn () => function (string $attribute, mixed $value, Closure $fail) {
                                             if ($value <= 0) {

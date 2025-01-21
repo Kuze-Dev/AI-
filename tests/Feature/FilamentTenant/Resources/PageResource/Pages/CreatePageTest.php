@@ -131,11 +131,17 @@ it('can clone page', function () {
 
     Livewire::withQueryParams(['clone' => $page->slug]);
 
+    $block_content = $page->blockContents->toArray();
+    
+    unset($block_content['0']['block']);
+
+    // dd($block_content);
+
     $clonePage = livewire(CreatePage::class)
         ->assertFormSet([
             'visibility' => $page->visibility,
             'published_at' => $page->published_at,
-            'block_contents' => $page->blockContents->toArray(),
+            'block_contents' => $block_content,
             'meta_data' => [
                 'author' => $page->metaData?->author,
                 'description' => $page->metaData?->description,

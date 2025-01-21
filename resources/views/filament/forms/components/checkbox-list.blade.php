@@ -177,8 +177,8 @@
                     ])
                 >
                     <label
-                        class="filament-forms-checkbox-list-component-option-label flex items-center space-x-3 rtl:space-x-reverse {{ $isOptionDisabled($optionValue, $optionLabel) ? 'opacity-70' : null}} "
-                        @if ($isSearchable())
+                        class="filament-forms-checkbox-list-component-option-label flex items-center space-x-3 rtl:space-x-reverse {{ $isOptionDisabled($value, $label) ? 'opacity-70' : null}} "
+                        @if ($isSearchable)
                             x-show="
                                 $el.querySelector('.filament-forms-checkbox-list-component-option-label-text')
                                     .innerText.toLowerCase()
