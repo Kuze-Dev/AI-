@@ -48,7 +48,9 @@ uses(
             'tenancy.database.prefix' => ($token = ParallelTesting::token())
                 ? "test_tenancy_{$token}_"
                 : 'test_tenancy_',
-            'tenancy.database.suffix' => '_'.ParallelTesting::token(),
+            'tenancy.database.suffix' => ($token = ParallelTesting::token())
+                ? "_{$token}"
+                : '_',
         ]);
     })
     ->afterEach(function () {
@@ -87,7 +89,9 @@ uses(
             'tenancy.database.prefix' => ($token = ParallelTesting::token())
                 ? "test_tenancy_{$token}_"
                 : 'test_tenancy_',
-            'tenancy.database.suffix' => '_'.ParallelTesting::token(),
+            'tenancy.database.suffix' => ($token = ParallelTesting::token())
+                ? "_{$token}"
+                : '_',
         ]);
     })
     ->afterEach(function () {
