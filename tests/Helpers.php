@@ -70,10 +70,6 @@ function assertActivityLogged(
 
 function testInTenantContext(array|string|null $features = null): Tenant
 {
-    config([
-        'tenancy.database.suffix' => '_'.ParallelTesting::token(),
-    ]);
-
     Filament::setCurrentPanel(Filament::getPanels()['tenant']);
 
     /** @var Tenant */

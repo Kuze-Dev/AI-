@@ -44,10 +44,11 @@ uses(
         });
 
         config([
-            'tenancy.database.template_tenant_connection' => 'sqlite',
+            'tenancy.database.template_tenant_connection' => 'tenant_template_sqlite',
             'tenancy.database.prefix' => ($token = ParallelTesting::token())
-                ? "test_{$token}_"
-                : 'test_',
+                ? "test_tenancy_{$token}_"
+                : 'test_tenancy_',
+            'tenancy.database.suffix' => '_'.ParallelTesting::token(),
         ]);
     })
     ->afterEach(function () {
@@ -80,11 +81,13 @@ uses(
 
         Relation::morphMap(['test_user' => User::class]);
 
+
         config([
-            'tenancy.database.template_tenant_connection' => 'sqlite',
+            'tenancy.database.template_tenant_connection' => 'tenant_template_sqlite',
             'tenancy.database.prefix' => ($token = ParallelTesting::token())
-                ? "test_{$token}_"
-                : 'test_',
+                ? "test_tenancy_{$token}_"
+                : 'test_tenancy_',
+            'tenancy.database.suffix' => '_'.ParallelTesting::token(),
         ]);
     })
     ->afterEach(function () {
