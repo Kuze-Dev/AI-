@@ -15,6 +15,7 @@ use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -70,7 +71,7 @@ function assertActivityLogged(
 function testInTenantContext(array|string|null $features = null): Tenant
 {
     config([
-        'tenancy.database.suffix' => '_'.Str::random(7),
+        'tenancy.database.suffix' => '_'.ParallelTesting::token(),
     ]);
 
     Filament::setCurrentPanel(Filament::getPanels()['tenant']);
