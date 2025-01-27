@@ -20,6 +20,11 @@ class PaymentSettings extends Settings
 
     public bool $stripe_production_mode;
 
+    public ?string $vision_pay_apiKey = null;
+
+    public bool $vision_pay_production_mode;
+    
+
     public static function group(): string
     {
         return 'payments';
@@ -32,7 +37,7 @@ class PaymentSettings extends Settings
             'paypal_secret_key',
             'stripe_publishable_key',
             'stripe_secret_key',
-
+            'vision_pay_apiKey',
         ];
     }
 }

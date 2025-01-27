@@ -1,0 +1,143 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Domain\Payments\API\VisionPay;
+
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+
+final class Client
+{
+    public const PRODUCTION_URL = 'https://apigateway.visionpay.com.au';
+    public const SANDBOX_URL = 'https://apigatewaystaging.visionpay.com.au';
+
+    private PendingRequest $client;
+
+    private ?string $jwtToken = null;
+
+    public function __construct(
+        public readonly string $apiKey,      // Your Vision Pay API Key
+        public readonly bool $isProduction, // Use production or sandbox environment
+    ) {
+        $this->client = Http::baseUrl(
+            $isProduction
+                ? self::PRODUCTION_URL
+                : self::SANDBOX_URL
+        )->acceptJson();
+    }
+
+    /**
+     * Authenticate with Vision Pay to obtain a JWT token.
+     *
+     * @return string The JWT token
+     * @throws \Exception If authentication fails
+     */
+    public function authenticate(): string
+    {
+        if ($this->jwtToken) {
+            return $this->jwtToken;
+        }
+    
+        $this->jwtToken = Cache::remember('vision_pay_token', 60, function () {
+            return $this->generateToken();
+        });
+    
+        $this->client->withToken($this->jwtToken); // Set the token for subsequent requests
+
+        return $this->jwtToken;
+    }
+    
+    /**
+     * @return string| The JWT token
+     * @throws \Exception If authentication fails
+     */
+    private function generateToken(): string
+    {
+        $response = $this->client->post('/api/ApiKey/authenticate', [
+            'accessToken' => $this->apiKey,
+        ]);
+    
+        if ($response->failed()) {
+            throw new \Exception('Authentication failed: ' . $response->body());
+        }
+    
+        return $response->json('token');
+    }
+    
+    
+
+    /**
+     * Ensure the client is authenticated before making a request.
+     *
+     * @return void
+     * @throws \Exception If not authenticated
+     */
+    private function ensureAuthenticated(): void
+    {
+        if (!$this->jwtToken) {
+            throw new \Exception('Client is not authenticated. Call authenticate() first.');
+        }
+    }
+
+
+    /**
+     * Make a POST request to a Vision Pay API endpoint.
+     *
+     * @param string $endpoint
+     * @param array $data
+     * @return Response
+     * @throws \Exception If not authenticated
+     */
+    public function post(string $endpoint, array $data): Response
+    {
+        $this->ensureAuthenticated();
+        return $this->client->post($endpoint, $data);
+    }
+
+    /**
+     * Manually set a JWT token.
+     *
+     * @param string $token
+     * @return void
+     */
+    public function setJwtToken(string $token): void
+    {
+        $this->jwtToken = $token;
+        $this->client->withToken($this->jwtToken);
+    }
+
+    /**
+     * Retrieve the current JWT token.
+     *
+     * @return string|null
+     */
+    public function getJwtToken(): ?string
+    {
+        return $this->jwtToken;
+    }
+
+    /**
+     * Get a list of payments by reference.
+     *
+     * @param string $reference
+     * @return Response
+     * @throws \Exception If the client is not authenticated
+     */
+    public function getPaymentListByReference(string $reference): Response
+    {
+        $this->ensureAuthenticated();
+
+        $endpoint = "/api/payment/{$reference}";
+        // dd($this->client->withToken($this->jwtToken)->get($endpoint));
+        $response = $this->client->withToken($this->jwtToken)->get($endpoint);
+
+        if ($response->successful()) {
+            return $response;
+        }
+
+        throw new \Exception('Failed to retrieve payment list: ' . $response->body());
+    }
+}

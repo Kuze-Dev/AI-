@@ -9,6 +9,7 @@ use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
 use Domain\Payments\Providers\StripeProvider;
+use Domain\Payments\Providers\VisionPayProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
@@ -39,6 +40,7 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
                             'manual' => new OfflinePayment(),
                             'stripe' => new StripeProvider(),
                             'bank-transfer' => new OfflinePayment(),
+                            'vision-pay' => new VisionPayProvider(),
                             default => throw new InvalidArgumentException(),
                         };
                     });
