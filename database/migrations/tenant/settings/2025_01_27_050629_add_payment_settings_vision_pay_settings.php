@@ -12,7 +12,7 @@ return new class extends SettingsMigration
         $this->migrator->add('payments.vision_pay_apiKey', null);
 
         $this->migrator->add('payments.vision_pay_production_mode', false);
-   
+
     }
 
     public function down(): void
@@ -21,6 +21,5 @@ return new class extends SettingsMigration
 
         $this->migrator->delete('payments.vision_pay_production_mode');
 
-       
     }
 };

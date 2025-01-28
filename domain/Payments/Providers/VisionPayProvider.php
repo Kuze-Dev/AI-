@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Domain\Payments\Providers;
 
 use App\Settings\PaymentSettings;
+use Domain\Payments\API\VisionPay\Client as VisionPayClient;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
-use Domain\Payments\API\VisionPay\Client as VisionPayClient;
 use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment;
@@ -62,15 +62,14 @@ class VisionPayProvider extends Provider
             return PaymentAuthorize::fromArray([
                 'success' => true,
                 'message' => 'Authenticated',
-                'data' => $data
+                'data' => $data,
             ]);
 
         } catch (\Throwable $th) {
-           
+
             return new PaymentAuthorize(false);
         }
 
-        
     }
 
     public function refund(Payment $paymentModel, int $amount): PaymentRefund
@@ -88,13 +87,13 @@ class VisionPayProvider extends Provider
     }
 
     protected function processTransaction(Payment $paymentModel, array $data): PaymentCapture
-    {   
+    {
 
         $this->visionPayClient->authenticate();
-      
+
         $response = json_decode(
             $this->visionPayClient->getPaymentListByReference($data['reference'])
-            ->body(),true
+                ->body(), true
         );
 
         if ($response['reference'] == $data['reference'] && $response['approvalCode'] == $data['authcode']) {
@@ -102,15 +101,13 @@ class VisionPayProvider extends Provider
             $paymentModel->update([
                 'status' => PaymentStatus::PAID->value,
             ]);
-    
+
             event(new PaymentProcessEvent($paymentModel));
-    
+
             return new PaymentCapture(success: true);
         }
 
-        throw new InvalidArgumentException("Invalid Payment Data");
-        
-
+        throw new InvalidArgumentException('Invalid Payment Data');
     }
 
     protected function cancelTransaction(Payment $paymentModel): PaymentCapture

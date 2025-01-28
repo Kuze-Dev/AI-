@@ -23,7 +23,6 @@ class PaymentSettings extends Settings
     public ?string $vision_pay_apiKey = null;
 
     public bool $vision_pay_production_mode;
-    
 
     public static function group(): string
     {

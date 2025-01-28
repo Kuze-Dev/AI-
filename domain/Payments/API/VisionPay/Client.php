@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Http;
 final class Client
 {
     public const PRODUCTION_URL = 'https://apigateway.visionpay.com.au';
+
     public const SANDBOX_URL = 'https://apigatewaystaging.visionpay.com.au';
 
     private PendingRequest $client;
@@ -33,6 +34,7 @@ final class Client
      * Authenticate with Vision Pay to obtain a JWT token.
      *
      * @return string The JWT token
+     *
      * @throws \Exception If authentication fails
      */
     public function authenticate(): string
@@ -40,18 +42,17 @@ final class Client
         if ($this->jwtToken) {
             return $this->jwtToken;
         }
-    
+
         $this->jwtToken = Cache::remember('vision_pay_token', 60, function () {
             return $this->generateToken();
         });
-    
+
         $this->client->withToken($this->jwtToken); // Set the token for subsequent requests
 
         return $this->jwtToken;
     }
-    
+
     /**
-     * @return string| The JWT token
      * @throws \Exception If authentication fails
      */
     private function generateToken(): string
@@ -59,49 +60,40 @@ final class Client
         $response = $this->client->post('/api/ApiKey/authenticate', [
             'accessToken' => $this->apiKey,
         ]);
-    
+
         if ($response->failed()) {
-            throw new \Exception('Authentication failed: ' . $response->body());
+            throw new \Exception('Authentication failed: '.$response->body());
         }
-    
+
         return $response->json('token');
     }
-    
-    
 
     /**
      * Ensure the client is authenticated before making a request.
      *
-     * @return void
      * @throws \Exception If not authenticated
      */
     private function ensureAuthenticated(): void
     {
-        if (!$this->jwtToken) {
+        if (! $this->jwtToken) {
             throw new \Exception('Client is not authenticated. Call authenticate() first.');
         }
     }
 
-
     /**
      * Make a POST request to a Vision Pay API endpoint.
      *
-     * @param string $endpoint
-     * @param array $data
-     * @return Response
      * @throws \Exception If not authenticated
      */
     public function post(string $endpoint, array $data): Response
     {
         $this->ensureAuthenticated();
+
         return $this->client->post($endpoint, $data);
     }
 
     /**
      * Manually set a JWT token.
-     *
-     * @param string $token
-     * @return void
      */
     public function setJwtToken(string $token): void
     {
@@ -111,8 +103,6 @@ final class Client
 
     /**
      * Retrieve the current JWT token.
-     *
-     * @return string|null
      */
     public function getJwtToken(): ?string
     {
@@ -122,22 +112,48 @@ final class Client
     /**
      * Get a list of payments by reference.
      *
-     * @param string $reference
-     * @return Response
      * @throws \Exception If the client is not authenticated
      */
     public function getPaymentListByReference(string $reference): Response
     {
         $this->ensureAuthenticated();
 
+        /** @var string */
+        $token = $this->jwtToken;
+
         $endpoint = "/api/payment/{$reference}";
-        // dd($this->client->withToken($this->jwtToken)->get($endpoint));
-        $response = $this->client->withToken($this->jwtToken)->get($endpoint);
+
+        $response = $this->client->withToken($token)->get($endpoint);
 
         if ($response->successful()) {
             return $response;
         }
 
-        throw new \Exception('Failed to retrieve payment list: ' . $response->body());
+        throw new \Exception('Failed to retrieve payment list: '.$response->body());
+    }
+
+    /**
+     * Get a list of payments by reference.
+     *
+     * @throws \Exception If the client is not authenticated
+     */
+    public function refundPayment(string $reference, string $amount): Response
+    {
+        $this->ensureAuthenticated();
+
+        /** @var string */
+        $token = $this->jwtToken;
+
+        $endpoint = "/api/payment/{$reference}/refund";
+
+        $response = $this->client->withToken($token)->put($endpoint, [
+            'amount' => (float) $amount,
+        ]);
+
+        if ($response->successful()) {
+            return $response;
+        }
+
+        throw new \Exception('Failed to retrieve payment list: '.$response->body());
     }
 }
