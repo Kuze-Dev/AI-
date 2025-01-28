@@ -199,6 +199,7 @@ class TenantResource extends Resource
                                             Features\Shopconfiguration\PaymentGateway\StripeGateway::class => app(Features\Shopconfiguration\PaymentGateway\StripeGateway::class)->label,
                                             Features\Shopconfiguration\PaymentGateway\OfflineGateway::class => app(Features\Shopconfiguration\PaymentGateway\OfflineGateway::class)->label,
                                             Features\Shopconfiguration\PaymentGateway\BankTransfer::class => app(Features\Shopconfiguration\PaymentGateway\BankTransfer::class)->label,
+                                            Features\Shopconfiguration\PaymentGateway\VisionpayGateway::class => app(Features\Shopconfiguration\PaymentGateway\VisionpayGateway::class)->label,
                                         ],
                                         'shipping' => [
                                             Features\Shopconfiguration\Shipping\ShippingStorePickup::class => app(Features\Shopconfiguration\Shipping\ShippingStorePickup::class)->label,
