@@ -59,7 +59,8 @@ class PaymentSettings extends TenantBaseSettings
                             ->label(fn ($state) => $state ? 'Vision Pay (Live)' : 'Vision Pay (sandbox)')
                             ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
                             ->reactive(),
-                    ]),
+                    ])
+                    ->hidden(fn () => ! tenancy()->tenant?->features()->active(\App\Features\Shopconfiguration\PaymentGateway\VisionpayGateway::class)),
             ]),
 
         ];

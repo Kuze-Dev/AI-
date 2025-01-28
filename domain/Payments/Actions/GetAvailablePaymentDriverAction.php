@@ -24,8 +24,7 @@ class GetAvailablePaymentDriverAction
                 'stripe' => $tenant?->features()->active(app(StripeGateway::class)->name) ? app(StripeGateway::class)->label : false,
                 'manual' => $tenant?->features()->active(app(OfflineGateway::class)->name) ? app(OfflineGateway::class)->label : false,
                 'bank-transfer' => $tenant?->features()->active(app(BankTransfer::class)->name) ? app(BankTransfer::class)->label : false,
-                // 'vision-pay' => $tenant?->features()->active(app(VisionpayGateway::class)->name) ? app(VisionpayGateway::class)->label : false,
-                'vision-pay' => app(VisionpayGateway::class)->label,
+                'vision-pay' => $tenant?->features()->active(app(VisionpayGateway::class)->name) ? app(VisionpayGateway::class)->label : false,
             ], fn ($value) => $value !== false);
         }
 

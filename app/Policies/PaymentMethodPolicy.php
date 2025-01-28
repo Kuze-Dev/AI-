@@ -8,6 +8,7 @@ use App\Features\Shopconfiguration\PaymentGateway\BankTransfer;
 use App\Features\Shopconfiguration\PaymentGateway\OfflineGateway;
 use App\Features\Shopconfiguration\PaymentGateway\PaypalGateway;
 use App\Features\Shopconfiguration\PaymentGateway\StripeGateway;
+use App\Features\Shopconfiguration\PaymentGateway\VisionpayGateway;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Illuminate\Auth\Access\Response;
@@ -24,6 +25,7 @@ class PaymentMethodPolicy
             OfflineGateway::class,
             StripeGateway::class,
             BankTransfer::class,
+            VisionpayGateway::class,
         ])) {
             return Response::denyAsNotFound();
         }
