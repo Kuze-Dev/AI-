@@ -9,7 +9,8 @@ class PaymentAuthorize
     public function __construct(
         public bool $success = false,
         public ?string $message = null,
-        public ?string $url = null
+        public ?string $url = null,
+        public ?array $data = [],
     ) {
     }
 
@@ -19,6 +20,7 @@ class PaymentAuthorize
             success: $data['success'],
             message: $data['message'] ?? null,
             url: $data['url'] ?? null,
+            data: $data['data'] ?? null
         );
     }
 }
