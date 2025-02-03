@@ -34,6 +34,7 @@ class UpdateTenantAction
         }
 
         $tenant->setInternal('mail_from_address', $tenantData->mail?->from_address);
+        $tenant->setInternal('google_map_api_key', $tenantData->google_map_api_key);
         $tenant->save();
 
         $this->syncDomains($tenant, $tenantData->domains);
