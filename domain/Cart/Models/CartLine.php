@@ -56,6 +56,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class CartLine extends Model implements HasMedia
 {
     use HasFactory;
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
     use LogsActivity;
 

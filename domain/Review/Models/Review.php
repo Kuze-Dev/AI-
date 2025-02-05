@@ -59,6 +59,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class Review extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     protected $fillable = [

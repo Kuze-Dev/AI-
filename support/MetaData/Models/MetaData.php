@@ -43,6 +43,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  */
 class MetaData extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     /**

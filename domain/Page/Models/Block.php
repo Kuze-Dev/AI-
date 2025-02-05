@@ -54,6 +54,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
 class Block extends Model implements HasMedia
 {
     use ConstraintsRelationships;
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
     use LogsActivity;
     use Sites;

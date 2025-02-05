@@ -57,6 +57,7 @@ class PaymentMethod extends Model implements HasMedia
 {
     use HasFactory;
     use HasSlug;
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
     use LogsActivity;
     use SoftDeletes;
