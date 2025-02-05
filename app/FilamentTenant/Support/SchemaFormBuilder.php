@@ -641,10 +641,15 @@ class SchemaFormBuilder extends Component
 
     public function makeLocationPickerComponent(LocationPickerData $locationPickerData)
     {
+
+        return \App\FilamentTenant\Support\Forms\LocationPickerField::make($locationPickerData->state_name);
+        
         $locationPicker =  Group::make([
+            Group::make([
             TextInput::make($locationPickerData->state_name.'_full_address')
-            ->dehydrated(false)
-            ->formatStateUsing(fn () => 'Search Location'),   
+                ->dehydrated(false)
+                ->columnspan(2)
+                ->formatStateUsing(fn () => 'Search Location'),   
             TextInput::make($locationPickerData->state_name.'_latitude')
                 ->reactive()
                 ->afterStateUpdated(function ($state, callable $get, callable $set) use ($locationPickerData) {
@@ -652,7 +657,7 @@ class SchemaFormBuilder extends Component
                     'lat' => floatVal($state),
                     'lng' => floatVal($locationPickerData->state_name.$get('_longitude')),
                 ]);
-                })
+                })->columnspan(1)
                 ->lazy(),
             TextInput::make($locationPickerData->state_name.'_longitude')
                 ->reactive()
@@ -661,8 +666,9 @@ class SchemaFormBuilder extends Component
                         'lat' => floatval($locationPickerData->state_name.$get('_latitude')),
                         'lng' => floatVal($state),
                     ]);
-                })
-                ->lazy(),         
+                })->columnspan(1)
+                ->lazy(),     
+            ])->columns(2),    
             \Cheesegrits\FilamentGoogleMaps\Fields\Map::make($locationPickerData->state_name)
                 ->mapControls([
                     'mapTypeControl'    => true,
