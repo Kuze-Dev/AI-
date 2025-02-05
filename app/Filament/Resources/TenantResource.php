@@ -79,7 +79,7 @@ class TenantResource extends Resource
                             ->columnSpan(['md' => 2])
                             ->password()
                             ->revealable(fn (?Tenant $record) => $record === null)
-                            ->required()
+                            ->required(!app()->isLocal())
                             ->afterStateHydrated(
                                 fn (Forms\Components\TextInput $component, ?Tenant $record) => $component
                                     ->state($record ? 'nice try, but we won\'t show the password' : null)),
