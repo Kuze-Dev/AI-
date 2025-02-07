@@ -205,6 +205,10 @@ class BlueprintResource extends Resource
                     ->reactive()
                     ->options(
                         collect(FieldType::cases())
+                            ->reject(fn (FieldType $fieldType) => (
+                                tenancy()->tenant?->features()->inactive(\App\Features\CMS\GoogleMapField::class) &&
+                                $fieldType === FieldType::LOCATION_PICKER
+                            ))
                             ->mapWithKeys(fn (FieldType $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
                             ->sort()
                             ->toArray()
