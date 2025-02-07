@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
+use App\FilamentTenant\Support\Forms\LocationPickerField;
 use Closure;
 use Domain\Blueprint\DataTransferObjects\CheckBoxFieldData;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
@@ -33,7 +34,6 @@ use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
@@ -109,7 +109,7 @@ class SchemaFormBuilder extends Component
             ->schema(array_map(fn (FieldData $field) => $this->generateFieldComponent($field), $section->fields));
     }
 
-    private function generateFieldComponent(FieldData $field): Field|Group
+    private function generateFieldComponent(FieldData $field): Field
     {
         $fieldComponent = match ($field::class) {
             DatetimeFieldData::class => $this->makeDateTimePickerComponent($field),
@@ -133,17 +133,12 @@ class SchemaFormBuilder extends Component
             default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
         };
 
-        if ($fieldComponent instanceOf Group) {
-            
-            return $fieldComponent;
-        }
-
         if (! $this->isDehydrated()) {
             return $fieldComponent
                 ->label($field->title)
                 ->helperText($field->helper_text);
         }
-        
+
         return $fieldComponent
             ->label($field->title)
             ->required(fn () => in_array('required', $field->rules))
@@ -639,77 +634,10 @@ class SchemaFormBuilder extends Component
 
     }
 
-    public function makeLocationPickerComponent(LocationPickerData $locationPickerData)
+    public function makeLocationPickerComponent(LocationPickerData $locationPickerData): LocationPickerField
     {
 
-        return \App\FilamentTenant\Support\Forms\LocationPickerField::make($locationPickerData->state_name);
-        
-        $locationPicker =  Group::make([
-            Group::make([
-            TextInput::make($locationPickerData->state_name.'_full_address')
-                ->dehydrated(false)
-                ->columnspan(2)
-                ->formatStateUsing(fn () => 'Search Location'),   
-            TextInput::make($locationPickerData->state_name.'_latitude')
-                ->reactive()
-                ->afterStateUpdated(function ($state, callable $get, callable $set) use ($locationPickerData) {
-                $set($locationPickerData->state_name, [
-                    'lat' => floatVal($state),
-                    'lng' => floatVal($locationPickerData->state_name.$get('_longitude')),
-                ]);
-                })->columnspan(1)
-                ->lazy(),
-            TextInput::make($locationPickerData->state_name.'_longitude')
-                ->reactive()
-                ->afterStateUpdated(function ($state, callable $get, callable $set) use ($locationPickerData) {
-                    $set($locationPickerData->state_name, [
-                        'lat' => floatval($locationPickerData->state_name.$get('_latitude')),
-                        'lng' => floatVal($state),
-                    ]);
-                })->columnspan(1)
-                ->lazy(),     
-            ])->columns(2),    
-            \Cheesegrits\FilamentGoogleMaps\Fields\Map::make($locationPickerData->state_name)
-                ->mapControls([
-                    'mapTypeControl'    => true,
-                    'scaleControl'      => true,
-                    'streetViewControl' => true,
-                    'rotateControl'     => true,
-                    'fullscreenControl' => true,
-                    'searchBoxControl'  => false, // creates geocomplete field inside map
-                    'zoomControl'       => false,
-                ])
-                ->height(fn () => '400px') // map height (width is controlled by Filament options)
-                ->defaultZoom(18) // default zoom level when opening form
-                ->autocomplete($locationPickerData->state_name.'_full_address') // field on form to use as Places geocompletion field
-                ->autocompleteReverse(true) // reverse geocode marker location to autocomplete field
-                ->defaultLocation([
-                    '14.5454321',
-                    '121.0686773'
-                ])
-                ->afterStateUpdated(function ($state, callable $get, callable $set) use ($locationPickerData){
-                    $set($locationPickerData->state_name.'_latitude', $state['lat']);
-                    $set($locationPickerData->state_name.'_longitude', $state['lng']);
-                })
-                // ->reverseGeocode([
-                //     'street' => '%n %S',
-                //     'city' => '%L',
-                //     'state' => '%A1',
-                //     'zip' => '%z',
-                // ]) // reverse geocode marker location to form fields, see notes below
-                // ->debug() // prints reverse geocode format strings to the debug console 
-                // ->defaultLocation([39.526610, -107.727261]) // default for new forms
-                // ->draggable() // allow dragging to move marker
-                // ->clickable(false) // allow clicking to move marker
-                // ->geolocate() // adds a button to request device location and set map marker accordingly
-                // ->geolocateLabel('Get Location') // overrides the default label for geolocate button
-                // ->geolocateOnLoad(true, false) // geolocate on load, second arg 'always' (default false, only for new form))
-                // ->layers([
-                //     'https://googlearchive.github.io/js-v2-samples/ggeoxml/cta.kml',
-                // ]) // array of KML layer URLs to add to the map
-                // ->geoJson('https://fgm.test/storage/AGEBS01.geojson') // GeoJSON file, URL or JSON
-                // ->geoJsonContainsField('geojson') // field to capture GeoJSON polygon(s) which contain the map marker
-            ]);
-        return $locationPicker;
+        return LocationPickerField::make($locationPickerData->state_name);
+
     }
 }

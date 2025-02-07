@@ -12,7 +12,7 @@ class BlueprintServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/config/blueprint.php', 'domain.blueprint');
-        
+
     }
 
     public function boot(): void

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Blueprint\DataTransferObjects;
 
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Blueprint\Enums\TiptapTools;
 use Illuminate\Support\Str;
 
 class LocationPickerData extends FieldData

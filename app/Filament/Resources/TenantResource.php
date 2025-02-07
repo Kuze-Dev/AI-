@@ -223,7 +223,7 @@ class TenantResource extends Resource
                             // ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('google_map_api_key')))
                             ->columnSpanFull(),
                     ])->hidden(
-                        fn (?Tenant $record) => !$record?->features()->active(\App\Features\CMS\GoogleMapField::class)
+                        fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\GoogleMapField::class)
                     ),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->view('filament.forms.components.redbgheading-section')

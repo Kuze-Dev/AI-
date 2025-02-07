@@ -9,7 +9,7 @@ class TenantData
     /** @param  array<DomainData>  $domains */
     public function __construct(
         public readonly string $name,
-        public readonly bool $is_suspended = true,
+        public readonly bool $is_suspended,
         public readonly ?string $google_map_api_key,
         public readonly ?DatabaseData $database = null,
         public readonly ?BucketData $bucket = null,

@@ -41,7 +41,7 @@ class CreateBlueprintDataAction
         }
 
         if (is_array($blueprintDataData->value)) {
-            
+
             $filtered = array_filter($blueprintDataData->value, function ($value) {
                 $pathInfo = pathinfo($value);
                 if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {

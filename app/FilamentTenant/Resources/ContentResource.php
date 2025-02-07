@@ -257,35 +257,35 @@ class ContentResource extends Resource
 
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('full_address')
-                    ->dehydrated(false)
-                    ->formatStateUsing(fn () => 'Pasig, Metro Manila, Philippines'),   
+                        ->dehydrated(false)
+                        ->formatStateUsing(fn () => 'Pasig, Metro Manila, Philippines'),
                     Forms\Components\TextInput::make('latitude')
-    ->reactive()
-    ->afterStateUpdated(function ($state, callable $get, callable $set) {
-        $set('location', [
-            'lat' => floatVal($state),
-            'lng' => floatVal($get('longitude')),
-        ]);
-    })
-    ->lazy(),
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                            $set('location', [
+                                'lat' => floatval($state),
+                                'lng' => floatval($get('longitude')),
+                            ]);
+                        })
+                        ->lazy(),
                     Forms\Components\TextInput::make('longitude')
                         ->reactive()
                         ->afterStateUpdated(function ($state, callable $get, callable $set) {
                             $set('location', [
                                 'lat' => floatval($get('latitude')),
-                                'lng' => floatVal($state),
+                                'lng' => floatval($state),
                             ]);
                         })
-                        ->lazy(),         
+                        ->lazy(),
                     \Cheesegrits\FilamentGoogleMaps\Fields\Map::make('gmap')
                         ->mapControls([
-                            'mapTypeControl'    => true,
-                            'scaleControl'      => true,
+                            'mapTypeControl' => true,
+                            'scaleControl' => true,
                             'streetViewControl' => true,
-                            'rotateControl'     => true,
+                            'rotateControl' => true,
                             'fullscreenControl' => true,
-                            'searchBoxControl'  => false, // creates geocomplete field inside map
-                            'zoomControl'       => false,
+                            'searchBoxControl' => false, // creates geocomplete field inside map
+                            'zoomControl' => false,
                         ])
                         ->height(fn () => '400px') // map height (width is controlled by Filament options)
                         ->defaultZoom(18) // default zoom level when opening form
@@ -293,31 +293,31 @@ class ContentResource extends Resource
                         ->autocompleteReverse(true) // reverse geocode marker location to autocomplete field
                         ->defaultLocation([
                             '14.5454321',
-                            '121.0686773'
+                            '121.0686773',
                         ])
                         ->afterStateUpdated(function ($state, callable $get, callable $set) {
                             $set('latitude', $state['lat']);
                             $set('longitude', $state['lng']);
-                        })
-                        // ->reverseGeocode([
-                        //     'street' => '%n %S',
-                        //     'city' => '%L',
-                        //     'state' => '%A1',
-                        //     'zip' => '%z',
-                        // ]) // reverse geocode marker location to form fields, see notes below
-                        // ->debug() // prints reverse geocode format strings to the debug console 
-                        // ->defaultLocation([39.526610, -107.727261]) // default for new forms
-                        // ->draggable() // allow dragging to move marker
-                        // ->clickable(false) // allow clicking to move marker
-                        // ->geolocate() // adds a button to request device location and set map marker accordingly
-                        // ->geolocateLabel('Get Location') // overrides the default label for geolocate button
-                        // ->geolocateOnLoad(true, false) // geolocate on load, second arg 'always' (default false, only for new form))
-                        // ->layers([
-                        //     'https://googlearchive.github.io/js-v2-samples/ggeoxml/cta.kml',
-                        // ]) // array of KML layer URLs to add to the map
-                        // ->geoJson('https://fgm.test/storage/AGEBS01.geojson') // GeoJSON file, URL or JSON
-                        // ->geoJsonContainsField('geojson') // field to capture GeoJSON polygon(s) which contain the map marker
-                    ]),
+                        }),
+                    // ->reverseGeocode([
+                    //     'street' => '%n %S',
+                    //     'city' => '%L',
+                    //     'state' => '%A1',
+                    //     'zip' => '%z',
+                    // ]) // reverse geocode marker location to form fields, see notes below
+                    // ->debug() // prints reverse geocode format strings to the debug console
+                    // ->defaultLocation([39.526610, -107.727261]) // default for new forms
+                    // ->draggable() // allow dragging to move marker
+                    // ->clickable(false) // allow clicking to move marker
+                    // ->geolocate() // adds a button to request device location and set map marker accordingly
+                    // ->geolocateLabel('Get Location') // overrides the default label for geolocate button
+                    // ->geolocateOnLoad(true, false) // geolocate on load, second arg 'always' (default false, only for new form))
+                    // ->layers([
+                    //     'https://googlearchive.github.io/js-v2-samples/ggeoxml/cta.kml',
+                    // ]) // array of KML layer URLs to add to the map
+                    // ->geoJson('https://fgm.test/storage/AGEBS01.geojson') // GeoJSON file, URL or JSON
+                    // ->geoJsonContainsField('geojson') // field to capture GeoJSON polygon(s) which contain the map marker
+                ]),
             ]);
     }
 
