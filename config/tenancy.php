@@ -38,6 +38,7 @@ return [
         App\Tenancy\Bootstrappers\BucketBootstrapper::class,
         App\Tenancy\Bootstrappers\ExcelBootstrapper::class,
         App\Tenancy\Bootstrappers\MailBootstrapper::class,
+        App\Tenancy\Bootstrappers\GoogleMapBootstrapper::class,
     ],
 
     /**

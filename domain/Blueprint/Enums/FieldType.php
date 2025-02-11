@@ -7,6 +7,7 @@ namespace Domain\Blueprint\Enums;
 use Domain\Blueprint\DataTransferObjects\CheckBoxFieldData;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
+use Domain\Blueprint\DataTransferObjects\LocationPickerData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
 use Domain\Blueprint\DataTransferObjects\MediaFieldData;
 use Domain\Blueprint\DataTransferObjects\RadioFieldData;
@@ -42,6 +43,7 @@ enum FieldType: string
     case RADIO = 'radio';
     case TINYEDITOR = 'tinyeditor';
     case TIPTAPEDITOR = 'tiptap';
+    case LOCATION_PICKER = 'location-picker';
 
     public function getFieldDataClass(): string
     {
@@ -66,6 +68,7 @@ enum FieldType: string
             self::RADIO => RadioFieldData::class,
             self::TINYEDITOR => TinyEditorData::class,
             self::TIPTAPEDITOR => TipTapEditorData::class,
+            self::LOCATION_PICKER => LocationPickerData::class,
         };
     }
 }
