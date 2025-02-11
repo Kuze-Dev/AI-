@@ -167,6 +167,8 @@ class TenantResource extends Resource
                                     'extras' => [
                                         Features\CMS\Internationalization::class => app(Features\CMS\Internationalization::class)->label,
                                         Features\CMS\SitesManagement::class => app(Features\CMS\SitesManagement::class)->label,
+                                        Features\CMS\GoogleMapField::class => app(Features\CMS\GoogleMapField::class)->label,
+
                                     ],
                                 ],
                                 Features\Customer\CustomerBase::class => [
@@ -213,6 +215,15 @@ class TenantResource extends Resource
                             ]),
                     ])->hidden(
                         fn () => ! auth()->user()?->can('tenant.updateFeatures')
+                    ),
+                Forms\Components\Section::make(trans('Google Map Settings'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\TextInput::make('google_map_api_key')
+                            // ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('google_map_api_key')))
+                            ->columnSpanFull(),
+                    ])->hidden(
+                        fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\GoogleMapField::class)
                     ),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->view('filament.forms.components.redbgheading-section')
