@@ -22,7 +22,6 @@ use function Pest\Laravel\seed;
 
 uses(
     Illuminate\Foundation\Testing\TestCase::class,
-    Tests\CreatesApplication::class,
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
@@ -63,7 +62,6 @@ uses(
 
 uses(
     Illuminate\Foundation\Testing\TestCase::class,
-    Tests\CreatesApplication::class,
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {

@@ -10,12 +10,14 @@ use Domain\Auth\DataTransferObjects\TwoFactorData;
 use Domain\Auth\Exceptions\UserProviderNotSupportedException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Foundation\Auth\User as FoundationUser;
 use Illuminate\Validation\UnauthorizedException;
 use Mockery\MockInterface;
 use Pest\Mock\Mock;
 use Tests\Fixtures\User;
+use Illuminate\Support\Facades\Auth;
 
 beforeEach(function () {
     Event::fake();
@@ -30,10 +32,13 @@ beforeEach(function () {
 });
 
 it('can authenticate via totp code', function () {
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(retrieveById: fn () => $this->user);
-    $guard = (new Mock(StatefulGuard::class))
-        ->expect(login: fn () => null);
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(retrieveById: fn () => $this->user);
+    $userProvider = mock_expect(EloquentUserProvider::class,retrieveById: fn () => $this->user);
+
+//    $guard = (new Mock(StatefulGuard::class))
+//        ->expect(login: fn () => null);
+    $guard = mock_expect(StatefulGuard::class,login: fn () => null);
     Auth::shouldReceive('guard')
         ->once()
         ->andReturn($guard);
@@ -51,10 +56,14 @@ it('can authenticate via totp code', function () {
 });
 
 it('can authenticate via recovery code', function () {
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(retrieveById: fn () => $this->user);
-    $guard = (new Mock(StatefulGuard::class))
-        ->expect(login: fn () => null);
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(retrieveById: fn () => $this->user);
+    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => $this->user);
+
+//    $guard = (new Mock(StatefulGuard::class))
+//        ->expect(login: fn () => null);
+    $guard = mock_expect(StatefulGuard::class, login: fn () => null);
+
     Auth::shouldReceive('guard')
         ->once()
         ->andReturn($guard);
@@ -72,10 +81,14 @@ it('can authenticate via recovery code', function () {
 });
 
 it('can add safe device upon authentication', function () {
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(retrieveById: fn () => $this->user);
-    $guard = (new Mock(StatefulGuard::class))
-        ->expect(login: fn () => null);
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(retrieveById: fn () => $this->user);
+    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => $this->user);
+
+//    $guard = (new Mock(StatefulGuard::class))
+//        ->expect(login: fn () => null);
+    $guard = mock_expect(StatefulGuard::class, login: fn () => null);
+
     Auth::shouldReceive('guard')
         ->once()
         ->andReturn($guard);
@@ -97,8 +110,10 @@ it('can add safe device upon authentication', function () {
 });
 
 it('won\'t authenticate invalid totp code', function () {
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(retrieveById: fn () => $this->user);
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(retrieveById: fn () => $this->user);
+    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => $this->user);
+
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);
@@ -113,8 +128,10 @@ it('won\'t authenticate invalid totp code', function () {
 });
 
 it('won\'t authenticate invalid recovery code', function () {
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(retrieveById: fn () => $this->user);
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(retrieveById: fn () => $this->user);
+    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => $this->user);
+
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);
@@ -129,8 +146,10 @@ it('won\'t authenticate invalid recovery code', function () {
 });
 
 it('throws exception when no totp code and recovery code provided', function () {
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(retrieveById: fn () => $this->user);
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(retrieveById: fn () => $this->user);
+    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => $this->user);
+
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);
@@ -139,8 +158,10 @@ it('throws exception when no totp code and recovery code provided', function () 
 })->throws(\LogicException::class);
 
 it('throws exception when no challenged user is found', function () {
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(retrieveById: fn () => null);
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(retrieveById: fn () => null);
+    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => null);
+
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);
@@ -149,7 +170,9 @@ it('throws exception when no challenged user is found', function () {
 })->throws(AuthenticationException::class);
 
 it('throws exception when invalid user provider is given', function () {
-    $userProvider = new Mock(UserProvider::class);
+//    $userProvider = new Mock(UserProvider::class);
+    $userProvider = mock_expect(UserProvider::class);
+
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);
@@ -158,8 +181,10 @@ it('throws exception when invalid user provider is given', function () {
 })->throws(UserProviderNotSupportedException::class);
 
 it('throws exception when user is not two factor authenticatable', function () {
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(retrieveById: fn () => new FoundationUser());
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(retrieveById: fn () => new FoundationUser());
+    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => new FoundationUser());
+
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);

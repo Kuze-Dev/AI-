@@ -143,3 +143,36 @@ function deactivateFeatures(string|array $features): void
     }
 
 }
+
+/**
+ * @template TObject as object
+ *
+ * @param  class-string<TObject>|TObject  $object
+ * @return TObject|\Mockery\MockInterface
+ */
+function mock_expect(string|object $object, callable ...$methods): mixed
+{
+    /** @var TObject|\Mockery\MockInterface $mock */
+    $mock = mock($object);
+
+    foreach ($methods as $method => $expectation) {
+        /* @phpstan-ignore-next-line */
+        $m = $mock
+            ->shouldReceive((string) $method)
+            ->atLeast()
+            ->once();
+
+        $m->andReturnUsing($expectation);
+    }
+
+    return $mock;
+
+//
+//    return mock($object)
+//        ->shouldReceive((string) $method)
+//        ->atLeast()
+//        ->once()
+//        ->andReturnUsing($expectation);
+
+
+}
