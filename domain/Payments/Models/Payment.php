@@ -65,6 +65,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  */
 class Payment extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     /**

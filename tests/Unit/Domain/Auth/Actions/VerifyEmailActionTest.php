@@ -13,8 +13,9 @@ beforeEach(function () {
 });
 
 it('can verify email', function () {
-    $user = (new Mock(new User(['id' => 1, 'email' => 'test@user'])))
-        ->expect(markEmailAsVerified: fn () => true);
+//    $user = (new Mock(new User(['id' => 1, 'email' => 'test@user'])))
+//        ->expect(markEmailAsVerified: fn () => true);
+    $user = mock_expect(new User(['id' => 1, 'email' => 'test@user']),markEmailAsVerified: fn () => true);
 
     $result = app(VerifyEmailAction::class)->execute($user);
 

@@ -105,6 +105,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Order extends Model implements HasMedia, PayableInterface
 {
     use HasPayments;
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
     use LogsActivity;
     use Notifiable;

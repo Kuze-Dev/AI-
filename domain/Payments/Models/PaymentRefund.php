@@ -47,6 +47,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  */
 class PaymentRefund extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     /**

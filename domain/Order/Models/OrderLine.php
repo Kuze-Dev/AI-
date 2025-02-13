@@ -75,6 +75,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class OrderLine extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
     use LogsActivity;
 

@@ -70,8 +70,6 @@ services:
             - auth
             - request
             - data_set
-rules:
-    - Spatie\Ray\PHPStan\RemainingRayCallRule
 
 parameters:
 
@@ -90,13 +88,11 @@ parameters:
         - domain
         - support
 
-    # The level 10 is the highest level
+    # The level 9 is the highest level
     level: 8
 
     ignoreErrors:
         #- '#Access to property \$value on an unknown class StringBackedEnum.#'
-        - identifier: return.unusedType
-        - identifier: missingType.iterableValue
 
     excludePaths:
         # - ./*/*/FileToBeExcluded.php
@@ -107,10 +103,4 @@ parameters:
 
     checkOctaneCompatibility: true
     checkModelProperties: true
-
-    parallel:
-            maximumNumberOfProcesses: 6
-
-    errorFormat: ticketswap
-    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
-
+    checkMissingIterableValueType: false

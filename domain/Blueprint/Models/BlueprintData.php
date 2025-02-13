@@ -53,6 +53,7 @@ use Spatie\Image\Enums\Fit;
  */
 class BlueprintData extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     protected $fillable = [

@@ -15,6 +15,7 @@ use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
@@ -69,10 +70,6 @@ function assertActivityLogged(
 
 function testInTenantContext(array|string|null $features = null): Tenant
 {
-    config([
-        'tenancy.database.suffix' => '_'.Str::random(7),
-    ]);
-
     Filament::setCurrentPanel(Filament::getPanels()['tenant']);
 
     /** @var Tenant */
@@ -144,5 +141,38 @@ function deactivateFeatures(string|array $features): void
     foreach (Arr::wrap($features) as $feature) {
         $tenant->features()->deactivate($feature);
     }
+
+}
+
+/**
+ * @template TObject as object
+ *
+ * @param  class-string<TObject>|TObject  $object
+ * @return TObject|\Mockery\MockInterface
+ */
+function mock_expect(string|object $object, callable ...$methods): mixed
+{
+    /** @var TObject|\Mockery\MockInterface $mock */
+    $mock = mock($object);
+
+    foreach ($methods as $method => $expectation) {
+        /* @phpstan-ignore-next-line */
+        $m = $mock
+            ->shouldReceive((string) $method)
+            ->atLeast()
+            ->once();
+
+        $m->andReturnUsing($expectation);
+    }
+
+    return $mock;
+
+//
+//    return mock($object)
+//        ->shouldReceive((string) $method)
+//        ->atLeast()
+//        ->once()
+//        ->andReturnUsing($expectation);
+
 
 }

@@ -47,6 +47,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
 class ProductVariant extends Model implements HasMedia
 {
     use ConstraintsRelationships;
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     protected $fillable = [

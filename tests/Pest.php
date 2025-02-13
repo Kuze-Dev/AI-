@@ -22,7 +22,6 @@ use function Pest\Laravel\seed;
 
 uses(
     Illuminate\Foundation\Testing\TestCase::class,
-    Tests\CreatesApplication::class,
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
@@ -44,10 +43,9 @@ uses(
         });
 
         config([
-            'tenancy.database.template_tenant_connection' => 'sqlite',
-            'tenancy.database.prefix' => ($token = ParallelTesting::token())
-                ? "test_{$token}_"
-                : 'test_',
+            'tenancy.database.template_tenant_connection' => 'tenant_template_sqlite',
+            'tenancy.database.prefix' => 'test_tenancy_'.(ParallelTesting::token() ? Str::random().'_':''),
+            'tenancy.database.suffix' => '_'.(ParallelTesting::token() ? Str::random().'_':''),
         ]);
     })
     ->afterEach(function () {
@@ -60,7 +58,6 @@ uses(
 
 uses(
     Illuminate\Foundation\Testing\TestCase::class,
-    Tests\CreatesApplication::class,
     Illuminate\Foundation\Testing\LazilyRefreshDatabase::class,
 )
     ->beforeEach(function () {
@@ -80,11 +77,11 @@ uses(
 
         Relation::morphMap(['test_user' => User::class]);
 
+
         config([
-            'tenancy.database.template_tenant_connection' => 'sqlite',
-            'tenancy.database.prefix' => ($token = ParallelTesting::token())
-                ? "test_{$token}_"
-                : 'test_',
+            'tenancy.database.template_tenant_connection' => 'tenant_template_sqlite',
+            'tenancy.database.prefix' => 'test_tenancy_'.(ParallelTesting::token() ? Str::random().'_':''),
+            'tenancy.database.suffix' => '_'.(ParallelTesting::token() ? Str::random().'_':''),
         ]);
     })
     ->afterEach(function () {

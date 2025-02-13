@@ -22,6 +22,7 @@ use Sentry\Laravel\Integration;
 use Spatie\Health\Exceptions\CheckDidNotComplete;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 use Spatie\QueryBuilder\Exceptions\InvalidFilterValue;
+use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -67,6 +68,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 CheckDidNotComplete::class,
                 FileIsTooBig::class,
                 InvalidFilterValue::class,
+                TenantCouldNotBeIdentifiedOnDomainException::class
             ])
             ->render(function (InvalidFilterValue $e, Request $request) {
                 abort(400, $e->getMessage());

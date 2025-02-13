@@ -20,16 +20,26 @@ use Tests\Fixtures\User;
 
 it('can check if two factor is required', function () {
     Event::fake();
-    $user = (new Mock(new User()))
-        ->expect(
-            hasEnabledTwoFactorAuthentication: fn () => true,
-            getKey: fn () => 1,
-        );
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(
-            retrieveByCredentials: fn () => $user,
-            validateCredentials: fn () => true,
-        );
+//    $user = (new Mock(new User()))
+//        ->expect(
+//            hasEnabledTwoFactorAuthentication: fn () => true,
+//            getKey: fn () => 1,
+//        );
+    $user = mock_expect(
+        new User(),
+        hasEnabledTwoFactorAuthentication: fn () => true,
+        getKey: fn () => 1
+    );
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(
+//            retrieveByCredentials: fn () => $user,
+//            validateCredentials: fn () => true,
+//        );
+    $userProvider = mock_expect(
+        EloquentUserProvider::class,
+        retrieveByCredentials: fn () => $user,
+        validateCredentials: fn () => true
+    );
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);
@@ -45,13 +55,21 @@ it('can check if two factor is required', function () {
 
 it('proceeds through pipeline when two factor is disabled for user', function () {
     Event::fake();
-    $user = (new Mock(new User()))
-        ->expect(hasEnabledTwoFactorAuthentication: fn () => false);
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(
-            retrieveByCredentials: fn () => $user,
-            validateCredentials: fn () => true,
-        );
+//    $user = (new Mock(new User()))
+//        ->expect(hasEnabledTwoFactorAuthentication: fn () => false);
+    $user = mock_expect(new User(),hasEnabledTwoFactorAuthentication: fn () => false);
+
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(
+//            retrieveByCredentials: fn () => $user,
+//            validateCredentials: fn () => true,
+//        );
+    $userProvider = mock_expect(
+        EloquentUserProvider::class,
+        retrieveByCredentials: fn () => $user,
+        validateCredentials: fn () => true
+    );
+
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);
@@ -67,13 +85,21 @@ it('proceeds through pipeline when two factor is disabled for user', function ()
 
 it('proceeds through pipeline when user is on safe device', function () {
     Event::fake();
-    $user = (new Mock(new User()))
-        ->expect(hasEnabledTwoFactorAuthentication: fn () => true);
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(
-            retrieveByCredentials: fn () => $user,
-            validateCredentials: fn () => true,
-        );
+//    $user = (new Mock(new User()))
+//        ->expect(hasEnabledTwoFactorAuthentication: fn () => true);
+    $user = mock_expect(new User(),hasEnabledTwoFactorAuthentication: fn () => true);
+
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(
+//            retrieveByCredentials: fn () => $user,
+//            validateCredentials: fn () => true,
+//        );
+    $userProvider = mock_expect(
+        EloquentUserProvider::class,
+        retrieveByCredentials: fn () => $user,
+        validateCredentials: fn () => true
+    );
+
     $this->mock(
         CheckIfOnSafeDeviceAction::class,
         fn (MockInterface $mock) => $mock->expects('execute')->andReturns(true)
@@ -93,11 +119,17 @@ it('proceeds through pipeline when user is on safe device', function () {
 
 it('throws exception on invalid credentials', function () {
     Event::fake();
-    $userProvider = (new Mock(EloquentUserProvider::class))
-        ->expect(
-            retrieveByCredentials: fn () => new User(),
-            validateCredentials: fn () => false,
-        );
+//    $userProvider = (new Mock(EloquentUserProvider::class))
+//        ->expect(
+//            retrieveByCredentials: fn () => new User(),
+//            validateCredentials: fn () => false,
+//        );
+    $userProvider = mock_expect(
+        EloquentUserProvider::class,
+        retrieveByCredentials: fn () => new User(),
+        validateCredentials: fn () => false
+    );
+
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn($userProvider);
