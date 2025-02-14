@@ -38,7 +38,7 @@ definitions:
           changesets:
             includePaths:
               - "**.php"
-              - "phpstan.neon.dist"
+              - "phpstan.neon"
               - "composer.json"
               - "bitbucket-pipelines.yml"
     - step: &test
