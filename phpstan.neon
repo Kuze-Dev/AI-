@@ -93,6 +93,7 @@ parameters:
 
     ignoreErrors:
         #- '#Access to property \$value on an unknown class StringBackedEnum.#'
+        - identifier: missingType.iterableValue
 
     excludePaths:
         # - ./*/*/FileToBeExcluded.php
