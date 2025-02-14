@@ -12,6 +12,7 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Support\RouteUrl\Contracts\HasRouteUrl;
+use Support\RouteUrl\EloquentBuilder\RouteUrlEloquentBuilder;
 use Support\RouteUrl\Models\RouteUrl;
 
 class MicroSiteUniqueRouteUrlRule implements ValidationRule
@@ -71,7 +72,7 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
             }
 
             $query->whereNot(
-                fn (EloquentBuilder $query) => $query
+                fn (RouteUrlEloquentBuilder $query) => $query
                     ->where('model_type', $this->ignoreModel->getMorphClass())
                     ->whereIn('model_id', array_filter($ignoreModelIds))
             );
