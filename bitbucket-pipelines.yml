@@ -39,6 +39,8 @@ definitions:
             includePaths:
               - "**.php"
               - "phpstan.neon.dist"
+              - "composer.json"
+              - "bitbucket-pipelines.yml"
     - step: &test
         <<: *common-step
         name: Test
