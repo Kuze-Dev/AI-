@@ -104,3 +104,4 @@ parameters:
 
     checkOctaneCompatibility: true
     checkModelProperties: true
+    checkMissingIterableValueType: false
