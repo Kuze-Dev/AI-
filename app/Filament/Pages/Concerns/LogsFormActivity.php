@@ -134,8 +134,8 @@ trait LogsFormActivity
     protected function getDescriptionForEvent(string $event): string
     {
         if (method_exists($this, 'getResource')) {
-            if (method_exists($this, 'getRecord')) {
-                return $this->getRecord()->getAttribute($this->getResource()::getRecordTitleAttribute());
+            if (method_exists($this, 'getRecord') && ($record = $this->getRecord()) !== null) {
+                return $record->getAttribute($this->getResource()::getRecordTitleAttribute());
             }
 
             return Str::headline($this->getResource()::getModelLabel()).' '.$event;
