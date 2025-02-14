@@ -18532,7 +18532,9 @@
     },
     "platform-dev": {},
     "platform-overrides": {
-        "php": "8.2.11"
+        "php": "8.2.11",
+        "ext-pcntl": "8.2",
+        "ext-posix": "8.2"
     },
     "plugin-api-version": "2.6.0"
 }
