@@ -12,6 +12,3 @@ use Support\RouteUrl\Models\RouteUrl;
  * @mixin TModel
  */
 class RouteUrlEloquentBuilder extends Builder {}
-{
-
-}
