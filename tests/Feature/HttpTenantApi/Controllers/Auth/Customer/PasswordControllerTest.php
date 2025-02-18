@@ -35,7 +35,7 @@ it('can send link', function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    Event::fake();
+    Event::fake(PasswordResetSent::class);
     Notification::fake();
     Queue::fake();
 
@@ -55,7 +55,7 @@ it('can reset password', function () {
             'remember_token' => 'old-remember_token',
         ]);
 
-    Event::fake();
+    Event::fake(PasswordReset::class);
     Notification::fake();
     Queue::fake();
 

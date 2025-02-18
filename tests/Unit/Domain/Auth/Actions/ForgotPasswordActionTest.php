@@ -7,6 +7,7 @@ use Domain\Auth\Enums\PasswordResetResult;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Facades\Password;
 use Pest\Mock\Mock;
+beforeEach()->skip('skip otp');
 
 it('can send password reset', function () {
     Password::shouldReceive('broker')

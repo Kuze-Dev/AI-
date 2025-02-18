@@ -44,8 +44,8 @@ uses(
 
         config([
             'tenancy.database.template_tenant_connection' => 'tenant_template_sqlite',
-            'tenancy.database.prefix' => 'test_tenancy_'.(ParallelTesting::token() ? Str::random().'_':''),
-            'tenancy.database.suffix' => '_'.(ParallelTesting::token() ? Str::random().'_':''),
+            'tenancy.database.prefix' => 'test_tenancy_'.(($token = ParallelTesting::token())!==null ? $token.'_':''),
+            'tenancy.database.suffix' => '_'.(($token =ParallelTesting::token())!==null ? $token.'_':''),
         ]);
     })
     ->afterEach(function () {
@@ -80,8 +80,8 @@ uses(
 
         config([
             'tenancy.database.template_tenant_connection' => 'tenant_template_sqlite',
-            'tenancy.database.prefix' => 'test_tenancy_'.(ParallelTesting::token() ? Str::random().'_':''),
-            'tenancy.database.suffix' => '_'.(ParallelTesting::token() ? Str::random().'_':''),
+            'tenancy.database.prefix' => 'test_tenancy_'.(($token = ParallelTesting::token())!==null ? $token.'_':''),
+            'tenancy.database.suffix' => '_'.(($token =ParallelTesting::token())!==null ? $token.'_':''),
         ]);
     })
     ->afterEach(function () {

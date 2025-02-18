@@ -19,7 +19,7 @@ use Pest\Mock\Mock;
 use Tests\Fixtures\User;
 
 it('can check if two factor is required', function () {
-    Event::fake();
+    Event::fake(TwoFactorAuthenticationChallenged::class);
 //    $user = (new Mock(new User()))
 //        ->expect(
 //            hasEnabledTwoFactorAuthentication: fn () => true,
@@ -54,7 +54,7 @@ it('can check if two factor is required', function () {
 });
 
 it('proceeds through pipeline when two factor is disabled for user', function () {
-    Event::fake();
+    Event::fake(TwoFactorAuthenticationChallenged::class);
 //    $user = (new Mock(new User()))
 //        ->expect(hasEnabledTwoFactorAuthentication: fn () => false);
     $user = mock_expect(new User(),hasEnabledTwoFactorAuthentication: fn () => false);
@@ -84,7 +84,7 @@ it('proceeds through pipeline when two factor is disabled for user', function ()
 });
 
 it('proceeds through pipeline when user is on safe device', function () {
-    Event::fake();
+    Event::fake(TwoFactorAuthenticationChallenged::class);
 //    $user = (new Mock(new User()))
 //        ->expect(hasEnabledTwoFactorAuthentication: fn () => true);
     $user = mock_expect(new User(),hasEnabledTwoFactorAuthentication: fn () => true);
@@ -118,7 +118,7 @@ it('proceeds through pipeline when user is on safe device', function () {
 });
 
 it('throws exception on invalid credentials', function () {
-    Event::fake();
+    Event::fake(Failed::class);
 //    $userProvider = (new Mock(EloquentUserProvider::class))
 //        ->expect(
 //            retrieveByCredentials: fn () => new User(),
@@ -149,7 +149,7 @@ it('throws exception on invalid credentials', function () {
 })->throws(ValidationException::class);
 
 it('throws exception on invalid user provider', function () {
-    Event::fake();
+    Event::fake(TwoFactorAuthenticationChallenged::class);
     Auth::shouldReceive('createUserProvider')
         ->once()
         ->andReturn(mock(UserProvider::class));

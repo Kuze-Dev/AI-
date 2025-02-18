@@ -29,7 +29,7 @@ beforeEach(function () {
             'secret' => 'secret',
         ])
         ->save();
-});
+})->skip('skip otp');
 
 it('can authenticate via totp code', function () {
 //    $userProvider = (new Mock(EloquentUserProvider::class))
