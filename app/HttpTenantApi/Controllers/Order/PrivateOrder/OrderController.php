@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Order\PrivateOrder;
 
+use App\Attributes\CurrentApiCustomer;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;
+use Domain\Customer\Models\Customer;
 use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
@@ -36,10 +38,8 @@ use Symfony\Component\Mailer\Exception\TransportException;
 ]
 class OrderController extends Controller
 {
-    public function index(): mixed
+    public function index(#[CurrentApiCustomer] Customer $customer): mixed
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         return OrderResource::collection(
             QueryBuilder::for(Order::with([
@@ -119,10 +119,8 @@ class OrderController extends Controller
         }
     }
 
-    public function show(Order $order): OrderResource
+    public function show(Order $order,#[CurrentApiCustomer] Customer $customer): OrderResource
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         $model = QueryBuilder::for(
             $order->with([

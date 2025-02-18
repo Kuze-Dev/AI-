@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
+use App\Attributes\CurrentApiCustomer;
 use App\HttpTenantApi\Resources\ServiceOrderResource;
+use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderData;
 use Domain\ServiceOrder\Exceptions\InvalidServiceBillException;
@@ -26,10 +28,8 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 ]
 class ServiceOrderController
 {
-    public function index(): JsonApiResourceCollection
+    public function index(#[CurrentApiCustomer] Customer $customer): JsonApiResourceCollection
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         return ServiceOrderResource::collection(
             QueryBuilder::for(ServiceOrder::query()->whereBelongsTo($customer))
@@ -41,10 +41,8 @@ class ServiceOrderController
         );
     }
 
-    public function show(string $serviceOrder): ServiceOrderResource
+    public function show(string $serviceOrder,#[CurrentApiCustomer] Customer $customer): ServiceOrderResource
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         return ServiceOrderResource::make(
             QueryBuilder::for(ServiceOrder::whereReference($serviceOrder)->whereBelongsTo($customer))

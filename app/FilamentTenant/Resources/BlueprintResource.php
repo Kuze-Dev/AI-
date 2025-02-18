@@ -18,7 +18,6 @@ use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Enums\TiptapTools;
 use Domain\Blueprint\Models\Blueprint;
-use Closure;
 use ErrorException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;

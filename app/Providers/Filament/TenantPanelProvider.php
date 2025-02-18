@@ -49,7 +49,7 @@ class TenantPanelProvider extends PanelProvider
             ->emailVerification()
             ->userMenuItems([
                 'profile' => MenuItem::make()
-                    ->label(fn () => Filament::auth()->user()?->full_name),
+                    ->label(fn () => filament_admin()->full_name),
             ])
             ->colors([
                 'primary' => Color::Blue,

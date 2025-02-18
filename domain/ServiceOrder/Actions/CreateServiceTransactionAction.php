@@ -15,10 +15,10 @@ class CreateServiceTransactionAction
         return ServiceTransaction::create(
             (array) new ServiceTransactionData(
                 service_order_id: $createServiceTransactionData->service_order->id,
-                service_bill_id: $createServiceTransactionData->service_bill?->id ?? null,
+                service_bill_id: $createServiceTransactionData->service_bill->id ?? null,
                 payment_id: $createServiceTransactionData->payment->id,
                 payment_method_id: $createServiceTransactionData->payment->payment_method_id,
-                total_amount: $createServiceTransactionData->service_bill?->total_amount ?? $createServiceTransactionData->total_amount,
+                total_amount: $createServiceTransactionData->service_bill->total_amount ?? $createServiceTransactionData->total_amount,
                 currency: $createServiceTransactionData->service_order->currency_code,
                 status: $createServiceTransactionData->service_transaction_status,
             )

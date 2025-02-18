@@ -64,8 +64,7 @@ class CommonServiceProvider extends ServiceProvider
                 if (Filament::auth()->check()) {
                     $component
                         ->timezone(
-                            /** @phpstan-ignore-next-line  */
-                            Filament::auth()->user()->timezone
+                            filament_admin()->timezone
                         );
                 }
             }
@@ -76,8 +75,7 @@ class CommonServiceProvider extends ServiceProvider
                 if (Filament::auth()->check()) {
                     $component
                         ->timezone(
-                            /** @phpstan-ignore-next-line  */
-                            Filament::auth()->user()->timezone
+                            filament_admin()->timezone
                         );
                 }
             }
@@ -87,8 +85,7 @@ class CommonServiceProvider extends ServiceProvider
                 if (Filament::auth()->check()) {
                     $column
                         ->timezone(
-                            /** @phpstan-ignore-next-line  */
-                            Filament::auth()->user()->timezone
+                            filament_admin()->timezone
                         );
                 }
             }

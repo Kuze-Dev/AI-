@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
 use App\Features\CMS\SitesManagement;
-use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
@@ -21,20 +20,20 @@ use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
 use Domain\Tenant\TenantFeatureSupport;
+use Filament\Actions;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\StaticAction;
 use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
-use Filament\Actions;
-use Filament\Actions\ActionGroup;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
-use Filament\Actions\StaticAction;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportRedirects\Redirector;
 
@@ -107,26 +106,24 @@ class EditContentEntry extends EditRecord
                     ->label(trans('Save As Draft'))
                     ->action(function (Action $action) {
                         $data = $this->form->getState();
-                           
+
                         $record = $this->record;
-        
+
                         $record->pageDraft?->delete();
-        
+
                         $pageData = ContentEntryData::fromArray($data);
-        
+
                         $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
-        
+
                         Notification::make()
                             ->success()
                             ->title(trans('Overwritten Draft'))
                             ->body(trans('Content Entry Draft has been overwritten'))
                             ->send();
-        
+
                         $action->redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
-                       
-        
-              
-                        })
+
+                    })
                     ->requiresConfirmation()
                     ->modalHeading('Draft for this content already exists')
                     ->modalDescription('You have an existing draft for this content. Do you want to overwrite the existing draft?')
@@ -140,9 +137,9 @@ class EditContentEntry extends EditRecord
                     ->action('save')
                     ->keyBindings(['mod+s']),
             ])
-            ->button()
-            ->icon('')
-            ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label')),
+                ->button()
+                ->icon('')
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label')),
             Actions\DeleteAction::make(),
             ActionGroup::make([
                 Action::make('preview')
@@ -166,9 +163,9 @@ class EditContentEntry extends EditRecord
                     ->action(function (Action $action) {
                         /** @var array */
                         $data = $action->getFormData();
-                        
+
                         return $this->createTranslation($data);
-                       
+
                     })
                     // ->action('createTranslation')
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
@@ -244,10 +241,10 @@ class EditContentEntry extends EditRecord
                     ]),
 
             ])
-            ->button()
-            ->color('gray')
-            ->icon('')
-            ->label(trans('More Actions')),
+                ->button()
+                ->color('gray')
+                ->icon('')
+                ->label(trans('More Actions')),
         ];
     }
 
@@ -259,7 +256,7 @@ class EditContentEntry extends EditRecord
 
         $pageData = ContentEntryData::fromArray($data);
 
-        //check if page has existing draft
+        // check if page has existing draft
 
         if (! is_null($record->pageDraft)) {
 
@@ -364,8 +361,7 @@ class EditContentEntry extends EditRecord
     {
         $record = $this->record;
 
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = auth()->user();
+        $admin = filament_admin();
 
         if ($record->draftable_id) {
 

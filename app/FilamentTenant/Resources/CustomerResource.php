@@ -267,11 +267,11 @@ class CustomerResource extends Resource
                     ]),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->translateLabel()
-                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->dateTime(timezone: filament_admin()->timezone)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->translateLabel()
-                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->dateTime(timezone: filament_admin()->timezone)
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
             ])

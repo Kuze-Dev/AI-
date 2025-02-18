@@ -40,7 +40,7 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
     public function __construct(private ServiceBill $serviceBill)
     {
         $this->serviceOrder = $this->serviceBill->serviceOrder;
-        $this->payment_method = $this->serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
+        $this->payment_method = $this->serviceBill->serviceOrder->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;

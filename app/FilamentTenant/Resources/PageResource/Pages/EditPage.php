@@ -210,7 +210,7 @@ class EditPage extends EditRecord
 
                             return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
                         }),
-                   
+
                     Action::make('overwriteDraft')
                         ->label(trans('Save As Draft'))
                         ->action('overwriteDraft')
@@ -491,8 +491,7 @@ class EditPage extends EditRecord
         /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();
 
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = auth()->user();
+        $admin = filament_admin();
 
         if ($exist) {
 

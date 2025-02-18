@@ -63,13 +63,13 @@ class BlockResource extends Resource
                 // Forms\Components\FileUpload::make('image'),
                 \App\FilamentTenant\Support\MediaUploader::make('image')
                     ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? []) ?: null)
-                    ->formatStateUsing(function (?Block $record){
-                        if($record){
+                    ->formatStateUsing(function (?Block $record) {
+                        if ($record) {
                             return $record->media->pluck('uuid')->toArray();
                         }
                         return [];
                     })
-                    ->getUploadedFileUsing( function ($file) {
+                    ->getUploadedFileUsing(function ($file) {
 
                         if (! is_null($file)) {
                             $mediaModel = Media::where('uuid', $file)
@@ -84,14 +84,14 @@ class BlockResource extends Resource
                                     'url' => $mediaModel->getUrl(),
                                 ];
 
-                            $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                                $storage = Storage::disk(config('filament.default_filesystem_disk'));
 
-                            if ($storage->exists($file)) {
-                                return $storage->url($file);
+                                if ($storage->exists($file)) {
+                                    return $storage->url($file);
+                                }
+
                             }
-
                         }
-                    }
 
                         return [];
                     })

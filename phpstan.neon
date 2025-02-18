@@ -93,6 +93,8 @@ parameters:
 
     ignoreErrors:
         #- '#Access to property \$value on an unknown class StringBackedEnum.#'
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
 
     excludePaths:
         # - ./*/*/FileToBeExcluded.php
@@ -103,4 +105,6 @@ parameters:
 
     checkOctaneCompatibility: true
     checkModelProperties: true
-    checkMissingIterableValueType: false
+
+    errorFormat: ticketswap
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

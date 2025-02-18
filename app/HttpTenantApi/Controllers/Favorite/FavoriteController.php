@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Favorite;
 
+use App\Attributes\CurrentApiCustomer;
 use App\HttpTenantApi\Resources\FavoriteResource;
+use Domain\Customer\Models\Customer;
 use Domain\Favorite\Actions\CreateFavoriteAction;
 use Domain\Favorite\Actions\DestroyFavoriteAction;
 use Domain\Favorite\DataTransferObjects\FavoriteData;
@@ -23,12 +25,8 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 ]
 class FavoriteController
 {
-    public function index(): JsonApiResourceCollection
+    public function index(#[CurrentApiCustomer] Customer $customer): JsonApiResourceCollection
     {
-        $customer = auth()->user();
-        if (! $customer) {
-            throw new AuthenticationException();
-        }
 
         return FavoriteResource::collection(
             QueryBuilder::for(Favorite::whereCustomerId($customer->id))
@@ -44,13 +42,8 @@ class FavoriteController
         );
     }
 
-    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction): JsonResponse
+    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction, #[CurrentApiCustomer] Customer $customer): JsonResponse
     {
-        $customer = auth()->user();
-        if (! $customer) {
-            throw new AuthenticationException();
-        }
-
         $validatedData = $request->validated();
 
         $favoriteData = FavoriteData::fromArray([
@@ -65,12 +58,8 @@ class FavoriteController
         }
     }
 
-    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction): JsonResponse
+    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction,#[CurrentApiCustomer] Customer $customer): JsonResponse
     {
-        $customer = auth()->user();
-        if (! $customer) {
-            throw new AuthenticationException();
-        }
 
         $favoriteData = FavoriteData::fromArray([
             'customer_id' => $customer->id,

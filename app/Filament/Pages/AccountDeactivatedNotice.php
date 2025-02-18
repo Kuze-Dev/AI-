@@ -14,9 +14,9 @@ class AccountDeactivatedNotice extends SimplePage
 
     public function mount(): void
     {
-        $user = Filament::auth()->user();
+        $admin = filament_admin();
 
-        if ($user instanceof HasActiveState && $user->isActive()) {
+        if ($admin instanceof HasActiveState && $admin->isActive()) {
             redirect()->intended(Filament::getUrl());
         }
     }

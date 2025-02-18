@@ -21,7 +21,7 @@ final class Helpers
     public static function now(): Carbon
     {
         return now(
-            Filament::auth()->user()?->{config('filament-export.user_timezone_field')}
+            filament_admin_optional()?->{config('filament-export.user_timezone_field')}
         );
     }
 }

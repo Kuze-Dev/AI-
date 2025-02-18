@@ -161,8 +161,7 @@ trait ExportsRecords
             return ExcelFacade::download($exportClass, $fileName, $writerType);
         }
 
-        /** @var \Illuminate\Database\Eloquent\Model $user */
-        $user = Filament::auth()->user();
+        $user = filament_admin();
 
         ExcelFacade::queue(
             export: $exportClass,

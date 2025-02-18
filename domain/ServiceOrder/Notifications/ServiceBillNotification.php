@@ -39,7 +39,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
     {
         $this->serviceOrder = $this->serviceBill->serviceOrder;
 
-        $this->payment_method = $this->serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
+        $this->payment_method = $this->serviceBill->serviceOrder->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
         $this->logo = app(SiteSettings::class)->getLogoUrl();
 

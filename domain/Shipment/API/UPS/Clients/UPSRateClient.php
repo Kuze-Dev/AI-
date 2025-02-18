@@ -178,7 +178,7 @@ class UPSRateClient extends BaseClient
             ],
         ];
 
-        /** @var string */
+        /** @var string $jsonString */
         $jsonString = json_encode($data);
 
         $response = $this->client->getClient()

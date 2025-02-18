@@ -118,8 +118,7 @@ class EditTaxonomy extends EditRecord
         /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();
 
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = auth()->user();
+        $admin = filament_admin();
 
         if ($exist) {
 

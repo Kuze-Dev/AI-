@@ -64,8 +64,8 @@ class ImportAction extends Action
                 $response = Excel::import($this->getImportClass(), $data['file']);
 
                 if ($response instanceof PendingDispatch) {
-                    /** @var \Illuminate\Database\Eloquent\Model $user */
-                    $user = Filament::auth()->user();
+
+                    $user = filament_admin();
 
                     $response->chain([fn () => event(new ImportFinished($user))]);
 
@@ -189,11 +189,10 @@ class ImportAction extends Action
             return new $importClass();
         }
 
-        /** @var \Illuminate\Foundation\Auth\User $user */
-        $user = Filament::auth()->user();
+        $admin = filament_admin();
 
         return new DefaultImport(
-            user: $user,
+            user: $admin,
             processRowsUsing: new SerializableClosure($this->processRowsUsing),
             uniqueBy: $this->uniqueBy,
             validateRules: $this->validateRules,

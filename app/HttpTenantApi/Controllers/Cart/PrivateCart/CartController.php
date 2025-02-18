@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
+use App\Attributes\CurrentApiCustomer;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
+use Domain\Customer\Models\Customer;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Tier\Models\Tier;
@@ -23,10 +25,8 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CartController extends Controller
 {
-    public function index(): mixed
+    public function index(#[CurrentApiCustomer] Customer $customer): mixed
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         /** @var \Domain\Tier\Models\Tier $tier */
         $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();

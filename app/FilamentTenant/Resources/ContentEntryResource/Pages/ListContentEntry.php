@@ -20,16 +20,15 @@ use Illuminate\Support\Str;
 class ListContentEntry extends ListRecords
 {
     // use HasParentResource;
-    
+
     protected static string $resource = ContentEntryResource::class;
 
     public mixed $ownerRecord;
 
-
     #[\Override]
     public function mount(string $ownerRecord = ''): void
     {
-   
+
         $this->ownerRecord = app(Content::class)->resolveRouteBinding($ownerRecord)?->load('taxonomies.taxonomyTerms');
 
         if ($this->ownerRecord === null) {
@@ -57,7 +56,6 @@ class ListContentEntry extends ListRecords
             //         'ownerRecord' => $this->ownerRecord,
             //     ])
             // ),
-
 
         ];
     }

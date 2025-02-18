@@ -298,7 +298,7 @@ class ContentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    
+
                     // Tables\Actions\Action::make('view-entries')
                     //     ->icon('heroicon-s-eye')
                     //     ->color('gray')
@@ -311,7 +311,7 @@ class ContentResource extends Resource
                                 'ownerRecord' => $record,
                             ])
                         ),
-                        Tables\Actions\DeleteAction::make()
+                    Tables\Actions\DeleteAction::make()
                         ->using(function (Content $record) {
                             try {
                                 return app(DeleteContentAction::class)->execute($record);

@@ -16,7 +16,7 @@ class EditProfile extends \Filament\Pages\Auth\EditProfile
     #[\Override]
     public static function canAccess(): bool
     {
-        return ! Filament::auth()->user()?->isZeroDayAdmin();
+        return ! filament_admin()?->isZeroDayAdmin();
     }
 
     #[\Override]

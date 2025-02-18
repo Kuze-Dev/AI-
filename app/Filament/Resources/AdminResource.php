@@ -268,7 +268,7 @@ class AdminResource extends Resource
                         ->withActivityLog(
                             event: 'impersonated',
                             description: fn (Admin $record) => $record->full_name.' impersonated',
-                            causedBy: Filament::auth()->user()
+                            causedBy: filament_admin()
                         ),
                 ]),
             ])

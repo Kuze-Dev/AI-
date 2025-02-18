@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
+use App\Attributes\CurrentApiCustomer;
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CreateCartAction;
 use Domain\Cart\Actions\CreateCartLineAction;
@@ -15,6 +16,7 @@ use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CreateCartLineRequest;
 use Domain\Cart\Requests\UpdateCartLineRequest;
+use Domain\Customer\Models\Customer;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -30,12 +32,10 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 ]
 class CartLinesController extends Controller
 {
-    public function store(CreateCartLineRequest $request): mixed
+    public function store(CreateCartLineRequest $request,#[CurrentApiCustomer] Customer $customer): mixed
     {
         $validatedData = $request->validated();
 
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $customer) {

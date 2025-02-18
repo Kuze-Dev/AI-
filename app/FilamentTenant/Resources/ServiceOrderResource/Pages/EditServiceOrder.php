@@ -140,7 +140,7 @@ class EditServiceOrder extends EditRecord
                                 ->columnSpan(2)
                                 ->content(
                                     fn (ServiceOrder $record) => $record->schedule
-                                        ->timezone(Filament::auth()->user()->timezone)
+                                        ->timezone(filament_admin()->timezone)
                                         ->format('F j Y g:i A')
                                 )
                                 ->visible(fn (ServiceOrder $record) => ! $record->service->is_subscription),

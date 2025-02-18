@@ -35,12 +35,12 @@ trait ConstraintsRelationships
 
     protected function onDeleteRestrictRelations(): array
     {
-        return $this->getClassAttribute(OnDeleteRestrict::class)?->relations ?? [];
+        return $this->getClassAttribute(OnDeleteRestrict::class)->relations ?? [];
     }
 
     protected function onDeleteCascadeRelations(): array
     {
-        return $this->getClassAttribute(OnDeleteCascade::class)?->relations ?? [];
+        return $this->getClassAttribute(OnDeleteCascade::class)->relations ?? [];
     }
 
     /**

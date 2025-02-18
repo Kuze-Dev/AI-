@@ -19,7 +19,6 @@ use Domain\Internationalization\Models\Locale;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\TenantFeatureSupport;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
@@ -51,7 +50,7 @@ class ContentEntryResource extends Resource
         return 'filament.tenant.resources.contents.entries';
     }
 
-    // public static string $parentResource = ContentResource::class; 
+    // public static string $parentResource = ContentResource::class;
     // #[\Override]
     public static function getRoutes(): Closure
     {
@@ -111,11 +110,12 @@ class ContentEntryResource extends Resource
 
                                         return false;
                                     }
-                                  
-                                    if($livewire->record?->draftable_id &&
-                                        $livewire->record?->title == $livewire->record?->parentPage->title){
+
+                                    if ($livewire->record?->draftable_id &&
+                                        $livewire->record?->title == $livewire->record?->parentPage->title) {
                                         return false;
-                                    }   
+                                    }
+
                                     return $rule->where('content_id', $livewire->ownerRecord->id);
                                 },
                                 ignoreRecord: true
@@ -263,7 +263,7 @@ class ContentEntryResource extends Resource
                         ->hidden(
                             // fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())
                             function ($livewire) {
-                                return ( empty($livewire->ownerRecord->taxonomies->toArray()) );
+                                return  empty($livewire->ownerRecord->taxonomies->toArray());
                             }
                         ),
                     Forms\Components\Section::make(trans('Publishing'))

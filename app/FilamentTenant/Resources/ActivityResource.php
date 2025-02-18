@@ -6,6 +6,4 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource as BaseActivityResource;
 
-class ActivityResource extends BaseActivityResource
-{
-}
+class ActivityResource extends BaseActivityResource {}
