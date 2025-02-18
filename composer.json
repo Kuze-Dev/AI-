@@ -84,7 +84,10 @@
             "Support\\": "support/",
             "HalcyonAgile\\FilamentImport\\": "packages/halcyon-agile/filament-import/src/",
             "HalcyonAgile\\FilamentExport\\": "packages/halcyon-agile/filament-export/src/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
