@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\HasBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Stringable;
-use Support\RouteUrl\EloquentBuilder\RouteUrlEloquentBuilder;
 
 /**
  * Support\RouteUrl\Models\RouteUrl
@@ -38,11 +37,6 @@ use Support\RouteUrl\EloquentBuilder\RouteUrlEloquentBuilder;
  */
 class RouteUrl extends Model implements Stringable
 {
-
-    /** @use HasBuilder<RouteUrlEloquentBuilder> */
-    use HasBuilder;
-
-    protected static string $builder = RouteUrlEloquentBuilder::class;
 
     protected $fillable = [
         'model_type',
