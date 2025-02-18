@@ -126,7 +126,7 @@ class TenancyServiceProvider extends ServiceProvider
     {
         $this->bootEvents();
 
-        $this->makeTenancyMiddlewareHighestPriority();
+//        $this->makeTenancyMiddlewareHighestPriority();
 
         TenantConfig::$storageToConfigMap = [
             'name' => [
@@ -156,24 +156,24 @@ class TenancyServiceProvider extends ServiceProvider
             }
         }
     }
-
-    protected function makeTenancyMiddlewareHighestPriority(): void
-    {
-        $tenancyMiddleware = [
-            // Even higher priority than the initialization middleware
-            Middleware\PreventAccessFromCentralDomains::class,
-
-            Middleware\InitializeTenancyByDomain::class,
-            Middleware\InitializeTenancyBySubdomain::class,
-            Middleware\InitializeTenancyByDomainOrSubdomain::class,
-            Middleware\InitializeTenancyByPath::class,
-            Middleware\InitializeTenancyByRequestData::class,
-        ];
-
-        foreach (array_reverse($tenancyMiddleware) as $middleware) {
-            $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);
-        }
-    }
+//
+//    protected function makeTenancyMiddlewareHighestPriority(): void
+//    {
+//        $tenancyMiddleware = [
+//            // Even higher priority than the initialization middleware
+//            Middleware\PreventAccessFromCentralDomains::class,
+//
+//            Middleware\InitializeTenancyByDomain::class,
+//            Middleware\InitializeTenancyBySubdomain::class,
+//            Middleware\InitializeTenancyByDomainOrSubdomain::class,
+//            Middleware\InitializeTenancyByPath::class,
+//            Middleware\InitializeTenancyByRequestData::class,
+//        ];
+//
+//        foreach (array_reverse($tenancyMiddleware) as $middleware) {
+//            $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);
+//        }
+//    }
 
     private function prepareLivewire(): void
     {
