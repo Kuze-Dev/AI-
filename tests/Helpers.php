@@ -4,25 +4,19 @@ declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
 use App\Features\ECommerce\ECommerceBase;
-use Database\Seeders\Tenant\Auth\PermissionSeeder;
-use Database\Seeders\Tenant\Auth\RoleSeeder;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
-use Domain\Tenant\Database\Factories\TenantFactory;
 use Domain\Tenant\Models\Tenant;
 use Domain\Tenant\TenantSupport;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\ParallelTesting;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\seed;
 
 function loginAsSuperAdmin(?Admin $admin = null): Admin
 {
@@ -70,18 +64,11 @@ function assertActivityLogged(
 
 function testInTenantContext(array|string|null $features = null): Tenant
 {
+    tenancy()->initialize($tenant = Tenant::first());
+
+    URL::useOrigin('http://foo.hasp.test');
+
     Filament::setCurrentPanel(Filament::getPanels()['tenant']);
-
-    /** @var Tenant */
-    $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
-
-    $domain = 'test.'.parse_url((string) config('app.url'), PHP_URL_HOST);
-
-    $tenant->createDomain(['domain' => $domain]);
-
-    URL::forceRootUrl(Request::getScheme().'://'.$domain);
-
-    tenancy()->initialize($tenant);
 
     activateFeatures(
         collect($features ?? [])
@@ -90,11 +77,6 @@ function testInTenantContext(array|string|null $features = null): Tenant
             ])
             ->toArray()
     );
-
-    seed([
-        PermissionSeeder::class,
-        RoleSeeder::class,
-    ]);
 
     return $tenant;
 }

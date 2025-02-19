@@ -50,14 +50,19 @@ return [
          * Connection used as a "template" for the dynamically created tenant database connection.
          * Note: don't name your template connection tenant. That name is reserved by package.
          */
-        'template_tenant_connection' => 'tenant_template',
+        'template_tenant_connection' => env('TENANCY_TEMPLATE_TENANT_CONNECTION','tenant_template'),
 
         /**
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => Str::of(env('APP_NAME'))->lower()->snake().'_',
-        'suffix' => '_db',
+        'prefix' => (
+            env('APP_ENV') === 'testing'
+                ? \Illuminate\Support\Arr::random(range(1,10)).'_'
+                : ''
+            )
+            .Str::of(env('APP_NAME'))->lower()->snake().'_',
+        'suffix' => env('TENANCY_SUFFIX', '_db'),
 
         /**
          * TenantDatabaseManagers are classes that handle the creation & deletion of tenant databases.

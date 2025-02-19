@@ -34,6 +34,7 @@
     <env name="ADMIN_CHANGE_EMAIL" value="false"/>
     <env name="SETTINGS_CACHE_ENABLED" value="false"/>
     <env name="SENTRY_LARAVEL_DSN" value="null"/>
-    <env name="HELO_ENABLED" value="false"/>
+    <env name="TENANCY_TEMPLATE_TENANT_CONNECTION" value="tenant_template_sqlite"/>
+    <env name="TENANCY_SUFFIX" value="_db.sqlite"/>
   </php>
 </phpunit>
