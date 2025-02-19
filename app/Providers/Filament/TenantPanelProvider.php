@@ -86,7 +86,7 @@ class TenantPanelProvider extends PanelProvider
             ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
             // ->spa()
             ->maxContentWidth(MaxWidth::Full)
-            ->databaseTransactions()
+            ->databaseTransactions(!app()->runningUnitTests())
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
