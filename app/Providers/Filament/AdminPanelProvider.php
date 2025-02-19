@@ -6,11 +6,8 @@ namespace App\Providers\Filament;
 
 use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Pages\AccountDeactivatedNotice;
-use App\Filament\Pages\ConfirmPassword;
 use App\Filament\Pages\EditProfile;
-use App\Filament\Pages\Login;
 use App\Settings\SiteSettings;
-use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -30,6 +27,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -44,7 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->authGuard('admin')
             ->authPasswordBroker('admin')
-            ->login(Login::class)
+            ->login()
             ->profile(EditProfile::class)
             ->passwordReset()
             ->emailVerification()
@@ -71,7 +69,10 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => trans('Access')),
                 NavigationGroup::make()->label(fn () => trans('System')),
             ])
-            ->plugin(FilamentSpatieLaravelHealthPlugin::make()->navigationGroup(trans('System')))
+            ->plugins([
+                FilamentSpatieLaravelHealthPlugin::make()->navigationGroup(trans('System')),
+                FilamentPasswordConfirmationPlugin::make(),
+            ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
             ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
@@ -105,9 +106,6 @@ class AdminPanelProvider extends PanelProvider
                     ->middleware('guest:admin')
                     ->name('two-factor');
 
-                Route::get('password/confirm', ConfirmPassword::class)
-                    ->middleware(Authenticate::class)
-                    ->name('password.confirm');
 
                 Route::middleware(Authenticate::class)
                     ->group(function () {

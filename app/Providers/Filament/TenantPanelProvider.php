@@ -6,13 +6,10 @@ namespace App\Providers\Filament;
 
 use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
 use App\FilamentTenant\Pages\AccountDeactivatedNotice;
-use App\FilamentTenant\Pages\ConfirmPassword;
 use App\FilamentTenant\Pages\EditProfile;
-use App\FilamentTenant\Pages\Login;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\FilamentTenant\Widgets\Report as ReportWidget;
 use App\Settings\SiteSettings;
-use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -32,6 +29,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
 
 class TenantPanelProvider extends PanelProvider
 {
@@ -43,7 +41,7 @@ class TenantPanelProvider extends PanelProvider
             ->path('admin')
             ->authGuard('admin')
             ->authPasswordBroker('admin')
-            ->login(Login::class)
+            ->login()
             ->profile(EditProfile::class)
             ->passwordReset()
             ->emailVerification()
@@ -81,6 +79,9 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => trans('Access')),
                 NavigationGroup::make()->label(fn () => trans('System')),
             ])
+            ->plugins([
+                FilamentPasswordConfirmationPlugin::make(),
+            ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
             ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
@@ -115,9 +116,6 @@ class TenantPanelProvider extends PanelProvider
                     ->middleware('guest:admin')
                     ->name('two-factor');
 
-                Route::get('password/confirm', ConfirmPassword::class)
-                    ->middleware(Authenticate::class)
-                    ->name('password.confirm');
 
                 Route::middleware(Authenticate::class)
                     ->group(function () {

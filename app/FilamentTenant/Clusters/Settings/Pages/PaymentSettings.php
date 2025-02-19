@@ -11,18 +11,18 @@ use App\Settings\PaymentSettings as SettingsPaymentSettings;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Illuminate\Auth\Middleware\RequirePassword;
+use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
 
 class PaymentSettings extends TenantBaseSettings
 {
     use AuthorizeEcommerceSettings;
+    use RequiresPasswordConfirmation;
 
     protected static string $settings = SettingsPaymentSettings::class;
 
     protected static ?string $navigationIcon = 'heroicon-s-credit-card';
 
     protected static ?string $title = 'Payment Settings';
-
-    protected static string|array $routeMiddleware = RequirePassword::class.':filament.tenant.password.confirm';
 
     #[\Override]
     protected function getFormSchema(): array

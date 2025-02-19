@@ -7,10 +7,11 @@ namespace App\FilamentTenant\Resources;
 use App\Filament\Resources\AdminResource as BaseAdminResource;
 use App\FilamentTenant\Resources\AdminResource\Pages;
 use Illuminate\Auth\Middleware\RequirePassword;
+use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
 
 class AdminResource extends BaseAdminResource
 {
-    protected static string|array $routeMiddleware = RequirePassword::class.':filament.tenant.password.confirm';
+    use RequiresPasswordConfirmation;
 
     #[\Override]
     public static function getPages(): array
