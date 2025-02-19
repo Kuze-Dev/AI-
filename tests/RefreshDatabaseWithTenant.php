@@ -58,7 +58,7 @@ trait RefreshDatabaseWithTenant
                 'name' => self::TENANT_ID,
             ]);
 
-        $this->artisan('tenants:seed', ['--class' => $this->seeder]);
+//        $this->artisan('tenants:seed', ['--class' => $this->seeder]);
     }
 
 }
