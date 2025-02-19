@@ -17,6 +17,7 @@ use Domain\Tenant\Models\Tenant;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -28,12 +29,6 @@ class TenantResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    #[\Override]
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['name'];
-    }
 
     #[\Override]
     public static function form(Form $form): Form
@@ -95,6 +90,7 @@ class TenantResource extends Resource
                             ->options([
                                 's3' => 'AWS S3 Storage',
                                 'r2' => 'Cloudflare R2 Storage',
+                                'local' => 'Local',
                             ])
                             ->columnSpanFull()
                             ->reactive()
@@ -102,32 +98,32 @@ class TenantResource extends Resource
                             ->placeholder('Select Storage Driver')
                             ->afterStateHydrated(fn (Forms\Components\Select $component, ?Tenant $record) => $component->state($record?->getInternal('driver'))),
                         Forms\Components\TextInput::make('bucket')
-                            ->required(fn (?Tenant $record, \Filament\Forms\Get $get) => ($record === null && in_array($get('driver'), ['s3', 'r2'])))
+                            ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get('driver'), ['s3', 'r2'])))
                             ->columnSpan(['md' => 4])
                             ->reactive()
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket'))),
                         Forms\Components\TextInput::make('access_key')
-                            ->required(fn (?Tenant $record, \Filament\Forms\Get $get) => ($record === null && in_array($get('driver'), ['s3', 'r2'])))
+                            ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get('driver'), ['s3', 'r2'])))
                             ->columnSpan(['md' => 2])
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_access_key'))),
                         Forms\Components\TextInput::make('secret_key')
-                            ->required(fn (?Tenant $record, \Filament\Forms\Get $get) => ($record === null && in_array($get('driver'), ['s3', 'r2'])))
+                            ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get('driver'), ['s3', 'r2'])))
                             ->columnSpan(['md' => 2])
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_secret_key'))),
                         Divider::make('')
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('endpoint')
-                            ->required(fn (?Tenant $record, \Filament\Forms\Get $get) => ($record === null && in_array($get('driver'), ['s3', 'r2'])))
+                            ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get('driver'), ['s3', 'r2'])))
                             ->columnSpan(['md' => 2])
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_endpoint'))),
                         Forms\Components\TextInput::make('url')
-                            ->hidden(fn (\Filament\Forms\Get $get) => $get('driver') == 's3' ? true : false)
-                            ->required(fn (?Tenant $record, \Filament\Forms\Get $get) => ($record === null && in_array($get('driver'), ['r2'])))
+                            ->hidden(fn (Get $get) => $get('driver') === 's3')
+                            ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get('driver'), ['r2'])))
                             ->columnSpan(['md' => 2])
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_url'))),
                         Forms\Components\TextInput::make('region')
-                            ->required(fn (?Tenant $record, \Filament\Forms\Get $get) => ($record === null && in_array($get('driver'), ['s3'])))
-                            ->hidden(fn (\Filament\Forms\Get $get) => $get('driver') == 'r2' ? true : false)
+                            ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get('driver'), ['s3'])))
+                            ->hidden(fn (Get $get) => $get('driver') === 'r2')
                             ->columnSpan(['md' => 2])
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_region'))),
                         Forms\Components\Toggle::make('style_endpoint')
