@@ -278,16 +278,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.339.15",
+            "version": "3.339.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "46ef2d3734ba8358966af80e4ac181633bd03692"
+                "reference": "f4db102dea7150a8330faee93d6754cd9a9dca37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/46ef2d3734ba8358966af80e4ac181633bd03692",
-                "reference": "46ef2d3734ba8358966af80e4ac181633bd03692",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/f4db102dea7150a8330faee93d6754cd9a9dca37",
+                "reference": "f4db102dea7150a8330faee93d6754cd9a9dca37",
                 "shasum": ""
             },
             "require": {
@@ -369,9 +369,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.339.15"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.339.16"
             },
-            "time": "2025-02-17T19:07:50+00:00"
+            "time": "2025-02-18T19:13:56+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -3390,16 +3390,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v11.42.1",
+            "version": "v11.43.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "ff392f42f6c55cc774ce75553a11c6b031da67f8"
+                "reference": "70760d976486310b11d8e487e873077db069e77a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/ff392f42f6c55cc774ce75553a11c6b031da67f8",
-                "reference": "ff392f42f6c55cc774ce75553a11c6b031da67f8",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/70760d976486310b11d8e487e873077db069e77a",
+                "reference": "70760d976486310b11d8e487e873077db069e77a",
                 "shasum": ""
             },
             "require": {
@@ -3601,7 +3601,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-02-12T20:58:18+00:00"
+            "time": "2025-02-18T15:37:56+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -4012,24 +4012,24 @@
         },
         {
             "name": "laravel/vapor-cli",
-            "version": "v1.65.5",
+            "version": "v1.65.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/vapor-cli.git",
-                "reference": "46cf158fef5e8cbe415c598c1220e110e60070fc"
+                "reference": "4997b56672772948dd1534cf7160cd1eb3c6dffc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/vapor-cli/zipball/46cf158fef5e8cbe415c598c1220e110e60070fc",
-                "reference": "46cf158fef5e8cbe415c598c1220e110e60070fc",
+                "url": "https://api.github.com/repos/laravel/vapor-cli/zipball/4997b56672772948dd1534cf7160cd1eb3c6dffc",
+                "reference": "4997b56672772948dd1534cf7160cd1eb3c6dffc",
                 "shasum": ""
             },
             "require": {
                 "ext-zip": "*",
                 "guzzlehttp/guzzle": "^6.3|^7.0",
-                "illuminate/container": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/filesystem": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
-                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "illuminate/container": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/filesystem": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
                 "league/flysystem": "^1.0|^3.0",
                 "league/flysystem-aws-s3-v3": "^1.0|^3.0",
                 "php": "^7.2|^8.0",
@@ -4075,22 +4075,22 @@
                 "vapor"
             ],
             "support": {
-                "source": "https://github.com/laravel/vapor-cli/tree/v1.65.5"
+                "source": "https://github.com/laravel/vapor-cli/tree/v1.65.6"
             },
-            "time": "2025-02-05T18:53:47+00:00"
+            "time": "2025-02-18T18:40:39+00:00"
         },
         {
             "name": "laravel/vapor-core",
-            "version": "v2.37.9",
+            "version": "v2.37.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/vapor-core.git",
-                "reference": "9dde47564c2eba6ab489cc7fc728587920344aa2"
+                "reference": "0e53ce2e4dbb4560712d17fc7d0eddcb3bed03e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/vapor-core/zipball/9dde47564c2eba6ab489cc7fc728587920344aa2",
-                "reference": "9dde47564c2eba6ab489cc7fc728587920344aa2",
+                "url": "https://api.github.com/repos/laravel/vapor-core/zipball/0e53ce2e4dbb4560712d17fc7d0eddcb3bed03e1",
+                "reference": "0e53ce2e4dbb4560712d17fc7d0eddcb3bed03e1",
                 "shasum": ""
             },
             "require": {
@@ -4155,9 +4155,9 @@
                 "vapor"
             ],
             "support": {
-                "source": "https://github.com/laravel/vapor-core/tree/v2.37.9"
+                "source": "https://github.com/laravel/vapor-core/tree/v2.37.10"
             },
-            "time": "2025-01-07T23:06:04+00:00"
+            "time": "2025-02-18T15:13:15+00:00"
         },
         {
             "name": "league/commonmark",
@@ -9485,16 +9485,16 @@
         },
         {
             "name": "spatie/shiki-php",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/shiki-php.git",
-                "reference": "50919178a6865f1165bf1a8f08430b88ef3a53de"
+                "reference": "24b4dcc161f37144180edbef49557edb96c1dc2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/shiki-php/zipball/50919178a6865f1165bf1a8f08430b88ef3a53de",
-                "reference": "50919178a6865f1165bf1a8f08430b88ef3a53de",
+                "url": "https://api.github.com/repos/spatie/shiki-php/zipball/24b4dcc161f37144180edbef49557edb96c1dc2d",
+                "reference": "24b4dcc161f37144180edbef49557edb96c1dc2d",
                 "shasum": ""
             },
             "require": {
@@ -9538,7 +9538,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/shiki-php/tree/2.3.0"
+                "source": "https://github.com/spatie/shiki-php/tree/2.3.1"
             },
             "funding": [
                 {
@@ -9546,7 +9546,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-02-10T15:41:13+00:00"
+            "time": "2025-02-18T13:18:46+00:00"
         },
         {
             "name": "spatie/ssl-certificate",
