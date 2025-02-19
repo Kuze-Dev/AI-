@@ -33,7 +33,7 @@ function loginAsAdmin(?Admin $admin = null): Admin
     );
 
     $role = app(Role::class)
-        ->create(['name' => config('domain.role.super_admin')]);
+        ->createOrFirst(['name' => config('domain.role.super_admin')]);
 
     $admin->syncRoles($role);
 
