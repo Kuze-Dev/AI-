@@ -11,6 +11,7 @@ use App\FilamentTenant\Support\Traits\HasParentResource;
 use Domain\Content\Actions\CreateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -86,7 +87,6 @@ class CreateContentEntry extends CreateRecord
             ->execute($this->ownerRecord, ContentEntryData::fromArray($data));
     }
 
-    #[\Override]
     protected function getRedirectUrl(): string
     {
         $resource = static::getResource();
