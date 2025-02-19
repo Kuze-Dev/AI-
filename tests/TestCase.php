@@ -13,7 +13,7 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
 {
     use RefreshDatabaseWithTenant;
 
-    private string $seeder = TestSeeder::class;
+//    private string $seeder = TestSeeder::class;
 
     protected function setUp(): void
     {

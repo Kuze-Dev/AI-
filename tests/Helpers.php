@@ -6,6 +6,7 @@ use App\Features\CMS\CMSBase;
 use App\Features\ECommerce\ECommerceBase;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
+use Domain\Role\Database\Factories\RoleFactory;
 use Domain\Tenant\Models\Tenant;
 use Domain\Tenant\TenantSupport;
 use Filament\Facades\Filament;
@@ -26,6 +27,7 @@ function loginAsSuperAdmin(?Admin $admin = null): Admin
 function loginAsAdmin(?Admin $admin = null): Admin
 {
     $admin ??= AdminFactory::new()
+        ->has(RoleFactory::new(['name' => config('domain.role.super_admin')]))
         ->createOne();
 
     return tap($admin, actingAs(...));

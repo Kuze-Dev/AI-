@@ -56,12 +56,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => (
-            env('APP_ENV') === 'testing'
-                ? \Illuminate\Support\Arr::random(range(1,10)).'_'
-                : ''
-            )
-            .Str::of(env('APP_NAME'))->lower()->snake().'_',
+        'prefix' => Str::of(env('APP_NAME'))->lower()->snake().'_',
         'suffix' => env('TENANCY_SUFFIX', '_db'),
 
         /**

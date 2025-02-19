@@ -9,6 +9,9 @@ use Domain\Tenant\Models\Tenant;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\ParallelTesting;
+use Illuminate\Support\Facades\Schema;
 
 /** https://discord.com/channels/976506366502006874/1341202555513995335/1341581357155094570 */
 trait RefreshDatabaseWithTenant
@@ -40,10 +43,13 @@ trait RefreshDatabaseWithTenant
 
     public function afterRefreshingDatabase(): void
     {
+        config([
+            'tenancy.database.prefix' => 'test_tenancy_'.(($token = ParallelTesting::token())!==null ? $token.'_':''),
+        ]);
 
-//            $dbName = config('tenancy.database.prefix') . self::TENANT_ID. config('tenancy.database.suffix');
-//
-//            Schema::dropDatabaseIfExists($dbName);
+        $dbName = config('tenancy.database.prefix') . self::TENANT_ID. config('tenancy.database.suffix');
+
+        File::delete(database_path($dbName));
 
         $this->tenant = TenantFactory::new()
             ->withDomains('foo.hasp.test')
@@ -52,7 +58,7 @@ trait RefreshDatabaseWithTenant
                 'name' => self::TENANT_ID,
             ]);
 
-        $this->artisan('tenants:seed', ['--class' => $this->seeder]);
+//        $this->artisan('tenants:seed', ['--class' => $this->seeder]);
     }
 
 }
