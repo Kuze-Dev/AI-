@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
+use Filament\Notifications\Notification;
 
 class AddressesRelationManager extends RelationManager
 {
@@ -140,7 +141,10 @@ class AddressesRelationManager extends RelationManager
                     ->updateStateUsing(function (Address $record) {
                         DB::transaction(function () use ($record) {
                             app(SetAddressAsDefaultShippingAction::class)->execute($record);
-                            Filament::notify('success', trans('Address set to default shipping successfully!'));
+                            Notification::make()
+                                ->title(trans('Address set to default shipping successfully!'))
+                                ->success()
+                                ->send();
                         });
                     })
                     ->disabled(fn (Address $record) => $record->is_default_shipping),
@@ -150,7 +154,10 @@ class AddressesRelationManager extends RelationManager
                     ->updateStateUsing(function (Address $record) {
                         DB::transaction(function () use ($record) {
                             app(SetAddressAsDefaultBillingAction::class)->execute($record);
-                            Filament::notify('success', trans('Address set to default billing successfully!'));
+                            Notification::make()
+                                ->title( trans('Address set to default billing successfully!'))
+                                ->success()
+                                ->send();
                         });
                     })
                     ->disabled(fn (Address $record) => $record->is_default_billing),
