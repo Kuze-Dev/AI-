@@ -11,7 +11,7 @@ use App\FilamentTenant\Support\Traits\HasParentResource;
 use Domain\Content\Actions\CreateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

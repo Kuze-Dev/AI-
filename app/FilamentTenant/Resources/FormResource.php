@@ -23,6 +23,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -284,7 +285,7 @@ class FormResource extends Resource
                         ])
                         ->columnSpan(['md' => 3]),
                 ])->columns(4),
-                
+
             ]);
     }
 
@@ -301,12 +302,14 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class)),
-                Tables\Columns\BadgeColumn::make('form_submissions_count')
+                Tables\Columns\TextColumn::make('form_submissions_count')
+                    ->badge()
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
                     ->icon('heroicon-m-envelope')
                     ->color(fn (FormModel $record) => $record->store_submission ? 'success' : 'secondary'),
-                Tables\Columns\TagsColumn::make('sites.name')
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
                     ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)

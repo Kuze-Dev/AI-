@@ -10,7 +10,7 @@ use Domain\Form\Actions\UpdateFormAction;
 use Domain\Form\DataTransferObjects\FormData;
 use Exception;
 use Filament\Actions\Action;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 

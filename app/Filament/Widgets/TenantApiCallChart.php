@@ -5,15 +5,20 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use Domain\Tenant\Models\Tenant;
-use Filament\Widgets\BarChartWidget;
+use Filament\Widgets\ChartWidget;
 
-class TenantApiCallChart extends BarChartWidget
+class TenantApiCallChart extends ChartWidget
 {
     protected static ?string $heading = 'Tenant API calls';
 
     protected int|string|array $columnSpan = 'full';
 
     protected static ?string $pollingInterval = '300';
+
+    protected function getType(): string
+    {
+        return 'bar';
+    }
 
     #[\Override]
     protected function getFilters(): ?array

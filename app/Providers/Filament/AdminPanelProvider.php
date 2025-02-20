@@ -8,6 +8,7 @@ use App\Filament\Livewire\Auth\TwoFactorAuthentication;
 use App\Filament\Pages\AccountDeactivatedNotice;
 use App\Filament\Pages\EditProfile;
 use App\Settings\SiteSettings;
+use Awcodes\FilamentVersions\VersionsPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -28,6 +29,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
+use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -72,6 +74,14 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentSpatieLaravelHealthPlugin::make()->navigationGroup(trans('System')),
                 FilamentPasswordConfirmationPlugin::make(),
+                EnvironmentIndicatorPlugin::make()
+                    ->visible(true)
+                    ->color(fn () => match (app()->environment()) {
+                        'production' => null,
+                        'staging' => Color::Green,
+                        default => Color::Zinc,
+                    }),
+                VersionsPlugin::make(),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()

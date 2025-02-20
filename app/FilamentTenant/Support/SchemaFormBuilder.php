@@ -176,11 +176,11 @@ class SchemaFormBuilder extends Component
         }
 
         if ($fileFieldData->can_download) {
-            $fileUpload->enableDownload($fileFieldData->can_download);
+            $fileUpload->downloadable($fileFieldData->can_download);
         }
 
         if ($fileFieldData->reorder) {
-            $fileUpload->enableReordering($fileFieldData->reorder);
+            $fileUpload->reorderable($fileFieldData->reorder);
         }
 
         if (! empty($fileFieldData->accept)) {
@@ -231,10 +231,10 @@ class SchemaFormBuilder extends Component
         }
 
         if ($mediaFieldData->reorder) {
-            $media->enableReordering($mediaFieldData->reorder);
+            $media->reorderable($mediaFieldData->reorder);
         }
 
-        $media->enableOpen();
+        $media->openable();
 
         $media->formatStateUsing(function (?array $state): array {
 

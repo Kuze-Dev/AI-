@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources\PageResource\Pages;
 
 use App\FilamentTenant\Resources\PageResource;
 use Exception;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListPages extends ListRecords

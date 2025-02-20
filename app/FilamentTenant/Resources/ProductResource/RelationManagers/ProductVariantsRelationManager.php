@@ -146,7 +146,8 @@ class ProductVariantsRelationManager extends RelationManager
                     ->translateLabel()
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
                     ->translateLabel()
                     ->formatStateUsing(fn ($state) => $state
                         ? ucfirst(STATUS::ACTIVE->value)

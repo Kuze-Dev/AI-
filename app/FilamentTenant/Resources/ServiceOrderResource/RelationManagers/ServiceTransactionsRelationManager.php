@@ -40,7 +40,8 @@ class ServiceTransactionsRelationManager extends RelationManager
                     ->exists('payment_method')
                     ->label(trans('Payment Method'))
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
                     ->translateLabel()
                     ->formatStateUsing(
                         fn (string $state): string => ucfirst($state)

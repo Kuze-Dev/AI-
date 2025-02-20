@@ -11,9 +11,9 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-final class CauserRelationManager extends RelationManager
+final class ActionsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'causerActivities';
+    protected static string $relationship = 'actions';
 
     protected static ?string $recordTitleAttribute = 'id';
 

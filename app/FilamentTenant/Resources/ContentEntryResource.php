@@ -21,9 +21,11 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -100,7 +102,7 @@ class ContentEntryResource extends Resource
             ->columns(3)
             ->schema([
                 Forms\Components\Group::make([
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         Forms\Components\TextInput::make('title')
                             ->unique(
                                 modifyRuleUsing: function ($livewire, Unique $rule) {
@@ -181,7 +183,7 @@ class ContentEntryResource extends Resource
                         Forms\Components\Hidden::make('author_id')
                             ->default(Auth::id()),
                     ]),
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         // Forms\Components\CheckboxList::make('sites')
                         \App\FilamentTenant\Support\CheckBoxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
@@ -325,10 +327,12 @@ class ContentEntryResource extends Resource
                             $query->where('first_name', 'like', "%{$search}%")
                                 ->orWhere('last_name', 'like', "%{$search}%");
                         })),
-                Tables\Columns\TagsColumn::make('taxonomyTerms.name')
+                Tables\Columns\TextColumn::make('taxonomyTerms.name')
+                    ->badge()
                     ->limit()
                     ->searchable(),
-                Tables\Columns\TagsColumn::make('sites.name')
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('published_at')

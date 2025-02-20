@@ -9,6 +9,7 @@ use Domain\Globals\Models\Globals;
 use Filament\Resources\RelationManagers\RelationManager;
 // use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -40,7 +41,8 @@ class GlobalsTranslationRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-                Tables\Columns\TagsColumn::make('sites.name')
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->toggleable(condition: function () {
                         return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);

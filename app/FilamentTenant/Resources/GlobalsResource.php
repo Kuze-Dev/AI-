@@ -22,6 +22,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -189,7 +190,8 @@ class GlobalsResource extends Resource
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class)),
-                Tables\Columns\TagsColumn::make('sites.name')
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
                     ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
                     ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')

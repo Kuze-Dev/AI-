@@ -11,6 +11,7 @@ use Domain\Customer\Actions\ImportCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
 use Filament\Actions;
 // use Filament\Actions\ImportAction;

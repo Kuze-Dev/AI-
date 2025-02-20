@@ -8,7 +8,7 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\BlockResource;
 use Domain\Page\Actions\CreateBlockAction;
 use Domain\Page\DataTransferObjects\BlockData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

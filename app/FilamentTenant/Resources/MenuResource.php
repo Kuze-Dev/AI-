@@ -20,9 +20,11 @@ use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -83,7 +85,7 @@ class MenuResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(
@@ -105,7 +107,7 @@ class MenuResource extends Resource
                         ->string()
                         ->maxLength(255),
                 ]),
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     // Forms\Components\CheckboxList::make('sites')
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
@@ -213,7 +215,7 @@ class MenuResource extends Resource
                                             )
                                             ->columnSpan(['md' => 1]),
                                     ]),
-                                Forms\Components\Card::make([
+                                Forms\Components\Section::make([
                                     Forms\Components\Radio::make('type')
                                         ->lazy()
                                         ->inline()
@@ -288,7 +290,8 @@ class MenuResource extends Resource
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),
-                Tables\Columns\TagsColumn::make('sites.name')
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
                     ->toggleable(condition: fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(timezone: Auth::user()?->timezone)

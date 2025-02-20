@@ -21,6 +21,7 @@ use Domain\Blueprint\Models\Blueprint;
 use ErrorException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -60,18 +61,18 @@ class BlueprintResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->string()
                         ->maxLength(255),
                 ]),
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->statePath('schema')
                     ->schema([
                         Forms\Components\Repeater::make('sections')
-                            ->orderable()
+                            ->orderColumn()
                             ->itemLabel(fn (array $state) => $state['title'] ?? null)
                             ->minItems(1)
                             ->collapsible()
@@ -166,7 +167,7 @@ class BlueprintResource extends Resource
     protected static function getFieldsSchema(): Forms\Components\Repeater
     {
         return Forms\Components\Repeater::make('fields')
-            ->orderable()
+            ->orderColumn()
             ->itemLabel(function (array $state) {
                 if (blank($state['title'])) {
                     return null;
@@ -412,7 +413,7 @@ class BlueprintResource extends Resource
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
-                    ->orderable()
+                    ->orderColumn()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
                     ->columnSpanFull()
                     ->columns(2)
@@ -453,7 +454,7 @@ class BlueprintResource extends Resource
                     ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
-                    ->orderable()
+                    ->orderColumn()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
                     ->columnSpanFull()
                     ->columns(2)
@@ -788,7 +789,7 @@ class BlueprintResource extends Resource
                     ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
-                    ->orderable()
+                    ->orderColumn()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
                     ->columnSpanFull()
                     ->columns(2)
@@ -800,7 +801,7 @@ class BlueprintResource extends Resource
                     ]),
                 Forms\Components\Repeater::make('descriptions')
                     ->collapsible()
-                    ->orderable()
+                    ->orderColumn()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
                     ->columnSpanFull()
                     ->columns(2)

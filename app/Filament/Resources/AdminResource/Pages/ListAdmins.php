@@ -10,7 +10,7 @@ use Domain\Admin\Imports\AdminImporter;
 use Exception;
 use Filament\Actions\ExportAction;
 use Filament\Actions\ImportAction;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAdmins extends ListRecords

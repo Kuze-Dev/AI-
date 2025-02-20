@@ -19,6 +19,7 @@ use Filament\Actions\RestoreAction;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Tables;
@@ -35,6 +36,12 @@ class CommonServiceProvider extends ServiceProvider
         $this->registerMacros();
 
         $this->configureComponents();
+
+//        Infolist::$defaultCurrency =
+//        Tables\Table::$defaultCurrency = 'PHP';
+
+        Infolist::$defaultDateTimeDisplayFormat =
+        Tables\Table::$defaultDateTimeDisplayFormat = 'M d, Y h:i A';
 
         Page::$reportValidationErrorUsing = function (ValidationException $exception) {
             Notification::make()

@@ -7,7 +7,7 @@ namespace App\FilamentTenant\Resources\SiteResource\Pages;
 use App\FilamentTenant\Resources\SiteResource;
 use Domain\Site\Actions\CreateSiteAction;
 use Domain\Site\DataTransferObjects\SiteData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 

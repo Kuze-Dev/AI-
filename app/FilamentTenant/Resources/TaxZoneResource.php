@@ -12,6 +12,7 @@ use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
 use Domain\Taxation\Models\TaxZone;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -43,7 +44,7 @@ class TaxZoneResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->string()
@@ -81,7 +82,7 @@ class TaxZoneResource extends Resource
                                     ->formatStateUsing(fn (?TaxZone $record) => $record?->countries->modelKeys() ?? [])
                                     ->bulkToggleable()
                                     ->searchable()
-                                    ->disableLabel()
+                                    ->hiddenLabel()
                                     ->required()
                                     ->columns(3),
                             ])
@@ -114,7 +115,7 @@ class TaxZoneResource extends Resource
                                     ->formatStateUsing(fn (?TaxZone $record) => $record?->states->modelKeys() ?? [])
                                     ->bulkToggleable()
                                     ->searchable()
-                                    ->disableLabel()
+                                    ->hiddenLabel()
                                     ->required()
                                     ->columns(3),
                             ])

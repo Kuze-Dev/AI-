@@ -9,7 +9,7 @@ use App\FilamentTenant\Resources\BlueprintResource;
 use Domain\Blueprint\Actions\CreateBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\BlueprintData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 

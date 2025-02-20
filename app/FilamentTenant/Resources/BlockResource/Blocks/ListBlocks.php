@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources\BlockResource\Blocks;
 
 use App\FilamentTenant\Resources\BlockResource;
 use Exception;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListBlocks extends ListRecords

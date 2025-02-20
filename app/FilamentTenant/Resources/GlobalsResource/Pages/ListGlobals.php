@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 
 use App\FilamentTenant\Resources\GlobalsResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListGlobals extends ListRecords

@@ -7,7 +7,7 @@ namespace App\FilamentTenant\Resources\ContentResource\Pages;
 use App\FilamentTenant\Resources\ContentResource;
 use Closure;
 use Domain\Content\Models\Content;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListContent extends ListRecords

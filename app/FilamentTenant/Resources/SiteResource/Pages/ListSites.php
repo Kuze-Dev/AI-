@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\SiteResource\Pages;
 
 use App\FilamentTenant\Resources\SiteResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;

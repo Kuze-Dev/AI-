@@ -43,7 +43,8 @@ class TaxonomyTranslationRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-                Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
+                Tables\Columns\TextColumn::make('taxonomy_terms_count')
+                    ->badge()
                     ->counts('taxonomyTerms')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')

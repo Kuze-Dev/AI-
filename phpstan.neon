@@ -75,6 +75,7 @@ parameters:
 
     tmpDir: build/phpstan
 
+
     stubFiles:
         - phpstan-stubs/Permission.stub
         - phpstan-stubs/PermissionRegistrar.stub
@@ -105,6 +106,7 @@ parameters:
 
     checkOctaneCompatibility: true
     checkModelProperties: true
+    noEnvCallsOutsideOfConfig: true
 
     errorFormat: ticketswap
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

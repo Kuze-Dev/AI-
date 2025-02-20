@@ -17,6 +17,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ShippingMethodResource extends Resource
 {
@@ -68,7 +69,7 @@ class ShippingMethodResource extends Resource
                             if ($component->getVisibility() === 'private') {
                                 try {
                                     return $media?->getTemporaryUrl(now()->addMinutes(5));
-                                } catch (Throwable) {
+                                } catch (\Throwable) {
                                     // This driver does not support creating temporary URLs.
                                 }
                             }

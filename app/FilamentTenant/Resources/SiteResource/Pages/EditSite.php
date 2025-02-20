@@ -8,8 +8,8 @@ use App\FilamentTenant\Resources\SiteResource;
 use Domain\Site\Actions\UpdateSiteAction;
 use Domain\Site\DataTransferObjects\SiteData;
 use Domain\Site\Models\Site;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 

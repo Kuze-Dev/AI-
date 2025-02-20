@@ -90,7 +90,8 @@ class ActivityResource extends Resource
                     ->label('Log')
                     ->translateLabel()
                     ->formatStateUsing(fn (string $state) => Str::headline($state)),
-                Tables\Columns\BadgeColumn::make('event')
+                Tables\Columns\TextColumn::make('event')
+                    ->badge()
                     ->toggleable()
                     ->toggledHiddenByDefault(),
                 Tables\Columns\TextColumn::make('description')

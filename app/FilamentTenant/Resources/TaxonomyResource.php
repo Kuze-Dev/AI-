@@ -21,6 +21,7 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 // use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -183,7 +184,7 @@ class TaxonomyResource extends Resource
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
 
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     // Forms\Components\CheckboxList::make('sites')
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->reactive()
@@ -343,7 +344,8 @@ class TaxonomyResource extends Resource
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),
-                Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
+                Tables\Columns\TextColumn::make('taxonomy_terms_count')
+                    ->badge()
                     ->counts('taxonomyTerms')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')

@@ -10,7 +10,7 @@ use Domain\Content\Actions\CreateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Page\Enums\Visibility;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

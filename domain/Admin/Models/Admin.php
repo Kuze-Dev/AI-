@@ -23,6 +23,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -97,6 +98,7 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
     use Notifiable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
+    use CausesActivity;
 
     protected $fillable = [
         'first_name',
@@ -170,11 +172,5 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Spatie\Activitylog\Models\Activity> */
-    public function causerActivities(): MorphMany
-    {
-        return $this->morphMany(ActivitylogServiceProvider::determineActivityModel(), 'causer');
     }
 }

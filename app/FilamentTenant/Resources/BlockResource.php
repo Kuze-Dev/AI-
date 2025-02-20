@@ -14,6 +14,7 @@ use Domain\Page\Models\Block;
 use Domain\Site\Models\Site;
 use Exception;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -108,7 +109,7 @@ class BlockResource extends Resource
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('blueprint_id') ? false : true)
                     ->helperText('If enabled, the content below will serve as the default for all related pages')
                     ->reactive(),
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rules([

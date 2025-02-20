@@ -10,6 +10,7 @@ use Domain\Page\Models\Page;
 use Filament\Resources\RelationManagers\RelationManager;
 // use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -57,18 +58,19 @@ class PageTranslationRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-                Tables\Columns\BadgeColumn::make('visibility')
+                Tables\Columns\TextColumn::make('visibility')
+                    ->badge()
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TagsColumn::make('sites.name')
+                Tables\Columns\TextColumn::make('sites.name')
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->toggleable(condition: function () {
                         return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
                     }, isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
-                    ->options([
+                    ->icons([
                         'heroicon-o-check-circle' => fn ($state) => $state !== null,
                         'heroicon-o-x-circle' => fn ($state) => $state === null,
                     ])

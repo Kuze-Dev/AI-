@@ -7,7 +7,7 @@ namespace App\FilamentTenant\Resources\BlueprintResource\Pages;
 use App\FilamentTenant\Resources\BlueprintResource;
 use Domain\Blueprint\Actions\ImportBlueprintAction;
 use Domain\Blueprint\Models\Blueprint;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use HalcyonAgile\FilamentImport\Actions\ImportAction;
 

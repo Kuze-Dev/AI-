@@ -216,7 +216,7 @@ class EditPage extends EditRecord
                         ->action('overwriteDraft')
                         ->requiresConfirmation()
                         ->modalHeading('Draft for this page already exists')
-                        ->modalSubheading('You have an existing draft for this page. Do you want to overwrite the existing draft?')
+                        ->modalDescription('You have an existing draft for this page. Do you want to overwrite the existing draft?')
                         ->modalCancelAction(fn () => Action::makeModalAction('redirect')
                             ->label(trans('Edit Existing Draft'))
                             ->color('gray')

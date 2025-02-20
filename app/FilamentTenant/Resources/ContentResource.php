@@ -17,9 +17,11 @@ use Domain\Site\Models\Site;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -197,7 +199,7 @@ class ContentResource extends Resource
                         ->hidden(fn () => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class))
                         ->required(),
 
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         // Forms\Components\CheckboxList::make('sites')
                         \App\FilamentTenant\Support\CheckBoxList::make('sites')
                             ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
@@ -267,7 +269,8 @@ class ContentResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
-                Tables\Columns\TagsColumn::make('sites.name')
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')

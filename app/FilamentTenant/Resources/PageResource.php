@@ -24,9 +24,11 @@ use Domain\Tenant\TenantFeatureSupport;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -73,7 +75,7 @@ class PageResource extends Resource
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-                        Forms\Components\Card::make([
+                        Forms\Components\Section::make([
                             Forms\Components\TextInput::make('name')
                                 ->unique(
                                     ignoreRecord: true,
@@ -158,7 +160,7 @@ class PageResource extends Resource
                             Forms\Components\Hidden::make('author_id')
                                 ->default(Auth::id()),
                         ]),
-                        Forms\Components\Card::make([
+                        Forms\Components\Section::make([
                             // Forms\Components\CheckboxList::make('sites')
                             \App\FilamentTenant\Support\CheckBoxList::make('sites')
                                 ->reactive()
@@ -262,7 +264,7 @@ class PageResource extends Resource
                             ->label('Blocks')
                             ->default([])
                             ->collapsed(fn (string $context) => $context === 'edit')
-                            ->orderable('order')
+                            ->orderColumn('order')
                             ->schema([
                                 // Forms\Components\ViewField::make('block_id')
                                 \App\Filament\Livewire\Forms\CustomViewField::make('block_id')
@@ -331,16 +333,18 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),
-                Tables\Columns\BadgeColumn::make('visibility')
+                Tables\Columns\TextColumn::make('visibility')
+                    ->badge()
                     ->formatStateUsing(fn (Visibility $state) => Str::headline($state->value))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TagsColumn::make('sites.name')
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
-                    ->options([
+                    ->icons([
                         'heroicon-o-check-circle' => fn ($state) => $state !== null,
                         'heroicon-o-x-circle' => fn ($state) => $state === null,
                     ])

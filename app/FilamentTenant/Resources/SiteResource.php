@@ -47,7 +47,7 @@ class SiteResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(ignoreRecord: true),
@@ -64,7 +64,7 @@ class SiteResource extends Resource
                     Forms\Components\Fieldset::make('Site Managers')
                         ->schema([
                             Forms\Components\CheckboxList::make('site_manager')
-                                ->disableLabel()
+                                ->hiddenLabel()
                                 ->columnSpanFull()
                                 ->searchable()
                                 ->formatStateUsing(fn (?Site $record) => $record ? $record->siteManager->pluck('id')->toArray() : [])

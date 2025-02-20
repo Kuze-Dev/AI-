@@ -8,12 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Support\RouteUrl\Models\RouteUrl;
 
+/**
+ * @template TRelatedModel of \Support\RouteUrl\Models\RouteUrl
+ * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, ?TRelatedModel>
+ */
 trait HasRouteUrl
 {
     /**
-     * @template TRelatedModel of \Support\RouteUrl\Models\RouteUrl
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<Model, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, $this>
      */
     public function routeUrls(): MorphOne
     {
@@ -22,9 +26,7 @@ trait HasRouteUrl
     }
 
     /**
-     * @template TRelatedModel of \Support\RouteUrl\Models\RouteUrl
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<Model, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, $this>
      */
     public function activeRouteUrl(): MorphOne
     {

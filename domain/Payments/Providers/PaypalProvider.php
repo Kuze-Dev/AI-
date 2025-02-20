@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Payments\Providers;
 
 use App\Settings\PaymentSettings;
-use Doctrine\Common\Cache\Psr6\InvalidArgument;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
@@ -125,7 +124,7 @@ class PaypalProvider extends Provider
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
             'cancelled' => $this->cancelTransaction($paymentModel),
-            default => throw new InvalidArgument(),
+            default => throw new \InvalidArgumentException(),
         };
     }
 

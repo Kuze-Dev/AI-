@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\LocaleResource\Pages;
 
 use App\FilamentTenant\Resources\LocaleResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListLocale extends ListRecords
