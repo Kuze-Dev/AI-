@@ -21,10 +21,10 @@ trait RefreshDatabaseWithTenant
     public Tenant $tenant;
     private const string TENANT_ID= 'tenant_id';
 
-    public function getConnectionsToTransact(): array
-    {
-        return [null, 'tenant_template_sqlite'];
-    }
+//    public function getConnectionsToTransact(): array
+//    {
+//        return [null, 'tenant_template_sqlite'];
+//    }
 
     protected function refreshTestDatabase(): void
     {

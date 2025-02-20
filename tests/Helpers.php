@@ -16,6 +16,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
 
+use Spatie\Permission\Contracts\Role;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 
@@ -26,9 +27,15 @@ function loginAsSuperAdmin(?Admin $admin = null): Admin
 
 function loginAsAdmin(?Admin $admin = null): Admin
 {
-    $admin ??= AdminFactory::new()
-        ->has(RoleFactory::new(['name' => config('domain.role.super_admin')]))
-        ->createOne();
+    $admin ??= (
+        Admin::where(['email' => 'admin@admin.com'])->first()
+        ?? AdminFactory::new() ->createOne(['email' => 'admin@admin.com'])
+    );
+
+    $role = app(Role::class)
+        ->createOrFirst(['name' => config('domain.role.super_admin')]);
+
+    $admin->syncRoles($role);
 
     return tap($admin, actingAs(...));
 }

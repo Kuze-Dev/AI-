@@ -23,10 +23,13 @@ use Filament\Tables\Table;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
 use Spatie\Permission\Models\Permission;
 
 class RoleResource extends Resource
 {
+    use RequiresPasswordConfirmation;
+
     public static PermissionGroupCollection $permissionGroups;
 
     protected static ?string $model = Role::class;
@@ -35,7 +38,6 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static string|array $routeMiddleware = RequirePassword::class.':filament.admin.password.confirm';
 
     #[\Override]
     public static function getNavigationGroup(): ?string

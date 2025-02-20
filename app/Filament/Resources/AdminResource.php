@@ -23,16 +23,17 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
 use Lloricode\Timezone\Timezone;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class AdminResource extends Resource
 {
+    use RequiresPasswordConfirmation;
     protected static ?string $model = Admin::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    protected static string|array $routeMiddleware = RequirePassword::class.':filament.admin.password.confirm';
 
     protected static ?string $recordTitleAttribute = 'full_name';
 

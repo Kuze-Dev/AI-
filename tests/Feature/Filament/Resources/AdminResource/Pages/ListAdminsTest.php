@@ -12,6 +12,7 @@ use Filament\Facades\Filament;
 use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Contracts\Permission;
 use STS\FilamentImpersonate\Impersonate;
 
 use function Pest\Laravel\assertModelMissing;
@@ -124,7 +125,14 @@ it('can send password reset link', function () {
 });
 
 it('can impersonate', function () {
-    loginAsAdmin()->givePermissionTo('admin.viewAny', 'admin.impersonate');
+
+    loginAsAdmin()->givePermissionTo([
+        app(Permission::class)
+            ->create(['name' => 'admin.viewAny']),
+
+        app(Permission::class)
+        ->create(['name' => 'admin.impersonate']),
+   ] );
 
     $admin = AdminFactory::new()->createOne();
 
