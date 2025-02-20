@@ -135,6 +135,8 @@
             "@php artisan tenants:run ide-helper:models --option=\"smart-reset=1\" --option=\"write=1\" --ansi"
         ],
         "analyse": "vendor/bin/phpstan analyse",
+        "analyse-pro": "vendor/bin/phpstan analyse --pro",
+        "analyse-pro-no-timeout": ["Composer\\Config::disableProcessTimeout", "vendor/bin/phpstan analyse --pro"],
         "analyse-no-memory-limit": "vendor/bin/phpstan analyse --memory-limit=-1",
         "analyse-generate-baseline": "vendor/bin/phpstan analyse --generate-baseline",
         "format": "vendor/bin/pint",
