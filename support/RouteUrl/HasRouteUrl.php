@@ -21,7 +21,6 @@ trait HasRouteUrl
      */
     public function routeUrls(): MorphOne
     {
-        /** @phpstan-ignore-next-line */
         return $this->morphOne(RouteUrl::class, 'model');
     }
 
@@ -30,7 +29,6 @@ trait HasRouteUrl
      */
     public function activeRouteUrl(): MorphOne
     {
-        /** @phpstan-ignore-next-line */
         return $this->routeUrls()->latestOfMany('updated_at');
     }
 }

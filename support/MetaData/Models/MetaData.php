@@ -61,13 +61,13 @@ class MetaData extends Model implements HasMedia
         'media',
     ];
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function model(): MorphTo
     {
         return $this->morphTo();
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function resourceModel(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'model_type', 'model_id');

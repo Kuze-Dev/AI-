@@ -72,10 +72,9 @@ class TwoFactorAuthentication extends Model
         return $this->hasMany(SafeDevice::class);
     }
 
-    /** @return MorphTo<Model&TwoFactorAuthenticatable, self> */
+    /** @return MorphTo<Model&TwoFactorAuthenticatable, $this> */
     public function authenticatable(): MorphTo
     {
-        /** @var MorphTo<Model&TwoFactorAuthenticatable, self> */
         return $this->morphTo();
     }
 

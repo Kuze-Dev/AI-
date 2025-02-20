@@ -112,7 +112,7 @@ class Payment extends Model implements HasMedia
         return $this->hasMany(PaymentRefund::class);
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function payable(): MorphTo
     {
         return $this->morphTo();

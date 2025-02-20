@@ -52,7 +52,7 @@ class RouteUrl extends Model implements Stringable
         ];
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function model(): MorphTo
     {
         return $this->morphTo();

@@ -7,6 +7,7 @@ namespace Domain\Order\Models;
 use Domain\Review\Models\Review;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -154,8 +155,8 @@ class OrderLine extends Model implements HasMedia
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
-
-    public function purchasable()
+    /** @return MorphTo<Model, $this> */
+    public function purchasable(): MorphTo
     {
         return $this->morphTo();
     }

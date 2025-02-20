@@ -101,7 +101,7 @@ class Node extends Model implements HasInternationalizationInterface, Sortable
         return $this->hasMany(self::class, 'parent_id')->ordered()->with('children');
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function model(): MorphTo
     {
         return $this->morphTo();
