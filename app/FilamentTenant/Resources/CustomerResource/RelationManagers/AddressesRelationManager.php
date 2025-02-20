@@ -200,7 +200,10 @@ class AddressesRelationManager extends RelationManager
                             try {
                                 return app(DeleteAddressAction::class)->execute($record);
                             } catch (CantDeleteDefaultAddressException) {
-                                Filament::notify('danger', trans('Deleting default address not allowed.'));
+                                Notification::make()
+                                    ->title(trans( trans('Deleting default address not allowed.')))
+                                    ->danger()
+                                    ->send();
 
                                 return false;
                             } catch (DeleteRestrictedException) {
