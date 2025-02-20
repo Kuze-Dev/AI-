@@ -19,6 +19,7 @@ use Domain\Internationalization\Models\Locale;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\TenantFeatureSupport;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Section;
@@ -61,7 +62,7 @@ class ContentEntryResource extends Resource
 
             Route::name("contents.{$slug}.")
                 ->prefix('contents/{ownerRecord}')
-                ->middleware(static::getMiddlewares())
+                ->middleware(static::getRouteMiddleware(Filament::getCurrentPanel()))
                 ->group(function () {
                     foreach (static::getPages() as $name => $page) {
                         Route::get($page['route'], $page['class'])->name($name);

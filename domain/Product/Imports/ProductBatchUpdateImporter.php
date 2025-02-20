@@ -17,6 +17,7 @@ use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Throwable;
@@ -287,11 +288,11 @@ class ProductBatchUpdateImporter extends Importer
     {
         $body = 'Your product/variant batch update import has completed and '.
             number_format($import->successful_rows).' '.
-            str('row')->plural($import->successful_rows).' imported.';
+            Str::of('row')->plural($import->successful_rows).' imported.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
             $body .= ' '.number_format($failedRowsCount).' '.
-                str('row')->plural($failedRowsCount).' failed to import.';
+                Str::of('row')->plural($failedRowsCount).' failed to import.';
         }
 
         return $body;

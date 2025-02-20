@@ -6,7 +6,7 @@ namespace Domain\Customer\Export;
 
 use App\Settings\CustomerSettings;
 use Domain\Customer\Models\Customer;
-use Filament\Support\Actions\Action;
+use Filament\Actions\Action;
 use HalcyonAgile\FilamentExport\Actions\ExportAction;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;

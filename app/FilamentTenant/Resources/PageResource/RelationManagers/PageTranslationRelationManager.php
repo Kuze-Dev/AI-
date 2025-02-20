@@ -28,7 +28,7 @@ class PageTranslationRelationManager extends RelationManager
 
     public Model $ownerRecord;
 
-    /** @phpstan-ignore-next-line */
+    /** `@phpstan-ignore-next-line` */
     public function getRelationship(): Relation|Builder
     {
         /** @phpstan-ignore-next-line */

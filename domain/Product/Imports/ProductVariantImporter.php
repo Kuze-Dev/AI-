@@ -12,6 +12,7 @@ use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 /**
@@ -242,10 +243,10 @@ class ProductVariantImporter extends Importer
     {
         $body = 'Your product variant import has completed and '.
             number_format($import->successful_rows).' '.
-            str('row')->plural($import->successful_rows).' imported.';
+            Str::of('row')->plural($import->successful_rows).' imported.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' '.number_format($failedRowsCount).' '.str('row')
+            $body .= ' '.number_format($failedRowsCount).' '.Str::of('row')
                 ->plural($failedRowsCount).' failed to import.';
         }
 

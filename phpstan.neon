@@ -44,7 +44,6 @@ services:
             - collect
             - csrf_field
             - csrf_token
-            - env
             - method_field
             - now
             - old
@@ -70,6 +69,7 @@ services:
             - auth
             - request
             - data_set
+            - once
 
 parameters:
 
@@ -84,7 +84,6 @@ parameters:
 
     paths:
         - app
-        - config
         - database
         - domain
         - support
@@ -98,7 +97,8 @@ parameters:
         - identifier: missingType.generics
 
     excludePaths:
-        # - ./*/*/FileToBeExcluded.php
+        - domain/*/config/*
+        - support/*/config/*
 
     earlyTerminatingFunctionCalls:
         - rd
