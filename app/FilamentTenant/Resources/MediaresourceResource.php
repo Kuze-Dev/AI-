@@ -206,7 +206,7 @@ class MediaresourceResource extends Resource
     {
         return [
             'index' => Pages\ListMediaresources::route('/'),
-            'edit' => Pages\EditMediaresource::route('/{record}/edit'),
+            'edit' => Pages\EditMediaResource::route('/{record}/edit'),
         ];
     }
 }

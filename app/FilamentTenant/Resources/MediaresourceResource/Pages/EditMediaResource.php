@@ -11,7 +11,7 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Support\Common\Actions\SyncMediaCollectionAction;
 
-class EditMediaresource extends EditRecord
+class EditMediaResource extends EditRecord
 {
     use LogsFormActivity;
 
@@ -27,18 +27,12 @@ class EditMediaresource extends EditRecord
         ];
     }
 
+    /**
+     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Media   $record
+     */
     #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media */
-        $media = $record;
-
-        return app(SyncMediaCollectionAction::class)->updateMedia($media, $data['custom_properties']);
-    }
-
-    #[\Override]
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
+        return app(SyncMediaCollectionAction::class)->updateMedia($record, $data['custom_properties']);
     }
 }
