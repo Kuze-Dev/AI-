@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
+use App\FilamentTenant\Support\Forms\LocationPickerField;
 use Closure;
 use Domain\Blueprint\DataTransferObjects\CheckBoxFieldData;
 use Domain\Blueprint\DataTransferObjects\DatetimeFieldData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\FileFieldData;
+use Domain\Blueprint\DataTransferObjects\LocationPickerData;
 use Domain\Blueprint\DataTransferObjects\MarkdownFieldData;
 use Domain\Blueprint\DataTransferObjects\MediaFieldData;
 use Domain\Blueprint\DataTransferObjects\RadioFieldData;
@@ -116,7 +118,8 @@ class SchemaFormBuilder extends Component
             DatetimeFieldData::class => $this->makeDateTimePickerComponent($field),
             FileFieldData::class => $this->makeFileUploadComponent($field),
             MarkdownFieldData::class => MarkdownEditor::make($field->state_name)
-                ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons)),
+                ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons
+            )),
             RichtextFieldData::class => $this->makeRichTextComponent($field),
             SelectFieldData::class => $this->makeSelectComponent($field),
             CheckBoxFieldData::class => $this->makeCheckBoxListComponent($field),
@@ -129,6 +132,7 @@ class SchemaFormBuilder extends Component
             MediaFieldData::class => $this->makeMediaComponent($field),
             TinyEditorData::class => $this->makeTinyEditorComponent($field),
             TipTapEditorData::class => $this->makeTiptapEditorComponent($field),
+            LocationPickerData::class => $this->makeLocationPickerComponent($field),
 
             default => throw new InvalidArgumentException('Cannot generate field component for `'.$field::class.'` as its not supported.'),
         };
@@ -640,6 +644,13 @@ class SchemaFormBuilder extends Component
         }
 
         return $radio;
+
+    }
+
+    public function makeLocationPickerComponent(LocationPickerData $locationPickerData): LocationPickerField
+    {
+
+        return LocationPickerField::make($locationPickerData->state_name);
 
     }
 }

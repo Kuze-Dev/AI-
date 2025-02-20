@@ -10,6 +10,7 @@
         "awcodes/filament-tiptap-editor": "^3.5.1",
         "bacon/bacon-qr-code": "^3.0.1",
         "barryvdh/laravel-dompdf": "^3.0.1",
+        "cheesegrits/filament-google-maps": "^3.0",
         "fakerphp/faker": "^1.24.1",
         "filament/filament": "^3.2.133",
         "filament/spatie-laravel-media-library-plugin": "^3.2.133",

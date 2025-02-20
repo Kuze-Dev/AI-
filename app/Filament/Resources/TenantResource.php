@@ -173,6 +173,7 @@ class TenantResource extends Resource
                                             extra: [
                                                 Features\CMS\Internationalization::class,
                                                 Features\CMS\SitesManagement::class,
+                                                Features\CMS\GoogleMapField::class,
                                             ],
                                         ),
                                     ]
@@ -237,6 +238,14 @@ class TenantResource extends Resource
                     ->hidden(
                         fn () => ! Filament::auth()
                             ->user()?->can('tenant.updateFeatures')
+                    ),
+                Forms\Components\Section::make(trans('Google Map Settings'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\TextInput::make('google_map_api_key')
+                            ->columnSpanFull(),
+                    ])->hidden(
+                        fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\GoogleMapField::class)
                     ),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->collapsed(fn (string $context) => $context === 'edit')
