@@ -4,31 +4,36 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AdminResource\RelationManagers;
 
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use Exception;
+use App\Filament\Resources\ActivityResource;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-final class ActionsRelationManager extends RelationManager
+class ActionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'actions';
 
     protected static ?string $recordTitleAttribute = 'id';
 
-    /** @throws Exception */
     #[\Override]
-    public function form(Form $form): Form
+    public function infolist(Infolist $infolist): Infolist
     {
-        return ActivitiesRelationManager::form($form);
+        return ActivityResource::infolist($infolist);
     }
 
-    /** @throws Exception */
+    //    public function form(Form $form): Form
+    //    {
+    //        return ActivityResource::form($form);
+    //    }
+
     #[\Override]
     public function table(Table $table): Table
     {
-        return ActivitiesRelationManager::table($table);
+        return ActivityResource::table($table)
+            ->filtersLayout(FiltersLayout::AboveContentCollapsible);
     }
 
     #[\Override]
