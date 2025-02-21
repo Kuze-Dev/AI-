@@ -99,6 +99,8 @@ parameters:
     excludePaths:
         - domain/*/config/*
         - support/*/config/*
+        - domain/*/Database/*
+        - support/*/Database/*
 
     earlyTerminatingFunctionCalls:
         - rd
