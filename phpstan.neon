@@ -84,7 +84,6 @@ parameters:
 
     paths:
         - app
-        - database
         - domain
         - support
 

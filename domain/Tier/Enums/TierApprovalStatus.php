@@ -12,7 +12,7 @@ enum TierApprovalStatus: string implements HasLabel
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

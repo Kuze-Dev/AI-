@@ -30,13 +30,12 @@ class RouteUrlV2Controller
     ]
     public function __invoke(string $url = ''): JsonApiResource
     {
-        /** @var array */
         $notDraftableModels = [
             app(Taxonomy::class)->getMorphClass(),
             app(TaxonomyTerm::class)->getMorphClass(),
         ];
 
-        /** @var \Illuminate\Database\Eloquent\Builder<RouteUrl> */
+        /** @var \Illuminate\Database\Eloquent\Builder<RouteUrl> $queryRouteUrl */
         $queryRouteUrl = RouteUrl::whereUrl(Str::start($url, '/'))
             ->with('model');
 

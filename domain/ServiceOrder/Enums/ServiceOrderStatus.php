@@ -34,7 +34,7 @@ enum ServiceOrderStatus: string implements HasColor, HasLabel
         return $status;
     }
 
-    public function getColor(): string|array|null
+    public function getColor(): string
     {
         return match ($this) {
             ServiceOrderStatus::PENDING, ServiceOrderStatus::INPROGRESS => 'warning',
@@ -44,7 +44,7 @@ enum ServiceOrderStatus: string implements HasColor, HasLabel
         };
     }
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

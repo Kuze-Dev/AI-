@@ -9,6 +9,7 @@ use Carbon\CarbonInterval;
 use DateInterval;
 use Filament\Forms\ComponentContainer;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\ActivityLogger;
@@ -25,8 +26,9 @@ trait LogsFormActivity
     public function afterFill(): void
     {
         $state = $this->form->getRawState();
-
+        /** @phpstan-ignore argument.type */
         $this->form->dehydrateState($state);
+        /** @phpstan-ignore argument.type */
         $this->form->mutateDehydratedState($state);
 
         $this->initialFormState = ($statePath = $this->form->getStatePath())
@@ -133,7 +135,9 @@ trait LogsFormActivity
 
     protected function getDescriptionForEvent(string $event): string
     {
+        /** @phpstan-ignore function.alreadyNarrowedType, notIdentical.alwaysTrue */
         if (method_exists($this, 'getResource')) {
+            /** @phpstan-ignore function.alreadyNarrowedType, notIdentical.alwaysTrue */
             if (method_exists($this, 'getRecord') && ($record = $this->getRecord()) !== null) {
                 return $record->getAttribute($this->getResource()::getRecordTitleAttribute());
             }
