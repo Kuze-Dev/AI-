@@ -219,6 +219,7 @@ class TenantResource extends Resource
                                                 Features\Shopconfiguration\PaymentGateway\StripeGateway::class,
                                                 Features\Shopconfiguration\PaymentGateway\OfflineGateway::class,
                                                 Features\Shopconfiguration\PaymentGateway\BankTransfer::class,
+                                                Features\Shopconfiguration\PaymentGateway\VisionpayGateway::class
                                             ],
                                             groupLabel: trans('Payments'),
                                         ),

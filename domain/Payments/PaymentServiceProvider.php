@@ -40,6 +40,7 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
                         'manual' => new OfflinePayment(),
                         'stripe' => new StripeProvider(),
                         'bank-transfer' => new OfflinePayment(),
+                        'vision-pay' => new VisionPayProvider(),
                         default => throw new InvalidArgumentException(),
                     });
                 }
