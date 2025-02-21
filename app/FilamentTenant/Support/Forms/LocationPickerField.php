@@ -33,7 +33,7 @@ class LocationPickerField extends Field
                         ->columnspan(2)
                         ->placeholder('Add Address Name'),
                     TextInput::make('latitude')
-                        ->lazy()
+                        ->reactive()
                         // ->default('14.5454321')
                         ->afterStateUpdated(function ($state, Get $get, Set $set) {
                             $set('map', [
@@ -43,7 +43,7 @@ class LocationPickerField extends Field
                         })
                         ->columnspan(1),
                     TextInput::make('longitude')
-                        ->lazy()
+                        ->reactive()
                         // ->default('121.0686773')
                         ->afterStateUpdated(function ($state, Get $get, Set $set) {
                             $set('map', [
@@ -55,6 +55,7 @@ class LocationPickerField extends Field
                 ])->columns(2),
                 Map::make('map')
                     ->dehydrated(false)
+                    ->reactive()
                     ->mapControls([
                         'mapTypeControl' => true,
                         'scaleControl' => true,
@@ -84,7 +85,7 @@ class LocationPickerField extends Field
                     })
                     ->afterStateHydrated(function (Map $component, Get $get, Set $set) {
 
-
+                        
                         // $component->state([
                         //     'lat' => floatval($get('latitude')),
                         //     'lng' => floatval($get('longitude')),
