@@ -137,14 +137,13 @@ class FormResource extends Resource
                             )
                             ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
-                                /** @var \Domain\Admin\Models\Admin */
-                                $user = Auth::user();
+                                $admin = filament_admin();
 
-                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                if ($admin->hasRole(config('domain.role.super_admin'))) {
                                     return false;
                                 }
 
-                                $user_sites = $user->userSite->pluck('id')->toArray();
+                                $user_sites = $admin->userSite->pluck('id')->toArray();
 
                                 $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
@@ -168,7 +167,7 @@ class FormResource extends Resource
                         ->hidden((bool) ! (tenancy()->tenant?->features()
                             ->active(
                                 \App\Features\CMS\SitesManagement::class)
-                            && Auth::user()?->hasRole(config('domain.role.super_admin'))
+                            && filament_admin()->hasRole(config('domain.role.super_admin'))
                         )),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
@@ -312,7 +311,7 @@ class FormResource extends Resource
                     ->badge()
                     ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([
@@ -321,9 +320,9 @@ class FormResource extends Resource
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
-                        if (Auth::user()?->can('site.siteManager') &&
-                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
-                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        if (filament_admin()->can('site.siteManager') &&
+                        ! (filament_admin()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
                         }
 
                         return $query;
@@ -338,7 +337,7 @@ class FormResource extends Resource
                 ]),
             ])->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-                    ->authorize(fn () => Auth::user()?->hasRole(config('domain.role.super_admin'))),
+                    ->authorize(fn () => filament_admin()->hasRole(config('domain.role.super_admin'))),
             ])
             ->defaultSort('updated_at', 'desc');
     }
@@ -347,15 +346,15 @@ class FormResource extends Resource
     #[\Override]
     public static function getEloquentQuery(): Builder
     {
-        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
         if (TenantFeatureSupport::active(SitesManagement::class) &&
-            Auth::user()?->can('site.siteManager') &&
-            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+            filament_admin()->can('site.siteManager') &&
+            ! (filament_admin()->hasRole(config('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray()));
+            return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();

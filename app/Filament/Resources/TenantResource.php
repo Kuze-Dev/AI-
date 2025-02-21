@@ -165,6 +165,7 @@ class TenantResource extends Resource
                     ->dehydrated(false)
                     ->schema([
                         FeatureSelector::make('features')
+                            /** @phpstan-ignore argument.type */
                             ->options([
                                 new Features\GroupFeature(
                                     base: Features\CMS\CMSBase::class,
@@ -235,8 +236,7 @@ class TenantResource extends Resource
                             ]),
                     ])
                     ->hidden(
-                        fn () => ! Filament::auth()
-                            ->user()?->can('tenant.updateFeatures')
+                        fn () => ! filament_admin()->can('tenant.updateFeatures')
                     ),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->collapsed(fn (string $context) => $context === 'edit')
@@ -247,8 +247,7 @@ class TenantResource extends Resource
                             ->inline(false),
                     ])
                     ->hidden(
-                        fn () => ! Filament::auth()
-                            ->user()?->can('tenant.canSuspendTenant')
+                        fn () => ! filament_admin()->can('tenant.canSuspendTenant')
                     ),
             ])->columns(2);
     }

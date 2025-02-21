@@ -16,7 +16,7 @@ class EditProfile extends \Filament\Pages\Auth\EditProfile
     #[\Override]
     public static function canAccess(): bool
     {
-        return ! filament_admin()?->isZeroDayAdmin();
+        return ! filament_admin()->isZeroDayAdmin();
     }
 
     #[\Override]
@@ -38,7 +38,7 @@ class EditProfile extends \Filament\Pages\Auth\EditProfile
                             ->required()
                             ->string(),
                         $emailTextInput
-                            ->rules(Rule::email())
+                            ->rules(fn () => Rule::email())
                             ->helperText(
                                 ! config('domain.admin.can_change_email')
                                 ? 'Email update is currently disabled.'

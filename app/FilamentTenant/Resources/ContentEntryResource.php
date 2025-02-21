@@ -182,7 +182,7 @@ class ContentEntryResource extends Resource
                             })
                             ->required(),
                         Forms\Components\Hidden::make('author_id')
-                            ->default(Auth::id()),
+                            ->default(filament_admin()->getKey()),
                     ]),
                     Forms\Components\Section::make([
                         // Forms\Components\CheckboxList::make('sites')
@@ -191,10 +191,9 @@ class ContentEntryResource extends Resource
                             ->rule(fn (?ContentEntry $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(function ($livewire) {
 
-                                /** @var \Domain\Admin\Models\Admin */
-                                $user = Auth::user();
+                                $admin = filament_admin();
 
-                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                if ($admin->hasRole(config('domain.role.super_admin'))) {
                                     return $livewire->ownerRecord->sites->pluck('name', 'id')
                                         ->toArray();
                                 }
@@ -206,14 +205,13 @@ class ContentEntryResource extends Resource
                             })
                             ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
-                                /** @var \Domain\Admin\Models\Admin */
-                                $user = Auth::user();
+                                $admin = filament_admin();
 
-                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                if ($admin->hasRole(config('domain.role.super_admin'))) {
                                     return false;
                                 }
 
-                                $user_sites = $user->userSite->pluck('id')->toArray();
+                                $user_sites = $admin->userSite->pluck('id')->toArray();
 
                                 $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
@@ -271,8 +269,7 @@ class ContentEntryResource extends Resource
                         ),
                     Forms\Components\Section::make(trans('Publishing'))
                         ->schema([
-                            Forms\Components\DateTimePicker::make('published_at')
-                                ->timezone(Auth::user()?->timezone),
+                            Forms\Components\DateTimePicker::make('published_at'),
                         ])
                         ->hidden(
                             fn ($livewire) => ! $livewire->ownerRecord->hasPublishDates()
@@ -337,13 +334,13 @@ class ContentEntryResource extends Resource
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
                     ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('published_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable()
                     ->visible(
                         // fn ($livewire) => $livewire->ownerRecord->hasPublishDates()
                     ),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([

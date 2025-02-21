@@ -26,6 +26,6 @@ trait AuthorizeCMSSettings
             return true;
         }
 
-        return Auth::user()?->can('cmsSettings.'.self::getSlug()) ?? false;
+        return filament_admin()->can('cmsSettings.'.self::getSlug()) ?? false;
     }
 }

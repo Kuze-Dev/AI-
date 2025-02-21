@@ -79,16 +79,16 @@ class TaxonomyResource extends Resource
     /** @return Builder<\Domain\Taxonomy\Models\Taxonomy> */
     public static function getEloquentQuery(): Builder
     {
-        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
-            Auth::user()?->can('site.siteManager') &&
-            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+            filament_admin()->can('site.siteManager') &&
+            ! (filament_admin()->hasRole(config('domain.role.super_admin')))
         ) {
             return static::getModel()::query()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
+                return $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray());
             });
         }
 
@@ -198,7 +198,7 @@ class TaxonomyResource extends Resource
                         ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
                             /** @var \Domain\Admin\Models\Admin */
-                            $user = Auth::user();
+                            $user = filament_admin();
 
                             if ($user->hasRole(config('domain.role.super_admin'))) {
                                 return false;
@@ -349,7 +349,7 @@ class TaxonomyResource extends Resource
                     ->counts('taxonomyTerms')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([
@@ -358,9 +358,9 @@ class TaxonomyResource extends Resource
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
-                        if (Auth::user()?->can('site.siteManager') &&
-                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
-                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        if (filament_admin()->can('site.siteManager') &&
+                        ! (filament_admin()->hasRole(config('domain.role.super_admin')))) {
+                            return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
                         }
 
                         return $query;
@@ -382,7 +382,7 @@ class TaxonomyResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-                    ->authorize(fn () => Auth::user()?->hasRole(config('domain.role.super_admin'))),
+                    ->authorize(fn () => filament_admin()->hasRole(config('domain.role.super_admin'))),
             ]);
     }
 

@@ -34,6 +34,6 @@ abstract class BaseSettings extends SettingsPage
             return true;
         }
 
-        return Auth::user()?->can('settings.'.self::getSlug()) ?? false;
+        return filament_admin()->can('settings.'.self::getSlug()) ;
     }
 }

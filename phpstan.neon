@@ -95,6 +95,7 @@ parameters:
         #- '#Access to property \$value on an unknown class StringBackedEnum.#'
         - identifier: missingType.iterableValue
         - identifier: missingType.generics
+        - identifier: nullsafe.neverNull
 
     excludePaths:
         - domain/*/config/*

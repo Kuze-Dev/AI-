@@ -80,9 +80,9 @@ class LocaleResource extends Resource
                 Tables\Columns\TextColumn::make('code'),
                 Tables\Columns\CheckboxColumn::make('is_default')->label('Default')->disabled(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone),
+                    ->dateTime(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone),
+                    ->dateTime(),
             ])
             ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->actions([

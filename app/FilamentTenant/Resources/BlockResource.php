@@ -151,14 +151,13 @@ class BlockResource extends Resource
                         )
                         ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
-                            /** @var \Domain\Admin\Models\Admin */
-                            $user = Auth::user();
+                            $admin = filament_admin();
 
-                            if ($user->hasRole(config('domain.role.super_admin'))) {
+                            if ($admin->hasRole(config('domain.role.super_admin'))) {
                                 return false;
                             }
 
-                            $user_sites = $user->userSite->pluck('id')->toArray();
+                            $user_sites = $admin->userSite->pluck('id')->toArray();
 
                             $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
@@ -203,7 +202,7 @@ class BlockResource extends Resource
         //                 ->helperText('If enabled, the content below will serve as the default for all related pages')
         //                 ->reactive(),
         //         ])
-        //             ->disabled(fn () => ! Auth::user()?->hasRole(config('domain.role.super_admin'))),
+        //             ->disabled(fn () => ! filament_admin()->hasRole(config('domain.role.super_admin'))),
         //         Forms\Components\Card::make([
         //             // Forms\Components\CheckboxList::make('sites')
         //             \App\FilamentTenant\Support\CheckBoxList::make('sites')
@@ -247,8 +246,7 @@ class BlockResource extends Resource
         //                 )
         //                 ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
-        //                     /** @var \Domain\Admin\Models\Admin */
-        //                     $user = Auth::user();
+        //                     $user = filament_admin();
 
         //                     if ($user->hasRole(config('domain.role.super_admin'))) {
         //                         return false;
@@ -302,7 +300,7 @@ class BlockResource extends Resource
                     Tables\Columns\TextColumn::make('updated_at')
                         ->size('sm')
                         ->color('gray')
-                        ->dateTime(timezone: Auth::user()?->timezone)
+                        ->dateTime()
                         ->sortable(),
                 ])->space(2),
             ])

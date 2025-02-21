@@ -32,8 +32,7 @@ class CustomerSettings extends TenantBaseSettings
 
     protected static function authorizeAccess(): bool
     {
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = Auth::user();
+        $admin = filament_admin();
 
         $settingsPermissions = app(PermissionRegistrar::class)
             ->getPermissions()
@@ -52,8 +51,8 @@ class CustomerSettings extends TenantBaseSettings
     protected function canEditSection(string $permission): bool
     {
         if (
-            Auth::user()?->hasRole(config('domain.role.super_admin')) ||
-            Auth::user()?->can('customerSettings.'.$permission)
+            filament_admin()->hasRole(config('domain.role.super_admin')) ||
+            filament_admin()->can('customerSettings.'.$permission)
         ) {
             return true;
         }
@@ -77,7 +76,7 @@ class CustomerSettings extends TenantBaseSettings
                 ->disabled(! $this->canEditSection('customerEmailNotificationSettings'))
                 ->schema([
                     Forms\Components\Section::make('Register Invitation Notification')
-                        ->disabled(fn () => ! Auth::user()?->hasRole(config('domain.role.super_admin')))
+                        ->disabled(fn () => ! filament_admin()->hasRole(config('domain.role.super_admin')))
                         ->schema([
                             Forms\Components\MarkdownEditor::make('customer_register_invitation_greetings')
                                 ->helpertext('If you need to update these mail settings, please contact your system administrator')

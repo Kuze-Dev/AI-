@@ -103,7 +103,7 @@ class BlueprintResource extends Resource
                     ->searchable(),
                 // ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
 
@@ -265,10 +265,8 @@ class BlueprintResource extends Resource
     {
         return match ($fieldType) {
             FieldType::DATETIME => [
-                Forms\Components\DateTimePicker::make('min')
-                    ->timezone(Auth::user()?->timezone),
-                Forms\Components\DateTimePicker::make('max')
-                    ->timezone(Auth::user()?->timezone),
+                Forms\Components\DateTimePicker::make('min'),
+                Forms\Components\DateTimePicker::make('max'),
                 Forms\Components\TextInput::make('format')
                     ->helperText(new HtmlString(<<<'HTML'
                             See <a href="https://www.php.net/manual/en/datetime.format.php" class="text-primary-500" target="_blank" rel="noopener noreferrer">PHP's Date/Time Format</a> for available options.

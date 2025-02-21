@@ -18,17 +18,16 @@ class ListSites extends ListRecords
     #[\Override]
     protected function getTableQuery(): Builder
     {
-        /** @var \Domain\Admin\Models\Admin */
-        $user = Auth::user();
+        $admin = filament_admin();
 
         $query = static::getResource()::getEloquentQuery();
 
-        if ($user->hasRole(config('domain.role.super_admin'))) {
+        if ($admin->hasRole(config('domain.role.super_admin'))) {
             return static::getResource()::getEloquentQuery();
         }
 
-        return $query->whereHas('siteManager', function ($subquery) use ($user) {
-            $subquery->where('admin_id', $user->id);
+        return $query->whereHas('siteManager', function ($subquery) use ($admin) {
+            $subquery->where('admin_id', $admin->id);
         });
     }
 

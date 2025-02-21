@@ -72,9 +72,9 @@ class CreateServiceOrder extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $rawData = $this->form->getRawState();
-        
 
-        $data['admin_id'] = Filament::auth()->id();
+
+        $data['admin_id'] = filament_admin()->getKey();
         $data['reference'] = app(GenerateReferenceNumberAction::class)
             ->execute(ServiceOrder::class);
 
@@ -96,7 +96,7 @@ class CreateServiceOrder extends CreateRecord
         $data['currency_code'] = $currency->code;
         $data['currency_name'] = $currency->name;
         $data['currency_symbol'] = $currency->symbol;
-        
+
         $taxableInfo = self::getTax(
             $rawData,
             self::getSubTotalPrice(
@@ -109,7 +109,7 @@ class CreateServiceOrder extends CreateRecord
         $data['tax_percentage'] = $taxableInfo->tax_percentage;
         $data['tax_total'] = $taxableInfo->tax_total;
         $data['total_price'] = $taxableInfo->total_price;
-        
+
         $data['schedule'] = $rawData['schedule'];
         // for afterCreate
         self::$is_same_as_billing = $rawData['is_same_as_billing'];

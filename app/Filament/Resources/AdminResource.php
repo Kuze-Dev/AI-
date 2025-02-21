@@ -79,9 +79,7 @@ class AdminResource extends Resource
                         ->required()
                         ->rule(Password::default())
                         ->helperText(
-                            app()->environment('local', 'testing')
-                                ? trans('Password must be at least 4 characters.')
-                                : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
+                            trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
                         )
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')

@@ -48,7 +48,7 @@ class GlobalsTranslationRelationManager extends RelationManager
                         return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
                     }, isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([

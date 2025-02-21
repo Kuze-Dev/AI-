@@ -130,8 +130,7 @@ class CustomerResource extends Resource
                     Forms\Components\DatePicker::make('birth_date')
                         ->translateLabel()
                         ->nullable()
-                        ->before(fn () => now())
-                        ->timezone(null),
+                        ->before(fn () => now()),
                     Forms\Components\Select::make('tier_id')
                         ->translateLabel()
                         ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))
@@ -269,11 +268,11 @@ class CustomerResource extends Resource
                     ]),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->translateLabel()
-                    ->dateTime(timezone: filament_admin()->timezone)
+                    ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->translateLabel()
-                    ->dateTime(timezone: filament_admin()->timezone)
+                    ->dateTime()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
             ])

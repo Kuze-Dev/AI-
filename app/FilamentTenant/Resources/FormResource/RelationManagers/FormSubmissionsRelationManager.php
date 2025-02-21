@@ -38,15 +38,14 @@ class FormSubmissionsRelationManager extends RelationManager
     #[\Override]
     public function table(Table $table): Table
     {
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = Auth::user();
+        $admin = filament_admin();
 
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id'),
                 Tables\Columns\TextColumn::make('data.main.name'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->actions([

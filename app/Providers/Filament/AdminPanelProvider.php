@@ -72,7 +72,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => trans('System')),
             ])
             ->plugins([
-                FilamentSpatieLaravelHealthPlugin::make()->navigationGroup(trans('System')),
+                FilamentSpatieLaravelHealthPlugin::make()
+                    ->authorize(fn () => filament_admin()->hasRole(config('domain.role.super_admin')))
+                    ->navigationGroup(fn () => trans('System')),
                 FilamentPasswordConfirmationPlugin::make(),
                 EnvironmentIndicatorPlugin::make()
                     ->visible(true)
