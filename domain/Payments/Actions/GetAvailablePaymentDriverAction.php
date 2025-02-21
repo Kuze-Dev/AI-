@@ -8,6 +8,7 @@ use App\Features\Shopconfiguration\PaymentGateway\BankTransfer;
 use App\Features\Shopconfiguration\PaymentGateway\OfflineGateway;
 use App\Features\Shopconfiguration\PaymentGateway\PaypalGateway;
 use App\Features\Shopconfiguration\PaymentGateway\StripeGateway;
+use App\Features\Shopconfiguration\PaymentGateway\VisionpayGateway;
 use Domain\Tenant\TenantFeatureSupport;
 
 class GetAvailablePaymentDriverAction
@@ -26,6 +27,9 @@ class GetAvailablePaymentDriverAction
                 : false,
             'bank-transfer' => TenantFeatureSupport::active(BankTransfer::class)
                 ? app(BankTransfer::class)->getLabel()
+                : false,
+            'vision-pay' => TenantFeatureSupport::active(VisionpayGateway::class) 
+                ? app(VisionpayGateway::class)->getLabel() 
                 : false,
         ], fn ($value) => $value !== false);
 
