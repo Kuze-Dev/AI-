@@ -31,6 +31,8 @@ trait RefreshDatabaseWithTenant
         if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh', $this->migrateFreshUsing());
 
+            $this->artisan('db:seed');
+
             $this->artisan('tenants:migrate-fresh');  // <--- added
 
             $this->app[Kernel::class]->setArtisan(null);
@@ -57,8 +59,8 @@ trait RefreshDatabaseWithTenant
                 'id' => self::TENANT_ID,
                 'name' => self::TENANT_ID,
             ]);
-
-//        $this->artisan('tenants:seed', ['--class' => $this->seeder]);
+        
+       $this->artisan('tenants:seed');
     }
 
 }

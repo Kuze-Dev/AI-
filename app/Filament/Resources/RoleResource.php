@@ -13,10 +13,13 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\Filament\Resources\RoleResource\Pages;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
+use Domain\Role\Actions\DeleteRoleAction;
+use Domain\Role\Exceptions\CantDeleteRoleWithAssociatedUsersException;
 use Domain\Role\Models\Role;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -25,6 +28,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
 use Spatie\Permission\Models\Permission;
+use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class RoleResource extends Resource
 {
@@ -102,8 +106,40 @@ class RoleResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
-                ]),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Role $record) {
+                            try {
+                                return app(DeleteRoleAction::class)->execute($record);
+                            } catch (\Exception $e) {
+
+                                if ($e instanceof DeleteRestrictedException) {
+
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Delete of this Record is Restricted')
+                                        ->body($e->getMessage())
+                                        ->send();
+
+                                    return $e->getMessage();
+                                }
+
+                                if ($e instanceof CantDeleteRoleWithAssociatedUsersException) {
+
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Cannot Delete this Record')
+                                        ->body('Cannot Delete Role with Associated Users!')
+                                        ->send();
+
+                                    return false;
+
+                                }
+
+                                return false;
+                            }
+                        })
+                        ->authorize('delete'),
+                    ]),
             ])
             ->bulkActions([])
             ->defaultSort('updated_at', 'desc');
