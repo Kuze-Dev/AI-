@@ -60,7 +60,7 @@ trait RefreshDatabaseWithTenant
                 'name' => self::TENANT_ID,
             ]);
         
-       $this->artisan('tenants:seed');
+    //    $this->artisan('tenants:seed');
     }
 
 }
