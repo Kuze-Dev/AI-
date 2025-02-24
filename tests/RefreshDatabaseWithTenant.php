@@ -31,7 +31,7 @@ trait RefreshDatabaseWithTenant
         if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh', $this->migrateFreshUsing());
 
-            // $this->artisan('db:seed');
+            $this->artisan('db:seed');
 
             $this->artisan('tenants:migrate-fresh');  // <--- added
 
