@@ -84,7 +84,6 @@ parameters:
 
     paths:
         - app
-        - database
         - domain
         - support
 
@@ -100,6 +99,8 @@ parameters:
     excludePaths:
         - domain/*/config/*
         - support/*/config/*
+        - domain/*/Database/*
+        - support/*/Database/*
 
     earlyTerminatingFunctionCalls:
         - rd

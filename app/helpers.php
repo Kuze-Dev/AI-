@@ -11,14 +11,7 @@ if (! function_exists('filament_admin')) {
 
     function filament_admin(): Admin
     {
-        return once(fn () => Filament::auth()->user());
-    }
-}
-
-if (! function_exists('filament_admin_optional')) {
-
-    function filament_admin_optional(): ?Admin
-    {
+        /** @phpstan-ignore return.type */
         return once(fn () => Filament::auth()->user());
     }
 }

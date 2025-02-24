@@ -16,13 +16,22 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property-read ContentEntry|Page|null $parentPage.
  *
  * @mixin \Illuminate\Database\Eloquent\Model
+ *
+ * @template TRelatedModel of \Support\RouteUrl\Models\RouteUrl
+ * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, ?TRelatedModel>
  */
 interface HasRouteUrl
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl> */
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, $this>
+     */
     public function routeUrls(): MorphOne;
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl> */
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, $this>
+     */
     public function activeRouteUrl(): MorphOne;
 
     public static function generateRouteUrl(Model $model, array $attributes): string;

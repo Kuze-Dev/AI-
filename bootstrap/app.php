@@ -45,16 +45,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware
-            ->priority([
-                // Even higher priority than the initialization middleware
-                TenancyMiddleware\PreventAccessFromCentralDomains::class,
-
-                TenancyMiddleware\InitializeTenancyByDomain::class,
-                TenancyMiddleware\InitializeTenancyBySubdomain::class,
-                TenancyMiddleware\InitializeTenancyByDomainOrSubdomain::class,
-                TenancyMiddleware\InitializeTenancyByPath::class,
-                TenancyMiddleware\InitializeTenancyByRequestData::class,
-            ])
             ->redirectGuestsTo(fn () => Filament::getLoginUrl())
             ->alias([
                 'active' => EnsureAccountIsActive::class,
