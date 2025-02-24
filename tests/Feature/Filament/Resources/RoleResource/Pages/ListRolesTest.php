@@ -53,10 +53,8 @@ it('can not delete role with existing user', function () {
     $admin->roles()->attach($role);
 
     livewire(ListRoles::class)
-        ->callTableAction(DeleteAction::class, $role);
-    //        ->assertNotified();
-})
-    ->throws(
-        DeleteRestrictedException::class,
-        'Delete has been restricted as `Domain\Role\Models\Role::users()` has existing entries.'
-    );
+        ->callTableAction(DeleteAction::class, $role)
+        ->assertNotified(trans(
+            'Cannot Delete this Record',
+           ));
+});

@@ -72,7 +72,7 @@ class SiteResource extends Resource
                                 ->options(fn () => \Domain\Admin\Models\Admin::permission('site.siteManager')
                                     ->get()
                                     ->pluck('site_label', 'id')
-                                    ->toArray()),
+                                    ->toArray() ?? []),
                         ]),
                 ]),
             ]);

@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             Page\PageSeeder::class,
             Tier\TierSeeder::class,
         ]);
-
+        
         if (! app()->runningUnitTests()) {
             $this->call([
                 Address\CountrySeeder::class,
