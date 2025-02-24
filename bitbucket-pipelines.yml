@@ -48,7 +48,7 @@ definitions:
         script:
           - *setup-script
           # TODO: remove test-no-timeout when using stancl/tenancy v4
-          - composer test-ci -- --ci --profile --passthru-php="-d memory_limit=-1"
+          - composer test-ci -- --ci --passthru-php="-d memory_limit=-1"
 
 pipelines:
   branches:
