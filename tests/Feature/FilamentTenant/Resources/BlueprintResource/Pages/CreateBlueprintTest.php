@@ -86,6 +86,7 @@ it('can show field options', function (FieldType $fieldType, array $fieldOptions
                         'fields' => [
                             [
                                 'title' => 'Foo',
+                                'state_name' => 'foo',
                                 'type' => $fieldType,
                             ],
                         ],
@@ -102,107 +103,20 @@ it('can show field options', function (FieldType $fieldType, array $fieldOptions
         expect($matchedField)->toBeInstanceOf(Field::class);
     }
 })->with([
-    'datetime field' => [
-        'type' => FieldType::DATETIME,
-        'field_options' => [
-            'min',
-            'max',
-            'format',
-        ],
-    ],
-    'file field' => [
-        'type' => FieldType::FILE,
-        'field_options' => [
-            'multiple',
-            'reorder',
-            'min_size',
-            'max_size',
-        ],
-    ],
-    'markdown field' => [
-        'type' => FieldType::MARKDOWN,
-        'field_options' => ['buttons'],
-    ],
-    'richtext field' => [
-        'type' => FieldType::RICHTEXT,
-        'field_options' => ['buttons'],
-    ],
-    'select field' => [
-        'type' => FieldType::SELECT,
-        'field_options' => ['multiple'],
-    ],
-    'checkbox field' => [
-        'type' => FieldType::CHECKBOX,
-        'field_options' => [],
-    ],
-    'radio field' => [
-        'type' => FieldType::RADIO,
-        'field_options' => [],
-    ],
-    'textarea field' => [
-        'type' => FieldType::TEXTAREA,
-        'field_options' => [
-            'min_length',
-            'max_length',
-            'rows',
-            'cols',
-        ],
-    ],
-    'text field' => [
-        'type' => FieldType::TEXT,
-        'field_options' => [
-            'min_length',
-            'max_length',
-        ],
-    ],
-    'email field' => [
-        'type' => FieldType::EMAIL,
-        'field_options' => [
-            'min_length',
-            'max_length',
-        ],
-    ],
-    'number field' => [
-        'type' => FieldType::NUMBER,
-        'field_options' => [
-            'min',
-            'max',
-            'step',
-        ],
-    ],
-    'tel field' => [
-        'type' => FieldType::TEL,
-        'field_options' => [
-            'min_length',
-            'max_length',
-        ],
-    ],
-    'url field' => [
-        'type' => FieldType::URL,
-        'field_options' => [
-            'min_length',
-            'max_length',
-        ],
-    ],
-    'password field' => [
-        'type' => FieldType::PASSWORD,
-        'field_options' => [
-            'min_length',
-            'max_length',
-        ],
-    ],
-    'media field' => [
-        'type' => FieldType::MEDIA,
-        'field_options' => [
-            'min_size',
-            'max_size',
-        ],
-    ],
-    'tinyeditor field' => [
-        'type' => FieldType::TINYEDITOR,
-        'field_options' => [
-            'min_length',
-            'max_length',
-        ],
-    ],
+    'datetime field' => [FieldType::DATETIME, ['min', 'max', 'format']],
+    'file field' => [FieldType::FILE, ['multiple', 'reorder', 'min_size', 'max_size']],
+    'markdown field' => [FieldType::MARKDOWN, ['buttons']],
+    'richtext field' => [FieldType::RICHTEXT, ['buttons']],
+    'select field' => [FieldType::SELECT, ['multiple']],
+    'checkbox field' => [FieldType::CHECKBOX, []],
+    'radio field' => [FieldType::RADIO, []],
+    'textarea field' => [FieldType::TEXTAREA, ['min_length', 'max_length', 'rows', 'cols']],
+    'text field' => [FieldType::TEXT, ['min_length', 'max_length']],
+    'email field' => [FieldType::EMAIL, ['min_length', 'max_length']],
+    'number field' => [FieldType::NUMBER, ['min', 'max', 'step']],
+    'tel field' => [FieldType::TEL, ['min_length', 'max_length']],
+    'url field' => [FieldType::URL, ['min_length', 'max_length']],
+    'password field' => [FieldType::PASSWORD, ['min_length', 'max_length']],
+    'media field' => [FieldType::MEDIA, ['min_size', 'max_size']],
+    'tinyeditor field' => [FieldType::TINYEDITOR, ['min_length', 'max_length']],
 ]);
