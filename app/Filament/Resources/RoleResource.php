@@ -107,37 +107,37 @@ class RoleResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
-                        // ->using(function (Role $record) {
-                        //     try {
-                        //         return app(DeleteRoleAction::class)->execute($record);
-                        //     } catch (\Exception $e) {
+                        ->using(function (Role $record) {
+                            try {
+                                return app(DeleteRoleAction::class)->execute($record);
+                            } catch (\Exception $e) {
 
-                        //         if ($e instanceof DeleteRestrictedException) {
+                                if ($e instanceof DeleteRestrictedException) {
 
-                        //             Notification::make()
-                        //                 ->danger()
-                        //                 ->title('Delete of this Record is Restricted')
-                        //                 ->body($e->getMessage())
-                        //                 ->send();
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Delete of this Record is Restricted')
+                                        ->body($e->getMessage())
+                                        ->send();
 
-                        //             return $e->getMessage();
-                        //         }
+                                    return $e->getMessage();
+                                }
 
-                        //         if ($e instanceof CantDeleteRoleWithAssociatedUsersException) {
+                                if ($e instanceof CantDeleteRoleWithAssociatedUsersException) {
 
-                        //             Notification::make()
-                        //                 ->danger()
-                        //                 ->title('Cannot Delete this Record')
-                        //                 ->body('Cannot Delete Role with Associated Users!')
-                        //                 ->send();
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('Cannot Delete this Record')
+                                        ->body('Cannot Delete Role with Associated Users!')
+                                        ->send();
 
-                        //             return false;
+                                    return false;
 
-                        //         }
+                                }
 
-                        //         return false;
-                        //     }
-                        // })
+                                return false;
+                            }
+                        })
                         ->authorize('delete'),
                     ]),
             ])
