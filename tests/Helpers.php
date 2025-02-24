@@ -10,6 +10,7 @@ use Domain\Role\Database\Factories\RoleFactory;
 use Domain\Tenant\Models\Tenant;
 use Domain\Tenant\TenantSupport;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Repeater;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
@@ -78,6 +79,15 @@ function testInTenantContext(array|string|null $features = null): Tenant
     URL::useOrigin('http://foo.hasp.test');
 
     Filament::setCurrentPanel(Filament::getPanels()['tenant']);
+
+    /**
+     * since Livewire doesn't need to keep track of the UUIDs in a test, 
+     * you can disable the UUID generation and replace them with numeric keys, 
+     * using the Repeater::fake() method at the start of your test:
+     * 
+     * https://filamentphp.com/docs/3.x/forms/fields/repeater#customizing-the-repeater-item-actions
+     */
+    Repeater::fake();
 
     activateFeatures(
         collect($features ?? [])
