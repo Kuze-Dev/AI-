@@ -130,7 +130,13 @@ it('register w/ same address', function () {
 
 it('can register with wholesaler tier', function () {
 
-    $tier = TierFactory::createWholesaler();
+    $tier = app(Tier::class)->firstOrCreate(
+        [
+            'name' => config('domain.tier.wholesaler-domestic')
+        ],[
+            'description' => 'wholesaler'
+        ]
+    );
 
     $state = StateFactory::new()->createOne();
     $data = CustomerRegistrationRequestFactory::new()

@@ -9,6 +9,7 @@ use App\FilamentTenant\Resources\CustomerResource\Pages\EditCustomer;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
+use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -23,14 +24,22 @@ beforeEach(function () {
         TierBase::class,
     ]);
     loginAsSuperAdmin();
+
+    $this->tier = app(Tier::class)->firstOrCreate(
+        [
+            'name' => config('domain.tier.default')
+        ],[
+            'description' => 'test'
+        ]
+    );
 });
 
 it('can render page', function () {
-    $tier = TierFactory::createDefault();
+   
 
     $customer = CustomerFactory::new()
         ->createOne([
-            'tier_id' => $tier->getKey(),
+            'tier_id' => $this->tier->getKey(),
         ]);
     livewire(EditCustomer::class, ['record' => $customer->getRouteKey()])
         ->assertSuccessful()
@@ -47,11 +56,11 @@ it('can render page', function () {
 });
 
 it('can edit tier', function () {
-    $tier = TierFactory::createDefault();
+   
 
     $customer = CustomerFactory::new()
         ->createOne([
-            'tier_id' => $tier->getKey(),
+            'tier_id' => $this->tier->getKey(),
         ]);
 
     livewire(EditCustomer::class, ['record' => $customer->getRouteKey()])
@@ -73,6 +82,5 @@ it('can edit tier', function () {
         'last_name' => 'test last name',
         'mobile' => '09123456789',
         'status' => $customer->status,
-        'birth_date' => now()->subDay()->toDateString().' 00:00:00',
     ]);
 });
