@@ -73,7 +73,7 @@ class EditCustomer extends EditRecord
             $customer->sendEmailVerificationNotification();
         }
 
-        if ($customer->tier_approval_status == TierApprovalStatus::APPROVED) {
+        if ($customer->tier_approval_status === TierApprovalStatus::APPROVED) {
             app(SendApprovedEmailAction::class)->execute($customer);
             $customer->sendEmailVerificationNotification();
         }

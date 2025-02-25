@@ -32,7 +32,7 @@ class CreateTenant extends CreateRecord
 
     public function afterCreate(): void
     {
-        /** @var array{feature: array} $data */
+        /** @var array{features: array} $data */
         $data = $this->form->getRawState();
 
         $this->record->syncFeature(self::getNormalizedFeatureNames($data['features']));
