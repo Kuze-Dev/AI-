@@ -5,10 +5,15 @@ declare(strict_types=1);
 use App\Filament\Resources\RoleResource\Pages\EditRole;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Domain\Role\Database\Factories\RoleFactory;
+use Tests\TestSeeder;
 
 use function Pest\Livewire\livewire;
+use function Pest\Laravel\seed;
 
-beforeEach(fn () => loginAsSuperAdmin());
+beforeEach(function () {
+    seed(TestSeeder::class);
+    loginAsSuperAdmin();
+});
 
 it('can show edit', function () {
     $role = RoleFactory::new()->createOne();
