@@ -23,7 +23,7 @@ use function Pest\Laravel\assertDatabaseHas;
 
 function loginAsSuperAdmin(?Admin $admin = null): Admin
 {
-    return loginAsAdmin($admin)->assignRole(config('domain.role.super_admin'));
+    return loginAsAdmin($admin);//->assignRole(config('domain.role.super_admin'));
 }
 
 function loginAsAdmin(?Admin $admin = null): Admin
@@ -81,10 +81,10 @@ function testInTenantContext(array|string|null $features = null): Tenant
     Filament::setCurrentPanel(Filament::getPanels()['tenant']);
 
     /**
-     * since Livewire doesn't need to keep track of the UUIDs in a test, 
-     * you can disable the UUID generation and replace them with numeric keys, 
+     * since Livewire doesn't need to keep track of the UUIDs in a test,
+     * you can disable the UUID generation and replace them with numeric keys,
      * using the Repeater::fake() method at the start of your test:
-     * 
+     *
      * https://filamentphp.com/docs/3.x/forms/fields/repeater#customizing-the-repeater-item-actions
      */
     Repeater::fake();
