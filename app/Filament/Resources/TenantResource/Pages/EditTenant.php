@@ -43,6 +43,7 @@ class EditTenant extends EditRecord
 
     public function afterSave(): void
     {
+        /** @var array{features: array} $data */
         $data = $this->form->getRawState();
 
         $this->record->syncFeature(self::getNormalizedFeatureNames($data['features']));
