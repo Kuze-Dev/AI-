@@ -13,6 +13,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
+use Filament\Facades\Filament;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
 use Tests\RequestFactories\CustomerRequestFactory;
@@ -74,15 +75,7 @@ it('can create customer'/* w/ same address'*/, function () {
         'tier_approval_status' => TierApprovalStatus::APPROVED,
         'birth_date' => $data['birth_date'].' 00:00:00',
     ]);
-    //
-    //    assertDatabaseHas(Address::class, [
-    //        'customer_id' => $customer->getKey(),
-    //        'state_id' => $data['shipping_state_id'],
-    //        'label_as' => $data['shipping_label_as'],
-    //        'address_line_1' => $data['shipping_address_line_1'],
-    //        'zip_code' => $data['shipping_zip_code'],
-    //        'city' => $data['shipping_city'],
-    //        'is_default_shipping' => 1,
-    //        'is_default_billing' => 1,
-    //    ]);
+
+    // assertEquals( $data['birth_date'],
+    // now()->createFromDate($data['birth_date'])->timezone(Filament::auth()->user()->timezone)->format('Y-m-d'));
 });
