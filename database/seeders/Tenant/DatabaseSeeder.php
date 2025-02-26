@@ -20,12 +20,13 @@ class DatabaseSeeder extends Seeder
             Auth\RoleSeeder::class,
             Auth\AdminSeeder::class,
             LocaleSeeder::class,
-            Page\PageSeeder::class,
+            // Page\PageSeeder::class,
             Tier\TierSeeder::class,
         ]);
         
         if (! app()->runningUnitTests()) {
             $this->call([
+                Page\PageSeeder::class,
                 Address\CountrySeeder::class,
                 DiscountSeeder::class,
                 Product\ProductSeeder::class,
