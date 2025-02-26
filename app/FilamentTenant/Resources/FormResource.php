@@ -45,11 +45,11 @@ class FormResource extends Resource
         return trans('CMS');
     }
 
-    // /** @return Builder<FormModel> */
-    // protected static function getGlobalSearchEloquentQuery(): Builder
-    // {
-    //     return parent::getGlobalSearchEloquentQuery()->withCount('formSubmissions');
-    // }
+    /** @return Builder<FormModel> */
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->withCount('formSubmissions');
+    }
 
     /** @param  FormModel  $record */
     #[\Override]

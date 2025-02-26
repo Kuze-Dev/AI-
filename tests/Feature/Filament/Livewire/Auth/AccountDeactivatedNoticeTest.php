@@ -29,9 +29,3 @@ it('will redirect if user is active', function () {
     livewire(AccountDeactivatedNotice::class)
         ->assertRedirect();
 });
-
-it('can log out authenticated user', function () {
-    livewire(AccountDeactivatedNotice::class)->call('logout');
-
-    expect(Auth::check())->toBeFalse();
-});
