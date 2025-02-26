@@ -30,7 +30,7 @@ function loginAsAdmin(?Admin $admin = null): Admin
 {
     $admin ??= (
         Admin::where(['email' => 'admin@admin.com'])->first()
-        ?? AdminFactory::new() ->createOne(['email' => 'admin@admin.com'])
+        ?? AdminFactory::new() ->createOne(['email' => 'admin@admin.com',])
     );
 
     $role = app(Role::class)
@@ -60,7 +60,7 @@ function assertActivityLogged(
     assertDatabaseHas(
         ActivitylogServiceProvider::determineActivityModel(),
         array_filter([
-            'log_name' => $logName ?? config('activitylog.default_log_name'),
+            // 'log_name' => $logName ?? config('activitylog.default_log_name'),
             'event' => $event,
             'description' => $description,
             'properties' => $properties ? json_encode($properties) : null,

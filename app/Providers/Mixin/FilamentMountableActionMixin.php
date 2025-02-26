@@ -23,7 +23,7 @@ class FilamentMountableActionMixin
     public function withActivityLog(): Closure
     {
         return fn (
-            ?string $logName = null,
+            string $logName = 'admin',
             Closure|string|null $event = null,
             Closure|string|null $description = null,
             Closure|array|null $properties = null,

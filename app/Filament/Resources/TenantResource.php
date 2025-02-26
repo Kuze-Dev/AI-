@@ -269,12 +269,12 @@ class TenantResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('domains.domain')
-                    ->badge()
-                    ->url(
-                        fn (Tenant $record) => $record->domainFirstUrl(),
-                        shouldOpenInNewTab: true
-                    ),
+                // Tables\Columns\TextColumn::make('domains.domain')
+                //     ->badge()
+                //     ->url(
+                //         fn (Tenant $record) => $record->domainFirstUrl(),
+                //         shouldOpenInNewTab: true
+                //     ),
                 Tables\Columns\TextColumn::make('total_api_request'),
                 Tables\Columns\IconColumn::make('is_suspended')
                     ->label(trans('Active'))
