@@ -130,7 +130,16 @@ class CustomerResource extends Resource
                     Forms\Components\DatePicker::make('birth_date')
                         ->translateLabel()
                         ->nullable()
-                        ->before(fn () => now()),
+                        ->before(fn () => null)
+                        /**
+                         * Important Note: 
+                         *  
+                         * Base the data on set timezone on config to avoid data
+                         * incosistency specially in importing process need to 
+                         * set timezone on tenancy to maintain data consistency
+                         * in both application and database. 
+                        */
+                         ->timezone(config('app.timezone')), 
                     Forms\Components\Select::make('tier_id')
                         ->translateLabel()
                         ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))
