@@ -340,7 +340,8 @@ class TaxonomyResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable()
-                    ->truncate('max-w-xs 2xl:max-w-xl', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),

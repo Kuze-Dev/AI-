@@ -41,12 +41,14 @@ class ContentEntryTranslationRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('routeUrls.url')
                     ->label('URL')
                     ->sortable()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),

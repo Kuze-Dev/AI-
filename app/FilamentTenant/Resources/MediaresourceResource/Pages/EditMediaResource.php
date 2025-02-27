@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources\MediaresourceResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\MediaresourceResource;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Support\Common\Actions\SyncMediaCollectionAction;

@@ -10,6 +10,7 @@ use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\Settings\CMSSettings as SettingsCMSSettings;
 use Domain\Blueprint\Models\Blueprint;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 
@@ -35,13 +36,13 @@ class CMSSettings extends TenantBaseSettings
     protected function getFormSchema(): array
     {
         return [
-            Card::make([
+            Section::make([
                 TextInput::make('deploy_hook')
                     ->required()
                     ->url()
                     ->columnSpan('full'),
             ]),
-            Card::make([
+            Section::make([
                 TextInput::make('front_end_domain')
                     ->nullable()
                     ->rules([new FullyQualifiedDomainNameRule()])
@@ -49,7 +50,7 @@ class CMSSettings extends TenantBaseSettings
                     ->columnSpan('full'),
             ]),
 
-            Card::make([
+            Section::make([
                 Select::make('media_blueprint_id')
                     ->label(trans('Blueprint'))
                     ->preload()

@@ -320,16 +320,19 @@ class PageResource extends Resource
                     ->searchable(query: fn (Builder $query, string $search): Builder =>
                         /** @var Builder|Page $query */
                         $query->Where('name', 'like', "%{$search}%"))
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('name')
                     ->hidden()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('activeRouteUrl.url')
                     ->label('URL')
                     ->sortable()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),

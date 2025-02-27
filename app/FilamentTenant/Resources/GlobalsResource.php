@@ -185,7 +185,8 @@ class GlobalsResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable()
-                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class)),

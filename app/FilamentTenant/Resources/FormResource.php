@@ -297,7 +297,8 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable()
-                    ->truncate('max-w-xs 2xl:max-w-xl', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class)),

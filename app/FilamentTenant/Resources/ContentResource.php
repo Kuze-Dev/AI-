@@ -267,7 +267,8 @@ class ContentResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable()
-                    ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('sites.name')
                     ->badge()
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))

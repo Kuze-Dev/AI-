@@ -85,11 +85,11 @@ class BlockResource extends Resource
                                     'url' => $mediaModel->getUrl(),
                                 ];
 
-                                $storage = Storage::disk(config('filament.default_filesystem_disk'));
-
-                                if ($storage->exists($file)) {
-                                    return $storage->url($file);
-                                }
+//                                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+//
+//                                if ($storage->exists($file)) {
+//                                    return $storage->url($file);
+//                                }
 
                             }
                         }

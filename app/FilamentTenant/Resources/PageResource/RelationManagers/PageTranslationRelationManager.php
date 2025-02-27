@@ -50,11 +50,13 @@ class PageTranslationRelationManager extends RelationManager
                         /** @var Builder|Page $query */
                         return $query->Where('name', 'like', "%{$search}%");
                     })
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('name')
                     ->hidden()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),

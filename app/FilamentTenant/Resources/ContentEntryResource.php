@@ -308,12 +308,14 @@ class ContentEntryResource extends Resource
                         return $query->where('title', 'like', "%{$search}%");
 
                     })
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('routeUrls.url')
                     ->label('URL')
                     ->sortable()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
                     ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),

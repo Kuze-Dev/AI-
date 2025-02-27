@@ -16,6 +16,7 @@ use Domain\Customer\Models\Customer;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Section;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -64,7 +65,7 @@ class CustomerSettings extends TenantBaseSettings
     protected function getFormSchema(): array
     {
         return [
-            Card::make([
+            Section::make([
                 Forms\Components\Select::make('blueprint_id')
                     ->label(trans('Blueprint'))
                     ->preload()

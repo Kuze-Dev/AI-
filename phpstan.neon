@@ -77,10 +77,12 @@ parameters:
 
 
     stubFiles:
+        - phpstan-stubs/MountableAction.stub
         - phpstan-stubs/Permission.stub
         - phpstan-stubs/PermissionRegistrar.stub
-        - phpstan-stubs/Tenancy.stub
+        - phpstan-stubs/Select.stub
         - phpstan-stubs/SimpleMessage.stub
+        - phpstan-stubs/Tenancy.stub
 
     paths:
         - app
