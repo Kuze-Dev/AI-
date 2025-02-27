@@ -22,9 +22,9 @@ return [
     /*
      * filament
      */
+    App\Providers\Filament\CommonServiceProvider::class,
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\Filament\TenantPanelProvider::class,
-    App\Providers\Filament\CommonServiceProvider::class,
 
     /*
      * Domain Service Providers...
