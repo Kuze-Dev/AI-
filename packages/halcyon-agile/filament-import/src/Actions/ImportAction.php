@@ -29,6 +29,11 @@ class ImportAction extends Action
     protected array $validateAttributes;
 
     /**
+     * default disk is s3
+     */
+    protected string $disk = 's3';
+
+    /**
      * @var non-empty-string
      */
     protected string $uniqueBy;
@@ -61,8 +66,7 @@ class ImportAction extends Action
             ->translateLabel()
             ->action(function (array $data) {
                 /** @var \Maatwebsite\Excel\Excel|PendingDispatch */
-                $response = Excel::import($this->getImportClass(), $data['file']);
-
+                $response = Excel::import($this->getImportClass(), $data['file'], $this->disk);
                 if ($response instanceof PendingDispatch) {
 
                     $user = filament_admin();
@@ -155,6 +159,16 @@ class ImportAction extends Action
     public function processRowsUsing(Closure $processRowsUsing): self
     {
         $this->processRowsUsing = $processRowsUsing;
+
+        return $this;
+    }
+
+     /**
+     * @param string $disk
+     */
+    public function disk(string $disk): self
+    {
+        $this->disk = $disk;
 
         return $this;
     }
