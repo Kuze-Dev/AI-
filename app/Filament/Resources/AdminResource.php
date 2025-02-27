@@ -21,6 +21,7 @@ use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -196,7 +197,7 @@ class AdminResource extends Resource
                             }
                             $query->whereHas('roles', function (Builder $role) use ($data) {
                                 /**
-                                 * @var Builder<\Domain\Role\Models\Role> $role
+                                 * @var Builder<\Domain\Role\Models\Role&Model> $role
                                  */
                                  $role->where('id', $data['value']);
                             });
