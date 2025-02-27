@@ -10,7 +10,6 @@ use App\Filament\Resources\AdminResource\RelationManagers\ActionsRelationManager
 use Domain\Admin\Exports\AdminExporter;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
-use Domain\Role\Models\Role;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -113,12 +112,7 @@ class AdminResource extends Resource
                                 ->translateLabel()
                                 ->relationship(
                                     titleAttribute: 'name',
-                                    modifyQueryUsing: function (Builder $query) {
-                                        /**
-                                         * @var Builder<\Domain\Role\Models\Role> $query
-                                         */
-                                         $query->where('guard_name', 'admin');
-                                    }
+                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
                                 )
                                 ->multiple()
                                 ->preload()
@@ -127,12 +121,7 @@ class AdminResource extends Resource
                                 ->translateLabel()
                                 ->relationship(
                                     titleAttribute: 'name',
-                                    modifyQueryUsing: function (Builder $query) {
-                                        /**
-                                         * @var Builder<\Domain\Role\Models\Role> $query
-                                         */
-                                         $query->where('guard_name', 'admin');
-                                    }
+                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
                                 )
                                 ->multiple()
                                 ->preload()
@@ -189,18 +178,13 @@ class AdminResource extends Resource
                     )
                     ->query(function (Builder $query, array $data) {
                         $query->when(filled($data['value']), function (Builder $query) use ($data) {
-                            /** @var Builder<Admin> $query */
+                            /** @var Admin|Builder $query */
                             if ($data['value'] === 'no-roles') {
                                 $query->whereDoesntHave('roles');
 
                                 return;
                             }
-                            $query->whereHas('roles', function (Builder $role) use ($data) {
-                                /**
-                                 * @var Builder<\Domain\Role\Models\Role&Model> $role
-                                 */
-                                 $role->where('id', $data['value']);
-                            });
+                            $query->whereHas('roles', fn ($role) => $role->where('id', $data['value']));
                         });
                     }),
                 Tables\Filters\SelectFilter::make('active')
@@ -208,7 +192,7 @@ class AdminResource extends Resource
                     ->query(function (Builder $query, array $data) {
                         $query->when(filled($data['value']), function (Builder $query) use ($data) {
                             $query->when(filled($data['value']), function (Builder $query) use ($data) {
-                                /** @var Builder<Admin> $query */
+                                /** @var Admin|Builder $query */
                                 match ($data['value']) {
                                     '1' => $query->where('active', true),
                                     '0' => $query->where('active', false),

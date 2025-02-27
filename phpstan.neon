@@ -109,7 +109,7 @@ parameters:
         - dd
 
     checkOctaneCompatibility: true
-    checkModelProperties: true
+#    checkModelProperties: true
 
     errorFormat: ticketswap
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

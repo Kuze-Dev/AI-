@@ -49,12 +49,7 @@ class EditContentEntry extends EditRecord
 
     public mixed $ownerRecord;
 
-    /**
-     * Override mount and
-     * call parent component mount.
-     *
-     * @param  mixed  $record
-     */
+
     #[\Override]
     public function mount(int|string $record, string $ownerRecord = ''): void
     {
