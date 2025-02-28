@@ -49,7 +49,7 @@ class ChangeByAdminNotification extends Notification implements ShouldQueue
     /** Get the mail representation of the notification. */
     public function toMail(object $notifiable): MailMessage
     {
-        $user = Auth::user();
+        $user = filament_admin();
 
         return (new MailMessage())
             ->greeting('Hi Admin,')

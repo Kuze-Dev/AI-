@@ -12,7 +12,7 @@ enum PaymentPlanValue: string implements HasLabel
     case FIXED = 'fixed';
     case PERCENT = 'percent';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

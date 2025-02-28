@@ -12,7 +12,7 @@ enum Status: string implements HasLabel
     case ACTIVE = 'active';
     case INACTIVE = 'inactive';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

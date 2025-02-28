@@ -68,7 +68,7 @@ class ServiceOrderAddress extends Model
         ];
     }
 
-    /** @return Attribute<string, never> */
+    /** @return Attribute<non-falsy-string, never> */
     protected function fullAddress(): Attribute
     {
         return Attribute::get(

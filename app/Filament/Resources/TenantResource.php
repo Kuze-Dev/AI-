@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Features;
+use App\Features\Enums\FeatureEnum;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\TenantResource\Forms\FeatureSelector;
 use App\Filament\Resources\TenantResource\Pages;
@@ -222,7 +223,7 @@ class TenantResource extends Resource
                                                 Features\Shopconfiguration\PaymentGateway\BankTransfer::class,
                                                 Features\Shopconfiguration\PaymentGateway\VisionpayGateway::class
                                             ],
-                                            groupLabel: trans('Payments'),
+                                            groupLabel: FeatureEnum::PAYMENTS->value,
                                         ),
                                         new Features\GroupFeatureExtra(
                                             extra: [
@@ -231,7 +232,7 @@ class TenantResource extends Resource
                                                 Features\Shopconfiguration\Shipping\ShippingUps::class,
                                                 Features\Shopconfiguration\Shipping\ShippingAusPost::class,
                                             ],
-                                            groupLabel: trans('Shipping'),
+                                            groupLabel: FeatureEnum::SHIPPING->value,
                                         ),
                                     ]
                                 ),

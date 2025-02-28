@@ -14,12 +14,12 @@ enum ServiceBillStatus: string implements HasColor, HasLabel
     case PENDING = 'pending';
     case FOR_APPROVAL = 'for_approval';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }
 
-    public function getColor(): string|array|null
+    public function getColor(): string|array
     {
         return match ($this) {
             self::PAID => 'success',
