@@ -12,7 +12,7 @@ enum DiscountAmountType: string implements HasLabel
     case FIXED_VALUE = 'fixed_value';
     case PERCENTAGE = 'percentage';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

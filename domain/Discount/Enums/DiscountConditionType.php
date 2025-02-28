@@ -12,7 +12,7 @@ enum DiscountConditionType: string implements HasLabel
     case ORDER_SUB_TOTAL = 'order_sub_total';
     case DELIVERY_FEE = 'delivery_fee';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

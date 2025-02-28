@@ -23,7 +23,7 @@ class GenerateServiceTransactionReceiptAction
         $customer = $serviceOrder->customer;
 
         /** @var string $filename */
-        $filename = Str::snake(app(SiteSettings::class)->name).'_'.
+        $filename = Str::snake( (string) app(SiteSettings::class)->name).'_'.
             now()->format('m_Y_His');
 
         /** @var string $path */

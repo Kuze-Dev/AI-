@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
@@ -24,6 +25,7 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
 use Support\RouteUrl\HasRouteUrl;
+use Support\RouteUrl\Models\RouteUrl;
 
 /**
  * Domain\Taxonomy\Models\TaxonomyTerm
@@ -61,6 +63,8 @@ use Support\RouteUrl\HasRouteUrl;
  * @method static Builder|TaxonomyTerm whereSlug($value)
  * @method static Builder|TaxonomyTerm whereTaxonomyId($value)
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
+ * 
+ * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
  *
  * @mixin \Eloquent
  */
@@ -71,7 +75,7 @@ use Support\RouteUrl\HasRouteUrl;
 class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
 {
     use ConstraintsRelationships;
-    use HasRouteUrl;
+    // use HasRouteUrl;
     use HasSlug;
     use SortableTrait;
 
@@ -95,6 +99,22 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
     public function getUrlAttribute(): ?string
     {
         return $this->activeRouteUrl?->url ?: null;
+    }
+
+     /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<RouteUrl, $this>
+     */
+    public function routeUrls(): MorphOne
+    {
+        return $this->morphOne(RouteUrl::class, 'model');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<RouteUrl, $this>
+     */
+    public function activeRouteUrl(): MorphOne
+    {
+        return $this->routeUrls()->latestOfMany('updated_at');
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, $this> */

@@ -24,7 +24,7 @@ enum OrderStatuses: string implements HasColor, HasLabel //, HasIcon
     case FORPAYMENT = 'for_payment';
     case FORAPPROVAL = 'for_approval';
 
-    public function getColor(): string|array|null
+    public function getColor(): string
     {
         return match ($this) {
             self::FORAPPROVAL => 'warning',

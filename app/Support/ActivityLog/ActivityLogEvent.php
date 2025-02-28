@@ -50,7 +50,7 @@ enum ActivityLogEvent: string implements HasLabel
     case email_link_clicked_setup_password_already_confirmed = 'setup-password-already-confirmed';
 
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

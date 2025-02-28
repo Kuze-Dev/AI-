@@ -13,12 +13,12 @@ enum DiscountStatus: string implements HasColor, HasLabel
     case ACTIVE = 'active';
     case INACTIVE = 'inactive';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }
 
-    public function getColor(): string|array|null
+    public function getColor(): string
     {
         return match ($this) {
             self::ACTIVE => 'success',

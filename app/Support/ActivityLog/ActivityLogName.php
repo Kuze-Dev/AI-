@@ -20,7 +20,7 @@ enum ActivityLogName: string implements HasLabel
     case settings = 'settings';
     case email_link_clicked = 'email_link_clicked';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

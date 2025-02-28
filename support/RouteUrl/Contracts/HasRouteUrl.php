@@ -25,12 +25,12 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 interface HasRouteUrl
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
      */
     public function routeUrls(): MorphOne;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
      */
     public function activeRouteUrl(): MorphOne;
 

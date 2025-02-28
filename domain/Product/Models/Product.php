@@ -185,7 +185,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
      * Declare relationship of
      * current model to taxonomy terms.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, Product>
      */
     public function taxonomyTerms(): BelongsToMany
     {
@@ -193,7 +193,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, Product>
      */
     public function taxonomyTermsBranch(): BelongsToMany
     {
@@ -279,8 +279,8 @@ class Product extends Model implements HasMedia, HasMetaDataContract
         if (! auth()->check()) {
             return false;
         }
-
-        $customer = auth()->user();
+        
+        $customer = customer_logged_in();
 
         if ($customer) {
             return $this->favorites()->where('customer_id', $customer->id)->exists();

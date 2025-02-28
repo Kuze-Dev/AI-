@@ -7,10 +7,12 @@ namespace Domain\Taxonomy\Models;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
 use Domain\Site\Traits\Sites;
+use Domain\Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -53,6 +55,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereUpdatedAt($value)
  *
+ * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
  * @mixin \Eloquent
  */
 #[
@@ -62,7 +65,7 @@ use Support\RouteUrl\HasRouteUrl;
 class Taxonomy extends Model implements HasRouteUrlContract
 {
     use ConstraintsRelationships;
-    use HasRouteUrl;
+    // use HasRouteUrl;
     use HasSlug;
     use LogsActivity;
     use Sites;
@@ -75,6 +78,23 @@ class Taxonomy extends Model implements HasRouteUrlContract
         'blueprint_id',
         'translation_id',
     ];
+
+    
+     /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<RouteUrl, $this>
+     */
+    public function routeUrls(): MorphOne
+    {
+        return $this->morphOne(RouteUrl::class, 'model');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<RouteUrl, $this>
+     */
+    public function activeRouteUrl(): MorphOne
+    {
+        return $this->routeUrls()->latestOfMany('updated_at');
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

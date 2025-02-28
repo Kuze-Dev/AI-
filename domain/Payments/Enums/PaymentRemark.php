@@ -14,12 +14,12 @@ enum PaymentRemark: string implements HasColor, HasIcon, HasLabel
     case APPROVED = 'approved';
     case DECLINED = 'declined';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }
 
-    public function getColor(): string|array|null
+    public function getColor(): string
     {
         return match ($this) {
             self::APPROVED => 'success',
@@ -27,7 +27,7 @@ enum PaymentRemark: string implements HasColor, HasIcon, HasLabel
         };
     }
 
-    public function getIcon(): ?string
+    public function getIcon(): string
     {
         return match ($this) {
             self::APPROVED => 'heroicon-o-check-circle',

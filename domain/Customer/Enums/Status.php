@@ -13,7 +13,7 @@ enum Status: string implements HasLabel
     case INACTIVE = 'inactive';
     case BANNED = 'banned';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

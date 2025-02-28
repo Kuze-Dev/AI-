@@ -12,7 +12,7 @@ enum Taxonomy: string implements HasLabel
     case BRAND = 'brand';
     case CATEGORIES = 'categories';
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return Str::headline($this->value);
     }

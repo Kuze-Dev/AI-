@@ -19,7 +19,7 @@ enum ActivitySubjectType: string implements HasLabel
 
     case Customer = Customer::class;
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return (string) Str::of($this->value)->classBasename()->headline();
     }

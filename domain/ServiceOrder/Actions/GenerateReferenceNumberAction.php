@@ -14,7 +14,7 @@ class GenerateReferenceNumberAction
      */
     public function execute(string $model): string
     {
-        /** @var array|false $words */
+        /** @var list<string>|false $words */
         $words = preg_split(
             '/(?=[A-Z])/',
             Str::of($model)

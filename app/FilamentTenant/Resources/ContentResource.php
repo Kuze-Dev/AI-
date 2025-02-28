@@ -56,7 +56,11 @@ class ContentResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('contentEntries');
     }
 
-    /** @param  Content  $record */
+    /** 
+     * @param  Content  $record 
+     * 
+     * @return array<string, int<min, -1>|int<1, max>|string>
+     * */
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
