@@ -7,7 +7,7 @@ namespace Domain\Taxonomy\Models;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
 use Domain\Site\Traits\Sites;
-use Domain\Support\RouteUrl\Models\RouteUrl;
+use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
