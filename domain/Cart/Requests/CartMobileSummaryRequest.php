@@ -29,7 +29,7 @@ class CartMobileSummaryRequest extends FormRequest
     {
 
         /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
+        $customer = customer_logged_in();
 
         return [
             'reference' => [

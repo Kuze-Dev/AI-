@@ -94,25 +94,25 @@ class Review extends Model implements HasMedia
             ->registerMediaConversions($registerMediaConversions);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Review\Models\Review> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, $this> */
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Review\Models\Review>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, $this>*/
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Review\Models\Review> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, $this> */
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\OrderLine, \Domain\Review\Models\Review> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\OrderLine, $this> */
     public function order_line()
     {
         return $this->belongsTo(OrderLine::class);

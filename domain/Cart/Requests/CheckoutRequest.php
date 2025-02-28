@@ -20,9 +20,9 @@ class CheckoutRequest extends FormRequest
                 'array',
                 function ($attribute, $value, $fail) {
 
-                    $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                    $type = customer_logged_in() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
                     /** @var int|string $userId */
-                    $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
+                    $userId = customer_logged_in() ? customer_logged_in()->id : $this->bearerToken();
 
                     //auth check
                     $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($value, $userId, $type);
