@@ -279,8 +279,8 @@ class Product extends Model implements HasMedia, HasMetaDataContract
         if (! auth()->check()) {
             return false;
         }
-        
-        $customer = customer_logged_in();
+        /** @var \Domain\Customer\Models\Customer|null */
+        $customer = auth()->user();
 
         if ($customer) {
             return $this->favorites()->where('customer_id', $customer->id)->exists();

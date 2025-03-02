@@ -22,7 +22,7 @@ class CartSummaryRequest extends FormRequest
     public function rules(): array
     {
         /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = customer_logged_in();
+        $customer = auth()->user();
 
         return [
             'cart_line_ids' => [
