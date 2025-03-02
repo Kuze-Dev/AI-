@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use App\Models\User\User;
@@ -52,7 +52,7 @@ class VerifyEmailController extends Controller
     }
 
     #[Post('otp', name: 'customer.verification.verify.otp', middleware: 'auth:sanctum')]
-    public function verifyViaOTP(Request $request ,#[CurrentApiCustomer] Customer $customer): mixed
+    public function verifyViaOTP(Request $request ,#[CurrentUser] Customer $customer): mixed
     {
         $otp = $this->validate($request, [
             'otp' => 'required|string',

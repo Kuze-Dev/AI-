@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Review;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\HttpTenantApi\Resources\ReviewResource;
 use Domain\Customer\Models\Customer;
 use Domain\Review\Actions\CreateReviewAction;
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 ]
 class ReviewController
 {
-    public function store(ReviewStoreRequest $request, CreateReviewAction $createReviewAction, #[CurrentApiCustomer] Customer $customer): JsonResponse
+    public function store(ReviewStoreRequest $request, CreateReviewAction $createReviewAction, #[CurrentUser] Customer $customer): JsonResponse
     {
 
         $validatedData = $request->validated();

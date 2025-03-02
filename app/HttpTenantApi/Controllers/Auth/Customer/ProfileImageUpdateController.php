@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use Domain\Customer\Actions\UpdateCustomerProfileImageAction;
@@ -21,7 +21,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 class ProfileImageUpdateController extends Controller
 {
     #[Post('/')]
-    public function __invoke(Request $request, #[CurrentApiCustomer] Customer $customer): mixed
+    public function __invoke(Request $request, #[CurrentUser] Customer $customer): mixed
     {
         $profileImage = $this->validate($request, [
             'profile_image' => 'required|image',

@@ -7,6 +7,7 @@ namespace Domain\Cart\Requests;
 use Domain\Cart\Actions\CartPurchasableValidatorAction;
 use Domain\Cart\Enums\CartUserType;
 use Domain\Cart\Exceptions\InvalidPurchasableException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Http\FormRequest;
 use Throwable;
 

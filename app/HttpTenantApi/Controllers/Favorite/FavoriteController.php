@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Favorite;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\HttpTenantApi\Resources\FavoriteResource;
 use Domain\Customer\Models\Customer;
 use Domain\Favorite\Actions\CreateFavoriteAction;
@@ -25,7 +25,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 ]
 class FavoriteController
 {
-    public function index(#[CurrentApiCustomer] Customer $customer): JsonApiResourceCollection
+    public function index(#[CurrentUser] Customer $customer): JsonApiResourceCollection
     {
 
         return FavoriteResource::collection(
@@ -42,7 +42,7 @@ class FavoriteController
         );
     }
 
-    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction, #[CurrentApiCustomer] Customer $customer): JsonResponse
+    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction, #[CurrentUser] Customer $customer): JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -58,7 +58,7 @@ class FavoriteController
         }
     }
 
-    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction,#[CurrentApiCustomer] Customer $customer): JsonResponse
+    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction,#[CurrentUser] Customer $customer): JsonResponse
     {
 
         $favoriteData = FavoriteData::fromArray([

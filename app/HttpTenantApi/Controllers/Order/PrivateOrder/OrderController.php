@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Order\PrivateOrder;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;
 use Domain\Customer\Models\Customer;
@@ -38,7 +38,7 @@ use Symfony\Component\Mailer\Exception\TransportException;
 ]
 class OrderController extends Controller
 {
-    public function index(#[CurrentApiCustomer] Customer $customer): mixed
+    public function index(#[CurrentUser] Customer $customer): mixed
     {
 
         return OrderResource::collection(
@@ -119,7 +119,7 @@ class OrderController extends Controller
         }
     }
 
-    public function show(Order $order,#[CurrentApiCustomer] Customer $customer): OrderResource
+    public function show(Order $order,#[CurrentUser] Customer $customer): OrderResource
     {
 
         $model = QueryBuilder::for(

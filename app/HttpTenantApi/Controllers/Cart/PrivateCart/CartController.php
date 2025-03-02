@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
@@ -25,7 +25,7 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CartController extends Controller
 {
-    public function index(#[CurrentApiCustomer] Customer $customer): mixed
+    public function index(#[CurrentUser] Customer $customer): mixed
     {
 
         /** @var \Domain\Tier\Models\Tier $tier */

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Resources;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use Domain\Address\Models\Address;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\Enums\CartUserType;

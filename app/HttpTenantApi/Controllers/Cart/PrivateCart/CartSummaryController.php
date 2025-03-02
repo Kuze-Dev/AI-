@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
@@ -56,7 +56,7 @@ class CartSummaryController extends Controller
     }
 
     #[Get('carts/summary', name: 'carts.summary')]
-    public function summary(CartSummaryRequest $request,#[CurrentApiCustomer] Customer $customer): mixed
+    public function summary(CartSummaryRequest $request,#[CurrentUser] Customer $customer): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\HttpTenantApi\Resources\ServiceOrderResource;
 use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
@@ -28,7 +28,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 ]
 class ServiceOrderController
 {
-    public function index(#[CurrentApiCustomer] Customer $customer): JsonApiResourceCollection
+    public function index(#[CurrentUser] Customer $customer): JsonApiResourceCollection
     {
 
         return ServiceOrderResource::collection(
@@ -41,7 +41,7 @@ class ServiceOrderController
         );
     }
 
-    public function show(string $serviceOrder,#[CurrentApiCustomer] Customer $customer): ServiceOrderResource
+    public function show(string $serviceOrder,#[CurrentUser] Customer $customer): ServiceOrderResource
     {
 
         return ServiceOrderResource::make(

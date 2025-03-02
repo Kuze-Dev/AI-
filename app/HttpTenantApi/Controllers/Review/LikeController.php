@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Review;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use Domain\Customer\Models\Customer;
 use Domain\Review\Actions\EditLikeAction;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class LikeController
 {
     #[Patch('like/{reviewId}')]
-    public function __invoke(int $reviewId, EditLikeAction $editLikeAction,#[CurrentApiCustomer] Customer $customer): JsonResponse
+    public function __invoke(int $reviewId, EditLikeAction $editLikeAction,#[CurrentUser] Customer $customer): JsonResponse
     {
 
         $editLikeAction->execute($reviewId, $customer);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
-use App\Attributes\CurrentApiCustomer;
+use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CartSummaryAction;
@@ -24,7 +24,7 @@ use Throwable;
 class CheckoutMobileController extends Controller
 {
     #[Get('/v2/carts/summary', name: 'v2.carts.summary')]
-    public function summary(CartMobileSummaryRequest $request,#[CurrentApiCustomer] Customer $customer): mixed
+    public function summary(CartMobileSummaryRequest $request,#[CurrentUser] Customer $customer): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
