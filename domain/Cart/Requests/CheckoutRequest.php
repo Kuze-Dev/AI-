@@ -7,23 +7,24 @@ namespace Domain\Cart\Requests;
 use Domain\Cart\Actions\CartPurchasableValidatorAction;
 use Domain\Cart\Enums\CartUserType;
 use Domain\Cart\Exceptions\InvalidPurchasableException;
+use Domain\Customer\Models\Customer;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Http\FormRequest;
 use Throwable;
 
 class CheckoutRequest extends FormRequest
 {
-    public function rules(): array
+    public function rules(#[CurrentUser] ?Customer $customer): array
     {
         return [
             'cart_line_ids' => [
                 'required',
                 'array',
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail) use ($customer) {
 
-                    $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                    $type = $customer ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
                     /** @var int|string $userId */
-                    $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
+                    $userId = $customer ? $customer->id : $this->bearerToken();
 
                     //auth check
                     $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($value, $userId, $type);
