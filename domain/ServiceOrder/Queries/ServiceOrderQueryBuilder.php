@@ -7,7 +7,9 @@ namespace Domain\ServiceOrder\Queries;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Illuminate\Database\Eloquent\Builder;
 
-/** @extends \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceOrder> */
+/**
+ *  @template TServiceOrder of \Domain\ServiceOrder\Models\ServiceOrder
+ *  @extends \Illuminate\Database\Eloquent\Builder<TServiceOrder> */
 class ServiceOrderQueryBuilder extends Builder
 {
     public function whereActive(): self
