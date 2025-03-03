@@ -112,7 +112,7 @@ class Node extends Model implements HasInternationalizationInterface, Sortable
     {
          /**
          * Method Node::buildSortQuery() should return Illuminate\Database\Eloquent\Builder<Node> ...
-         *  @phpstan-ignore-next-line */
+         * @phpstan-ignore return.type */
         return static::query()->whereMenuId($this->menu_id)->whereParentId($this->parent_id);
     }
 

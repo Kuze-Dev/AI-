@@ -35,7 +35,7 @@ class FilamentSelectFormMixin
                     $query->orderBy($titleColumnName);
                 }
 
-                /** @phpstan-ignore-next-line PHPStan is not aware of Laravel's Macro magics */
+                /** @phpstan-ignore method.protected (PHPStan is not aware of Laravel's Macro magics)*/
                 $component->applySearchConstraint($query, strtolower($search ?? ''));
 
                 $baseQuery = $query->getQuery();

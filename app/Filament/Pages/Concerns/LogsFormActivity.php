@@ -99,7 +99,7 @@ trait LogsFormActivity
 
     protected function shouldLogInitialState(): bool
     {
-        /** @phpstan-ignore-next-line See https://github.com/phpstan/phpstan/issues/3632 */
+        /** @phpstan-ignore instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse (See https://github.com/phpstan/phpstan/issues/3632) */
         return $this instanceof EditRecord || $this instanceof BaseSettings;
     }
 

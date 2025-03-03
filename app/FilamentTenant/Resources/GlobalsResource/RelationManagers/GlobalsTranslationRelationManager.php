@@ -21,15 +21,15 @@ class GlobalsTranslationRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @phpstan-ignore-next-line */
+    /** @phpstan-ignore missingType.generics, missingType.generics */
     public function getRelationship(): Relation|Builder
     {
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound */
         if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0 || is_null($this->getOwnerRecord()->translation_id)) {
             return $this->getOwnerRecord()->{static::getRelationshipName()}();
         }
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound, property.notFound, property.notFound */
         return $this->getOwnerRecord()->{static::getRelationshipName()}()->orwhere('id', $this->ownerRecord->translation_id)->orwhere('translation_id', $this->ownerRecord->translation_id)->where('id', '!=', $this->ownerRecord->id);
     }
 

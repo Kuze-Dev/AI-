@@ -27,7 +27,7 @@ class UPSRateClient extends BaseClient
 
         $customer = $parcelData->reciever;
         // Create the associative array representing the JSON structure
-        
+
         $data = [
             'RateRequest' => [
                 'Request' => [
@@ -87,9 +87,9 @@ class UPSRateClient extends BaseClient
                 ],
             ],
         ];
-        
+
         /** @var string $jsonString */
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore varTag.nativeType */
         $jsonString = json_encode($data);
 
         $response = $this->client->getClient()
@@ -181,7 +181,7 @@ class UPSRateClient extends BaseClient
         ];
 
         /** @var string $jsonString */
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore varTag.nativeType */
         $jsonString = json_encode($data);
 
         $response = $this->client->getClient()

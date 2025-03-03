@@ -46,7 +46,7 @@ class SyncMediaCollectionAction
                     /**
                      * Ignore unknown addMediaFromDisk error for \Spatie\MediaLibrary\HasMedia interface
                      *
-                     *  @phpstan-ignore-next-line
+                     * @phpstan-ignore method.notFound
                      * */
                     return $model->addMediaFromDisk($mediaData->media, config('filament.default_filesystem_disk'))
                         ->withCustomProperties($mediaData->custom_properties)

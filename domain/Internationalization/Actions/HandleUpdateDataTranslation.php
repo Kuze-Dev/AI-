@@ -241,8 +241,8 @@ class HandleUpdateDataTranslation
     /**
      * @param  ContentEntry|BlockContent|Customer|TaxonomyTerm|Globals  $model,
      * @param  mixed  $modelDTO
+     * @phpstan-ignore missingType.parameter, missingType.parameter, missingType.generics
      */
-    /** @phpstan-ignore-next-line */
     protected function getTranslatableModelCollection($model, $modelDTO): Collection
     {
 

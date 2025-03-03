@@ -23,7 +23,7 @@ class MarkNotificationAsUnreadController
     public function update(DatabaseNotification $databaseNotification): JsonResponse
     {
         app(MarkAsUnreadNotificationAction::class)
-            /** @phpstan-ignore-next-line  */
+            /** @phpstan-ignore argument.type  */
             ->execute(Auth::user(), $databaseNotification);
 
         return response()

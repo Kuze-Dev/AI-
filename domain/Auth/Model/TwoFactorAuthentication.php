@@ -94,7 +94,7 @@ class TwoFactorAuthentication extends Model
     {
         return app(TwoFactorAuthenticationProvider::class)->qrCodeUrl(
             config('app.name'),
-            $this->authenticatable->twoFactorHolder(), // @phpstan-ignore-line
+            $this->authenticatable->twoFactorHolder(), // @phpstan-ignore method.notFound
             $this->secret
         );
     }

@@ -63,7 +63,7 @@ use Support\RouteUrl\Models\RouteUrl;
  * @method static Builder|TaxonomyTerm whereSlug($value)
  * @method static Builder|TaxonomyTerm whereTaxonomyId($value)
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
- * 
+ *
  *
  * @mixin \Eloquent
  */
@@ -166,7 +166,7 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
     {
         /**
          * Method Domain\Taxonomy\Models\TaxonomyTerm::buildSortQuery() should return Illuminate\Database\Eloquent\Builder<Domain\Taxonomy\Models\TaxonomyTerm> but returns Illuminate\Database\Eloquent\Builder<static(Domain\Taxonomy\Models\TaxonomyTerm)>domain/Taxonomy/Models/TaxonomyTerm.php
-         *  @phpstan-ignore-next-line */
+         *  @phpstan-ignore return.type */
         return static::query()->whereTaxonomyId($this->taxonomy_id)->whereParentId($this->parent_id);
     }
 

@@ -14,7 +14,7 @@ class ComputedTierSellingPrice
         /** @var \Domain\Tier\Models\Tier $tier */
         $tier = $product->productTier->first();
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound */
         $productDiscount = $tier->pivot;
 
         $amount = $productDiscount->discount;

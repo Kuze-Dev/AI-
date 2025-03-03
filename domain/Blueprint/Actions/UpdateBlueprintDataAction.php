@@ -221,12 +221,12 @@ class UpdateBlueprintDataAction
 
         $statepaths = array_column($flattenData, 'statepath');
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore method.notFound */
         $removeBlueprintData = $model->blueprintData()->whereNotIn('state_path', $statepaths)->get();
 
         foreach ($flattenData as $item) {
 
-            /** @phpstan-ignore-next-line */
+            /** @phpstan-ignore method.notFound */
             $blueprint_data_entity = $model->BlueprintData()->where('state_path', $item['statepath'])->get();
 
             if ($blueprint_data_entity->count() > 1) {
@@ -265,7 +265,7 @@ class UpdateBlueprintDataAction
 
             DeleteS3FilesFromDeletedBlueprintDataJob::dispatch(array_unique($toRemove));
 
-            /** @phpstan-ignore-next-line */
+            /** @phpstan-ignore method.notFound */
             $model->blueprintData()->whereNotIn('state_path', $statepaths)->delete();
 
         }
