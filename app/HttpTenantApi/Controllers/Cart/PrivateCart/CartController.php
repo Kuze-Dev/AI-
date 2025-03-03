@@ -29,7 +29,7 @@ class CartController extends Controller
     {
 
         /** @var \Domain\Tier\Models\Tier $tier */
-        $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
+        $tier = $customer->tier ?? Tier::query()->where('name', config()->string('domain.tier.default'))->first();
 
         $model = QueryBuilder::for(
             Cart::with([

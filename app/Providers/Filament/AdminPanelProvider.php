@@ -40,7 +40,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->domains(config('tenancy.central_domains'))
+            ->domains(config()->array('tenancy.central_domains'))
             ->path('admin')
             ->authGuard('admin')
             ->authPasswordBroker('admin')
@@ -73,7 +73,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentSpatieLaravelHealthPlugin::make()
-                    ->authorize(fn () => filament_admin()->hasRole(config('domain.role.super_admin')))
+                    ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin')))
                     ->navigationGroup(fn () => trans('System')),
                 FilamentPasswordConfirmationPlugin::make(),
                 EnvironmentIndicatorPlugin::make()

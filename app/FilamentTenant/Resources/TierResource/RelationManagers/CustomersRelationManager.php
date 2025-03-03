@@ -37,7 +37,7 @@ class CustomersRelationManager extends RelationManager
                     ->after(function ($record) {
 
                         /** @var \Domain\Tier\Models\Tier $tier */
-                        $tier = Tier::whereName(config('domain.tier.default'))->first();
+                        $tier = Tier::whereName(config()->string('domain.tier.default'))->first();
 
                         $record->update([
                             'tier_id' => $tier->getKey(),

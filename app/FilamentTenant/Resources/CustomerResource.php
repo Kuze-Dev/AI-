@@ -132,14 +132,14 @@ class CustomerResource extends Resource
                         ->nullable()
                         ->before(fn () => null)
                         /**
-                         * Important Note: 
-                         *  
+                         * Important Note:
+                         *
                          * Base the data on set timezone on config to avoid data
-                         * incosistency specially in importing process need to 
+                         * incosistency specially in importing process need to
                          * set timezone on tenancy to maintain data consistency
-                         * in both application and database. 
+                         * in both application and database.
                         */
-                         ->timezone(config('app.timezone')), 
+                         ->timezone(config()->string('app.timezone')),
                     Forms\Components\Select::make('tier_id')
                         ->translateLabel()
                         ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))

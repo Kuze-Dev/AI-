@@ -40,12 +40,12 @@ class EditProfile extends \Filament\Pages\Auth\EditProfile
                         $emailTextInput
                             ->rules(fn () => Rule::email())
                             ->helperText(
-                                ! config('domain.admin.can_change_email')
+                                ! config()->boolean('domain.admin.can_change_email')
                                 ? 'Email update is currently disabled.'
                                 : null
                             )
-                            ->disabled(! config('domain.admin.can_change_email'))
-                            ->dehydrated((bool) config('domain.admin.can_change_email')),
+                            ->disabled(! config()->boolean('domain.admin.can_change_email'))
+                            ->dehydrated(config()->boolean('domain.admin.can_change_email')),
                         $passwordTextInput
                             ->helperText(
                                 app()->environment('local', 'testing')

@@ -71,8 +71,8 @@ class AdminResource extends Resource
                         ->rules( fn () => Rule::email())
                         ->unique(ignoreRecord: true)
                         ->required()
-                        ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
-                        ->disabled(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email')),
+                        ->helperText(fn (?Admin $record) => ! empty($record) && ! config()->boolean('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
+                        ->disabled(fn (?Admin $record) => ! empty($record) && ! config()->boolean('domain.admin.can_change_email')),
                     Forms\Components\TextInput::make('password')
                         ->translateLabel()
                         ->password()
@@ -96,7 +96,7 @@ class AdminResource extends Resource
                         ->options(Timezone::generateList())
                         ->rule('timezone')
                         ->searchable()
-                        ->default(config('domain.admin.default_timezone')),
+                        ->default(config()->string('domain.admin.default_timezone')),
                 ])
                     ->columnSpan(['lg' => 2]),
                 Forms\Components\Group::make([
@@ -172,7 +172,7 @@ class AdminResource extends Resource
                 Tables\Filters\SelectFilter::make('role')
                     ->translateLabel()
                     ->options(
-                        app(config('permission.models.role'))
+                        app(config()->string('permission.models.role'))
                             ->pluck('name', 'id')
                             ->put('no-roles', 'No Roles')
                     )

@@ -280,7 +280,7 @@ class SchemaFormBuilder extends Component
                 //     return $media->getUrl();
                 // }
 
-                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
                 if ($storage->exists($file)) {
                     return $storage->url($file);
@@ -427,7 +427,7 @@ class SchemaFormBuilder extends Component
             )
             ->getUploadedAttachmentUrlUsing(function ($file) {
 
-                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
                 try {
                     if (! $storage->exists($file)) {
@@ -437,7 +437,7 @@ class SchemaFormBuilder extends Component
                     return null;
                 }
 
-                if (config('filament.default_filesystem_disk') === 'r2') {
+                if (config()->string('filament.default_filesystem_disk') === 'r2') {
                     return $storage->url($file);
                 } else {
                     if ($storage->getVisibility($file) === 'private') {
@@ -479,12 +479,12 @@ class SchemaFormBuilder extends Component
     {
 
         $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
-            ->fileAttachmentsDisk(config('filament.default_filesystem_disk'))
+            ->fileAttachmentsDisk(config()->string('filament.default_filesystem_disk'))
             ->fileAttachmentsVisibility('public')
             ->showMenuBar()
             ->getUploadedAttachmentUrlUsing(function ($file) {
 
-                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
                 try {
                     if (! $storage->exists($file)) {
@@ -494,7 +494,7 @@ class SchemaFormBuilder extends Component
                     return null;
                 }
 
-                if (config('filament.default_filesystem_disk') === 'r2') {
+                if (config()->string('filament.default_filesystem_disk') === 'r2') {
                     return $storage->url($file);
                 } else {
                     if ($storage->getVisibility($file) === 'private') {

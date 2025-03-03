@@ -135,7 +135,7 @@ class TenancyServiceProvider extends ServiceProvider
             ],
         ];
 
-        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').Str::of($tenant->name)->lower()->snake().config('tenancy.database.suffix'));
+        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config()->string('tenancy.database.prefix').Str::of($tenant->name)->lower()->snake().config()->string('tenancy.database.suffix'));
 
         TenantAssetsController::$tenancyMiddleware = 'tenant';
 

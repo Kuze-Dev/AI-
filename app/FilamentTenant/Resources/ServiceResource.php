@@ -69,7 +69,7 @@ class ServiceResource extends Resource
                                 ->translateLabel()
                                 ->getUploadedAttachmentUrlUsing(function ($file) {
 
-                                    $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                                    $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
                                     try {
                                         if (! $storage->exists($file)) {
@@ -79,7 +79,7 @@ class ServiceResource extends Resource
                                         return null;
                                     }
 
-                                    if (config('filament.default_filesystem_disk') === 'r2') {
+                                    if (config()->string('filament.default_filesystem_disk') === 'r2') {
                                         return $storage->url($file);
                                     } else {
                                         if ($storage->getVisibility($file) === 'private') {

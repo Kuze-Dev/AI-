@@ -440,7 +440,7 @@ class EditServiceOrder extends EditRecord
                                 ->inlineLabel()
                                 ->content(
                                     fn (ServiceOrder $record) => $record->created_at
-                                        ?->timezone(Auth::user()?->timezone ?? config('domain.admin.default_timezone'))
+                                        ?->timezone(Auth::user()?->timezone ?? config()->string('domain.admin.default_timezone'))
                                         ->translatedFormat('F d, Y g:i A')
                                 ),
 

@@ -79,13 +79,13 @@ class TaxonomyResource extends Resource
     /** @return Builder<\Domain\Taxonomy\Models\Taxonomy> */
     public static function getEloquentQuery(): Builder
     {
-        if (filament_admin()->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
             filament_admin()->can('site.siteManager') &&
-            ! (filament_admin()->hasRole(config('domain.role.super_admin')))
+            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
             return static::getModel()::query()->wherehas('sites', function ($q) {
                 return $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray());
@@ -200,7 +200,7 @@ class TaxonomyResource extends Resource
                             /** @var \Domain\Admin\Models\Admin */
                             $user = filament_admin();
 
-                            if ($user->hasRole(config('domain.role.super_admin'))) {
+                            if ($user->hasRole(config()->string('domain.role.super_admin'))) {
                                 return false;
                             }
 
@@ -360,7 +360,7 @@ class TaxonomyResource extends Resource
                     ->relationship('sites', 'name', function (Builder $query) {
 
                         if (filament_admin()->can('site.siteManager') &&
-                        ! (filament_admin()->hasRole(config('domain.role.super_admin')))) {
+                        ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
                             return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
                         }
 
@@ -383,7 +383,7 @@ class TaxonomyResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-                    ->authorize(fn () => filament_admin()->hasRole(config('domain.role.super_admin'))),
+                    ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
             ]);
     }
 

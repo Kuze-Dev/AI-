@@ -65,7 +65,7 @@ class RoleResource extends Resource
                         ->required()
                         ->maxLength(255),
                     Forms\Components\Select::make('guard_name')
-                        ->default(config('auth.defaults.guard'))
+                        ->default(config()->string('auth.defaults.guard'))
                         ->options(self::getGuards()->mapWithKeys(fn (string $guardName) => [$guardName => $guardName]))
                         ->required()
                         ->reactive(),
@@ -158,7 +158,7 @@ class RoleResource extends Resource
     /** @return Collection<int, string> */
     private static function getGuards(): Collection
     {
-        return (new Collection(config('auth.guards')))
+        return (new Collection(config()->array('auth.guards')))
             ->reject(fn (array $config, string $guard) => $guard === 'sanctum')
             ->map(fn (array $config, string $guard) => $guard);
     }

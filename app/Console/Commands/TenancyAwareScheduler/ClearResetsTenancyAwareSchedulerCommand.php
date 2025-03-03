@@ -21,9 +21,9 @@ class ClearResetsTenancyAwareSchedulerCommand extends ClearResetsCommand
     {
         // solve `Call to a member function prepare() on null`
 
-        $driver = $this->argument('name') ?? config('auth.defaults.passwords');
+        $driver = $this->argument('name') ?? config()->string('auth.defaults.passwords');
 
-        $table = config('auth.passwords.'.$driver.'.table');
+        $table = config()->string('auth.passwords.'.$driver.'.table');
 
         DB::table($table)
             ->where('created_at', '<', now()->addHour())->delete();

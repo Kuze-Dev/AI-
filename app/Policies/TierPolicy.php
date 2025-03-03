@@ -21,7 +21,7 @@ class TierPolicy
             return Response::denyAsNotFound();
         }
 
-        if ($tier instanceof Tier && $tier->name === config('domain.tier.default')) {
+        if ($tier instanceof Tier && $tier->name === config()->string('domain.tier.default')) {
             return false;
         }
 

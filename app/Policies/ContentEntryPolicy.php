@@ -45,7 +45,7 @@ class ContentEntryPolicy
         /** @var \Domain\Admin\Models\Admin */
         $admin = $user;
 
-        if ($admin->hasRole(config('domain.role.super_admin'))) {
+        if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
 
             return true;
         }

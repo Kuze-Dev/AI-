@@ -79,13 +79,13 @@ class ListContentEntry extends ListRecords
     protected function getTableQuery(): Builder
     {
 
-        if (filament_admin()->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
             return $this->ownerRecord->contentEntries()->getQuery();
         }
 
         if (TenantFeatureSupport::active(SitesManagement::class) &&
             filament_admin()->can('site.siteManager') &&
-            ! (filament_admin()->hasRole(config('domain.role.super_admin')))
+            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
             return $this->ownerRecord->contentEntries()
                 ->getQuery()

@@ -606,7 +606,7 @@ class BlueprintResource extends Resource
                         $set('relation_scopes', []);
                     })
                     ->options(
-                        (new Collection(config('domain.blueprint.related_resources', [])))
+                        (new Collection(config()->array('domain.blueprint.related_resources', [])))
                             ->keys()
                             ->mapWithKeys(
                                 fn (string $model) =>
@@ -768,7 +768,6 @@ class BlueprintResource extends Resource
                                                     ->hintColor('primary')
                                                     ->hintIcon('heroicon-s-question-mark-circle'),
                                             ]),
-                                            /** @phpstan-ignore-next-line */
                                             default => throw new ErrorException(
                                                 ManipulationType::class.'::'.Str::upper($manipulationType->value).' field not setup for conversion manipulation.'
                                             )

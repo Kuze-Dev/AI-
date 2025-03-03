@@ -43,7 +43,7 @@ class PagePolicy
 
     public function update(Admin $user, Page $page): bool
     {
-        if ($user->hasRole(config('domain.role.super_admin'))) {
+        if ($user->hasRole(config()->string('domain.role.super_admin'))) {
 
             return true;
         }

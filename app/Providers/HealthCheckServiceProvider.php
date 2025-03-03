@@ -35,7 +35,7 @@ class HealthCheckServiceProvider extends ServiceProvider
             EnvironmentCheck::new(),
             ScheduleCheck::new(),
             SslCertificationExpiredCheck::new()
-                ->url(config('app.url'))
+                ->url(config()->string('app.url'))
                 ->warnWhenSslCertificationExpiringDay(24)
                 ->failWhenSslCertificationExpiringDay(14),
             UsedDiskSpaceCheck::new(),
