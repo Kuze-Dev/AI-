@@ -14,7 +14,7 @@ class VerifyEmailRequest extends FormRequest
     public function authorize(
         #[RouteParameter('id')] string|null $id,
         #[RouteParameter('hash')] string|null $hash,
-        #[CurrentUser] Customer $customer,
+        #[CurrentUser('sanctum')] Customer $customer,
     ) : bool
     {
         if (! hash_equals($id ?? '' , (string) $customer->getKey())) {

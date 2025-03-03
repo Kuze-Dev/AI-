@@ -21,7 +21,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 class ProfileImageUpdateController extends Controller
 {
     #[Post('/')]
-    public function __invoke(Request $request, #[CurrentUser] Customer $customer): mixed
+    public function __invoke(Request $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $profileImage = $this->validate($request, [
             'profile_image' => 'required|image',

@@ -38,7 +38,7 @@ use Symfony\Component\Mailer\Exception\TransportException;
 ]
 class OrderController extends Controller
 {
-    public function index(#[CurrentUser] Customer $customer): mixed
+    public function index(#[CurrentUser('sanctum')] Customer $customer): mixed
     {
 
         return OrderResource::collection(
@@ -119,7 +119,7 @@ class OrderController extends Controller
         }
     }
 
-    public function show(Order $order,#[CurrentUser] Customer $customer): OrderResource
+    public function show(Order $order,#[CurrentUser('sanctum')] Customer $customer): OrderResource
     {
 
         $model = QueryBuilder::for(

@@ -24,7 +24,7 @@ use Throwable;
 class CheckoutMobileController extends Controller
 {
     #[Get('/v2/carts/summary', name: 'v2.carts.summary')]
-    public function summary(CartMobileSummaryRequest $request,#[CurrentUser] Customer $customer): mixed
+    public function summary(CartMobileSummaryRequest $request,#[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;

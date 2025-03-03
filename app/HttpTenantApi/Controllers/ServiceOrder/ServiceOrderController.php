@@ -28,7 +28,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 ]
 class ServiceOrderController
 {
-    public function index(#[CurrentUser] Customer $customer): JsonApiResourceCollection
+    public function index(#[CurrentUser('sanctum')] Customer $customer): JsonApiResourceCollection
     {
 
         return ServiceOrderResource::collection(
@@ -41,7 +41,7 @@ class ServiceOrderController
         );
     }
 
-    public function show(string $serviceOrder,#[CurrentUser] Customer $customer): ServiceOrderResource
+    public function show(string $serviceOrder,#[CurrentUser('sanctum')] Customer $customer): ServiceOrderResource
     {
 
         return ServiceOrderResource::make(

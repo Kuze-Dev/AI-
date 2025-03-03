@@ -25,7 +25,7 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CartController extends Controller
 {
-    public function index(#[CurrentUser] Customer $customer): mixed
+    public function index(#[CurrentUser('sanctum')] Customer $customer): mixed
     {
 
         /** @var \Domain\Tier\Models\Tier $tier */

@@ -52,7 +52,7 @@ class VerifyEmailController extends Controller
     }
 
     #[Post('otp', name: 'customer.verification.verify.otp', middleware: 'auth:sanctum')]
-    public function verifyViaOTP(Request $request ,#[CurrentUser] Customer $customer): mixed
+    public function verifyViaOTP(Request $request ,#[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $otp = $this->validate($request, [
             'otp' => 'required|string',
