@@ -277,15 +277,12 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     public function isFavorite(): bool
     {
        $customer = guest_customer_logged_in();
+
         if ($customer === null) {
             return false;
         }
 
-        if ($customer) {
-            return $this->favorites()->where('customer_id', $customer->id)->exists();
-        }
-
-        return false;
+        return $this->favorites()->where('customer_id', $customer->id)->exists();
     }
 
     public function getSlugOptions(): SlugOptions
