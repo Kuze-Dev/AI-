@@ -66,8 +66,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_price
- * @property PaymentPlanType|null $payment_type
- * @property PaymentPlanValue|null $payment_value
+ * @property PaymentPlanType $payment_type
+ * @property PaymentPlanValue $payment_value
  * @property array|null $payment_plan
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -251,14 +251,14 @@ class ServiceOrder extends Model implements PayableInterface
         return $this->hasMany(ServiceOrderAddress::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress, $this>*/
     public function serviceOrderServiceAddress(): HasOne
     {
         return $this->hasOne(ServiceOrderAddress::class)
             ->whereType(ServiceOrderAddressType::SERVICE_ADDRESS);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress, $this>*/
     public function serviceOrderBillingAddress(): HasOne
     {
         return $this->hasOne(ServiceOrderAddress::class)

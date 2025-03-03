@@ -61,7 +61,6 @@ class ServiceOrderPartialPaymentUpdatedListener
 
     private function handleServiceBillStatusUpdate(): void
     {
-        /** @var \Domain\ServiceOrder\Enums\ServiceTransactionStatus $serviceTransactionStatus */
         $serviceTransactionStatus = match ($this->payment->status) {
             'paid' => ServiceTransactionStatus::PAID,
             'refunded', => ServiceTransactionStatus::REFUNDED,

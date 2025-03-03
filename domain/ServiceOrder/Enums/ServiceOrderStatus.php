@@ -51,24 +51,26 @@ enum ServiceOrderStatus: string implements HasColor, HasLabel
 
     public static function casesForServiceOrder(ServiceOrder $serviceOrder): array
     {
-        $cases = collect([
+        $cases = [
             self::PENDING,
             self::FORPAYMENT,
-        ]);
-
+        ];
+    
         if ($serviceOrder->billing_cycle === null) {
-            $cases = $cases->merge([
+            $additionalStatuses = [
                 self::INPROGRESS,
                 self::COMPLETED,
-            ]);
+            ];
         } else {
-            $cases = $cases->merge([
+            $additionalStatuses = [
                 self::ACTIVE,
                 self::CLOSED,
-            ]);
+            ];
         }
-
-        return $cases
+    
+        $cases = array_merge($cases, $additionalStatuses);
+    
+        return collect($cases)
             ->mapWithKeys(fn (self $case) => [
                 $case->value => $case->getLabel(),
             ])->toArray();

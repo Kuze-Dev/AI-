@@ -19,7 +19,7 @@ enum ServiceBillStatus: string implements HasColor, HasLabel
         return Str::headline($this->value);
     }
 
-    public function getColor(): string|array
+    public function getColor(): string
     {
         return match ($this) {
             self::PAID => 'success',

@@ -24,7 +24,6 @@ class SendToCustomerServiceOrderStatusEmailAction
     /** @throws Throwable */
     public function execute(ServiceOrder $serviceOrder): void
     {
-        /** @var Notification|null $notification */
         $notification = match ($serviceOrder->status) {
             ServiceOrderStatus::PENDING => new ConfirmationServiceOrderNotification($serviceOrder),
             ServiceOrderStatus::INPROGRESS => new InProgressServiceOrderNotification($serviceOrder),

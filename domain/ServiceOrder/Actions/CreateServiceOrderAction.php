@@ -182,6 +182,7 @@ class CreateServiceOrderAction
                                     (int) $additionalCharge['quantity']
                                 );
                             }
+                            return null;
                         },
                         $additionalCharges
                     )
