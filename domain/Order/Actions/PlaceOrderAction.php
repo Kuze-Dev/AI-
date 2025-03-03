@@ -20,10 +20,8 @@ class PlaceOrderAction
         $payload = $this->prepareOrderAction
             ->execute($placeOrderData);
 
-        if ($payload instanceof PreparedOrderData) {
-            $result = $this->splitOrderAction->execute($payload, $placeOrderData);
+        $result = $this->splitOrderAction->execute($payload, $placeOrderData);
 
-            return $result;
-        }
+        return $result;
     }
 }

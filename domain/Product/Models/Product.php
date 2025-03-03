@@ -185,7 +185,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
      * Declare relationship of
      * current model to taxonomy terms.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, Product>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
      */
     public function taxonomyTerms(): BelongsToMany
     {
@@ -193,7 +193,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, Product>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
      */
     public function taxonomyTermsBranch(): BelongsToMany
     {
@@ -206,7 +206,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
      */
     public function taxonomyTermsCategory(): BelongsToMany
     {
@@ -232,7 +232,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     /**
      * Get the product tier relationship.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier, $this>
      */
     public function productTier(): BelongsToMany
     {

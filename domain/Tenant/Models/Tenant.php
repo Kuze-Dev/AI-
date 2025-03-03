@@ -83,7 +83,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return (string) $this->apiCalls()->sum('count');
     }
 
-    /** @return HasMany<TenantApiCall> */
+    /** @return HasMany<TenantApiCall, $this> */
     public function apiCalls(): HasMany
     {
         return $this->hasmany(TenantApiCall::class);

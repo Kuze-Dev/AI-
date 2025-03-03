@@ -95,7 +95,7 @@ class Node extends Model implements HasInternationalizationInterface, Sortable
         return $this->belongsTo(Menu::class);
     }
 
-    /** @return HasMany<self> */
+    /** @return HasMany<self, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->ordered()->with('children');
@@ -110,6 +110,9 @@ class Node extends Model implements HasInternationalizationInterface, Sortable
     /** @return Builder<self> */
     public function buildSortQuery(): Builder
     {
+         /**
+         * Method Node::buildSortQuery() should return Illuminate\Database\Eloquent\Builder<Node> ...
+         *  @phpstan-ignore-next-line */
         return static::query()->whereMenuId($this->menu_id)->whereParentId($this->parent_id);
     }
 

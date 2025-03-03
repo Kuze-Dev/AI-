@@ -61,7 +61,7 @@ class ProductVariantOrderData
                 option: $combinationData['option'],
                 option_value_id: $productOptionValue->id,
                 option_value: $combinationData['option_value'],
-                option_value_data: $productOption?->is_custom ? $productOptionValue->data : null
+                option_value_data: $productOption?->is_custom ? (array) $productOptionValue->data : null
             );
         }
 

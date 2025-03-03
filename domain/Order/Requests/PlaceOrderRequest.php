@@ -23,17 +23,20 @@ class PlaceOrderRequest extends FormRequest
             'addresses.shipping' => [
                 'required',
                 Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
-                    $customerId = auth()->user()?->id;
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
 
-                    $query->where('customer_id', $customerId);
+                    $query->where('customer_id', $customer->id);
                 }),
             ],
             'addresses.billing' => [
                 'required',
                 Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
-                    $customerId = auth()->user()?->id;
+                    
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
 
-                    $query->where('customer_id', $customerId);
+                    $query->where('customer_id', $customer->id);
                 }),
             ],
             'cart_reference' => [
@@ -41,8 +44,11 @@ class PlaceOrderRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $reference = $value;
 
-                    $cartLines = CartLine::whereHas('cart', function ($query) {
-                        $query->whereBelongsTo(auth()->user());
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
+
+                    $cartLines = CartLine::whereHas('cart', function ($query) use ($customer) {
+                        $query->whereBelongsTo($customer);
                     })
                         ->whereCheckoutReference($reference)
                         ->where('checkout_expiration', '>', now())

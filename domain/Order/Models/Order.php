@@ -171,13 +171,13 @@ class Order extends Model implements HasMedia, PayableInterface
         return $this->hasMany(OrderLine::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress, $this> */
     public function shippingAddress(): HasOne
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::SHIPPING);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress, $this> */
     public function billingAddress(): HasOne
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::BILLING);
@@ -210,12 +210,13 @@ class Order extends Model implements HasMedia, PayableInterface
     }
 
     #[\Override]
+    /** @return Attribute<non-falsy-string, never>.  */
     public function getReferenceNumber(): string
     {
         return $this->reference;
     }
 
-    /** @return Attribute<string, never> */
+    /** @return Attribute<non-falsy-string, never> */
     protected function customerFullName(): Attribute
     {
         return Attribute::get(

@@ -100,7 +100,7 @@ class ProductOptionValue extends Model implements HasMedia
      * Declare relationship of
      * current model to product option.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\ProductOption, \Domain\Product\Models\ProductOptionValue>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\ProductOption, $this>
      */
     public function productOption(): BelongsTo
     {

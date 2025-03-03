@@ -31,7 +31,7 @@ class UpdateContentAction
             ->sync($contentData->taxonomies);
 
         if (TenantFeatureSupport::active(SitesManagement::class) &&
-            Auth::user()?->hasRole(config('domain.role.super_admin'))
+            filament_admin()->hasRole(config('domain.role.super_admin'))
         ) {
 
             $content->sites()

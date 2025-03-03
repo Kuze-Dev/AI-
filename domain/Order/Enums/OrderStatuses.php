@@ -44,7 +44,7 @@ enum OrderStatuses: string implements HasColor, HasLabel //, HasIcon
         return Str::headline($this->value);
     }
 
-    public static function forOrderUpdate(Order $order)
+    public static function forOrderUpdate(Order $order): Collection
     {
         return collect(self::cases())
             ->when(

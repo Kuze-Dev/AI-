@@ -119,13 +119,13 @@ class OrderLine extends Model implements HasMedia
         ];
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderLine> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, $this> */
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Review\Models\Review> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Review\Models\Review, $this> */
     public function review()
     {
         return $this->hasOne(Review::class);

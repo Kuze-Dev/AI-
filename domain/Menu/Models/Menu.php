@@ -68,7 +68,7 @@ class Menu extends Model implements HasInternationalizationInterface
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return HasMany<Node> */
+    /** @return HasMany<Node, $this> */
     public function parentNodes(): HasMany
     {
         return $this->nodes()->whereNull('parent_id')->ordered();

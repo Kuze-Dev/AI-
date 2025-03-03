@@ -118,7 +118,7 @@ class Review extends Model implements HasMedia
         return $this->belongsTo(OrderLine::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\ReviewLike> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\ReviewLike, $this> */
     public function review_likes()
     {
         return $this->hasMany(ReviewLike::class);

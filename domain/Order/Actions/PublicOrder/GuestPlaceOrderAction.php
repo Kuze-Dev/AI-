@@ -21,11 +21,10 @@ class GuestPlaceOrderAction
     {
         $payload = $this->guestPrepareOrderAction
             ->execute($guestPlaceOrderData);
+            
+        $result = $this->guestSplitOrderAction->execute($payload, $guestPlaceOrderData);
 
-        if ($payload instanceof GuestPreparedOrderData) {
-            $result = $this->guestSplitOrderAction->execute($payload, $guestPlaceOrderData);
-
-            return $result;
-        }
+        return $result;
+        
     }
 }

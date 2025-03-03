@@ -54,7 +54,7 @@ class BlockContent extends Model implements Sortable
         'block',
     ];
 
-    /** @return BelongsTo<Block, self> */
+    /** @return BelongsTo<Block, $this> */
     public function block(): BelongsTo
     {
         return $this->belongsTo(Block::class);
@@ -75,6 +75,7 @@ class BlockContent extends Model implements Sortable
     /** @return Builder<BlockContent> */
     public function buildSortQuery(): Builder
     {
+        /** @phpstan-ignore return.type */
         return static::query()->where('page_id', $this->page_id);
     }
 
