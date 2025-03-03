@@ -8,8 +8,10 @@ use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
+use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -19,11 +21,8 @@ class CartSummaryRequest extends FormRequest
     /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     private Collection $cartLinesCache;
 
-    public function rules(): array
+    public function rules(#[CurrentUser] Customer $customer): array
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
-
         return [
             'cart_line_ids' => [
                 'required',

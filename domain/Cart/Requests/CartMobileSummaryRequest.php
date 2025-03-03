@@ -9,10 +9,12 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Cart\Models\CartLine;
+use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,12 +27,8 @@ class CartMobileSummaryRequest extends FormRequest
 
     private array $cartLineIds;
 
-    public function rules(): array
+    public function rules(#[CurrentUser] Customer $customer): array
     {
-
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
-
         return [
             'reference' => [
                 'required',

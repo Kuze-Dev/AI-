@@ -276,11 +276,10 @@ class Product extends Model implements HasMedia, HasMetaDataContract
 
     public function isFavorite(): bool
     {
-        if (! auth()->check()) {
+       $customer = guest_customer_logged_in();
+        if ($customer === null) {
             return false;
         }
-        /** @var \Domain\Customer\Models\Customer|null */
-        $customer = auth()->user();
 
         if ($customer) {
             return $this->favorites()->where('customer_id', $customer->id)->exists();

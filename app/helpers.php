@@ -18,10 +18,18 @@ if (! function_exists('filament_admin')) {
     }
 }
 
-if(! function_exists('customer_logged_in')) {
-    function customer_logged_in(): ?Customer
+if(! function_exists('guest_customer_logged_in')) {
+    function guest_customer_logged_in(): ?Customer
     {
-         /** @var Customer|null */
+        /** @phpstan-ignore return.type */
+        return once(fn () => auth('api')->user());
+    }
+}
+
+if(! function_exists('customer_logged_in')) {
+    function customer_logged_in(): Customer
+    {
+        /** @phpstan-ignore return.type */
         return once(fn () => auth('api')->user());
     }
 }
