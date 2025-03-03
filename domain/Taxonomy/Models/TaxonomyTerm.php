@@ -64,7 +64,6 @@ use Support\RouteUrl\Models\RouteUrl;
  * @method static Builder|TaxonomyTerm whereTaxonomyId($value)
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
  * 
- * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
  *
  * @mixin \Eloquent
  */
@@ -75,7 +74,7 @@ use Support\RouteUrl\Models\RouteUrl;
 class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
 {
     use ConstraintsRelationships;
-    // use HasRouteUrl;
+    use HasRouteUrl;
     use HasSlug;
     use SortableTrait;
 
@@ -101,29 +100,13 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
         return $this->activeRouteUrl?->url ?: null;
     }
 
-     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<RouteUrl, $this>
-     */
-    public function routeUrls(): MorphOne
-    {
-        return $this->morphOne(RouteUrl::class, 'model');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<RouteUrl, $this>
-     */
-    public function activeRouteUrl(): MorphOne
-    {
-        return $this->routeUrls()->latestOfMany('updated_at');
-    }
-
     /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, $this> */
     public function taxonomy(): BelongsTo
     {
         return $this->belongsTo(Taxonomy::class);
     }
 
-    /** @return HasMany<TaxonomyTerm> */
+    /** @return  \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->ordered()->with('children');
@@ -178,9 +161,12 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return Builder<TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Builder<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function buildSortQuery(): Builder
     {
+        /**
+         * Method Domain\Taxonomy\Models\TaxonomyTerm::buildSortQuery() should return Illuminate\Database\Eloquent\Builder<Domain\Taxonomy\Models\TaxonomyTerm> but returns Illuminate\Database\Eloquent\Builder<static(Domain\Taxonomy\Models\TaxonomyTerm)>domain/Taxonomy/Models/TaxonomyTerm.php
+         *  @phpstan-ignore-next-line */
         return static::query()->whereTaxonomyId($this->taxonomy_id)->whereParentId($this->parent_id);
     }
 

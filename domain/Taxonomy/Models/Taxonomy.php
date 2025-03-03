@@ -55,7 +55,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereUpdatedAt($value)
  *
- * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ *
  * @mixin \Eloquent
  */
 #[
@@ -65,7 +65,7 @@ use Support\RouteUrl\HasRouteUrl;
 class Taxonomy extends Model implements HasRouteUrlContract
 {
     use ConstraintsRelationships;
-    // use HasRouteUrl;
+    use HasRouteUrl;
     use HasSlug;
     use LogsActivity;
     use Sites;
@@ -78,23 +78,6 @@ class Taxonomy extends Model implements HasRouteUrlContract
         'blueprint_id',
         'translation_id',
     ];
-
-    
-     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<RouteUrl, $this>
-     */
-    public function routeUrls(): MorphOne
-    {
-        return $this->morphOne(RouteUrl::class, 'model');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<RouteUrl, $this>
-     */
-    public function activeRouteUrl(): MorphOne
-    {
-        return $this->routeUrls()->latestOfMany('updated_at');
-    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -110,7 +93,7 @@ class Taxonomy extends Model implements HasRouteUrlContract
         return $this->belongsTo(Blueprint::class);
     }
 
-    /** @return HasMany<TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function parentTerms(): HasMany
     {
         return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
