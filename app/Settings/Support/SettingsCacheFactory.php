@@ -23,7 +23,7 @@ class SettingsCacheFactory extends \Spatie\LaravelSettings\Support\SettingsCache
     public function build(?string $repository = null): SettingsCache
     {
         return new SettingsCache(
-            config()->boolean('settings.cache.enabled', false),
+            config('settings.cache.enabled', false),
             config('settings.cache.store'),
             tenant()?->getTenantKey() ?? 'central',
             config('settings.cache.ttl'),
