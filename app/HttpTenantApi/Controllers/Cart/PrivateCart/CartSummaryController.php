@@ -56,7 +56,7 @@ class CartSummaryController extends Controller
     }
 
     #[Get('carts/summary', name: 'carts.summary')]
-    public function summary(CartSummaryRequest $request,#[CurrentUser] Customer $customer): mixed
+    public function summary(CartSummaryRequest $request,#[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;

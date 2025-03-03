@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 ]
 class CartLinesController extends Controller
 {
-    public function store(CreateCartLineRequest $request,#[CurrentUser] Customer $customer): mixed
+    public function store(CreateCartLineRequest $request,#[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validatedData = $request->validated();
 

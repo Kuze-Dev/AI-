@@ -19,11 +19,8 @@ trait ConstraintsRelationships
     protected static function bootConstraintsRelationships(): void
     {
         static::deleting(function (self $model) {
-            /** 
-             * ignore Call to function method_exists() with (some models) 
-             * and 'trashed' will always evaluate to true.
-             * 
-             * @phpstan-ignore-next-line */
+
+            /** @phpstan-ignore function.alreadyNarrowedType (Call to function method_exists() with Domain\Customer\Models\Customer and 'trashed' will always evaluate to true.) */
             if (method_exists($model, 'trashed') && ! $model->trashed()) {
                 return;
             }
@@ -74,7 +71,7 @@ trait ConstraintsRelationships
 
     protected function cascadeDelete(string $relationName): void
     {
-        
+
         $relation = $this->{$relationName}();
 
         if ($relation instanceof BelongsToMany) {

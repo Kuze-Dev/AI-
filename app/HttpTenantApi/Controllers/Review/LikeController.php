@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class LikeController
 {
     #[Patch('like/{reviewId}')]
-    public function __invoke(int $reviewId, EditLikeAction $editLikeAction,#[CurrentUser] Customer $customer): JsonResponse
+    public function __invoke(int $reviewId, EditLikeAction $editLikeAction,#[CurrentUser('sanctum')] Customer $customer): JsonResponse
     {
 
         $editLikeAction->execute($reviewId, $customer);

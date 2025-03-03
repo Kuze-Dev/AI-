@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 ]
 class ReviewController
 {
-    public function store(ReviewStoreRequest $request, CreateReviewAction $createReviewAction, #[CurrentUser] Customer $customer): JsonResponse
+    public function store(ReviewStoreRequest $request, CreateReviewAction $createReviewAction, #[CurrentUser('sanctum')] Customer $customer): JsonResponse
     {
 
         $validatedData = $request->validated();

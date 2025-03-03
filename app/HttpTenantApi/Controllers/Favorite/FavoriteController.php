@@ -25,7 +25,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 ]
 class FavoriteController
 {
-    public function index(#[CurrentUser] Customer $customer): JsonApiResourceCollection
+    public function index(#[CurrentUser('sanctum')] Customer $customer): JsonApiResourceCollection
     {
 
         return FavoriteResource::collection(
@@ -42,7 +42,7 @@ class FavoriteController
         );
     }
 
-    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction, #[CurrentUser] Customer $customer): JsonResponse
+    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction, #[CurrentUser('sanctum')] Customer $customer): JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -58,7 +58,7 @@ class FavoriteController
         }
     }
 
-    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction,#[CurrentUser] Customer $customer): JsonResponse
+    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction,#[CurrentUser('sanctum')] Customer $customer): JsonResponse
     {
 
         $favoriteData = FavoriteData::fromArray([

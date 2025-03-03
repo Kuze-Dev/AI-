@@ -42,7 +42,7 @@ class TenantPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->authPasswordBroker('admin')
             ->login()
-            ->profile(EditProfile::class)
+            ->profile()
             ->passwordReset()
             ->emailVerification()
             ->userMenuItems([
