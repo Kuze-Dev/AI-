@@ -286,7 +286,7 @@ class AdminResource extends Resource
                                             return $model;
                                         }
 
-                                        return Admin::whereKey($model)->first();
+                                        return Admin::whereKey($model)->sole();
                                     }
                                 ),
                         ]
