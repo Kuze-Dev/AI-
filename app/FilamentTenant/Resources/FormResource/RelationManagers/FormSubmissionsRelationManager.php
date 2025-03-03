@@ -107,7 +107,7 @@ class FormSubmissionsRelationManager extends RelationManager
                             }
 
                             $data['main.submission_date'] = $record->created_at?->timezone(
-                                $admin->timezone ?: config('domain.admin.default_timezone')
+                                $admin->timezone ?: config()->string('domain.admin.default_timezone')
                             )->format('Y-m-d H:i a');
 
                             return $data;

@@ -155,7 +155,7 @@ class GlobalsResource extends Resource
 
                             $admin = filament_admin();
 
-                            if ($admin->hasRole(config('domain.role.super_admin'))) {
+                            if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
                                 return false;
                             }
 
@@ -205,7 +205,7 @@ class GlobalsResource extends Resource
                     ->relationship('sites', 'name', function (Builder $query) {
 
                         if (filament_admin()->can('site.siteManager') &&
-                        ! (filament_admin()->hasRole(config('domain.role.super_admin')))) {
+                        ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
                             return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
                         }
 
@@ -233,7 +233,7 @@ class GlobalsResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-                    ->authorize(fn () => filament_admin()->hasRole(config('domain.role.super_admin'))),
+                    ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
             ])
             ->defaultSort('updated_at', 'desc');
     }
@@ -242,13 +242,13 @@ class GlobalsResource extends Resource
     #[\Override]
     public static function getEloquentQuery(): Builder
     {
-        if (filament_admin()->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
         if (TenantFeatureSupport::active(SitesManagement::class) &&
             filament_admin()->can('site.siteManager') &&
-            ! (filament_admin()->hasRole(config('domain.role.super_admin')))
+            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
             return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));
         }

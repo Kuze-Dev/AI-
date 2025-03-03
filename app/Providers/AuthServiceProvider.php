@@ -68,7 +68,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->configureNotificationUrls();
 
         /** @see https://freek.dev/1325-when-to-use-gateafter-in-laravel */
-        Gate::after(fn ($user) => $user instanceof Admin ? $user->hasRole(config('domain.role.super_admin')) : null);
+        Gate::after(fn ($user) => $user instanceof Admin ? $user->hasRole(config()->string('domain.role.super_admin')) : null);
     }
 
     protected function configureNotificationUrls(): void
@@ -79,7 +79,7 @@ class AuthServiceProvider extends ServiceProvider
                 return (new MailMessage())
                     ->from(
                         TenantSupport::initialized() ?
-                        (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
+                        (app(FormSettings::class)->sender_email ? config()->string('mail.from.address') : config()->string('mail.from.address')) :
                         config('mail.from.address')
                     )
                     ->subject(trans('Verify Email Address'))
@@ -93,8 +93,8 @@ class AuthServiceProvider extends ServiceProvider
             return (new MailMessage())
                 ->from(
                     TenantSupport::initialized() ?
-                    (app(FormSettings::class)->sender_email ? config('mail.from.address') : config('mail.from.address')) :
-                    config('mail.from.address')
+                    (app(FormSettings::class)->sender_email ? config()->string('mail.from.address') : config()->string('mail.from.address')) :
+                    config()->string('mail.from.address')
                 )
                 ->subject(trans('Verify Email Address'))
                 ->line(trans('Please click the button below to verify your email address.'))
@@ -135,7 +135,7 @@ class AuthServiceProvider extends ServiceProvider
 
                 return $baseUrl.'/password/reset'.'?'.http_build_query([
                     'token' => $token,
-                    'expired_at' => now()->addMinutes(config('auth.passwords.customer.expire'))->timestamp,
+                    'expired_at' => now()->addMinutes(config()->integer('auth.passwords.customer.expire'))->timestamp,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);
             }

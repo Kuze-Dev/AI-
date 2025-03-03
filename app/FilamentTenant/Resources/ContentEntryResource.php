@@ -193,7 +193,7 @@ class ContentEntryResource extends Resource
 
                                 $admin = filament_admin();
 
-                                if ($admin->hasRole(config('domain.role.super_admin'))) {
+                                if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
                                     return $livewire->ownerRecord->sites->pluck('name', 'id')
                                         ->toArray();
                                 }
@@ -207,7 +207,7 @@ class ContentEntryResource extends Resource
 
                                 $admin = filament_admin();
 
-                                if ($admin->hasRole(config('domain.role.super_admin'))) {
+                                if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
                                     return false;
                                 }
 

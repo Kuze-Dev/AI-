@@ -204,7 +204,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             if (
                 $request->hasHeader('x-rate-key') &&
-                $request->header('x-rate-key') === config('custom.rate_limit_key')
+                $request->header('x-rate-key') === config()->string('custom.rate_limit_key')
             ) {
                 return Limit::none();
             }

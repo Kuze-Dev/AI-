@@ -22,7 +22,7 @@ class ListSites extends ListRecords
 
         $query = static::getResource()::getEloquentQuery();
 
-        if ($admin->hasRole(config('domain.role.super_admin'))) {
+        if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
             return static::getResource()::getEloquentQuery();
         }
 

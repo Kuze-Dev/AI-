@@ -102,7 +102,7 @@ class GuestCartLinesController extends Controller
 
             return response()->json($dbResult);
         } catch (Exception $e) {
-            $maxFileSize = File::getHumanReadableSize(config('media-library.max_file_size'));
+            $maxFileSize = File::getHumanReadableSize(config()->integer('media-library.max_file_size'));
             if ($e instanceof FileIsTooBig) {
                 return response()->json([
                     'message' => "File is too big , please upload file less than $maxFileSize",

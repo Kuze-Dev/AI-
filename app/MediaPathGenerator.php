@@ -27,7 +27,7 @@ class MediaPathGenerator extends DefaultPathGenerator
             return parent::getBasePath($media);
         }
 
-        $prefix = config('media-library.prefix', '');
+        $prefix = config()->string('media-library.prefix', '');
 
         $md5 = md5(
             $media->getKey().

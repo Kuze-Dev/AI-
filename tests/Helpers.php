@@ -23,7 +23,7 @@ use function Pest\Laravel\assertDatabaseHas;
 
 function loginAsSuperAdmin(?Admin $admin = null): Admin
 {
-    return loginAsAdmin($admin);//->assignRole(config('domain.role.super_admin'));
+    return loginAsAdmin($admin);//->assignRole(config()->string('domain.role.super_admin'));
 }
 
 function loginAsAdmin(?Admin $admin = null): Admin
@@ -34,7 +34,7 @@ function loginAsAdmin(?Admin $admin = null): Admin
     );
 
     $role = app(Role::class)
-        ->createOrFirst(['name' => config('domain.role.super_admin')]);
+        ->createOrFirst(['name' => config()->string('domain.role.super_admin')]);
 
     $admin->syncRoles($role);
 

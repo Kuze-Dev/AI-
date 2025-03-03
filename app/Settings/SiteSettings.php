@@ -39,7 +39,7 @@ class SiteSettings extends Settings
             return '';
         }
 
-        return Storage::disk(config('filament.default_filesystem_disk'))
+        return Storage::disk(config()->string('filament.default_filesystem_disk'))
             ->url($this->logo);
     }
 }

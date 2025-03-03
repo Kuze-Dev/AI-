@@ -153,7 +153,7 @@ class BlockResource extends Resource
 
                             $admin = filament_admin();
 
-                            if ($admin->hasRole(config('domain.role.super_admin'))) {
+                            if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
                                 return false;
                             }
 
@@ -202,7 +202,7 @@ class BlockResource extends Resource
         //                 ->helperText('If enabled, the content below will serve as the default for all related pages')
         //                 ->reactive(),
         //         ])
-        //             ->disabled(fn () => ! filament_admin()->hasRole(config('domain.role.super_admin'))),
+        //             ->disabled(fn () => ! filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
         //         Forms\Components\Card::make([
         //             // Forms\Components\CheckboxList::make('sites')
         //             \App\FilamentTenant\Support\CheckBoxList::make('sites')
@@ -248,7 +248,7 @@ class BlockResource extends Resource
 
         //                     $user = filament_admin();
 
-        //                     if ($user->hasRole(config('domain.role.super_admin'))) {
+        //                     if ($user->hasRole(config()->string('domain.role.super_admin'))) {
         //                         return false;
         //                     }
 

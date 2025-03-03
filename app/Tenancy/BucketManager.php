@@ -19,7 +19,7 @@ class BucketManager
 
     public function makeS3Client(): S3Client
     {
-        return new S3Client($this->formatS3Config(config('filesystems.disks.s3')));
+        return new S3Client($this->formatS3Config(config()->array('filesystems.disks.s3')));
     }
 
     public function formatS3Config(array $config): array

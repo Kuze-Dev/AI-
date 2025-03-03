@@ -58,12 +58,12 @@ class PaymentMethodResource extends Resource
                         ->beforeStateDehydrated(null)
                         ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
                         ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
-                            $mediaClass = config('media-library.media_model', Media::class);
+                            $mediaClass = config()->string('media-library.media_model', Media::class);
 
                             /** @var ?Media $media */
                             $media = $mediaClass::findByUuid($file);
 
-                            if (config('filament.default_filesystem_disk') === 'r2') {
+                            if (config()->string('filament.default_filesystem_disk') === 'r2') {
                                 return $media?->getUrl();
                             }
 
@@ -97,7 +97,7 @@ class PaymentMethodResource extends Resource
                     Forms\Components\RichEditor::make('instruction')
                         ->getUploadedAttachmentUrlUsing(function ($file) {
 
-                            $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                            $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
                             try {
                                 if (! $storage->exists($file)) {
@@ -107,7 +107,7 @@ class PaymentMethodResource extends Resource
                                 return null;
                             }
 
-                            if (config('filament.default_filesystem_disk') === 'r2') {
+                            if (config()->string('filament.default_filesystem_disk') === 'r2') {
                                 return $storage->url($file);
                             } else {
                                 if ($storage->getVisibility($file) === 'private') {

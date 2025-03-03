@@ -148,7 +148,7 @@ class MenuResource extends Resource
 
                             $admin = filament_admin();
 
-                            if ($admin->hasRole(config('domain.role.super_admin'))) {
+                            if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
                                 return false;
                             }
 
@@ -304,7 +304,7 @@ class MenuResource extends Resource
                     ->relationship('sites', 'name', function (Builder $query) {
 
                         if (filament_admin()->can('site.siteManager') &&
-                        ! (filament_admin()->hasRole(config('domain.role.super_admin')))) {
+                        ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
                             return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
                         }
 
@@ -328,13 +328,13 @@ class MenuResource extends Resource
     #[\Override]
     public static function getEloquentQuery(): Builder
     {
-        if (filament_admin()->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
         if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) &&
             filament_admin()->can('site.siteManager') &&
-            ! (filament_admin()->hasRole(config('domain.role.super_admin')))
+            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
             return static::getModel()::query()
                 ->wherehas('sites', fn ($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));

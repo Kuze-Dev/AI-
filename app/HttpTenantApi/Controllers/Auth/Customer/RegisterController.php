@@ -40,7 +40,7 @@ class RegisterController
         $customerBlueprint = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->first();
 
         /** @var \Domain\Tier\Models\Tier $defaultTier */
-        $defaultTier = Tier::whereName(config('domain.tier.default'))->first();
+        $defaultTier = Tier::whereName(config()->string('domain.tier.default'))->first();
 
         if ($request->invited) {
 

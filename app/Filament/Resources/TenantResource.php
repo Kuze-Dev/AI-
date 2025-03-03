@@ -51,7 +51,7 @@ class TenantResource extends Resource
                             ->columnSpan(['md' => 3])
                             ->required()
                             ->rule(
-                                new CheckDatabaseConnection(config('tenancy.database.template_tenant_connection')),
+                                new CheckDatabaseConnection(config()->string('tenancy.database.template_tenant_connection')),
                                 fn (string $context) => $context === 'create'
                             ),
 

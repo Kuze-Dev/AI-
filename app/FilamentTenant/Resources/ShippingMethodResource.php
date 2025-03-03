@@ -57,12 +57,12 @@ class ShippingMethodResource extends Resource
                         ->beforeStateDehydrated(null)
                         ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
                         ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
-                            $mediaClass = config('media-library.media_model', Media::class);
+                            $mediaClass = config()->string('media-library.media_model', Media::class);
 
                             /** @var ?Media $media */
                             $media = $mediaClass::findByUuid($file);
 
-                            if (config('filament.default_filesystem_disk') === 'r2') {
+                            if (config()->string('filament.default_filesystem_disk') === 'r2') {
                                 return $media?->getUrl();
                             }
 
