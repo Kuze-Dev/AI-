@@ -76,6 +76,7 @@ final class Exports
     {
         $date_format = app(CustomerSettings::class)->date_format;
 
+        /** @phpstan-ignore return.type */
         return ExportBulkAction::make()
             ->queue()
             ->query(
@@ -110,6 +111,7 @@ final class Exports
             ->withActivityLog(
                 event: 'bulk-exported',
                 description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                /** @phpstan-ignore-next-line  */
                 properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
             );
     }

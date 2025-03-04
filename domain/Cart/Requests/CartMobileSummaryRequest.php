@@ -41,7 +41,7 @@ class CartMobileSummaryRequest extends FormRequest
                         ]);
                     }, 'media'])
                         ->whereHas('cart', function ($query) {
-                            $query->whereBelongsTo(auth()->user());
+                            $query->whereBelongsTo(customer_logged_in());
                         })
                         ->whereCheckoutReference($value);
 

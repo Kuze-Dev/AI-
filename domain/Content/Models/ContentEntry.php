@@ -39,6 +39,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @property string $slug
  * @property string $locale
  * @property string|null $draftable_id
+ * @property string|null $translation_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property array $data
  * @property bool $status

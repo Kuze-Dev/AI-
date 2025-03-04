@@ -283,7 +283,7 @@ class GuestCartSummaryAction
         $discountTotal = 0;
 
         if (! is_null($discount)) {
-            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal) ?? 0;
+            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 
         return $discountTotal;

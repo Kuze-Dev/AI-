@@ -21,7 +21,7 @@ class BulkRemoveRequest extends FormRequest
 
                     $cartLines = CartLine::query()
                         ->whereHas('cart', function ($query) {
-                            $query->whereBelongsTo(auth()->user());
+                            $query->whereBelongsTo(customer_logged_in());
                         })
                         ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
                         ->whereNull('checked_out_at');

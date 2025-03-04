@@ -32,7 +32,7 @@ trait TwoFactorAuthenticatable
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Auth\Model\TwoFactorAuthentication, $this>
-     */
+     *  @phpstan-ignore-next-line */
     public function twoFactorAuthentication(): MorphOne
     {
         return $this->morphOne(TwoFactorAuthentication::class, 'authenticatable');

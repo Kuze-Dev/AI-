@@ -22,6 +22,7 @@ class VisionPayProvider extends Provider
 
     public function __construct()
     {
+        /** @var \App\Settings\PaymentSettings $paymentSettings */
         $paymentSettings = app(PaymentSettings::class);
 
         if ($paymentSettings->vision_pay_apiKey) {

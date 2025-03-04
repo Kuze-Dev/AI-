@@ -28,6 +28,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $slug
  * @property string $blueprint_id
  * @property string $locale
+ * @property string|null $translation_id
  * @property mixed|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

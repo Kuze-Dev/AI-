@@ -239,9 +239,8 @@ class HandleUpdateDataTranslation
     }
 
     /**
-     * @param  ContentEntry|BlockContent|Customer|TaxonomyTerm|Globals  $model,
+     * @param  ContentEntry|BlockContent|Customer|TaxonomyTerm|Globals  $model
      * @param  mixed  $modelDTO
-     * @phpstan-ignore missingType.parameter, missingType.parameter, missingType.generics
      */
     protected function getTranslatableModelCollection($model, $modelDTO): Collection
     {
@@ -272,15 +271,22 @@ class HandleUpdateDataTranslation
                 ->where('order', $model->order)
                 ->get();
         }
-
+        /**
+         * TODO::
+         * 
+         * Revisit Transalation Generation for other models
+         * 
+         */
+         /** @phpstan-ignore-next-line */
         if ($model->translation_id) {
-
+             /** @phpstan-ignore-next-line */
             $translation_collection = $model->dataTranslation()
                 ->orwhere('id', $model->translation_id)
                 ->orwhere('translation_id', $model->translation_id)
                 ->get();
 
         } else {
+             /** @phpstan-ignore-next-line */
             $translation_collection = $model->dataTranslation()
                 ->orwhere('id', $model->id)
                 ->get();

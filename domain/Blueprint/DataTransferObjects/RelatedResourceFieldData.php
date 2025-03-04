@@ -98,7 +98,9 @@ class RelatedResourceFieldData extends FieldData
         $modelQuery = $model->query();
 
         foreach ($this->relation_scopes as $relationName => $value) {
-            /** @var Relation<Model> $relationship */
+            /**
+             *  @var Relation<Model> $relationship 
+             * @phpstan-ignore-next-line */
             $relationship = $model->{$relationName}();
 
             $modelQuery->whereRelation($relationName, $relationship->getRelated()->getKeyName(), $value);

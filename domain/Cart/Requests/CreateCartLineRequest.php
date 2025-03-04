@@ -53,9 +53,9 @@ class CreateCartLineRequest extends FormRequest
                         $fail('Invalid product.');
                     }
 
-                    $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                    $type = guest_customer_logged_in() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
                     /** @var int|string $userId */
-                    $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
+                    $userId = guest_customer_logged_in() ? customer_logged_in()->id : $this->bearerToken();
 
                     if (is_null($variantId)) {
                         try {

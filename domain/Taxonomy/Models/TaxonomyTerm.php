@@ -37,6 +37,7 @@ use Support\RouteUrl\Models\RouteUrl;
  * @property string $slug
  * @property array $data
  * @property int $order
+ * @property string|null $translation_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $children

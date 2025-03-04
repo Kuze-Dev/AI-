@@ -20,7 +20,7 @@ if(! function_exists('guest_customer_logged_in')) {
     function guest_customer_logged_in(): ?Customer
     {
         /** @phpstan-ignore return.type */
-        return once(fn () => Auth::guard('api')->user());
+        return once(fn () => Auth::user());
     }
 }
 
