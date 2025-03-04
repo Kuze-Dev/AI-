@@ -44,3 +44,27 @@ parameters:
 			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\HasEmailVerificationOTP&Illuminate\\\\Contracts\\\\Auth\\\\MustVerifyEmail\\:\\:\\$emailVerificationOneTimePassword\\.$#"
 			count: 1
 			path: domain/Auth/Actions/VerifyEmailViaOTPAction.php
+		-
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/BlockContentResource.php
+
+		-
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/ContentEntryResource.php
+
+		-
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/GlobalsResource.php
+		-
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/TaxonomyTermResource.php
+
+

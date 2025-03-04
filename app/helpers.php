@@ -27,7 +27,6 @@ if(! function_exists('guest_customer_logged_in')) {
 if(! function_exists('customer_logged_in')) {
     function customer_logged_in(): Customer
     {
-        /** @phpstan-ignore return.type */
         return guest_customer_logged_in();
     }
 }

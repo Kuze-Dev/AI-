@@ -32,6 +32,6 @@ trait AuthorizeEcommerceSettings
             return true;
         }
 
-        return filament_admin()->can('ecommerceSettings.'.self::getSlug()) ?? false;
+        return filament_admin()->can('ecommerceSettings.'.self::getSlug()) ?: false;
     }
 }
