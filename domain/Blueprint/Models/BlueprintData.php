@@ -151,7 +151,7 @@ class BlueprintData extends Model implements HasMedia
                             }
                             if ($manipulation->type == ManipulationType::FIT) {
                                 // $fit = $manipulation->params[0];
-                                 /** @phpstan-ignore-next-line */
+                                 /** @phpstan-ignore match.unhandled */
                                 $fit = match ($manipulation->params[0]) {
                                     'contain' => Fit::Contain,
                                     'max' => Fit::Max,

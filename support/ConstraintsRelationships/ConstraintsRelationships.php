@@ -13,7 +13,6 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\ConstraintsRelationships\Exceptions\InvalidRelationshipConstraintException;
-/** @phpstan-ignore-next-line  */
 trait ConstraintsRelationships
 {
     protected static function bootConstraintsRelationships(): void

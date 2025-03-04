@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 interface HasMetaData
 {
     /**
-     *  @return MorphOne<\Support\MetaData\Models\MetaData> 
-     *  @phpstan-ignore-next-line  */
+     *  @return MorphOne<\Support\MetaData\Models\MetaData>
+     *  @phpstan-ignore generics.lessTypes  */
     public function metaData(): MorphOne;
 
     public function defaultMetaData(): array;

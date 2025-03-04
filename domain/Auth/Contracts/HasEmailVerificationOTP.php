@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 interface HasEmailVerificationOTP
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Auth\Model\EmailVerificationOneTimePassword> 
-     * @phpstan-ignore-next-line  */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Auth\Model\EmailVerificationOneTimePassword>
+     * @phpstan-ignore generics.lessTypes  */
     public function emailVerificationOneTimePassword(): MorphOne;
 
     public function getEmailVerificationColumn(): EmailVerificationType;

@@ -10,7 +10,7 @@ interface PayableInterface
 {
     /**
      *  @return MorphMany<\Domain\Payments\Models\Payment>
-     * @phpstan-ignore-next-line */
+     * @phpstan-ignore generics.lessTypes */
     public function payments(): MorphMany;
 
     public function getReferenceNumber(): string;

@@ -111,7 +111,7 @@ final class Exports
             ->withActivityLog(
                 event: 'bulk-exported',
                 description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
-                /** @phpstan-ignore-next-line  */
+                /** @phpstan-ignore method.notFound  */
                 properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
             );
     }

@@ -75,7 +75,7 @@ class TwoFactorAuthentication extends Model
     /** @return MorphTo<Model&TwoFactorAuthenticatable, $this> */
     public function authenticatable(): MorphTo
     {
-        /** @phpstan-ignore-next-line  */
+        /** @phpstan-ignore return.type  */
         return $this->morphTo();
     }
 

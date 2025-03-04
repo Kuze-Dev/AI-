@@ -44,7 +44,7 @@ class HandleDataTranslation
             $blueprintfieldtype = $model->taxonomy->blueprint->schema;
         /**
          *  suggested by copilot
-         *  @phpstan-ignore-next-line */
+         *  @phpstan-ignore instanceof.alwaysTrue */
         } elseif ($model instanceof Globals) {
             $blueprintfieldtype = $model->blueprint->schema;
         } else {

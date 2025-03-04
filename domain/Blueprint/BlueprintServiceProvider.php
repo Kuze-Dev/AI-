@@ -25,7 +25,7 @@ class BlueprintServiceProvider extends ServiceProvider
         foreach (config('domain.blueprint.relations') as $relationName => $modelClass) {
             Blueprint::resolveRelationUsing(
                 $relationName,
-                /** @phpstan-ignore-next-line  */
+                /** @phpstan-ignore argument.templateType */
                 fn (Blueprint $model) => $model->hasMany($modelClass)
             );
         }

@@ -71,7 +71,7 @@ class UpdateProductOptionAction
                 if ($optionValueModel instanceof ProductOptionValue) {
                     $optionValueModel->name = $productOptionValue->name;
                     $optionValueModel->product_option_id = $productOption->id;
-                    /** @phpstan-ignore-next-line */
+                    /** @phpstan-ignore assign.propertyType */
                     $optionValueModel->data = ['icon_type' => $productOptionValue->icon_type, 'icon_value' => $productOptionValue->icon_value];
                     $optionValueModel->save();
 

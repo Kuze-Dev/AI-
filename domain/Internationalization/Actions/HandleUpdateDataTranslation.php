@@ -273,20 +273,20 @@ class HandleUpdateDataTranslation
         }
         /**
          * TODO::
-         * 
+         *
          * Revisit Transalation Generation for other models
-         * 
+         *
          */
-         /** @phpstan-ignore-next-line */
+         /** @phpstan-ignore method.notFound  */
         if ($model->translation_id) {
-             /** @phpstan-ignore-next-line */
+             /** @phpstan-ignore method.notFound */
             $translation_collection = $model->dataTranslation()
                 ->orwhere('id', $model->translation_id)
                 ->orwhere('translation_id', $model->translation_id)
                 ->get();
 
         } else {
-             /** @phpstan-ignore-next-line */
+             /** @phpstan-ignore method.notFound  */
             $translation_collection = $model->dataTranslation()
                 ->orwhere('id', $model->id)
                 ->get();

@@ -99,8 +99,8 @@ class RelatedResourceFieldData extends FieldData
 
         foreach ($this->relation_scopes as $relationName => $value) {
             /**
-             *  @var Relation<Model> $relationship 
-             * @phpstan-ignore-next-line */
+             *  @var Relation<Model> $relationship
+             * @phpstan-ignore generics.lessTypes */
             $relationship = $model->{$relationName}();
 
             $modelQuery->whereRelation($relationName, $relationship->getRelated()->getKeyName(), $value);

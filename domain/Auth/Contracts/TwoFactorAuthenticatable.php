@@ -14,8 +14,8 @@ interface TwoFactorAuthenticatable
 {
     public function twoFactorHolder(): string;
 
-    /** @return MorphOne<TwoFactorAuthentication> 
-     * @phpstan-ignore-next-line */
+    /** @return MorphOne<TwoFactorAuthentication>
+     * @phpstan-ignore generics.lessTypes */
     public function twoFactorAuthentication(): MorphOne;
 
     public function hasEnabledTwoFactorAuthentication(): bool;
