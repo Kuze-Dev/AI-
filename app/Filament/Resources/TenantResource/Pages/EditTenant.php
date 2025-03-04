@@ -24,21 +24,27 @@ class EditTenant extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('save')
-                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
-                ->requiresConfirmation(fn (Action $livewire) => $livewire->data['is_suspended'] === true)
-                ->modalCancelAction(fn (Action $livewire) => Action::makeModalAction('redirect')
-                    ->label(trans('Cancel & Revert Changes'))
-                    ->color('gray')
-                    ->url(TenantResource::getUrl('edit', [$this->record])))
-                ->modalHeading(fn (Action $livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
-                ->modalDescription(fn (Action $livewire) => $livewire->data['is_suspended'] ? 'The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?' : null)
-                ->action('save')
-                ->keyBindings(['mod+s']),
+            $this->getSaveFormAction(),
             Actions\DeleteAction::make(),
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),
         ];
+    }
+
+    protected function getSaveFormAction(): Action
+    {
+        return Action::make('save')
+            ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+            ->requiresConfirmation(fn($livewire) => $livewire->data['is_suspended'] === true )
+            ->modalCancelActionLabel(trans('Cancel & Revert Changes'))
+            ->modalHeading(fn ($livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
+            ->modalDescription(
+                fn ($livewire) => $livewire->data['is_suspended']
+                    ? trans('The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?')
+                    : null
+            )
+            ->action(fn() => $this->save())
+            ->keyBindings(['mod+s']);
     }
 
     public function afterSave(): void
@@ -47,6 +53,5 @@ class EditTenant extends EditRecord
         $data = $this->form->getRawState();
 
         $this->record->syncFeature(self::getNormalizedFeatureNames($data['features']));
-
     }
 }
