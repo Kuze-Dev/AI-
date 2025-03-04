@@ -12,6 +12,7 @@ use Filament\Resources\Pages\EditRecord;
 
 /**
  * @property-read \Domain\Tenant\Models\Tenant $record
+ * @property-read array{is_suspended:bool} $data
  */
 class EditTenant extends EditRecord
 {
