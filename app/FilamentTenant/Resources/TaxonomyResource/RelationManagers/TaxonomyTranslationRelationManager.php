@@ -43,7 +43,7 @@ class TaxonomyTranslationRelationManager extends RelationManager
                     ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('taxonomy_terms_count')
                     ->badge()
                     ->counts('taxonomyTerms')

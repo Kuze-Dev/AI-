@@ -101,7 +101,7 @@ class FormResource extends Resource
                     Forms\Components\Section::make([
                         // Forms\Components\CheckboxList::make('sites')
                         \App\FilamentTenant\Support\CheckBoxList::make('sites')
-                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
                                 fn (?FormModel $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -319,7 +319,7 @@ class FormResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
                         if (filament_admin()->can('site.siteManager') &&

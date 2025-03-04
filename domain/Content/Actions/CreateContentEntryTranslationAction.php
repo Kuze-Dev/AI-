@@ -48,7 +48,7 @@ class CreateContentEntryTranslationAction
 
         $this->createOrUpdateRouteUrl->execute($contentEntryTranslation, $contentEntryData->route_url_data);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
             $contentEntryTranslation->sites()->sync($contentEntryData->sites);
         }

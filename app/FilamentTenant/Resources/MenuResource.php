@@ -110,7 +110,7 @@ class MenuResource extends Resource
                 Forms\Components\Section::make([
                     // Forms\Components\CheckboxList::make('sites')
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
-                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
                             fn (?Menu $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -161,7 +161,7 @@ class MenuResource extends Resource
                         ->formatStateUsing(fn (?Menu $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                 ])
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
@@ -184,7 +184,7 @@ class MenuResource extends Resource
 
                         },
                     ])
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
@@ -297,7 +297,7 @@ class MenuResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
                         if (filament_admin()->can('site.siteManager') &&

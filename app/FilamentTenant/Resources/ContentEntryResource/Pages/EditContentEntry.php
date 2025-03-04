@@ -163,13 +163,13 @@ class EditContentEntry extends EditRecord
 
                     })
                     // ->action('createTranslation')
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
-                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->required(),
                     ]),

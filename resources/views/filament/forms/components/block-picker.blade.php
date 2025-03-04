@@ -23,10 +23,10 @@
 
     <div
         class="flex items-center w-full gap-2 overflow-x-auto whitespace-nowrap"
-        x-data="{ 
+        x-data="{
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             blocks: @js($blocks),
-            showModal: false, 
+            showModal: false,
             blockEvent: function(i) {
                 if (this.state) {
                     this.showModal = ! this.showModal;
@@ -42,7 +42,7 @@
 
         <div x-show="showModal" class="w-full fixed top-0 right-0 h-full flex items-center justify-center z-10" style="background-color: #00000066;">
             <div @click.outside="showModal = false" class="relative" style="background-color: #262626; border-radius: 10px; box-shadow: 0px 0px 4px 1px #494949; padding-top:40px; padding-bottom:20px;">
-                <button type="button" class="absolute p-10 font-bolder cursor-pointer text-2xl text-white" 
+                <button type="button" class="absolute p-10 font-bolder cursor-pointer text-2xl text-white"
                     @click="showModal = false"
                     style="right:20px; top:5px;">X</button>
                 <button
@@ -54,8 +54,8 @@
             </div>
         </div>
         @foreach ($blocks as $id => $block)
-            @if (count($block_ids) > 0)   
-                @if (in_array($id,$block_ids) && tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+            @if (count($block_ids) > 0)
+                @if (in_array($id,$block_ids) && \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                     <div wire:key="{{ $getId() }}.{{ $id }}" x-show="!state || {{ $id }} === state">
                         <button
                             class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
@@ -71,7 +71,7 @@
                         <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
                     </div>
                 @endif
-            @elseif(tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+            @elseif(\Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class))
             <div wire:key="{{ $getId() }}.{{ $id }}" x-show="!state || {{ $id }} === state">
                 <button
                     class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
@@ -87,7 +87,7 @@
                 <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
             </div>
             @endif
-            
+
         @endforeach
     </div>
 </x-dynamic-component>

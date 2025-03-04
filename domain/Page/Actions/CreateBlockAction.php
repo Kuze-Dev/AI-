@@ -53,9 +53,9 @@ class CreateBlockAction
                 ])
             );
         }
-      
 
-        // if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+
+        // if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
         $block->sites()
             ->attach($blockData->sites);
         // }

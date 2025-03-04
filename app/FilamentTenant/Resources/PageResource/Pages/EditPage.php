@@ -262,19 +262,19 @@ class EditPage extends EditRecord
             //         ->color('secondary')
             //         ->slideOver(true)
             //         ->action('createTranslation')
-            //         ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+            //         ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
             //         ->form([
             //             Forms\Components\Select::make('locale')
             //                 ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
             //                 ->default((string) Locale::where('is_default', true)->first()?->code)
             //                 ->searchable()
-            //                 ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+            //                 ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
             //                 ->reactive()
             //                 ->required(),
             //         ]),
             //     Action::make('preview')
             //         ->color('secondary')
-            //         ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+            //         ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
             //         ->label(trans('Preview Page'))
             //         ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
             //             $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
@@ -289,7 +289,7 @@ class EditPage extends EditRecord
             //         }, true),
             //     Action::make('preview_microsite_action')
             //         ->label('Preview Microsite')
-            //         ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
+            //         ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class))
             //         ->color('secondary')
             //         ->record($this->getRecord())
             //         ->modalHeading('Preview Microsite')

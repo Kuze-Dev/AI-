@@ -52,7 +52,7 @@ class PublishedContentEntryDraftAction
         }
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
             is_null($contentEntry->draftable_id)
         ) {
 

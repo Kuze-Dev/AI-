@@ -16,7 +16,7 @@ class CreateMenuAction
             'locale' => $menuData->locale,
         ]);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
         ) {
             $menu->sites()
                 ->attach($menuData->sites);

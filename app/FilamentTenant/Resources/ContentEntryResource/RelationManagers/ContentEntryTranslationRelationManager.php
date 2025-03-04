@@ -51,7 +51,7 @@ class ContentEntryTranslationRelationManager extends RelationManager
                     ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -67,8 +67,8 @@ class ContentEntryTranslationRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sites.name')
                     ->badge()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: fn() => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
+                    ->toggleable(condition: fn() => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime()
                     ->sortable()

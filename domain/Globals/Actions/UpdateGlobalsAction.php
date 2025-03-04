@@ -53,7 +53,7 @@ class UpdateGlobalsAction
 
         $this->updateBlueprintDataAction->execute($model);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
         ) {
 
             $globals->sites()
@@ -61,7 +61,7 @@ class UpdateGlobalsAction
 
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)) {
 
             app(HandleUpdateDataTranslation::class)->execute($globals, $globalData);
 

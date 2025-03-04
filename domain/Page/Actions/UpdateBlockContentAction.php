@@ -36,7 +36,7 @@ class UpdateBlockContentAction
         $page = $blockContent->page;
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
             is_null($page->draftable_id)
         ) {
 

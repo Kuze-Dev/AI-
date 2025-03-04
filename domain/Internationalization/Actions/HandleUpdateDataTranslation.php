@@ -92,7 +92,7 @@ class HandleUpdateDataTranslation
                 );
 
                 if (
-                    tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+                    \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) &&
                     property_exists($modelDTO, 'sites')
                 ) {
 

@@ -104,7 +104,7 @@ class ContentResource extends Resource
                                 $prefix = $value;
 
                                 if (
-                                    tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
+                                    \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
                                 ) {
                                     $siteIDs = $get('sites');
 
@@ -197,13 +197,13 @@ class ContentResource extends Resource
                                 ->toArray()
                         )
                         ->default(Visibility::PUBLIC->value)
-                        ->hidden(fn () => tenancy()->tenant?->features()->inactive(\App\Features\Customer\CustomerBase::class))
+                        ->hidden(fn () => \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\Customer\CustomerBase::class))
                         ->required(),
 
                     Forms\Components\Section::make([
                         // Forms\Components\CheckboxList::make('sites')
                         \App\FilamentTenant\Support\CheckBoxList::make('sites')
-                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                             ->rules([
                                 fn (?Content $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -255,7 +255,7 @@ class ContentResource extends Resource
                             ->formatStateUsing(fn (?Content $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                     ])
-                        ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
+                        ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))),
                 ]),
             ]);
     }
@@ -281,7 +281,7 @@ class ContentResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
                         if (filament_admin()->can('site.siteManager') &&

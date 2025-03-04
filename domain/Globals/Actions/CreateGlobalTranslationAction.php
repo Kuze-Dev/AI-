@@ -37,7 +37,7 @@ class CreateGlobalTranslationAction
 
         $this->createBlueprintDataAction->execute($globalTranslation);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
             $globalTranslation->sites()->sync($globalData->sites);
         }

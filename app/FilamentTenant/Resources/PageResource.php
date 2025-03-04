@@ -128,7 +128,7 @@ class PageResource extends Resource
 
                                     },
                                 ])
-                                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                                ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                                 ->reactive()
                                 ->afterStateUpdated(function (Forms\Components\Select $component, \Filament\Forms\Get $get) {
                                     $component->getContainer()
@@ -162,12 +162,12 @@ class PageResource extends Resource
                             // Forms\Components\CheckboxList::make('sites')
                             \App\FilamentTenant\Support\CheckBoxList::make('sites')
                                 ->reactive()
-                                ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                                ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                                 ->rules([
                                     fn (?Page $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')),
                                     fn(?Page $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($get) {
 
-                                        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
                                             $block_ids = array_values(
                                                 array_filter(array_map(fn ($item) => $item['block_id'] ?? null, $get('block_contents'))
@@ -362,7 +362,7 @@ class PageResource extends Resource
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
                         if (filament_admin()->can('site.siteManager') &&

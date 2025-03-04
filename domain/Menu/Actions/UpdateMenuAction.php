@@ -23,7 +23,7 @@ class UpdateMenuAction
 
         $this->syncNodeAction->execute($menu, $menuData->nodes);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
             $menu->sites()->sync($menuData->sites);
 

@@ -28,7 +28,7 @@ class CreateGlobalsAction
 
         $this->createBlueprintDataAction->execute($globals);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
             $globals->sites()
                 ->attach($globalData->sites);

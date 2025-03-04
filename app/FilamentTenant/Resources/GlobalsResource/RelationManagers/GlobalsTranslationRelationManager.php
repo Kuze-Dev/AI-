@@ -40,11 +40,11 @@ class GlobalsTranslationRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('sites.name')
                     ->badge()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: fn() => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
+                    ->toggleable(condition: fn() => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable(),

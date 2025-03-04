@@ -111,7 +111,7 @@ class BlockResource extends Resource
                     ->reactive(),
                 Forms\Components\Section::make([
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
-                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
                             fn(?Block $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
@@ -163,7 +163,7 @@ class BlockResource extends Resource
                         ->formatStateUsing(fn (?Block $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                 ])
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))),
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->hidden(fn (?Block $record, \Filament\Forms\Get $get) => $get('is_fixed_content') && $record ? false : true)
@@ -203,7 +203,7 @@ class BlockResource extends Resource
         //         Forms\Components\Card::make([
         //             // Forms\Components\CheckboxList::make('sites')
         //             \App\FilamentTenant\Support\CheckBoxList::make('sites')
-        //                 ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+        //                 ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
         //                 ->rules([
         //                     function (?Block $record, Forms\Get $get) {
 
@@ -258,7 +258,7 @@ class BlockResource extends Resource
         //                 ->formatStateUsing(fn (?Block $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
         //         ])
-        //             ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
+        //             ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))),
         //         SchemaFormBuilder::make('data')
         //             ->id('schema-form')
         //             ->hidden(fn (Forms\Get $get) => $get('is_fixed_content') ? false : true)

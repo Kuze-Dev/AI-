@@ -40,7 +40,7 @@ class RouteUrlV2Controller
             ->with('model');
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) &&
             request('site')
         ) {
 

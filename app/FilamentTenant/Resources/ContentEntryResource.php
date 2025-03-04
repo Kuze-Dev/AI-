@@ -172,7 +172,7 @@ class ContentEntryResource extends Resource
 
                                 },
                             ])
-                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->afterStateUpdated(function (Forms\Components\Select $component, \Filament\Forms\Get $get) {
                                 $component->getContainer()
@@ -186,7 +186,7 @@ class ContentEntryResource extends Resource
                     Forms\Components\Section::make([
                         // Forms\Components\CheckboxList::make('sites')
                         \App\FilamentTenant\Support\CheckBoxList::make('sites')
-                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                             ->rule(fn (?ContentEntry $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                             ->options(function ($livewire) {
 
@@ -368,7 +368,7 @@ class ContentEntryResource extends Resource
                     ),
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name'),
                 Tables\Filters\Filter::make('published_at_year_month')
                     ->form([

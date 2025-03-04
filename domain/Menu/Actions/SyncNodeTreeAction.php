@@ -37,7 +37,7 @@ class SyncNodeTreeAction
 
         foreach ($nodesForPruning as $node) {
 
-            if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+            if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)) {
 
                 if ($node->translation_id) {
                     /** @var Node */
@@ -66,7 +66,7 @@ class SyncNodeTreeAction
         Node::setNewOrder($nodeIds);
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)
         ) {
 
             foreach ($nodeIds as $node_id) {
@@ -109,7 +109,7 @@ class SyncNodeTreeAction
             $node = $this->createNode($menu, $nodeData, $parentNode);
 
             if (
-                tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+                \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
                 $node->translation_id == null
             ) {
 
@@ -204,7 +204,7 @@ class SyncNodeTreeAction
         ]);
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
             $parentNode) {
 
         }
@@ -212,7 +212,7 @@ class SyncNodeTreeAction
         $node->refresh();
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
             $parentNode) {
 
             if ($menu->translation_id) {

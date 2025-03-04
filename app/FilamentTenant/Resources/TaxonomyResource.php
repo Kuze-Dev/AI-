@@ -84,7 +84,7 @@ class TaxonomyResource extends Resource
             return static::getModel()::query();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) &&
             filament_admin()->can('site.siteManager') &&
             ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
@@ -124,7 +124,7 @@ class TaxonomyResource extends Resource
                             ignoreRecord: true,
                             modifyRuleUsing: function (Unique $rule, $state, $livewire) {
 
-                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) || tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) || \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)) {
                                     return false;
                                 }
 
@@ -177,14 +177,14 @@ class TaxonomyResource extends Resource
 
                         },
                     ])
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
 
                 Forms\Components\Section::make([
                     // Forms\Components\CheckboxList::make('sites')
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->reactive()
-                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                         ->rule(fn (?Taxonomy $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
                         ->options(fn() => Site::orderBy('name')
                             ->pluck('name', 'id')
@@ -219,7 +219,7 @@ class TaxonomyResource extends Resource
                             );
                         }),
                 ])
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class)),
 
                 Forms\Components\Section::make(trans('Terms'))->schema([
                     Tree::make('terms')
@@ -347,7 +347,7 @@ class TaxonomyResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
                         if (filament_admin()->can('site.siteManager') &&

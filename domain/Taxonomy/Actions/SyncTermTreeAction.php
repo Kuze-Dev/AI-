@@ -69,7 +69,7 @@ class SyncTermTreeAction
         TaxonomyTerm::setNewOrder($termIds);
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)
         ) {
 
             foreach ($termIds as $term_id) {
@@ -111,7 +111,7 @@ class SyncTermTreeAction
             $this->updateBlueprintDataAction->execute($updated_term);
 
             if (
-                tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+                \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)
             ) {
                 app(HandleUpdateDataTranslation::class)->execute($updated_term, $termData);
             }
@@ -123,7 +123,7 @@ class SyncTermTreeAction
             $this->createBlueprintDataAction->execute($term);
 
             if (
-                tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+                \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)
             ) {
 
                 if ($term->translation_id) {
@@ -276,7 +276,7 @@ class SyncTermTreeAction
         $taxonomyTerm->refresh();
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
             $parentTerm) {
 
             if ($taxonomy->translation_id) {
