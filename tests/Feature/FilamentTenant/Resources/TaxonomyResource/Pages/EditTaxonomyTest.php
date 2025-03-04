@@ -6,7 +6,7 @@ use App\FilamentTenant\Resources\TaxonomyResource\Pages\EditTaxonomy;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
-use Domain\Support\RouteUrl\Models\RouteUrl;
+use Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\Taxonomy;
