@@ -14,7 +14,7 @@ use Throwable;
 
 class CheckoutRequest extends FormRequest
 {
-    public function rules(#[CurrentUser] ?Customer $customer): array
+    public function rules(#[CurrentUser('sanctum')] ?Customer $customer): array
     {
         return [
             'cart_line_ids' => [

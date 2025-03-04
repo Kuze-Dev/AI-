@@ -10,13 +10,13 @@ use Illuminate\Support\Str;
 /**
  * @implements Arrayable<string, mixed>
  */
-class SectionData implements Arrayable
+readonly class SectionData implements Arrayable
 {
-    /** @param  array<FieldData>  $fields */
+    /** @param  array<int, FieldData>  $fields */
     private function __construct(
-        public readonly string $title,
-        public readonly string $state_name,
-        public readonly array $fields
+        public string $title,
+        public string $state_name,
+        public array $fields
     ) {
     }
 

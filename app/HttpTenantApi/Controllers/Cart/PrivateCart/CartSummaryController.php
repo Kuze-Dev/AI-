@@ -25,11 +25,11 @@ use Throwable;
 class CartSummaryController extends Controller
 {
     #[Get('carts/count', name: 'carts.count')]
-    public function count(): mixed
+    public function count(#[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $cartLines = CartLine::with('purchasable')
-            ->whereHas('cart', function ($query) {
-                $query->whereBelongsTo(auth()->user());
+            ->whereHas('cart', function ($query) use ($customer) {
+                $query->whereBelongsTo($customer);
             })
             ->whereNull('checked_out_at')
             ->get();

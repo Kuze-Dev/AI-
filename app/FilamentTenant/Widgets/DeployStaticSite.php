@@ -21,7 +21,7 @@ class DeployStaticSite extends Widget
         return app(CMSSettings::class)->deploy_hook;
     }
 
-    public function deploy(): RedirectResponse|Redirector|bool
+    public function deploy(): RedirectResponse|bool
     {
 
         if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {

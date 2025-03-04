@@ -65,6 +65,7 @@ class ContentEntryResource extends Resource
                 ->middleware(static::getRouteMiddleware(Filament::getCurrentPanel()))
                 ->group(function () {
                     foreach (static::getPages() as $name => $page) {
+                        /** @var array{route:string, class:string} $page*/
                         Route::get($page['route'], $page['class'])->name($name);
                     }
                 });
@@ -466,7 +467,6 @@ class ContentEntryResource extends Resource
     #[\Override]
     public static function getPages(): array
     {
-
         return [
             'index' => Resources\ContentEntryResource\Pages\ListContentEntry::route('/entries'),
             'create' => Resources\ContentEntryResource\Pages\CreateContentEntry::route('entries/create'),

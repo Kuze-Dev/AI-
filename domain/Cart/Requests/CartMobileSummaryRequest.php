@@ -27,7 +27,7 @@ class CartMobileSummaryRequest extends FormRequest
 
     private array $cartLineIds;
 
-    public function rules(#[CurrentUser] Customer $customer): array
+    public function rules(#[CurrentUser('sanctum')] Customer $customer): array
     {
         return [
             'reference' => [

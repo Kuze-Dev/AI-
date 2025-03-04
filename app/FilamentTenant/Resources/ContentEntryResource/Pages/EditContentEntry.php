@@ -85,7 +85,7 @@ class EditContentEntry extends EditRecord
                 Action::make('published')
                     ->label(trans('Published Draft'))
                     ->action('published')
-                    ->hidden(fn () => $this->record->draftable_id == null ? true : false),
+                    ->hidden(fn () => $this->record->draftable_id === null),
                 Action::make('draft')
                     ->label(trans('Save As Draft'))
                     ->action('draft')
@@ -95,7 +95,7 @@ class EditContentEntry extends EditRecord
                             return true;
                         }
 
-                        return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
+                        return $this->record->draftable_id === null && $this->record->pageDraft;
                     }),
                 Action::make('overwriteDraft')
                     ->label(trans('Save As Draft'))

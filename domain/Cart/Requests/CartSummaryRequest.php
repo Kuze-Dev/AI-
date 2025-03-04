@@ -21,7 +21,7 @@ class CartSummaryRequest extends FormRequest
     /** @var \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     private Collection $cartLinesCache;
 
-    public function rules(#[CurrentUser] Customer $customer): array
+    public function rules(#[CurrentUser('sanctum')] Customer $customer): array
     {
         return [
             'cart_line_ids' => [

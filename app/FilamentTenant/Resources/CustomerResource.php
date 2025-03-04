@@ -203,7 +203,7 @@ class CustomerResource extends Resource
                         ->visibleOn('edit'),
                     Forms\Components\Placeholder::make('earned_points')
                         ->label(trans('Earned points from orders: '))
-                        ->content(fn ($record) => PointEarning::whereCustomerId($record?->getKey())->sum('earned_points') ?? 0)
+                        ->content(fn (?Customer $record) => PointEarning::where('customer_id', $record?->getKey())->sum('earned_points'))
                         ->hidden(fn () => TenantFeatureSupport::inactive(RewardPoints::class)),
                 ])
                     ->columns(2)

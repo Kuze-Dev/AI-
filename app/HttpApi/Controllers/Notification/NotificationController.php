@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\HttpApi\Controllers\Notification;
 
 use App\HttpApi\Resources\NotificationResource;
+use Domain\Admin\Models\Admin;
+use Domain\Customer\Models\Customer;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -23,12 +26,8 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 class NotificationController
 {
     #[Get('/')]
-    public function index(): JsonApiResourceCollection
+    public function index(#[CurrentUser] Customer|Admin $user): JsonApiResourceCollection
     {
-        if (! $user = Auth::user()) {
-            throw new AuthenticationException();
-        }
-
         return NotificationResource::collection(
             QueryBuilder::for(
                 $user->notifications()

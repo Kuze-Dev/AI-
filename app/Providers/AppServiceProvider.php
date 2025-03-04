@@ -94,6 +94,7 @@ class AppServiceProvider extends ServiceProvider
             throw new MissingAttributeException($model, $key);
         });
 
+        /** @phpstan-ignore argument.type */
         Relation::enforceMorphMap([
             Admin::class,
             config('permission.models.role'),

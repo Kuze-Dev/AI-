@@ -28,6 +28,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -140,7 +141,13 @@ class BlueprintResource extends Resource
                     ->withActivityLog(
                         event: 'bulk-exported',
                         description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
-                        properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
+                        properties: function (ExportBulkAction $action) {
+
+                            /** @var EloquentCollection $records */
+                            $records = $action->getRecords();
+
+                            return ['selected_record_ids' => $records->modelKeys()];
+                        }
                     ),
             ])
             ->defaultSort('created_at', 'desc');
