@@ -59,7 +59,7 @@ class Cart extends Model
         return 'uuid';
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine, $this> */
     public function cartLines(): HasMany
     {
         return $this->hasMany(CartLine::class)->whereNull('checked_out_at')->latest();

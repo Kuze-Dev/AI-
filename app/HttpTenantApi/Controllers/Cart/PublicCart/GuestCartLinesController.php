@@ -42,12 +42,6 @@ class GuestCartLinesController extends Controller
             $dbResult = DB::transaction(function () use ($validatedData, $sessionId) {
                 $cart = app(GuestCreateCartAction::class)->execute($sessionId);
 
-                if (! $cart instanceof Cart) {
-                    return response()->json([
-                        'message' => 'Invalid action',
-                    ], 400);
-                }
-
                 app(CreateCartLineAction::class)
                     ->execute($cart, CreateCartData::fromArray($validatedData));
 
@@ -90,14 +84,13 @@ class GuestCartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $cartline) {
-                $result = app(UpdateCartLineAction::class)
+                 app(UpdateCartLineAction::class)
                     ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
-                if ($result instanceof CartLine) {
                     return [
                         'message' => 'Cart updated successfully',
                     ];
-                }
+                
             });
 
             return response()->json($dbResult);

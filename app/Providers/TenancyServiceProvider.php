@@ -190,7 +190,7 @@ class TenancyServiceProvider extends ServiceProvider
         );
     }
 
-    public function prepareFilamentExport()
+    public function prepareFilamentExport(): void
     {
 
         Route::get('/filament/exports/{export}/download', DownloadExport::class)

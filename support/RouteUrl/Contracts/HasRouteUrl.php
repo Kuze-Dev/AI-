@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
  *
  * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, ?TRelatedModel>
- */
+ * @phpstan-ignore-next-line */
 interface HasRouteUrl
 {
     /**

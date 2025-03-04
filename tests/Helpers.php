@@ -6,6 +6,8 @@ use App\Features\CMS\CMSBase;
 use App\Features\ECommerce\ECommerceBase;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
+use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\Customer\Models\Customer;
 use Domain\Role\Database\Factories\RoleFactory;
 use Domain\Tenant\Models\Tenant;
 use Domain\Tenant\TenantSupport;
@@ -39,6 +41,14 @@ function loginAsAdmin(?Admin $admin = null): Admin
     $admin->syncRoles($role);
 
     return tap($admin, actingAs(...));
+}
+
+function loginAsCustomer(?Customer $customer = null): Customer
+{
+    $customer ??= CustomerFactory::new()
+        ->createOne();
+
+    return tap($customer, actingAs(...));
 }
 
 function loginAsUser(?Admin $user = null): Admin

@@ -140,7 +140,7 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         return $this->id === 1;
     }
 
-    /** @return Attribute<string, never> */
+    /** @return Attribute<non-falsy-string, never> */
     protected function fullName(): Attribute
     {
         return Attribute::get(
@@ -148,7 +148,7 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         );
     }
 
-    /** @return Attribute<string, never> */
+    /** @return Attribute<non-falsy-string, never> */
     protected function siteLabel(): Attribute
     {
         return Attribute::get(

@@ -16,7 +16,7 @@ use Domain\Order\Models\Order;
 
 final class DiscountHelperFunctions
 {
-    public function deductableAmount(Discount $discount, float $subTotal, float $shippingTotal): ?float
+    public function deductableAmount(Discount $discount, float $subTotal, float $shippingTotal): float
     {
         $deductable = 0;
 

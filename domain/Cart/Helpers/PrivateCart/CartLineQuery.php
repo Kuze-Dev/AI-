@@ -16,8 +16,7 @@ class CartLineQuery
     /** @return \Illuminate\Database\Eloquent\Collection<int, \Domain\Cart\Models\CartLine> */
     public function execute(array $cartLineIds): Collection
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
+        $customer = customer_logged_in();
 
         /** @var \Domain\Tier\Models\Tier $tier */
         $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
@@ -38,7 +37,7 @@ class CartLineQuery
                 ]);
             }, 'media'])
             ->whereHas('cart', function ($query) {
-                $query->whereBelongsTo(auth()->user());
+                $query->whereBelongsTo(customer_logged_in());
             })
             ->whereNull('checked_out_at')
             ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)

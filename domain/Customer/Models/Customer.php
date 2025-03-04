@@ -180,7 +180,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return Attribute<string, never> */
+    /** @return Attribute<non-falsy-string, never> */
     protected function fullName(): Attribute
     {
         return Attribute::get(

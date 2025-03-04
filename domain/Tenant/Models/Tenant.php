@@ -97,7 +97,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function syncFeature(array $features): void
     {
         $feature = $this->features();
-        $feature->deactivate(collect($feature->all())->keys());
+        $feature->deactivate(collect($feature->all())->keys()->toArray());
         $feature->activate($features);
     }
 }

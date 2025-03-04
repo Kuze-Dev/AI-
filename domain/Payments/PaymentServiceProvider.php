@@ -9,6 +9,7 @@ use Domain\Payments\Contracts\PaymentManagerInterface;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
 use Domain\Payments\Providers\StripeProvider;
+use Domain\Payments\Providers\VisionPayProvider;
 use Domain\Tenant\TenantSupport;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;

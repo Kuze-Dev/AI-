@@ -64,7 +64,7 @@ class OrderController extends Controller
                 $order = app(PlaceOrderAction::class)
                     ->execute(PlaceOrderData::fromArray($validatedData));
 
-                if (is_array($order) && $order['order'] instanceof Order) {
+                if ( $order['order'] instanceof Order) {
 
                     return [
                         'message' => 'Order placed successfully',

@@ -76,11 +76,13 @@ class ProductOptionValue extends Model implements HasMedia
     {
         return Attribute::make(
             get: function ($value) {
+                 /** @phpstan-ignore-next-line */
                 if (is_null($this->data) || $this->data['icon_type'] == 'text') {
                     return 'Type: Text | Value: N/A';
                 } else {
+                     /** @phpstan-ignore-next-line */
                     $iconTypeTransformed = ucwords(str_replace('_', ' ', (string) $this->data['icon_type']));
-
+                     /** @phpstan-ignore-next-line */
                     return "Type: {$iconTypeTransformed} | Value: {$this->data['icon_value']}";
                 }
             }

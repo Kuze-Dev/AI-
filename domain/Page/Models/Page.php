@@ -35,6 +35,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @property string $slug
  * @property Visibility $visibility
  * @property string|null $draftable_id
+ * @property string|null $translation_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
