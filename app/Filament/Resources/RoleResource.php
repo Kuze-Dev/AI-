@@ -166,6 +166,7 @@ class RoleResource extends Resource
     /** @return array<\Filament\Forms\Components\Component> */
     private static function generatePermissionGroupsFormSchema(Forms\Get $get): array
     {
+        /** @var string $guard */
         $guard = $get('guard_name');
 
         if (blank($guard)) {

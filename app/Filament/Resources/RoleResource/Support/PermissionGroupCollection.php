@@ -25,6 +25,7 @@ class PermissionGroupCollection extends Collection
             ->groupBy(fn (Permission $permission, int $key): string => explode('.', $permission->name, 2)[0])
             ->map(fn (Collection $permissionGroup) => PermissionGroup::make($permissionGroup));
 
-        return new self($items);
+        /** @phpstan-ignore new.static */
+        return new static($items);
     }
 }
