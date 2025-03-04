@@ -34,7 +34,7 @@ class EditTenant extends EditRecord
     protected function getSaveFormAction(): Action
     {
         return Action::make('save')
-            ->label(__('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+            ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
             ->requiresConfirmation(fn(self $livewire) => $livewire->data['is_suspended'] === true )
             ->modalCancelActionLabel(trans('Cancel & Revert Changes'))
             ->modalHeading(fn (self $livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
