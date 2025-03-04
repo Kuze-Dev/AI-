@@ -86,6 +86,7 @@ class CreateContentEntry extends CreateRecord
             ->execute($this->ownerRecord, ContentEntryData::fromArray($data));
     }
 
+    #[\Override]
     protected function getRedirectUrl(): string
     {
         $resource = static::getResource();

@@ -15,6 +15,7 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
 
 //    private string $seeder = TestSeeder::class;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -27,6 +28,7 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
         }
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         tenancy()->end();

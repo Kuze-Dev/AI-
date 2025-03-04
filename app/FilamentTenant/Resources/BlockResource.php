@@ -113,35 +113,32 @@ class BlockResource extends Resource
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
-                            function (?Block $record, \Filament\Forms\Get $get) {
+                            fn(?Block $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                $siteIDs = $value;
 
-                                    $siteIDs = $value;
+                                if ($record) {
+                                    $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
 
-                                    if ($record) {
-                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
-
-                                        $content = Block::where('name', $get('name'))
-                                            ->where('id', '!=', $record->id)
-                                            ->whereHas(
-                                                'sites',
-                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                            )->count();
-
-                                    } else {
-
-                                        $content = Block::where('name', $get('name'))->whereHas(
+                                    $content = Block::where('name', $get('name'))
+                                        ->where('id', '!=', $record->id)
+                                        ->whereHas(
                                             'sites',
                                             fn ($query) => $query->whereIn('site_id', $siteIDs)
                                         )->count();
-                                    }
 
-                                    if ($content > 0) {
-                                        $fail("Block {$get('name')} is already available in selected sites.");
-                                    }
+                                } else {
 
-                                };
+                                    $content = Block::where('name', $get('name'))->whereHas(
+                                        'sites',
+                                        fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                    )->count();
+                                }
+
+                                if ($content > 0) {
+                                    $fail("Block {$get('name')} is already available in selected sites.");
+                                }
+
                             },
                         ])
                         ->options(

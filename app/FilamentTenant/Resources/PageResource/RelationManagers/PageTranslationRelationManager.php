@@ -67,9 +67,7 @@ class PageTranslationRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sites.name')
                     ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
-                    }, isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn() => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
                     ->icons([

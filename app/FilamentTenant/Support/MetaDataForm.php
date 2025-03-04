@@ -38,11 +38,9 @@ class MetaDataForm extends Section
                 ->maxLength(fn (int $value = 160) => $value)
                 ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
-                ->formatStateUsing(function ($record) {
-                    return $record?->metaData?->getMedia('image')
-                        ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                        ->toArray() ?? [];
-                })
+                ->formatStateUsing(fn($record) => $record?->metaData?->getMedia('image')
+                    ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                    ->toArray() ?? [])
                 // ->image()
                 ->acceptedFileTypes([
                     'image/jpg',

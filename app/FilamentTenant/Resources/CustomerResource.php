@@ -110,13 +110,11 @@ class CustomerResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->formatStateUsing(fn ($state, Forms\Get $get) => $get('email') == $state ? null : $state)
                         ->rules([
-                            function () {
-                                return function (string $attribute, mixed $value, Closure $fail) {
-                                    if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                            fn() => function (string $attribute, mixed $value, Closure $fail) {
+                                if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
 
-                                        $fail('email is not allowed.');
-                                    }
-                                };
+                                    $fail('email is not allowed.');
+                                }
                             },
                         ])
                         ->reactive()

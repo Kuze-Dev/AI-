@@ -167,24 +167,21 @@ class MenuResource extends Resource
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        function (?Menu $record, Forms\Get $get) {
+                        fn(?Menu $record, Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                            return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                            if ($record) {
+                                $selectedLocale = $value;
 
-                                if ($record) {
-                                    $selectedLocale = $value;
+                                $originalContentId = $record->translation_id ?: $record->id;
 
-                                    $originalContentId = $record->translation_id ?: $record->id;
+                                $exist = Menu::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                )->where('locale', $selectedLocale)->first();
 
-                                    $exist = Menu::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
-                                    )->where('locale', $selectedLocale)->first();
-
-                                    if ($exist && $exist->id != $record->id) {
-                                        $fail("Menu {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                    }
+                                if ($exist && $exist->id != $record->id) {
+                                    $fail("Menu {$get('name')} has a existing ({$selectedLocale}) translation.");
                                 }
+                            }
 
-                            };
                         },
                     ])
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))

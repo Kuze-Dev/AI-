@@ -55,6 +55,7 @@ class PageResource extends Resource
     }
 
     /** @param  Page  $record */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
 
@@ -110,24 +111,21 @@ class PageResource extends Resource
                                 ->default((string) Locale::where('is_default', true)->first()?->code)
                                 ->searchable()
                                 ->rules([
-                                    function (?Page $record, \Filament\Forms\Get $get) {
+                                    fn(?Page $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                        return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                        if ($record) {
+                                            $selectedLocale = $value;
 
-                                            if ($record) {
-                                                $selectedLocale = $value;
+                                            $originalContentId = $record->translation_id ?: $record->id;
 
-                                                $originalContentId = $record->translation_id ?: $record->id;
+                                            $exist = Page::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                            )->where('locale', $selectedLocale)->first();
 
-                                                $exist = Page::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
-                                                )->where('locale', $selectedLocale)->first();
-
-                                                if ($exist && $exist->id != $record->id) {
-                                                    $fail("Page {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                                }
+                                            if ($exist && $exist->id != $record->id) {
+                                                $fail("Page {$get('name')} has a existing ({$selectedLocale}) translation.");
                                             }
+                                        }
 
-                                        };
                                     },
                                 ])
                                 ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
@@ -167,41 +165,33 @@ class PageResource extends Resource
                                 ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                                 ->rules([
                                     fn (?Page $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')),
-                                    function (?Page $record, \Filament\Forms\Get $get) {
+                                    fn(?Page $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($get) {
 
-                                        return function (string $attribute, $value, Closure $fail) use ($get) {
+                                        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
 
-                                            if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                            $block_ids = array_values(
+                                                array_filter(array_map(fn ($item) => $item['block_id'] ?? null, $get('block_contents'))
+                                                ));
 
-                                                $block_ids = array_values(
-                                                    array_filter(array_map(fn ($item) => $item['block_id'] ?? null, $get('block_contents'))
-                                                    ));
+                                            $siteIDs = $value;
 
-                                                $siteIDs = $value;
+                                            $block_siteIds = self::getCachedBlocks()
+                                                ->filter(fn($block) => $block->sites->pluck('id')->intersect($siteIDs)->isNotEmpty())->pluck('id')->toArray();
 
-                                                $block_siteIds = self::getCachedBlocks()
-                                                    ->filter(function ($block) use ($siteIDs) {
-                                                        return $block->sites->pluck('id')->intersect($siteIDs)->isNotEmpty();
+                                            foreach ($block_ids as $block_id) {
 
-                                                    })->pluck('id')->toArray();
-
-                                                foreach ($block_ids as $block_id) {
-
-                                                    if (! in_array($block_id, $block_siteIds)) {
-                                                        $fail('A block added to the page is not available with the selected sites. Please review the sites field or ensure that only blocks available for the selected sites are added.');
-                                                    }
+                                                if (! in_array($block_id, $block_siteIds)) {
+                                                    $fail('A block added to the page is not available with the selected sites. Please review the sites field or ensure that only blocks available for the selected sites are added.');
                                                 }
-
                                             }
 
-                                        };
+                                        }
+
                                     },
                                 ])
-                                ->options(function () {
-                                    return Site::orderBy('name')
-                                        ->pluck('name', 'id')
-                                        ->toArray();
-                                })
+                                ->options(fn() => Site::orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->toArray())
                                 ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
                                     /** @var \Domain\Admin\Models\Admin */
@@ -272,23 +262,18 @@ class PageResource extends Resource
                                     ->required()
                                     ->view('filament.forms.components.block-picker')
                                     ->datafilter(fn (\Filament\Forms\Get $get) => self::getCachedBlocks()
-                                        ->filter(function ($block) use ($get) {
-                                            return $block->sites->pluck('id')->intersect($get('../../sites'))->isNotEmpty();
-
-                                        })
+                                        ->filter(fn($block) => $block->sites->pluck('id')->intersect($get('../../sites'))->isNotEmpty())
                                         ->pluck('id')->toArray()
                                     )
                                     ->viewData(fn () => [
                                         'blocks' => self::getCachedBlocks()
                                             ->sortBy('name')
-                                            ->mapWithKeys(function (Block $block) {
-                                                return [
-                                                    $block->id => [
-                                                        'name' => $block['name'],
-                                                        'image' => $block->getFirstMediaUrl('image'),
-                                                    ],
-                                                ];
-                                            })
+                                            ->mapWithKeys(fn(Block $block) => [
+                                                $block->id => [
+                                                    'name' => $block['name'],
+                                                    'image' => $block->getFirstMediaUrl('image'),
+                                                ],
+                                            ])
                                             ->toArray()])
                                     ->reactive()
                                     ->afterStateUpdated(function (Forms\Components\ViewField $component, $state) {

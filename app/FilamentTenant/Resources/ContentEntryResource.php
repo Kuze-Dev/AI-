@@ -48,6 +48,7 @@ class ContentEntryResource extends Resource
 
     protected static ?string $slug = 'entries';
 
+    #[\Override]
     public static function getRouteBaseName(?string $panel = null): string
     {
         return 'filament.tenant.resources.contents.entries';
@@ -144,34 +145,31 @@ class ContentEntryResource extends Resource
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
                             ->rules([
-                                function (?ContentEntry $record, \Filament\Forms\Get $get) {
+                                fn(?ContentEntry $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                    return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                    if ($record) {
+                                        $selectedLocale = $value;
 
-                                        if ($record) {
-                                            $selectedLocale = $value;
+                                        $originalContentId = $record->translation_id ?: $record->id;
 
-                                            $originalContentId = $record->translation_id ?: $record->id;
+                                        if ($record->draftable_id) {
+                                            /** @var \Domain\Content\Models\ContentEntry */
+                                            $baseRecord = ContentEntry::find($record->draftable_id);
 
-                                            if ($record->draftable_id) {
-                                                /** @var \Domain\Content\Models\ContentEntry */
-                                                $baseRecord = ContentEntry::find($record->draftable_id);
+                                            $originalContentId = $baseRecord->translation_id ?: $baseRecord->id;
 
-                                                $originalContentId = $baseRecord->translation_id ?: $baseRecord->id;
-
-                                            }
-
-                                            $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
-                                            )->where('locale', $selectedLocale)->first();
-
-                                            if (is_null($record->draftable_id) && $exist && $exist->id != $record->id) {
-                                                $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                            } elseif ($record->draftable_id != null && $exist && $exist->id != $record->draftable_id) {
-                                                $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                            }
                                         }
 
-                                    };
+                                        $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                        )->where('locale', $selectedLocale)->first();
+
+                                        if (is_null($record->draftable_id) && $exist && $exist->id != $record->id) {
+                                            $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                        } elseif ($record->draftable_id != null && $exist && $exist->id != $record->draftable_id) {
+                                            $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
+                                        }
+                                    }
+
                                 },
                             ])
                             ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
@@ -264,9 +262,7 @@ class ContentEntryResource extends Resource
                         ])
                         ->hidden(
                             // fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())
-                            function ($livewire) {
-                                return  empty($livewire->ownerRecord->taxonomies->toArray());
-                            }
+                            fn($livewire) => empty($livewire->ownerRecord->taxonomies->toArray())
                         ),
                     Forms\Components\Section::make(trans('Publishing'))
                         ->schema([

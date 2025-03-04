@@ -263,7 +263,7 @@ class UpdateBlueprintDataAction
 
             }
 
-            DeleteS3FilesFromDeletedBlueprintDataJob::dispatch(array_unique($toRemove));
+            dispatch(new \Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob(array_unique($toRemove)));
 
             /** @phpstan-ignore method.notFound */
             $model->blueprintData()->whereNotIn('state_path', $statepaths)->delete();

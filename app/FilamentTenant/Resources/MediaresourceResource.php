@@ -76,39 +76,33 @@ class MediaresourceResource extends Resource
             ->columns([
                 Tables\Columns\Layout\Stack::make([
                     Tables\Columns\ImageColumn::make('original_url')
-                        ->getStateUsing(function ($record) {
-                            return match ($record->getTypeFromMime()) {
-                                'image' => $record->original_url,
-                                default => 'https://dummyimage.com/600x400/000/fff&text='.$record->getTypeFromMime(),
-                            };
+                        ->getStateUsing(fn($record) => match ($record->getTypeFromMime()) {
+                            'image' => $record->original_url,
+                            default => 'https://dummyimage.com/600x400/000/fff&text='.$record->getTypeFromMime(),
                         })
                         ->height(200)
                         ->width('100%')
                         ->extraAttributes(['class' => 'rounded-lg w-full overflow-hidden bg-neutral-800'])
                         ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
                     Tables\Columns\TextColumn::make('model_type')
-                        ->formatStateUsing(function ($record) {
-                            return match ($record->model_type) {
-                                app(MetaData::class)->getMorphClass() => 'MetaData',
-                                app(Block::class)->getMorphClass() => 'Blocks',
-                                app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.BlueprintData::select(['id', 'model_type'])->where('id', $record->model_id)->first()?->model_type.')',
-                                default => Str::upper($record->model_type),
-                            };
+                        ->formatStateUsing(fn($record) => match ($record->model_type) {
+                            app(MetaData::class)->getMorphClass() => 'MetaData',
+                            app(Block::class)->getMorphClass() => 'Blocks',
+                            app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.BlueprintData::select(['id', 'model_type'])->where('id', $record->model_id)->first()?->model_type.')',
+                            default => Str::upper($record->model_type),
                         })
                         ->searchable(),
                     Tables\Columns\TextColumn::make('name')
-                        ->url(function (Media $record) {
-                            return match ($record->model_type) {
-                                app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
-                                app(Block::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.blocks.edit', Block::find($record->model_id)),
-                                app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
-                                app(Service::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.services.edit', Service::find($record->model_id)),
-                                app(Customer::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.customers.edit', Customer::find($record->model_id)),
-                                app(PaymentMethod::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.payment-methods.edit', PaymentMethod::find($record->model_id)),
-                                app(Product::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.products.edit', Product::find($record->model_id)),
-                                app(ShippingMethod::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.shipping-methods.edit', ShippingMethod::find($record->model_id)),
-                                default => '/admin',
-                            };
+                        ->url(fn(Media $record) => match ($record->model_type) {
+                            app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
+                            app(Block::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.blocks.edit', Block::find($record->model_id)),
+                            app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
+                            app(Service::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.services.edit', Service::find($record->model_id)),
+                            app(Customer::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.customers.edit', Customer::find($record->model_id)),
+                            app(PaymentMethod::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.payment-methods.edit', PaymentMethod::find($record->model_id)),
+                            app(Product::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.products.edit', Product::find($record->model_id)),
+                            app(ShippingMethod::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.shipping-methods.edit', ShippingMethod::find($record->model_id)),
+                            default => '/admin',
                         })
                         ->openUrlInNewTab()
                         ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden'])

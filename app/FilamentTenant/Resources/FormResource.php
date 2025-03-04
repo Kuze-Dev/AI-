@@ -46,6 +46,7 @@ class FormResource extends Resource
     }
 
     /** @return Builder<FormModel> */
+    #[\Override]
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('formSubmissions');

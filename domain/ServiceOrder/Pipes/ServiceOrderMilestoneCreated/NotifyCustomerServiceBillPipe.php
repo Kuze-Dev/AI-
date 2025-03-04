@@ -13,7 +13,7 @@ class NotifyCustomerServiceBillPipe
         ServiceBillMilestonePipelineData $serviceBillMilestonePipelineData,
         callable $next
     ): void {
-        NotifyCustomerLatestServiceBillJob::dispatch($serviceBillMilestonePipelineData->service_order);
+        dispatch(new \Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob($serviceBillMilestonePipelineData->service_order));
         $next($serviceBillMilestonePipelineData);
     }
 }

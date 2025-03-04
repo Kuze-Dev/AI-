@@ -21,6 +21,7 @@ class LocationPickerData extends FieldData
     ) {
     }
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -32,7 +33,7 @@ class LocationPickerData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
             hidden_option: $data['hidden_option'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             helper_text: $data['helper_text'] ?? null,
         );
     }

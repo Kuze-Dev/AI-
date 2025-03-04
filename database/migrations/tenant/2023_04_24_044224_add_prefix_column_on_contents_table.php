@@ -29,7 +29,7 @@ return new class extends Migration
         }
 
         DB::table((new Content())->getTable())
-            ->orderBy('id')
+            ->oldest('id')
             ->lazy()
             ->each(
                 fn ($row) => DB::table((new Content())->getTable())

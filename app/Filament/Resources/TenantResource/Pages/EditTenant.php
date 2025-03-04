@@ -32,6 +32,7 @@ class EditTenant extends EditRecord
         ];
     }
 
+    #[\Override]
     protected function getSaveFormAction(): Action
     {
         return Action::make('save')

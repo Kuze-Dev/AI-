@@ -23,6 +23,7 @@ class ServiceSettings extends TenantBaseSettings
 
     protected static ?string $title = 'Service Settings';
 
+    #[\Override]
     public static function canAccess(): bool
     {
         return parent::canAccess() && TenantFeatureSupport::active(ServiceBase::class);

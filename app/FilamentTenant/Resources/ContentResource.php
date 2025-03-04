@@ -99,49 +99,46 @@ class ContentResource extends Resource
                         ->maxLength(255)
                         ->alphaDash()
                         ->rules([
-                            function (?Content $record, \Filament\Forms\Get $get) {
+                            fn(?Content $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                $prefix = $value;
 
-                                    $prefix = $value;
+                                if (
+                                    tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
+                                ) {
+                                    $siteIDs = $get('sites');
 
-                                    if (
-                                        tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
-                                    ) {
-                                        $siteIDs = $get('sites');
+                                    if ($record) {
+                                        $content = Content::where('prefix', $prefix)
+                                            ->where('id', '!=', $record->id)
+                                            ->whereHas(
+                                                'sites',
+                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                            )->count();
 
-                                        if ($record) {
-                                            $content = Content::where('prefix', $prefix)
-                                                ->where('id', '!=', $record->id)
-                                                ->whereHas(
-                                                    'sites',
-                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                                )->count();
-
-                                        } else {
-                                            $content = Content::where('prefix', $prefix)
-                                                ->whereHas(
-                                                    'sites',
-                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                                )->count();
-                                        }
                                     } else {
+                                        $content = Content::where('prefix', $prefix)
+                                            ->whereHas(
+                                                'sites',
+                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                            )->count();
+                                    }
+                                } else {
 
-                                        if ($record) {
-                                            $content = Content::where('prefix', $prefix)
-                                                ->where('id', '!=', $record->id)
-                                                ->count();
-                                        } else {
-                                            $content = Content::where('prefix', $prefix)->count();
-                                        }
-
+                                    if ($record) {
+                                        $content = Content::where('prefix', $prefix)
+                                            ->where('id', '!=', $record->id)
+                                            ->count();
+                                    } else {
+                                        $content = Content::where('prefix', $prefix)->count();
                                     }
 
-                                    if ($content > 0) {
-                                        $fail("Content prefix {$get('name')} has already been taken.");
-                                    }
+                                }
 
-                                };
+                                if ($content > 0) {
+                                    $fail("Content prefix {$get('name')} has already been taken.");
+                                }
+
                             },
                         ])
                         ->dehydrateStateUsing(fn (\Filament\Forms\Get $get, $state) => Str::slug($state ?: $get('name'))),

@@ -29,7 +29,7 @@ class UpdateBlockContentAction
 
         $blockContent->update([
             'block_id' => $blockContentData->block_id,
-            'data' => $sanitizeData ? $sanitizeData : null,
+            'data' => $sanitizeData ?: null,
         ]);
 
         /** @var Page */

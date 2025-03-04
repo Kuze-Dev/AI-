@@ -17,7 +17,7 @@ use Support\RouteUrl\Models\RouteUrl;
 trait HasRouteUrl
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl, $this>
      */
     public function routeUrls(): MorphOne
     {

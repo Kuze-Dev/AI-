@@ -46,6 +46,7 @@ class GlobalsResource extends Resource
     }
 
     /** @param  Globals  $record */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
 
@@ -55,6 +56,7 @@ class GlobalsResource extends Resource
         ]);
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -91,24 +93,21 @@ class GlobalsResource extends Resource
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        function (?Globals $record, Forms\Get $get) {
+                        fn(?Globals $record, Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                            return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                            if ($record) {
+                                $selectedLocale = $value;
 
-                                if ($record) {
-                                    $selectedLocale = $value;
+                                $originalContentId = $record->translation_id ?: $record->id;
 
-                                    $originalContentId = $record->translation_id ?: $record->id;
+                                $exist = Globals::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                )->where('locale', $selectedLocale)->first();
 
-                                    $exist = Globals::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
-                                    )->where('locale', $selectedLocale)->first();
-
-                                    if ($exist && $exist->id != $record->id) {
-                                        $fail("Global {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                    }
+                                if ($exist && $exist->id != $record->id) {
+                                    $fail("Global {$get('name')} has a existing ({$selectedLocale}) translation.");
                                 }
+                            }
 
-                            };
                         },
                     ])
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))

@@ -91,7 +91,7 @@ class AdminServiceOrderStatusUpdatedListener
             return;
         }
 
-        NotifyCustomerLatestServiceBillJob::dispatch($this->serviceOrder);
+        dispatch(new \Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob($this->serviceOrder));
     }
 
     private function notifyCustomer(): void
@@ -100,7 +100,7 @@ class AdminServiceOrderStatusUpdatedListener
             return;
         }
 
-        NotifyCustomerServiceOrderStatusJob::dispatch($this->serviceOrder);
+        dispatch(new \Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob($this->serviceOrder));
     }
 
     private function notifyAdmin(): void

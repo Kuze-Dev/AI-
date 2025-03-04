@@ -66,7 +66,7 @@ class VisionPayProvider extends Provider
                 'data' => $data,
             ]);
 
-        } catch (\Throwable $th) {
+        } catch (\Throwable) {
 
             return new PaymentAuthorize(false);
         }

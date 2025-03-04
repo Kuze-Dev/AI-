@@ -77,6 +77,7 @@ class TaxonomyResource extends Resource
     // public static function resolveRecordRouteBinding(int|string $key): ?Model
 
     /** @return Builder<\Domain\Taxonomy\Models\Taxonomy> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
@@ -87,9 +88,7 @@ class TaxonomyResource extends Resource
             filament_admin()->can('site.siteManager') &&
             ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray());
-            });
+            return static::getModel()::query()->wherehas('sites', fn($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();
@@ -161,24 +160,21 @@ class TaxonomyResource extends Resource
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        function (?Taxonomy $record, \Filament\Forms\Get $get) {
+                        fn(?Taxonomy $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                            return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                            if ($record) {
+                                $selectedLocale = $value;
 
-                                if ($record) {
-                                    $selectedLocale = $value;
+                                $originalContentId = $record->translation_id ?: $record->id;
 
-                                    $originalContentId = $record->translation_id ?: $record->id;
+                                $exist = Taxonomy::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                )->where('locale', $selectedLocale)->first();
 
-                                    $exist = Taxonomy::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
-                                    )->where('locale', $selectedLocale)->first();
-
-                                    if ($exist && $exist->id != $record->id) {
-                                        $fail("Taxonomy {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                    }
+                                if ($exist && $exist->id != $record->id) {
+                                    $fail("Taxonomy {$get('name')} has a existing ({$selectedLocale}) translation.");
                                 }
+                            }
 
-                            };
                         },
                     ])
                     ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
@@ -190,11 +186,9 @@ class TaxonomyResource extends Resource
                         ->reactive()
                         ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
                         ->rule(fn (?Taxonomy $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
-                        ->options(function () {
-                            return Site::orderBy('name')
-                                ->pluck('name', 'id')
-                                ->toArray();
-                        })
+                        ->options(fn() => Site::orderBy('name')
+                            ->pluck('name', 'id')
+                            ->toArray())
                         ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
                             /** @var \Domain\Admin\Models\Admin */
@@ -308,10 +302,7 @@ class TaxonomyResource extends Resource
 
                                                             return function (string $attribute, $value, Closure $fail) use ($datas, $current_item_id) {
 
-                                                                $filtered = array_filter($datas, function ($item) use ($value, $current_item_id) {
-
-                                                                    return isset($item['url']) && $item['url'] === $value && $item['id'] != $current_item_id;
-                                                                });
+                                                                $filtered = array_filter($datas, fn($item) => isset($item['url']) && $item['url'] === $value && $item['id'] != $current_item_id);
 
                                                                 if (! empty($filtered)) {
                                                                     $fail(trans('The :value is already been used.', ['value' => $value]));

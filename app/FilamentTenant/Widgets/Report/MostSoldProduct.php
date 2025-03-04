@@ -49,7 +49,7 @@ class MostSoldProduct extends ChartWidget
 
         $products = $query
             ->selectRaw('name, COUNT(*) as count')
-            ->groupBy('name')->limit(10)->orderByDesc('count')
+            ->groupBy('name')->limit(10)->latest('count')
             ->get()->toArray();
 
         $productCounts = collect($products)->pluck('count')->toArray();

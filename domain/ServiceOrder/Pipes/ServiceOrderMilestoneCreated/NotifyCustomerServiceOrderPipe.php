@@ -13,7 +13,7 @@ class NotifyCustomerServiceOrderPipe
         ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData,
         callable $next
     ): void {
-        NotifyCustomerServiceOrderStatusJob::dispatch($serviceOrderCreatedPipelineData->serviceOrder);
+        dispatch(new \Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob($serviceOrderCreatedPipelineData->serviceOrder));
         $next($serviceOrderCreatedPipelineData);
     }
 }

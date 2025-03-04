@@ -36,7 +36,7 @@ class UpdateServiceOrderStatusPipe
                 )
             );
 
-            NotifyCustomerServiceOrderStatusJob::dispatch($serviceOrder);
+            dispatch(new \Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob($serviceOrder));
         }
 
         return $next($serviceOrderPaymentUpdatedPipelineData);

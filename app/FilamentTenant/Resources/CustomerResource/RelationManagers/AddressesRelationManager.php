@@ -118,8 +118,7 @@ class AddressesRelationManager extends RelationManager
                     ->formatStateUsing(fn ($record) => $record->state->country->name)
                     ->sortable(query: fn (Builder $query, string $direction) => $query
                         ->join('states', 'addresses.state_id', '=', 'states.id')
-                        ->join('countries', 'states.country_id', '=', 'countries.id')
-                        ->orderBy('countries.name', $direction))
+                        ->join('countries', 'states.country_id', '=', 'countries.id')->oldest('countries.name'))
                     ->translateLabel()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('state.name')

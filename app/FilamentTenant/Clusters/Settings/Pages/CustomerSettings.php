@@ -101,9 +101,7 @@ class CustomerSettings extends TenantBaseSettings
 
                             DataInterpolation::make('customer')
                                 ->label('customer')
-                                ->schemaData(function () {
-                                    return app(Customer::class)->with('addresses')->latest()->first()?->toArray() ?? [];
-                                }),
+                                ->schemaData(fn() => app(Customer::class)->with('addresses')->latest()->first()?->toArray() ?? []),
                         ])
                         ->columnSpan(['md' => 1])
                         ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
