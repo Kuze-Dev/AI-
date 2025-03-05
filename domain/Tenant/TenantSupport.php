@@ -21,13 +21,13 @@ final class TenantSupport
     {
         return tenancy()->tenant;
     }
-
-    public static function modelNullable(): ?Tenant
-    {
-        if (self::initialized()) {
-            return self::model();
-        }
-
-        return null;
-    }
+//
+//    public static function modelNullable(): ?Tenant
+//    {
+//        if (self::initialized()) {
+//            return self::model();
+//        }
+//
+//        return null;
+//    }
 }
