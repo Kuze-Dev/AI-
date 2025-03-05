@@ -75,7 +75,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read int|null $activities_count
  * @property-read Admin|null $admin
  * @property-read Customer|null $customer
- * @property-read Service|null $service
+ * @property-read Service $service
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceBill> $serviceBills
  * @property-read int|null $service_bills_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceOrderAddress> $serviceOrderAddress
