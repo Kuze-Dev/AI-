@@ -90,7 +90,7 @@ parameters:
         - support
 
     # The level 9 is the highest level
-    level: 7 # TODO: use phpstan rule level 8
+    level: 8
 
     ignoreErrors:
         #- '#Access to property \$value on an unknown class StringBackedEnum.#'
