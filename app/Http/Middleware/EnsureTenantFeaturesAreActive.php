@@ -7,11 +7,14 @@ namespace App\Http\Middleware;
 use Closure;
 use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Http\Request;
+use Laravel\Pennant\Feature;
 
 class EnsureTenantFeaturesAreActive
 {
     public function handle(Request $request, Closure $next, string ...$features): mixed
     {
+        Feature::loadMissing($features);
+
         /** @phpstan-ignore argument.type */
         if(TenantFeatureSupport::someAreActive($features)) {
             return $next($request);
