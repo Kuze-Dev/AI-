@@ -39,23 +39,24 @@ class ServiceBillNotification extends Notification implements ShouldQueue
     {
         $this->serviceOrder = $this->serviceBill->serviceOrder;
 
-        $this->payment_method = $this->serviceBill->serviceOrder->latestPaymentMethod()?->slug ?? 'bank-transfer';
+        $this->payment_method = $this->serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
-        $this->logo = app(SiteSettings::class)->getLogoUrl();
+        $siteSettings = app(SiteSettings::class);
+        $serviceSettings = app(ServiceSettings::class);
 
-        $this->title = app(SiteSettings::class)->name;
+        $this->logo = $siteSettings->getLogoUrl();
+        $this->title = $siteSettings->name;
+        $this->description = $siteSettings->description;
 
-        $this->description = app(SiteSettings::class)->description;
+        $this->from = $serviceSettings->email_sender_name;
 
-        $this->from = app(ServiceSettings::class)->email_sender_name;
-
-        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.
+        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.$serviceSettings->domain_path_segment.
                      '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$this->serviceBill->reference.
                      '&payment_method='.$this->payment_method;
 
-        $this->replyTo = app(ServiceSettings::class)->email_reply_to ?? [];
+        $this->replyTo = $serviceSettings->email_reply_to ?? [];
 
-        $this->footer = app(ServiceSettings::class)->email_footer;
+        $this->footer = $serviceSettings->email_footer;
     }
 
     /** @return array<int, string> */

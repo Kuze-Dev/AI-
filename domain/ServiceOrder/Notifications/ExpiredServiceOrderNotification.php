@@ -34,7 +34,7 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
 
     private string $payment_method;
 
-    private string $footer;
+    private ?string $footer = null;
 
     /** Create a new notification instance. */
     public function __construct(private ServiceBill $serviceBill)

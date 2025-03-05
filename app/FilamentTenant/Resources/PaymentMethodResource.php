@@ -63,6 +63,10 @@ class PaymentMethodResource extends Resource
                             /** @var ?Media $media */
                             $media = $mediaClass::findByUuid($file);
 
+                            if (! $media) {
+                                return null;
+                            }
+                            
                             if (config()->string('filament.default_filesystem_disk') === 'r2') {
                                 return $media?->getUrl();
                             }

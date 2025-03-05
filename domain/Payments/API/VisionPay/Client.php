@@ -39,15 +39,20 @@ final class Client
      */
     public function authenticate(): string
     {
-        if ($this->jwtToken) {
-            return $this->jwtToken;
+        $token = $this->jwtToken;
+
+        if ($token) {
+            return $token;
         }
 
-        $this->jwtToken = Cache::remember('vision_pay_token', 60, fn() => $this->generateToken());
+        /** @var string $token */
+        $token = Cache::remember('vision_pay_token', 60, fn() => $this->generateToken());
+
+        $this->jwtToken = $token;
 
         $this->client->withToken($this->jwtToken); // Set the token for subsequent requests
 
-        return $this->jwtToken;
+        return $token;
     }
 
     /**

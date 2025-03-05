@@ -62,13 +62,17 @@ class ShippingMethodResource extends Resource
                             /** @var ?Media $media */
                             $media = $mediaClass::findByUuid($file);
 
+                            if (! $media) {
+                                return null;
+                            }
+                            
                             if (config()->string('filament.default_filesystem_disk') === 'r2') {
                                 return $media?->getUrl();
                             }
 
                             if ($component->getVisibility() === 'private') {
                                 try {
-                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+                                    return $media->getTemporaryUrl(now()->addMinutes(5));
                                 } catch (\Throwable) {
                                     // This driver does not support creating temporary URLs.
                                 }

@@ -71,6 +71,7 @@ class CreateServiceOrder extends CreateRecord
     #[\Override]
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        /** @var array */
         $rawData = $this->form->getRawState();
 
 
