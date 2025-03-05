@@ -7,11 +7,11 @@ namespace Domain\Order\Actions;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
 use Domain\Order\DataTransferObjects\PreparedOrderData;
 
-class PlaceOrderAction
+readonly class PlaceOrderAction
 {
     public function __construct(
-        private readonly PrepareOrderAction $prepareOrderAction,
-        private readonly SplitOrderAction $splitOrderAction,
+        private PrepareOrderAction $prepareOrderAction,
+        private SplitOrderAction $splitOrderAction,
     ) {
     }
 

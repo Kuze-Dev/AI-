@@ -7,18 +7,18 @@ namespace Domain\Menu\DataTransferObjects;
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 
-class NodeData
+readonly class NodeData
 {
     public function __construct(
-        public readonly string $label,
-        public readonly Target $target,
-        public readonly NodeType $type,
-        public readonly ?int $id = null,
-        public readonly ?string $url = null,
-        public readonly ?string $model_type = null,
-        public readonly ?int $model_id = null,
-        public readonly ?string $translation_id = null,
-        public readonly ?array $children = [],
+        public string $label,
+        public Target $target,
+        public NodeType $type,
+        public ?int $id = null,
+        public ?string $url = null,
+        public ?string $model_type = null,
+        public ?int $model_id = null,
+        public ?string $translation_id = null,
+        public ?array $children = [],
     ) {
     }
 

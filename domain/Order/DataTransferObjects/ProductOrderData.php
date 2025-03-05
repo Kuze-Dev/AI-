@@ -7,25 +7,25 @@ namespace Domain\Order\DataTransferObjects;
 use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Product\Models\Product;
 
-class ProductOrderData
+readonly class ProductOrderData
 {
     public function __construct(
-        public readonly int $id,
-        public readonly string $name,
-        public readonly string $slug,
-        public readonly string $sku,
-        public readonly float|string $retail_price,
-        public readonly float|string $selling_price,
-        public readonly bool $status,
-        public readonly bool $is_digital_product,
-        public readonly bool $is_featured,
-        public readonly bool $is_special_offer,
-        public readonly bool $allow_customer_remarks,
-        public readonly ?string $description,
-        public readonly ?int $stock,
-        public readonly ?bool $allow_stocks,
-        public readonly ?int $minimum_order_quantity,
-        public readonly ?bool $allow_guest_purchase,
+        public int $id,
+        public string $name,
+        public string $slug,
+        public string $sku,
+        public float|string $retail_price,
+        public float|string $selling_price,
+        public bool $status,
+        public bool $is_digital_product,
+        public bool $is_featured,
+        public bool $is_special_offer,
+        public bool $allow_customer_remarks,
+        public ?string $description,
+        public ?int $stock,
+        public ?bool $allow_stocks,
+        public ?int $minimum_order_quantity,
+        public ?bool $allow_guest_purchase,
     ) {
     }
 

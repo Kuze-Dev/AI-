@@ -13,10 +13,10 @@ use Domain\Order\Notifications\OrderPlacedMail;
 use Domain\Product\Actions\UpdateProductStockAction;
 use Illuminate\Support\Facades\Notification;
 
-class OrderPlacedListener
+readonly class OrderPlacedListener
 {
     public function __construct(
-        private readonly OrderSettings $orderSettings
+        private OrderSettings $orderSettings
     ) {
     }
 

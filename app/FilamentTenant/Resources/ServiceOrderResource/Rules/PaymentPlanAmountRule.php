@@ -8,11 +8,11 @@ use Closure;
 use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class PaymentPlanAmountRule implements ValidationRule
+readonly class PaymentPlanAmountRule implements ValidationRule
 {
     public function __construct(
-        protected readonly float $total_price,
-        protected readonly PaymentPlanValue $payment_value,
+        protected float $total_price,
+        protected PaymentPlanValue $payment_value,
     ) {
     }
 

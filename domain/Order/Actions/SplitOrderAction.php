@@ -17,13 +17,13 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Exceptions\PaymentException;
 
-class SplitOrderAction
+readonly class SplitOrderAction
 {
     public function __construct(
-        private readonly CreateOrderAction $createOrderAction,
-        private readonly CreateOrderLineAction $createOrderLineAction,
-        private readonly CreateOrderAddressAction $createOrderAddressAction,
-        private readonly CreatePaymentAction $createPaymentAction,
+        private CreateOrderAction $createOrderAction,
+        private CreateOrderLineAction $createOrderLineAction,
+        private CreateOrderAddressAction $createOrderAddressAction,
+        private CreatePaymentAction $createPaymentAction,
     ) {
     }
 

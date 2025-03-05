@@ -8,21 +8,21 @@ use Domain\Discount\DataTransferObjects\DiscountMessagesData;
 use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Models\TaxZone;
 
-class SummaryData
+readonly class SummaryData
 {
     public function __construct(
-        public readonly float $initialSubTotal,
-        public readonly float $subTotal,
-        public readonly float $taxTotal,
-        public readonly float $grandTotal,
-        public readonly float $initialShippingTotal,
-        public readonly float $shippingTotal,
-        public readonly ?float $discountTotal,
-        public readonly ?float $discounted_total_amount,
-        public readonly ?DiscountMessagesData $discountMessages,
-        public readonly ?TaxZone $taxZone,
-        public readonly ?PriceDisplay $taxDisplay,
-        public readonly ?float $taxPercentage,
+        public float $initialSubTotal,
+        public float $subTotal,
+        public float $taxTotal,
+        public float $grandTotal,
+        public float $initialShippingTotal,
+        public float $shippingTotal,
+        public ?float $discountTotal,
+        public ?float $discounted_total_amount,
+        public ?DiscountMessagesData $discountMessages,
+        public ?TaxZone $taxZone,
+        public ?PriceDisplay $taxDisplay,
+        public ?float $taxPercentage,
     ) {
     }
 

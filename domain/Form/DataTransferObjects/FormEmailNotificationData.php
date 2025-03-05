@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Domain\Form\DataTransferObjects;
 
-class FormEmailNotificationData
+readonly class FormEmailNotificationData
 {
     public function __construct(
-        public readonly array $to,
-        public readonly string $sender,
-        public readonly string $sender_name,
-        public readonly string $subject,
-        public readonly string $template,
-        public readonly bool $has_attachments,
-        public readonly ?int $id = null,
-        public readonly array $cc = [],
-        public readonly array $bcc = [],
-        public readonly array $reply_to = [],
+        public array $to,
+        public string $sender,
+        public string $sender_name,
+        public string $subject,
+        public string $template,
+        public bool $has_attachments,
+        public ?int $id = null,
+        public array $cc = [],
+        public array $bcc = [],
+        public array $reply_to = [],
     ) {
     }
 }

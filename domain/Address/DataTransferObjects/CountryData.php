@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Domain\Address\DataTransferObjects;
 
-class CountryData
+readonly class CountryData
 {
     public function __construct(
-        public readonly string $code,
-        public readonly string $name,
-        public readonly string $capital,
-        public readonly string $timezone,
-        public readonly bool $active,
+        public string $code,
+        public string $name,
+        public string $capital,
+        public string $timezone,
+        public bool $active,
     ) {
     }
 }

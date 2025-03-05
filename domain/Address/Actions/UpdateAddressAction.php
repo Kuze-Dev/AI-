@@ -7,11 +7,11 @@ namespace Domain\Address\Actions;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Models\Address;
 
-class UpdateAddressAction
+readonly class UpdateAddressAction
 {
     public function __construct(
-        private readonly SetAddressAsDefaultShippingAction $setAddressAsDefaultShipping,
-        private readonly SetAddressAsDefaultBillingAction $setAddressAsDefaultBilling,
+        private SetAddressAsDefaultShippingAction $setAddressAsDefaultShipping,
+        private SetAddressAsDefaultBillingAction $setAddressAsDefaultBilling,
     ) {
     }
 

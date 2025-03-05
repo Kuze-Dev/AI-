@@ -6,17 +6,17 @@ namespace Domain\Address\DataTransferObjects;
 
 use Domain\Customer\Models\Customer;
 
-class AddressData
+readonly class AddressData
 {
     public function __construct(
-        public readonly int $state_id,
-        public readonly string $label_as,
-        public readonly string $address_line_1,
-        public readonly string $zip_code,
-        public readonly string $city,
-        public readonly ?bool $is_default_shipping = null,
-        public readonly ?bool $is_default_billing = null,
-        public readonly ?int $customer_id = null,
+        public int $state_id,
+        public string $label_as,
+        public string $address_line_1,
+        public string $zip_code,
+        public string $city,
+        public ?bool $is_default_shipping = null,
+        public ?bool $is_default_billing = null,
+        public ?int $customer_id = null,
     ) {
     }
 

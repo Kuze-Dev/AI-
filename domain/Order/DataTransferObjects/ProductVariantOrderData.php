@@ -8,16 +8,16 @@ use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 
-class ProductVariantOrderData
+readonly class ProductVariantOrderData
 {
     public function __construct(
-        public readonly string $sku,
-        public readonly array $combination,
-        public readonly float|string $retail_price,
-        public readonly float|string $selling_price,
-        public readonly bool $status,
-        public readonly ProductOrderData $product,
-        public readonly ?int $stock,
+        public string $sku,
+        public array $combination,
+        public float|string $retail_price,
+        public float|string $selling_price,
+        public bool $status,
+        public ProductOrderData $product,
+        public ?int $stock,
     ) {
     }
 

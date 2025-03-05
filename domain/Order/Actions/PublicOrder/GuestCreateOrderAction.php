@@ -13,10 +13,10 @@ use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Illuminate\Support\Str;
 
-class GuestCreateOrderAction
+readonly class GuestCreateOrderAction
 {
     public function __construct(
-        private readonly GuestCartSummaryAction $guestCartSummaryAction,
+        private GuestCartSummaryAction $guestCartSummaryAction,
     ) {
     }
 

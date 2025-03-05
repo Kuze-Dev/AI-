@@ -14,10 +14,10 @@ use Log;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
-class UpdateOrderAction
+readonly class UpdateOrderAction
 {
     public function __construct(
-        private readonly UpdateOrderPaymentAction $updateOrderPaymentAction,
+        private UpdateOrderPaymentAction $updateOrderPaymentAction,
     ) {
     }
 

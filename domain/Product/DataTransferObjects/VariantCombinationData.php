@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Product\DataTransferObjects;
 
-class VariantCombinationData
+readonly class VariantCombinationData
 {
     public function __construct(
-        public readonly string $option,
-        public readonly int|string $option_id,
-        public readonly string $option_value,
-        public readonly int|string $option_value_id,
+        public string $option,
+        public int|string $option_id,
+        public string $option_value,
+        public int|string $option_value_id,
     ) {
     }
 

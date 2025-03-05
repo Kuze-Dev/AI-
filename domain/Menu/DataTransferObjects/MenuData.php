@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Domain\Menu\DataTransferObjects;
 
-class MenuData
+readonly class MenuData
 {
     /** @param  \Domain\Menu\DataTransferObjects\NodeData[]  $nodes */
     public function __construct(
-        public readonly string $name,
-        public readonly array $nodes = [],
-        public readonly array $sites = [],
-        public readonly ?string $locale = 'en',
+        public string $name,
+        public array $nodes = [],
+        public array $sites = [],
+        public ?string $locale = 'en',
     ) {
     }
 

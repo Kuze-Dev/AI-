@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
-class CreateCartData
+readonly class CreateCartData
 {
     public function __construct(
-        public readonly int|string $purchasable_id,
-        public readonly string $purchasable_type,
-        public readonly int $quantity,
-        public readonly ?int $variant_id,
-        public readonly ?CartRemarksData $remarks,
+        public int|string $purchasable_id,
+        public string $purchasable_type,
+        public int $quantity,
+        public ?int $variant_id,
+        public ?CartRemarksData $remarks,
     ) {
     }
 

@@ -8,10 +8,10 @@ use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Models\CartLine;
 use Domain\Media\Actions\CreateMediaFromS3UrlAction;
 
-class UpdateCartLineAction
+readonly class UpdateCartLineAction
 {
     public function __construct(
-        private readonly CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
+        private CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
     ) {
     }
 

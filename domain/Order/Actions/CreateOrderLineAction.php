@@ -17,10 +17,10 @@ use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
-class CreateOrderLineAction
+readonly class CreateOrderLineAction
 {
     public function __construct(
-        private readonly CartSummaryAction $cartSummaryAction
+        private CartSummaryAction $cartSummaryAction
     ) {
     }
 

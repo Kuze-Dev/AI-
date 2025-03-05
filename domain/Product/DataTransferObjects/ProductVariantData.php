@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Domain\Product\DataTransferObjects;
 
-class ProductVariantData
+readonly class ProductVariantData
 {
     public function __construct(
-        public readonly int|string $id,
-        public readonly string $sku,
-        public readonly array $combination,
-        public readonly float $retail_price,
-        public readonly float $selling_price,
-        public readonly ?bool $status = false,
-        public readonly ?int $stock = null,
-        public readonly ?int $product_id = null,
+        public int|string $id,
+        public string $sku,
+        public array $combination,
+        public float $retail_price,
+        public float $selling_price,
+        public ?bool $status = false,
+        public ?int $stock = null,
+        public ?int $product_id = null,
     ) {
     }
 

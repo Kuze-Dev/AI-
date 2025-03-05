@@ -13,10 +13,10 @@ use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class CreateCartLineAction
+readonly class CreateCartLineAction
 {
     public function __construct(
-        private readonly CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
+        private CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
     ) {
     }
 

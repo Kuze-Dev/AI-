@@ -10,10 +10,10 @@ use Domain\Tenant\Models\Tenant;
 use Illuminate\Support\Arr;
 use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 
-class BucketManager
+readonly class BucketManager
 {
     public function __construct(
-        protected readonly Tenant $tenant
+        protected Tenant $tenant
     ) {
     }
 

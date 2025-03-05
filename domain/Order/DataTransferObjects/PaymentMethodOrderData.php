@@ -6,15 +6,15 @@ namespace Domain\Order\DataTransferObjects;
 
 use Domain\PaymentMethod\Models\PaymentMethod;
 
-class PaymentMethodOrderData
+readonly class PaymentMethodOrderData
 {
     public function __construct(
-        public readonly string $title,
-        public readonly string $slug,
-        public readonly string $gateway,
-        public readonly ?string $subtitle,
-        public readonly ?string $description,
-        public readonly ?string $instruction,
+        public string $title,
+        public string $slug,
+        public string $gateway,
+        public ?string $subtitle,
+        public ?string $description,
+        public ?string $instruction,
     ) {
     }
 

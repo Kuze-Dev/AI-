@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Site\DataTransferObjects;
 
-class SiteData
+readonly class SiteData
 {
     public function __construct(
-        public readonly string $name,
-        public readonly ?string $domain = null,
-        public readonly ?string $deploy_hook = null,
-        public readonly ?array $site_manager = null,
+        public string $name,
+        public ?string $domain = null,
+        public ?string $deploy_hook = null,
+        public ?array $site_manager = null,
     ) {
     }
 

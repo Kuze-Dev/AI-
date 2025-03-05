@@ -10,10 +10,10 @@ use Domain\Order\Models\OrderLine;
 use Domain\Review\DataTransferObjects\CreateReviewData;
 use Domain\Review\Models\Review;
 
-class CreateReviewAction
+readonly class CreateReviewAction
 {
     public function __construct(
-        private readonly CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
+        private CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
     ) {
     }
 

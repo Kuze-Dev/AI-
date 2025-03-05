@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Domain\Form\DataTransferObjects;
 
-class FormData
+readonly class FormData
 {
     /** @param  \Domain\Form\DataTransferObjects\FormEmailNotificationData[]  $form_email_notifications */
     public function __construct(
-        public readonly string $blueprint_id,
-        public readonly string $name,
-        public readonly bool $store_submission = false,
-        public readonly bool $uses_captcha = false,
-        public readonly array $form_email_notifications = [],
-        public readonly array $sites = [],
+        public string $blueprint_id,
+        public string $name,
+        public bool $store_submission = false,
+        public bool $uses_captcha = false,
+        public array $form_email_notifications = [],
+        public array $sites = [],
     ) {
     }
 

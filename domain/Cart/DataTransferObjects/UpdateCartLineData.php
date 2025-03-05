@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
-class UpdateCartLineData
+readonly class UpdateCartLineData
 {
     public function __construct(
-        public readonly ?int $quantity,
-        public readonly ?CartRemarksData $remarks,
+        public ?int $quantity,
+        public ?CartRemarksData $remarks,
     ) {
     }
 

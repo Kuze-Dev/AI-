@@ -12,23 +12,23 @@ use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Models\TaxZone;
 
-class GuestPreparedOrderData
+readonly class GuestPreparedOrderData
 {
     public function __construct(
-        public readonly GuestCustomerData $customer,
-        public readonly GuestOrderAddressData $shippingAddress,
-        public readonly GuestOrderAddressData $billingAddress,
-        public readonly Currency $currency,
-        public readonly ShippingMethod $shippingMethod,
-        public readonly ReceiverData $shippingReceiverData,
-        public readonly ShippingAddressData $shippingAddressData,
-        public readonly PaymentMethod $paymentMethod,
-        public readonly mixed $cartLine,
-        public readonly GuestCountriesData $countries,
-        public readonly GuestStatesData $states,
-        public readonly ?TaxZone $taxZone,
-        public readonly ?string $notes,
-        public readonly ?Discount $discount,
+        public GuestCustomerData $customer,
+        public GuestOrderAddressData $shippingAddress,
+        public GuestOrderAddressData $billingAddress,
+        public Currency $currency,
+        public ShippingMethod $shippingMethod,
+        public ReceiverData $shippingReceiverData,
+        public ShippingAddressData $shippingAddressData,
+        public PaymentMethod $paymentMethod,
+        public mixed $cartLine,
+        public GuestCountriesData $countries,
+        public GuestStatesData $states,
+        public ?TaxZone $taxZone,
+        public ?string $notes,
+        public ?Discount $discount,
     ) {
     }
 

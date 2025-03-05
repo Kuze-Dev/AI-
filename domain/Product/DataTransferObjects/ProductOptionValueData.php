@@ -6,15 +6,15 @@ namespace Domain\Product\DataTransferObjects;
 
 use Illuminate\Http\UploadedFile;
 
-class ProductOptionValueData
+readonly class ProductOptionValueData
 {
     public function __construct(
-        public readonly int|string $id,
-        public readonly string $name,
-        public readonly string $slug,
-        public readonly int|string $product_option_id,
-        public readonly ?string $icon_value = null,
-        public readonly ?string $icon_type = 'text',
+        public int|string $id,
+        public string $name,
+        public string $slug,
+        public int|string $product_option_id,
+        public ?string $icon_value = null,
+        public ?string $icon_type = 'text',
         // public readonly UploadedFile|string|null|array $images = null,
     ) {
     }

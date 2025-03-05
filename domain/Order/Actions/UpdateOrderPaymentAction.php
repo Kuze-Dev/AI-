@@ -21,11 +21,11 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class UpdateOrderPaymentAction
+readonly class UpdateOrderPaymentAction
 {
     public function __construct(
-        private readonly UploadProofofPaymentAction $uploadProofofPaymentAction,
-        private readonly CreatePaymentLink $createPaymentLink,
+        private UploadProofofPaymentAction $uploadProofofPaymentAction,
+        private CreatePaymentLink $createPaymentLink,
     ) {
     }
 

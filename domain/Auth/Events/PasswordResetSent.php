@@ -7,10 +7,10 @@ namespace Domain\Auth\Events;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 
-class PasswordResetSent
+readonly class PasswordResetSent
 {
     public function __construct(
-        public readonly Authenticatable&Model $user
+        public Authenticatable&Model $user
     ) {
     }
 }

@@ -9,11 +9,11 @@ use Domain\Order\DataTransferObjects\GuestPreparedOrderData;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class GuestPlaceOrderAction
+readonly class GuestPlaceOrderAction
 {
     public function __construct(
-        private readonly GuestPrepareOrderAction $guestPrepareOrderAction,
-        private readonly GuestSplitOrderAction $guestSplitOrderAction,
+        private GuestPrepareOrderAction $guestPrepareOrderAction,
+        private GuestSplitOrderAction $guestSplitOrderAction,
     ) {
     }
 
@@ -21,10 +21,10 @@ class GuestPlaceOrderAction
     {
         $payload = $this->guestPrepareOrderAction
             ->execute($guestPlaceOrderData);
-            
+
         $result = $this->guestSplitOrderAction->execute($payload, $guestPlaceOrderData);
 
         return $result;
-        
+
     }
 }
