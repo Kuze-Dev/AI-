@@ -10,23 +10,23 @@ use Support\RouteUrl\Models\RouteUrl;
 
 /**
  * @template TRelatedModel of \Support\RouteUrl\Models\RouteUrl
- * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ * @template THasRouteModel as \Illuminate\Database\Eloquent\Model
  *
- * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, ?TRelatedModel>
+ * @mixin THasRouteModel
  */
 trait HasRouteUrl
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\RouteUrl\Models\RouteUrl, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, THasRouteModel>
      */
     public function routeUrls(): MorphOne
     {
-        /** @phpstan-ignore return.type, return.type, return.type, return.type */
+        /** @phpstan-ignore return.type */
         return $this->morphOne(RouteUrl::class, 'model');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, THasRouteModel>
      */
     public function activeRouteUrl(): MorphOne
     {

@@ -18,19 +18,18 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @mixin \Illuminate\Database\Eloquent\Model
  *
  * @template TRelatedModel of \Support\RouteUrl\Models\RouteUrl
- * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ * @template THasRouteModel of \Illuminate\Database\Eloquent\Model
  *
- * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, ?TRelatedModel>
- * @phpstan-ignore generics.noParent */
+ */
 interface HasRouteUrl
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, THasRouteModel>
      */
     public function routeUrls(): MorphOne;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, TDeclaringModel>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<TRelatedModel, THasRouteModel>
      */
     public function activeRouteUrl(): MorphOne;
 
