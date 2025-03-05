@@ -349,6 +349,7 @@ class ContentResource extends Resource
 
         if (TenantFeatureSupport::active(SitesManagement::class) &&
             filament_admin()->can('site.siteManager') &&
+            /** @phpstan-ignore booleanNot.alwaysTrue */
             ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
             return static::getModel()::query()

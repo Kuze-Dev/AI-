@@ -247,6 +247,7 @@ class GlobalsResource extends Resource
 
         if (TenantFeatureSupport::active(SitesManagement::class) &&
             filament_admin()->can('site.siteManager') &&
+            /** @phpstan-ignore booleanNot.alwaysTrue */
             ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
             return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));

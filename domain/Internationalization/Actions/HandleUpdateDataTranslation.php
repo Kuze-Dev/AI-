@@ -277,7 +277,7 @@ class HandleUpdateDataTranslation
          * Revisit Transalation Generation for other models
          *
          */
-         /** @phpstan-ignore method.notFound  */
+         /** @phpstan-ignore property.notFound  */
         if ($model->translation_id) {
              /** @phpstan-ignore method.notFound */
             $translation_collection = $model->dataTranslation()
