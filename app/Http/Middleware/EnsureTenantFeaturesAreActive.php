@@ -13,7 +13,7 @@ class EnsureTenantFeaturesAreActive
 {
     public function handle(Request $request, Closure $next, string ...$features): mixed
     {
-        Feature::loadMissing($features);
+//        Feature::loadMissing($features);
 
         /** @phpstan-ignore argument.type */
         if(TenantFeatureSupport::someAreActive($features)) {
