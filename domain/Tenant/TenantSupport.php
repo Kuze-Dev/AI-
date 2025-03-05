@@ -19,6 +19,7 @@ final class TenantSupport
 
     public static function model(): Tenant
     {
+        /** @phpstan-ignore return.type */
         return tenancy()->tenant;
     }
 //

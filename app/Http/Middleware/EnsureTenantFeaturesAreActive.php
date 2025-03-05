@@ -12,8 +12,11 @@ class EnsureTenantFeaturesAreActive
 {
     public function handle(Request $request, Closure $next, string ...$features): mixed
     {
-        return TenantFeatureSupport::someAreActive($features)
-            ? $next($request)
-            : abort(404, 'Some features are not active in this tenant');
+        /** @phpstan-ignore argument.type */
+        if(TenantFeatureSupport::someAreActive($features)) {
+            return $next($request);
+        }
+
+        abort(404, 'Some features are not active in this tenant');
     }
 }

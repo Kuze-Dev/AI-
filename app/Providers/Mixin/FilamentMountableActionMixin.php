@@ -35,7 +35,7 @@ class FilamentMountableActionMixin
             $description = Str::headline(
                 $action->evaluate($description ?? $event) ?? $action->getName()
             );
-            $causedBy ??= Filament::auth()->user();
+            $causedBy ??= filament_admin();
 
             $log = function (?Model $model) use ($properties, $event, $logName, $description, $causedBy): void {
                 if ($model !== null && $model::class === ActivitylogServiceProvider::determineActivityModel()) {
