@@ -52,7 +52,9 @@ class FormResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->withCount('formSubmissions');
     }
 
-    /** @param  FormModel  $record */
+    /** @param  FormModel  $record
+     @return array<string, string|\Illuminate\Support\HtmlString|int>
+     */
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {

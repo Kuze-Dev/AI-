@@ -31,6 +31,7 @@ class FeatureSelector extends Field
         $this->columns(['sm' => 2])
             ->default([])
             ->schema(
+                /** @phpstan-ignore argument.templateType */
                 fn (self $component) => collect($component->getOptions())
                     ->ensure(GroupFeature::class)
                     ->map(
