@@ -147,7 +147,10 @@
         "format-dirty": "vendor/bin/pint --dirty",
         "format-dry-run": "vendor/bin/pint --test",
         "test": "vendor/bin/pest -p --processes=6",
-        "test-ci": ["Composer\\Config::disableProcessTimeout", "vendor/bin/pest --parallel"],
+        "test-ci": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/pest -p --ci --passthru-php=\"-d memory_limit=-1\""
+        ],
         "test-no-timeout": ["Composer\\Config::disableProcessTimeout", "vendor/bin/pest --processes=6 --parallel"],
         "test-stop-on-f": "vendor/bin/pest -p --processes=6 --stop-on-failure --stop-on-error",
         "test-type-coverage": "vendor/bin/pest --processes=6 --type-coverage",
