@@ -9,12 +9,15 @@ use Filament\Forms;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
 
+/**
+ * @mixin \Filament\Forms\Components\Select
+ */
 class FilamentSelectFormMixin
 {
     public function optionsFromModel(): Closure
     {
         return function (string|Closure $model, string|Closure $titleColumnName, ?Closure $callback = null): Forms\Components\Select {
-            /** @var Forms\Components\Select $this */
+
             if (blank($this->getSearchColumns())) {
                 $this->searchable([$this->evaluate($titleColumnName)]);
             }
@@ -147,6 +150,7 @@ class FilamentSelectFormMixin
                 return Rule::exists($model, $keyName);
             });
 
+            /** @phpstan-ignore return.type */
             return $this;
         };
     }

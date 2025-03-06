@@ -153,12 +153,12 @@ class ProductOptionValuesRelationManager extends RelationManager
                     ->successNotificationTitle(trans('Option value has been removed.'))
                     ->using(function (ProductOptionValue $record, Tables\Actions\Action $action): bool {
 
-                        if (! $record->productOption instanceof ProductOption) {
-                            $action
-                                ->failureNotificationTitle(trans('The option value is unlinked from an option.'));
-
-                            return false;
-                        }
+//                        if (! $record->productOption instanceof ProductOption) {
+//                            $action
+//                                ->failureNotificationTitle(trans('The option value is unlinked from an option.'));
+//
+//                            return false;
+//                        }
 
                         try {
 
@@ -190,7 +190,7 @@ class ProductOptionValuesRelationManager extends RelationManager
 
                             ProductVariant::whereBelongsTo($record->productOption->product)
                                 ->where(function (Builder $query) use ($record) {
-                                    $query->whereJsonContains('combination', [['option_value_id' => $record->id]]);
+                                    $query->whereJsonContains('combination', [['option_value_id' => $record->getKey()]]);
                                 })
                                 ->delete();
 
@@ -223,7 +223,7 @@ class ProductOptionValuesRelationManager extends RelationManager
                 ],
         ]);
 
-        /** @var ProductOption $ownerRecordProductOption */
+        /** @var ProductOption|null $ownerRecordProductOption */
         $ownerRecordProductOption = $this->ownerRecord
             ->productOptions
             ->firstWhere('id', '!=', $data['productOption']);

@@ -210,10 +210,10 @@ class ServiceBillsRelationManager extends RelationManager
                     ])
                     ->action(function (Tables\Actions\Action $action, ServiceBill $record, array $data): void {
 
-                        $paymentRemarks = PaymentRemark::tryFrom($data['payment_remark']);
+                        $paymentRemarks = PaymentRemark::from($data['payment_remark']);
 
                         $payment = $record->latestPayment();
-                        
+
                         if ($payment === null) {
 
                             $action->failureNotificationTitle('Payment not found')
@@ -223,7 +223,7 @@ class ServiceBillsRelationManager extends RelationManager
 
                             return;
                         }
-                        
+
                         if ($paymentRemarks === PaymentRemark::APPROVED) {
                             $payment->update([
                                 'remarks' => $paymentRemarks->value,
@@ -258,7 +258,7 @@ class ServiceBillsRelationManager extends RelationManager
                                 ));
 
                                 return;
-                                
+
                             } catch (ModelNotFoundException $e) {
                                 $action->failureNotificationTitle($e->getMessage())
                                     ->failure();

@@ -351,7 +351,7 @@ final class Schema
 
                     Infolists\Components\TextEntry::make('tax_total')
                         ->label(fn (Order $record) => trans('Tax Total ( :percent% )', [
-                            'percent' => $record->tax_percentage,
+                            'percent' => $record->tax_percentage ?? 0,
                         ]))
                         ->inlineLabel()
                         ->prefix(fn (Order $record) => $record->currency_symbol)
