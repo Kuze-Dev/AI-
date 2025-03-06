@@ -208,18 +208,20 @@ class ServiceBillsRelationManager extends RelationManager
                             ->maxLength(255)
                             ->formatStateUsing(fn (ServiceBill $record) => $record->payments->value('admin_message')),
                     ])
-                    ->action(function (Tables\Actions\Action $action, ServiceBill $record, array $data) {
+                    ->action(function (Tables\Actions\Action $action, ServiceBill $record, array $data): void {
 
                         $paymentRemarks = PaymentRemark::tryFrom($data['payment_remark']);
 
                         $payment = $record->latestPayment();
                         
-                        if (!$payment) {
+                        if ($payment === null) {
 
                             $action->failureNotificationTitle('Payment not found')
                                 ->failure();
-                                
+
                             $action->halt(shouldRollBackDatabaseTransaction: true);
+
+                            return;
                         }
                         
                         if ($paymentRemarks === PaymentRemark::APPROVED) {
@@ -254,10 +256,15 @@ class ServiceBillsRelationManager extends RelationManager
                                     $record,
                                     $paymentRemarks->value,
                                 ));
+
+                                return;
+                                
                             } catch (ModelNotFoundException $e) {
                                 $action->failureNotificationTitle($e->getMessage())
                                     ->failure();
                                 $action->halt(shouldRollBackDatabaseTransaction: true);
+
+                                return;
                             }
                         }
 

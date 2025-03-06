@@ -60,6 +60,7 @@ class TaxonomyResource extends Resource
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+          /** @phpstan-ignore return.type */
         return array_filter([
             'Total terms' => $record->taxonomy_terms_count,
             'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),

@@ -94,7 +94,7 @@ class FeatureSelector extends Field
     private static function labeledGroup(GroupFeature $data, GroupFeatureExtra $extra): Fieldset
     {
         return Fieldset::make(
-            $data->fieldName().'_'.Str::slug($extra->groupLabel)
+            $data->fieldName().'_'.Str::slug($extra->groupLabel ?? '')
         )
             ->label($extra->groupLabel)
             ->schema([

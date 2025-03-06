@@ -535,7 +535,6 @@ class CreateServiceOrder extends CreateRecord
         return app(CalculateServiceOrderTotalPriceAction::class)
             ->execute(
                 $sellingPrice,
-                array_filter(
                     array_map(
                         function ($additionalCharge) {
                             if (
@@ -552,7 +551,6 @@ class CreateServiceOrder extends CreateRecord
                         },
                         $additionalCharges
                     )
-                )
             )
             ->getAmount();
     }
