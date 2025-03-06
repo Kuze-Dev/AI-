@@ -41,7 +41,7 @@ use Support\MetaData\Models\MetaData;
  * @property int $is_featured
  * @property int $is_special_offer
  * @property bool $pay_upfront
- * @property int $is_subscription
+ * @property bool $is_subscription
  * @property bool $status
  * @property int $needs_approval
  * @property int $is_auto_generated_bill

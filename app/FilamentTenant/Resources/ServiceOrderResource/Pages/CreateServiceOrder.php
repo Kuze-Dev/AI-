@@ -323,7 +323,7 @@ class CreateServiceOrder extends CreateRecord
                                                                         return false;
                                                                     }
 
-                                                                    return Support::service($get)?->is_subscription;
+                                                                    return Support::service($get)?->is_subscription ?? false;
                                                                 }
                                                             )
                                                             ->schema([
@@ -379,7 +379,7 @@ class CreateServiceOrder extends CreateRecord
                                                             ->rule(
                                                                 fn (Get $get) => new PaymentPlanAmountRule(
                                                                     floatval(Support::currencyFormat($get, 'totalPriceFloat')),
-                                                                    PaymentPlanValue::tryFrom($get('payment_value'))
+                                                                    PaymentPlanValue::from($get('payment_value'))
                                                                 )
                                                             )
                                                             ->columns()
