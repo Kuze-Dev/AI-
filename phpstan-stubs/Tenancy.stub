@@ -2,7 +2,9 @@
 
 namespace Stancl\Tenancy;
 
-/** @property \Domain\Tenant\Models\Tenant|null $tenant  */
+/**
+ * @property-read \Domain\Tenant\Models\Tenant|null $tenant
+ */
 class Tenancy
 {
 }
