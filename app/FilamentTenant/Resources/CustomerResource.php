@@ -340,6 +340,7 @@ class CustomerResource extends Resource
                                             return $model;
                                         }
 
+                                        /** @phpstan-ignore return.type */
                                         return Customer::whereKey($model)->first();
                                     }
                                 ),
