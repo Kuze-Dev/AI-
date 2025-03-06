@@ -37,7 +37,7 @@ class ImportFailedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->greeting('Import Failed')
             ->line($this->error);
     }

@@ -56,7 +56,7 @@ class EditContentEntry extends EditRecord
             ?->load('taxonomies.taxonomyTerms');
 
         if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel(Content::class, ['']);
+            throw (new ModelNotFoundException)->setModel(Content::class, ['']);
         }
 
         parent::mount($record);
@@ -69,7 +69,7 @@ class EditContentEntry extends EditRecord
         $record = $this->ownerRecord->resolveChildRouteBinding('contentEntries', $key, null);
 
         if ($record === null) {
-            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+            throw (new ModelNotFoundException)->setModel($this->getModel(), [$key]);
         }
 
         return $record;
@@ -89,7 +89,7 @@ class EditContentEntry extends EditRecord
                     ->action('draft')
                     ->hidden(function () {
 
-                        if ($this->record->draftable_id != null) {
+                        if ($this->record->draftable_id !== null) {
                             return true;
                         }
 
@@ -124,7 +124,7 @@ class EditContentEntry extends EditRecord
                     ->modalCancelAction(fn (StaticAction $action) => $action->url(
                         ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft])
                     ))
-                    ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true),
+                    ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id === null) ? false : true),
                 Action::make('save')
                     ->label(trans('Save and Continue Editing'))
                     ->action('save')
@@ -183,7 +183,7 @@ class EditContentEntry extends EditRecord
                         /** @var Site */
                         $site = Site::find($data['preview_microsite']);
 
-                        if ($site->domain == null) {
+                        if ($site->domain === null) {
 
                             Notification::make()
                                 ->danger()
@@ -435,7 +435,7 @@ class EditContentEntry extends EditRecord
         $segments = explode('/', $url);
 
         // Check if the first segment is a valid locale code from the array
-        if (in_array($segments[0], $locales)) {
+        if (in_array($segments[0], $locales, true)) {
             // Replace the existing locale with the new one
             $segments[0] = $locale;
         } else {

@@ -122,7 +122,7 @@ class CreateCustomerAction
 
         if (! empty(app(CustomerSettings::class)->customer_email_notifications)) {
 
-            $importedNotification = array_filter(app(CustomerSettings::class)->customer_email_notifications, fn ($mail_notification) => $mail_notification['events'] == CustomerEvent::REGISTERED->value);
+            $importedNotification = array_filter(app(CustomerSettings::class)->customer_email_notifications, fn ($mail_notification) => $mail_notification['events'] === CustomerEvent::REGISTERED->value);
 
             if (! empty($importedNotification)) {
                 foreach ($importedNotification as $notification) {

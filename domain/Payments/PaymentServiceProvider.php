@@ -37,12 +37,12 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
             if ($paymentMethods->count() > 0) {
                 foreach ($paymentMethods as $paymentType) {
                     app(PaymentManagerInterface::class)->extend($paymentType->slug, fn () => match ($paymentType->gateway) {
-                        'paypal' => new PaypalProvider(),
-                        'manual' => new OfflinePayment(),
-                        'stripe' => new StripeProvider(),
-                        'bank-transfer' => new OfflinePayment(),
-                        'vision-pay' => new VisionPayProvider(),
-                        default => throw new InvalidArgumentException(),
+                        'paypal' => new PaypalProvider,
+                        'manual' => new OfflinePayment,
+                        'stripe' => new StripeProvider,
+                        'bank-transfer' => new OfflinePayment,
+                        'vision-pay' => new VisionPayProvider,
+                        default => throw new InvalidArgumentException,
                     });
                 }
             }

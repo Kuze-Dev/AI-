@@ -83,7 +83,7 @@ class VisionPayProvider extends Provider
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
             'cancelled' => $this->cancelTransaction($paymentModel),
-            default => throw new InvalidArgumentException(),
+            default => throw new InvalidArgumentException,
         };
     }
 
@@ -97,7 +97,7 @@ class VisionPayProvider extends Provider
                 ->body(), true
         );
 
-        if ($response['reference'] == $data['reference'] && $response['approvalCode'] == $data['authcode']) {
+        if ($response['reference'] === $data['reference'] && $response['approvalCode'] === $data['authcode']) {
 
             $paymentModel->update([
                 'status' => PaymentStatus::PAID->value,

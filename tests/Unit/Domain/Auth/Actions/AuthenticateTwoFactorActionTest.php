@@ -154,7 +154,7 @@ it('throws exception when no totp code and recovery code provided', function () 
         ->once()
         ->andReturn($userProvider);
 
-    app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData());
+    app(AuthenticateTwoFactorAction::class)->execute(new TwoFactorData);
 })->throws(\LogicException::class);
 
 it('throws exception when no challenged user is found', function () {
@@ -183,7 +183,7 @@ it('throws exception when invalid user provider is given', function () {
 it('throws exception when user is not two factor authenticatable', function () {
     //    $userProvider = (new Mock(EloquentUserProvider::class))
     //        ->expect(retrieveById: fn () => new FoundationUser());
-    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => new FoundationUser());
+    $userProvider = mock_expect(EloquentUserProvider::class, retrieveById: fn () => new FoundationUser);
 
     Auth::shouldReceive('createUserProvider')
         ->once()

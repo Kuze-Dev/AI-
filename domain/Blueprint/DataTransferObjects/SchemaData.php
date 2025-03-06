@@ -44,7 +44,7 @@ class SchemaData implements Arrayable
 
                     $repeaterRule = $field->rules;
 
-                    if (! in_array('array', $repeaterRule)) {
+                    if (! in_array('array', $repeaterRule, true)) {
                         $repeaterRule[] = 'array';
                     }
 

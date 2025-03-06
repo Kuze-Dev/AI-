@@ -90,7 +90,7 @@ class UpdateBlueprintDataAction
             $statePath = $decopuledData->state_path;
             $newValue = $decopuledData->value;
 
-            if ($decopuledData->type == FieldType::MEDIA->value) {
+            if ($decopuledData->type === FieldType::MEDIA->value) {
 
                 $newValue = $decopuledData->getMedia('blueprint_media')->pluck('uuid')->toArray();
             }
@@ -130,10 +130,10 @@ class UpdateBlueprintDataAction
 
             $this->createBlueprintData->execute($model);
 
-            return $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first() ?: new BlueprintData();
+            return $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first() ?: new BlueprintData;
         }
 
-        if ($blueprintData->type == FieldType::MEDIA->value) {
+        if ($blueprintData->type === FieldType::MEDIA->value) {
 
             if (! $blueprintDataData->value) {
 
@@ -232,7 +232,7 @@ class UpdateBlueprintDataAction
 
                 $minValue = min($blueprint_entity_id);
 
-                $key = array_search($minValue, $blueprint_entity_id);
+                $key = array_search($minValue, $blueprint_entity_id, true);
 
                 unset($blueprint_entity_id[$key]);
 

@@ -37,14 +37,14 @@ enum ConditionEnum: string
     public function evaluate(mixed $value, mixed $target): bool
     {
         return match ($this) {
-            self::Equals => $value == $target,
-            self::NotEquals => $value != $target,
+            self::Equals => $value === $target,
+            self::NotEquals => $value !== $target,
             self::GreaterThan => $value > $target,
             self::GreaterThanOrEqual => $value >= $target,
             self::LessThan => $value < $target,
             self::LessThanOrEqual => $value <= $target,
-            self::InArray => in_array($value, explode(',', (string) $target)),
-            self::NotInArray => ! in_array($value, explode(',', (string) $target)),
+            self::InArray => in_array($value, explode(',', (string) $target), true),
+            self::NotInArray => ! in_array($value, explode(',', (string) $target), true),
         };
     }
 }

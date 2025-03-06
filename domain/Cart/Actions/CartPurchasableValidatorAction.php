@@ -18,7 +18,7 @@ class CartPurchasableValidatorAction
         int|string $userId,
         CartUserType $type
     ): void {
-        $product = Product::where((new Product())->getRouteKeyName(), $productId)->firstOrFail();
+        $product = Product::where((new Product)->getRouteKeyName(), $productId)->firstOrFail();
 
         $this->validatePurchasable($product);
 
@@ -56,10 +56,10 @@ class CartPurchasableValidatorAction
         CartUserType $type
     ): void {
         $productVariant = ProductVariant::with('product')->where(
-            (new ProductVariant())->getRouteKeyName(),
+            (new ProductVariant)->getRouteKeyName(),
             $variantId
         )->whereHas('product', function ($query) use ($productId) {
-            $query->where((new Product())->getRouteKeyName(), $productId);
+            $query->where((new Product)->getRouteKeyName(), $productId);
         })->firstOrFail();
 
         $this->validatePurchasable($productVariant);
@@ -127,7 +127,7 @@ class CartPurchasableValidatorAction
                 }
             })
             ->whereNull('checked_out_at')
-            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)->get();
+            ->whereIn((new CartLine)->getRouteKeyName(), $cartLineIds)->get();
 
         $count = 0;
 
@@ -224,7 +224,7 @@ class CartPurchasableValidatorAction
     public function validateAuth(array $cartLineIds, int|string $userId, CartUserType $type): int
     {
         return CartLine::with('purchasable')
-            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
+            ->whereIn((new CartLine)->getRouteKeyName(), $cartLineIds)
             ->whereHas('cart', function ($query) use ($userId, $type) {
                 if ($type === CartUserType::AUTHENTICATED) {
                     $query->where('customer_id', $userId);

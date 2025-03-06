@@ -72,7 +72,7 @@ class RelatedResourceFieldData extends FieldData
         $modelClass = $this->getRelatedModelClass();
 
         /** @var Model */
-        return new $modelClass();
+        return new $modelClass;
     }
 
     /** @return Collection<array-key, Model>|Model|null */
@@ -84,7 +84,7 @@ class RelatedResourceFieldData extends FieldData
             ? $this->getRelatedResourceQuery()
                 ->whereIn($related->getKeyName(), $value)
                 ->get()
-                ->sortBy(fn (Model $model) => array_search($model->getKey(), $value))
+                ->sortBy(fn (Model $model) => array_search($model->getKey(), $value, true))
             : $this->getRelatedResourceQuery()
                 ->where($related->getKeyName(), $value)
                 ->first();

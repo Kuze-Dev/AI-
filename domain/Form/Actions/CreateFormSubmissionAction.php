@@ -21,7 +21,7 @@ class CreateFormSubmissionAction
 
         foreach ($schema['sections'] as $section) {
             foreach ($section->fields as $field) {
-                if ($field->type == FieldType::FILE) {
+                if ($field->type === FieldType::FILE) {
                     $filesFields[] = $field->state_name;
                 }
             }

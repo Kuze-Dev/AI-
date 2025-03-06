@@ -34,7 +34,7 @@ class OfflinePayment extends Provider
     {
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
-            default => throw new InvalidArgumentException(),
+            default => throw new InvalidArgumentException,
         };
     }
 

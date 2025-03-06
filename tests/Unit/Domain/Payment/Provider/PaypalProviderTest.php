@@ -27,7 +27,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Paypal', 'slug' => 'paypal']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new PaypalProvider());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new PaypalProvider);
 
     PaymentSettings::fake([
         'paypal_secret_id' => 'test_paypal_secret_id',

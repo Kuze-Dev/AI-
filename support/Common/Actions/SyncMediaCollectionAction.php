@@ -40,7 +40,7 @@ class SyncMediaCollectionAction
                     $storage = Storage::disk(config('filament.default_filesystem_disk'));
 
                     if (! $storage->exists($mediaData->media)) {
-                        throw new UnableToCheckExistence();
+                        throw new UnableToCheckExistence;
                     }
 
                     /**
@@ -54,7 +54,7 @@ class SyncMediaCollectionAction
                 }
 
                 if (! Str::isUuid($mediaData->media)) {
-                    throw new InvalidArgumentException();
+                    throw new InvalidArgumentException;
                 }
 
                 if ($media = $model->getMedia($mediaCollectionData->collection)->firstWhere('uuid', $mediaData->media)) {
@@ -85,11 +85,11 @@ class SyncMediaCollectionAction
     protected function addMedia(Model&HasMedia $model, string $collection, UploadedFile $media, array $customProperties = []): Media
     {
         if (! $imageString = $media->get()) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         if (! method_exists($model, 'addMediaFromString')) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         return $model->addMediaFromString($imageString)
@@ -102,7 +102,7 @@ class SyncMediaCollectionAction
     protected function addMediaFromUrl(Model&HasMedia $model, string $collection, string $media): Media
     {
         if (! method_exists($model, 'addMediaFromUrl')) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         return $model

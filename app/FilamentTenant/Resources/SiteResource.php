@@ -54,7 +54,7 @@ class SiteResource extends Resource
                     Forms\Components\TextInput::make('domain')
                         ->required()
                         ->unique(ignoreRecord: true)
-                        ->rules([new FullyQualifiedDomainNameRule()])
+                        ->rules([new FullyQualifiedDomainNameRule])
                         ->maxLength(100)
                         ->reactive()
                         ->formatStateUsing(fn (?string $state): ?string => $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null)

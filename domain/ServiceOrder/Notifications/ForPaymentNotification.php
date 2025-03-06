@@ -71,7 +71,7 @@ class ForPaymentNotification extends Notification implements ShouldQueue
     {
         $admin = Admin::first();
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service order Being Placed')
             ->replyTo($this->replyTo)
             ->from($this->from)

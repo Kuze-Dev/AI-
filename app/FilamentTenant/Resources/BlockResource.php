@@ -157,7 +157,7 @@ class BlockResource extends Resource
 
                             $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                            return ! in_array($value, $intersect);
+                            return ! in_array($value, $intersect, true);
                         })
                         ->formatStateUsing(fn (?Block $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
@@ -166,7 +166,7 @@ class BlockResource extends Resource
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     ->hidden(fn (?Block $record, \Filament\Forms\Get $get) => $get('is_fixed_content') && $record ? false : true)
-                    ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
+                    ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') !== null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
         // return $form

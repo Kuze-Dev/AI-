@@ -170,7 +170,7 @@ class TaxonomyResource extends Resource
                                 $exist = Taxonomy::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
                                 )->where('locale', $selectedLocale)->first();
 
-                                if ($exist && $exist->id != $record->id) {
+                                if ($exist && $exist->id !== $record->id) {
                                     $fail("Taxonomy {$get('name')} has a existing ({$selectedLocale}) translation.");
                                 }
                             }
@@ -202,7 +202,7 @@ class TaxonomyResource extends Resource
 
                             $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                            return ! in_array($value, $intersect);
+                            return ! in_array($value, $intersect, true);
                         })
                         ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Taxonomy $record): void {
                             if (! $record) {
@@ -302,7 +302,7 @@ class TaxonomyResource extends Resource
 
                                                             return function (string $attribute, $value, Closure $fail) use ($datas, $current_item_id) {
 
-                                                                $filtered = array_filter($datas, fn ($item) => isset($item['url']) && $item['url'] === $value && $item['id'] != $current_item_id);
+                                                                $filtered = array_filter($datas, fn ($item) => isset($item['url']) && $item['url'] === $value && $item['id'] !== $current_item_id);
 
                                                                 if (! empty($filtered)) {
                                                                     $fail(trans('The :value is already been used.', ['value' => $value]));

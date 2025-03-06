@@ -83,6 +83,6 @@ readonly class GuestSplitOrderAction
             return $result;
         }
 
-        throw new PaymentException();
+        throw new PaymentException;
     }
 }

@@ -28,7 +28,7 @@ final class UPSClient
 
         $this->access_token = Cache::get('ups_oauth_access_token');
 
-        if ($this->access_token == null) {
+        if ($this->access_token === null) {
 
             $response = Http::baseUrl(
                 $isProduction

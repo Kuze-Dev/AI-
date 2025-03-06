@@ -51,7 +51,7 @@ class ConfirmationServiceOrderNotification extends Notification implements Shoul
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service Order Confirmation')
             ->replyTo($this->replyTo)
             ->from($this->from)

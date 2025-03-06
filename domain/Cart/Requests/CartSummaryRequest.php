@@ -40,16 +40,16 @@ class CartSummaryRequest extends FormRequest
             ],
             'billing_address_id' => [
                 'nullable',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())
+                Rule::exists(Address::class, (new Address)->getRouteKeyName())
                     ->where('customer_id', $customer->id),
             ],
             'shipping_method_id' => [
                 'nullable',
-                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+                Rule::exists(ShippingMethod::class, (new ShippingMethod)->getRouteKeyName()),
             ],
             'shipping_address_id' => [
                 'nullable',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())
+                Rule::exists(Address::class, (new Address)->getRouteKeyName())
                     ->where('customer_id', $customer->id),
             ],
             'service_id' => [
@@ -81,7 +81,7 @@ class CartSummaryRequest extends FormRequest
         if ($id = $this->validated('billing_address_id')) {
             /** @var \Domain\Address\Models\Address $billingAddress */
             $billingAddress = Address::with('state.country')
-                ->where((new Address())->getRouteKeyName(), $id)->first();
+                ->where((new Address)->getRouteKeyName(), $id)->first();
 
             /** @var \Domain\Address\Models\State $state */
             $state = $billingAddress->state;
@@ -98,7 +98,7 @@ class CartSummaryRequest extends FormRequest
     public function getShippingMethod(): ?ShippingMethod
     {
         if ($id = $this->validated('shipping_method_id')) {
-            return app(ShippingMethod::class)->where((new ShippingMethod())->getRouteKeyName(), $id)->first();
+            return app(ShippingMethod::class)->where((new ShippingMethod)->getRouteKeyName(), $id)->first();
         }
 
         return null;
@@ -107,7 +107,7 @@ class CartSummaryRequest extends FormRequest
     public function getShippingAddress(): ?Address
     {
         if ($id = $this->validated('shipping_address_id')) {
-            return app(Address::class)->where((new Address())->getRouteKeyName(), $id)->first();
+            return app(Address::class)->where((new Address)->getRouteKeyName(), $id)->first();
         }
 
         return null;
@@ -118,7 +118,7 @@ class CartSummaryRequest extends FormRequest
         if ($id = $this->validated('billing_address_id')) {
             /** @var \Domain\Address\Models\Address $billingAddress */
             $billingAddress = Address::with('state')
-                ->where((new Address())->getRouteKeyName(), $id)->first();
+                ->where((new Address)->getRouteKeyName(), $id)->first();
 
             /** @var \Domain\Address\Models\State $state */
             $state = $billingAddress->state;

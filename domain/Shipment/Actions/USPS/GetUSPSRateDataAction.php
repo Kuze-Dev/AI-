@@ -28,13 +28,13 @@ class GetUSPSRateDataAction
         /** @var \Domain\Customer\Models\Customer */
         $customer = Auth::user();
 
-        if ($customer != null) {
+        if ($customer !== null) {
 
             $verifiedAddress = $customer->verifiedAddress;
 
             if ($verifiedAddress !== null) {
 
-                if ($verifiedAddress->address != $addressValidateRequestData->toArray()) {
+                if ($verifiedAddress->address !== $addressValidateRequestData->toArray()) {
 
                     $updatedVerifiedAddress = $this->addressClient->verify($addressValidateRequestData);
 

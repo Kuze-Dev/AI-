@@ -132,7 +132,7 @@ class ProductOptionValuesRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->label(trans('Option value'))
-                    ->searchable([(new ProductOptionValue())->qualifyColumn('name')])
+                    ->searchable([(new ProductOptionValue)->qualifyColumn('name')])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('icon_details')
                     ->translateLabel(),

@@ -86,7 +86,7 @@ class CheckoutServiceOrderPartialPaymentAction
     private function proceedPayment(float $amountToPay): PaymentAuthorize
     {
         if ($this->serviceOrder->status === ServiceOrderStatus::PENDING) {
-            throw new ServiceOrderStatusStillPendingException();
+            throw new ServiceOrderStatusStillPendingException;
         }
 
         $providerData = new CreatepaymentData(

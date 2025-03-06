@@ -154,7 +154,7 @@ class MenuResource extends Resource
 
                             $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                            return ! in_array($value, $intersect);
+                            return ! in_array($value, $intersect, true);
                         })
                         ->formatStateUsing(fn (?Menu $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
@@ -175,7 +175,7 @@ class MenuResource extends Resource
                                 $exist = Menu::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
                                 )->where('locale', $selectedLocale)->first();
 
-                                if ($exist && $exist->id != $record->id) {
+                                if ($exist && $exist->id !== $record->id) {
                                     $fail("Menu {$get('name')} has a existing ({$selectedLocale}) translation.");
                                 }
                             }
@@ -239,7 +239,7 @@ class MenuResource extends Resource
                                                                 ->mapWithKeys(
                                                                     fn (string $model) =>
                                                                         /** @phpstan-ignore method.notFound */
-                                                                        [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()]
+                                                                        [(new $model)->getMorphClass() => Str::of($model)->classBasename()->headline()]
                                                                 )
                                                                 ->sort()
                                                                 ->toArray()

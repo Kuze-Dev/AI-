@@ -49,7 +49,7 @@ class PublishedPageDraftAction
         $blockContentIds = array_map(
             fn ($blockContentData) => ($blockContent = $page->blockContents->firstWhere('id', $blockContentData->id))
                 ? $this->updateBlockContent->execute($blockContent, $blockContentData)->id
-                : ($blockContentData->id != null ? $this->transferBlockToPageAction->execute($parentPage, $blockContentData)->id : $this->createBlockContent->execute($page, $blockContentData)->id),
+                : ($blockContentData->id !== null ? $this->transferBlockToPageAction->execute($parentPage, $blockContentData)->id : $this->createBlockContent->execute($page, $blockContentData)->id),
             $pageData->block_contents
         );
 

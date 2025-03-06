@@ -42,7 +42,7 @@ class ServiceOrderBankPaymentNotification extends Notification implements Should
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject("Payment {$this->paymentRemarks}")
             ->replyTo($this->serviceSettings->email_reply_to ?? [])
             ->from($this->serviceSettings->email_sender_name)

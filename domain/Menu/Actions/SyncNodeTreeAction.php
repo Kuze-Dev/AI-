@@ -110,7 +110,7 @@ class SyncNodeTreeAction
 
             if (
                 \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
-                $node->translation_id == null
+                $node->translation_id === null
             ) {
 
                 if ($menu->translation_id) {
@@ -125,7 +125,7 @@ class SyncNodeTreeAction
 
                 foreach ($menuCollection as $menu_item) {
 
-                    if ($menu->id == $menu_item->id) {
+                    if ($menu->id === $menu_item->id) {
 
                         continue;
                     }
@@ -179,8 +179,8 @@ class SyncNodeTreeAction
             'target' => $nodeData->target,
             'type' => $nodeData->type,
             'parent_id' => $parentNode?->id,
-            'model_type' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_type : null,
-            'model_id' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_id : null,
+            'model_type' => $nodeData->type === NodeType::RESOURCE ? $nodeData->model_type : null,
+            'model_id' => $nodeData->type === NodeType::RESOURCE ? $nodeData->model_id : null,
             'url' => $nodeData->type === NodeType::URL ? $nodeData->url : null,
             'translation_id' => $nodeData->translation_id,
         ]);
@@ -197,8 +197,8 @@ class SyncNodeTreeAction
             'target' => $nodeData->target,
             'type' => $nodeData->type,
             'parent_id' => $parentNode?->id,
-            'model_type' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_type : null,
-            'model_id' => $nodeData->type == NodeType::RESOURCE ? $nodeData->model_id : null,
+            'model_type' => $nodeData->type === NodeType::RESOURCE ? $nodeData->model_type : null,
+            'model_id' => $nodeData->type === NodeType::RESOURCE ? $nodeData->model_id : null,
             'url' => $nodeData->type === NodeType::URL ? $nodeData->url : null,
             'translation_id' => $nodeData->translation_id,
         ]);
@@ -245,7 +245,7 @@ class SyncNodeTreeAction
                 $menuCollection as $menu_item
             ) {
 
-                if ($menu_item->id == $this->menu->id) {
+                if ($menu_item->id === $this->menu->id) {
                     continue;
                 }
 

@@ -44,7 +44,7 @@ class CartSummaryAction
 
         $taxTotal = $tax['taxPercentage'] ? round($initialSubTotal * $tax['taxPercentage'] / 100, 2) : 0;
 
-        if ($tax['taxDisplay'] == PriceDisplay::INCLUSIVE) {
+        if ($tax['taxDisplay'] === PriceDisplay::INCLUSIVE) {
             $taxTotal = 0;
         }
 
@@ -69,9 +69,9 @@ class CartSummaryAction
         $subtotal = $initialSubTotal;
         $shippingTotal = $initialShippingTotal;
 
-        $discountMessages = (new DiscountHelperFunctions())->validateDiscountCode($discount, $initialTotal);
+        $discountMessages = (new DiscountHelperFunctions)->validateDiscountCode($discount, $initialTotal);
 
-        if ($discountMessages->status == 'valid') {
+        if ($discountMessages->status === 'valid') {
             if ($discount?->discountCondition?->discount_type === DiscountConditionType::ORDER_SUB_TOTAL) {
                 if ($discountTotal >= $initialSubTotal) {
                     $subtotal = 0;
@@ -99,7 +99,7 @@ class CartSummaryAction
             'taxPercentage' => $tax['taxPercentage'],
             'taxTotal' => $taxTotal,
             'grandTotal' => $grandTotal,
-            'discountTotal' => $discountMessages->status == 'valid' ? $discountTotal : 0,
+            'discountTotal' => $discountMessages->status === 'valid' ? $discountTotal : 0,
             'discountMessages' => $discountMessages,
             'initialShippingTotal' => $initialShippingTotal,
             'shippingTotal' => $shippingTotal,
@@ -321,7 +321,7 @@ class CartSummaryAction
         $discountTotal = 0;
 
         if (! is_null($discount)) {
-            $discountTotal = (new DiscountHelperFunctions())->deductableAmount($discount, $subTotal, $shippingTotal);
+            $discountTotal = (new DiscountHelperFunctions)->deductableAmount($discount, $subTotal, $shippingTotal);
         }
 
         return $discountTotal;

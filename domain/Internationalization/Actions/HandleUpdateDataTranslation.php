@@ -127,8 +127,8 @@ class HandleUpdateDataTranslation
             $statePath = $update['statepath'];
             $newValue = $update['value'];
 
-            if ($item->id != $source->id &&
-                $update['type'] == \Domain\Blueprint\Enums\FieldType::MEDIA &&
+            if ($item->id !== $source->id &&
+                $update['type'] === \Domain\Blueprint\Enums\FieldType::MEDIA &&
                 ! is_null($update['value'])
             ) {
                 $newValue = [];

@@ -60,7 +60,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     {
         $customer = $this->getCustomer($notifiable);
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Order '.$this->order->reference.' has been '.$this->status)
             ->replyTo($this->replyTo)
             ->from($this->from)

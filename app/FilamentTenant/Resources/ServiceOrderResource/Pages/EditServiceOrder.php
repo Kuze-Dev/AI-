@@ -154,7 +154,7 @@ class EditServiceOrder extends EditRecord
                                         ->reactive()
                                         ->itemLabel(function ($uuid, $component) {
                                             $keys = array_keys($component->getState());
-                                            $index = array_search($uuid, $keys);
+                                            $index = array_search($uuid, $keys, true);
 
                                             return $index + 1;
                                         })
@@ -178,7 +178,7 @@ class EditServiceOrder extends EditRecord
                                                                 return true;
                                                             }
 
-                                                            $key = array_search($get('description'), array_column($record->payment_plan, 'description'));
+                                                            $key = array_search($get('description'), array_column($record->payment_plan, 'description'), true);
 
                                                             if ($key !== false) {
                                                                 return $record->payment_plan[$key]['is_generated'];
@@ -566,7 +566,7 @@ class EditServiceOrder extends EditRecord
                                 ->inlineLabel()
                                 ->content(function (ServiceOrder $record) {
 
-                                    if ($record->tax_display == PriceDisplay::INCLUSIVE) {
+                                    if ($record->tax_display === PriceDisplay::INCLUSIVE) {
                                         return $record->format_tax_for_display;
                                     }
 

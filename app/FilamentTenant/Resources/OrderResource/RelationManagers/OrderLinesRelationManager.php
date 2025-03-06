@@ -33,7 +33,7 @@ class OrderLinesRelationManager extends RelationManager
                     ->label(trans('Product Name'))
                     ->limit(30)
                     ->description(function (OrderLine $record) {
-                        if ($record->purchasable_type == ProductVariant::class) {
+                        if ($record->purchasable_type === ProductVariant::class) {
                             /** @var \Domain\Product\Models\ProductVariant $productVariant */
                             $productVariant = $record->purchasable_data;
 

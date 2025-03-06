@@ -74,7 +74,7 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
     {
         $admin = Admin::first();
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service Expired')
             ->replyTo($this->replyTo)
             ->from($this->from)

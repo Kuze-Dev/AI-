@@ -113,7 +113,7 @@ class ServiceBillsRelationManager extends RelationManager
                                     fn (ServiceBill $record) => $record->tax_display !== null
                                 )
                                 ->state(function (ServiceBill $record) {
-                                    if ($record->tax_display == PriceDisplay::INCLUSIVE->value) {
+                                    if ($record->tax_display === PriceDisplay::INCLUSIVE->value) {
                                         return 'Inclusive';
                                     }
 

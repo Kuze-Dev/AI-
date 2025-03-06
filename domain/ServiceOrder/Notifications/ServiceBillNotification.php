@@ -67,7 +67,7 @@ class ServiceBillNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->replyTo($this->replyTo)
             ->from($this->from)
             ->subject('New Service Bill')

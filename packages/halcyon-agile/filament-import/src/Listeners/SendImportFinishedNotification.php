@@ -14,7 +14,7 @@ class SendImportFinishedNotification
     {
         Notification::send(
             $event->notifiable,
-            new ImportFinishedNotification()
+            new ImportFinishedNotification
         );
     }
 }

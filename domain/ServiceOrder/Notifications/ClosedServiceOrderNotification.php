@@ -51,7 +51,7 @@ class ClosedServiceOrderNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service canceled')
             ->replyTo($this->replyTo)
             ->from($this->from)

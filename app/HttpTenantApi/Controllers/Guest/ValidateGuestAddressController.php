@@ -39,7 +39,7 @@ class ValidateGuestAddressController extends Controller
 
             $stateName = $state->name;
 
-            if (TenantFeatureSupport::active(ShippingUsps::class) && $country->code == 'US') {
+            if (TenantFeatureSupport::active(ShippingUsps::class) && $country->code === 'US') {
 
                 $address = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
 

@@ -101,7 +101,7 @@ class GlobalsResource extends Resource
                                 $exist = Globals::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
                                 )->where('locale', $selectedLocale)->first();
 
-                                if ($exist && $exist->id != $record->id) {
+                                if ($exist && $exist->id !== $record->id) {
                                     $fail("Global {$get('name')} has a existing ({$selectedLocale}) translation.");
                                 }
                             }
@@ -160,7 +160,7 @@ class GlobalsResource extends Resource
 
                             $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                            return ! in_array($value, $intersect);
+                            return ! in_array($value, $intersect, true);
                         })
                         ->formatStateUsing(fn (?Globals $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
@@ -169,7 +169,7 @@ class GlobalsResource extends Resource
                 SchemaFormBuilder::make('data')
                     ->id('schema-form')
                     // ->hidden(fn (?Globals $record) => ! $record)
-                    ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') != null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
+                    ->schemaData(fn (\Filament\Forms\Get $get) => ($get('blueprint_id') !== null) ? Blueprint::whereId($get('blueprint_id'))->first()?->schema : null),
             ]),
         ]);
     }

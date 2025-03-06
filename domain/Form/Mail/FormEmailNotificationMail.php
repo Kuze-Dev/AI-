@@ -73,7 +73,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
         $contents = Blade::render($compiledTemplate, $this->getMailVariables());
 
-        return new HtmlString((new CssToInlineStyles())->convert(
+        return new HtmlString((new CssToInlineStyles)->convert(
             $contents,
             View::make($this->getTheme(), $this->getMailVariables())->render()
         ));

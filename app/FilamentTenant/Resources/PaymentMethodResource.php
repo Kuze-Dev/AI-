@@ -164,7 +164,7 @@ class PaymentMethodResource extends Resource
                 Tables\Columns\IconColumn::make('status')
                     ->label(trans('Enabled'))
                     ->icons([
-                        'heroicon-o-check-circle' => fn ($state) => $state == true,
+                        'heroicon-o-check-circle' => fn ($state) => $state === true,
                         'heroicon-o-x-circle' => fn ($state) => $state === false,
                     ])
                     ->color(fn (bool $state) => $state ? 'success' : 'danger'),

@@ -616,7 +616,7 @@ class BlueprintResource extends Resource
                             ->mapWithKeys(
                                 fn (string $model) =>
                                     /** @phpstan-ignore method.notFound */
-                                    [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()]
+                                    [(new $model)->getMorphClass() => Str::of($model)->classBasename()->headline()]
                             )
                             ->sort()
                             ->toArray()
@@ -651,7 +651,7 @@ class BlueprintResource extends Resource
 
                         foreach ($relationScopes as $relationName => $options) {
                             /** @var \Illuminate\Database\Eloquent\Model $related */
-                            $related = (new $modelClass())->{$relationName}()->getRelated();
+                            $related = (new $modelClass)->{$relationName}()->getRelated();
 
                             $schema[] = Forms\Components\Select::make("relation_scopes.$relationName")
                                 ->label(Str::headline($relationName))

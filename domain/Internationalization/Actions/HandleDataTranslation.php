@@ -99,7 +99,7 @@ class HandleDataTranslation
             $newValue = $update['value'];
 
             if (
-                $update['type'] == \Domain\Blueprint\Enums\FieldType::MEDIA &&
+                $update['type'] === \Domain\Blueprint\Enums\FieldType::MEDIA &&
                 ! is_null($update['value'])
             ) {
                 $newValue = [];

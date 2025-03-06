@@ -50,7 +50,7 @@ class ChangeByAdminNotification extends Notification implements ShouldQueue
     {
         $user = filament_admin();
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->greeting('Hi Admin,')
             ->from($this->from)
             ->subject("Service order #$this->reference")

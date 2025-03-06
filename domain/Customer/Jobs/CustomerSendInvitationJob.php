@@ -41,7 +41,7 @@ final class CustomerSendInvitationJob implements ShouldQueue
         /** @phpstan-ignore argument.templateType */
         $this->records?->ensure(Customer::class);
 
-        $this->keyName = (new Customer())->getKeyName();
+        $this->keyName = (new Customer)->getKeyName();
 
         $this->initialCustomerKey
             ??= $this->records?->sortByDesc($this->keyName)->value($this->keyName)

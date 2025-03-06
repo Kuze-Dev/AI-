@@ -14,11 +14,11 @@ class DeleteRoleAction
     {
 
         if ($role->name === config('domain.role.super_admin')) {
-            throw new CantDeleteSuperAdminRoleException();
+            throw new CantDeleteSuperAdminRoleException;
         }
 
         if ($role->users()->count()) {
-            throw new CantDeleteRoleWithAssociatedUsersException();
+            throw new CantDeleteRoleWithAssociatedUsersException;
         }
 
         return $role->delete();

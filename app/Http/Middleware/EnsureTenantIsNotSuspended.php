@@ -18,7 +18,7 @@ class EnsureTenantIsNotSuspended
     public function handle(Request $request, Closure $next, ?string $redirectTo = null): Response
     {
         if (TenantSupport::model()->is_suspended) {
-            throw new SuspendTenantException();
+            throw new SuspendTenantException;
         }
 
         return $next($request);

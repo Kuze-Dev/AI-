@@ -15,6 +15,6 @@ trait HasActiveState
 
     public function sendActivateAccountNotification(): void
     {
-        $this->notify(new ActivateAccount());
+        $this->notify(new ActivateAccount);
     }
 }

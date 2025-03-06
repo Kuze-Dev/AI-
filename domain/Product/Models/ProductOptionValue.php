@@ -77,7 +77,7 @@ class ProductOptionValue extends Model implements HasMedia
         return Attribute::make(
             get: function ($value) {
                 /** @phpstan-ignore offsetAccess.notFound */
-                if (is_null($this->data) || $this->data['icon_type'] == 'text') {
+                if (is_null($this->data) || $this->data['icon_type'] === 'text') {
                     return 'Type: Text | Value: N/A';
                 } else {
                     /** @phpstan-ignore offsetAccess.notFound */

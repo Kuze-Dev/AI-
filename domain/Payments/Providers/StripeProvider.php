@@ -100,7 +100,7 @@ class StripeProvider extends Provider
                 'amount' => $amount * 100,
             ]);
 
-            if ($refund->status == 'succeeded') {
+            if ($refund->status === 'succeeded') {
 
                 $paymentModel->refunds()->create([
 
@@ -114,7 +114,7 @@ class StripeProvider extends Provider
                 $refunded_amount = $paymentModel->refunds->sum('amount');
 
                 $paymentModel->update([
-                    'status' => ($amount == $refunded_amount) ? PaymentStatus::REFUNDED : PaymentStatus::PARTIALLY_REFUNDED,
+                    'status' => ($amount === $refunded_amount) ? PaymentStatus::REFUNDED : PaymentStatus::PARTIALLY_REFUNDED,
                 ]);
 
                 return new PaymentRefund(
@@ -141,7 +141,7 @@ class StripeProvider extends Provider
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
             'cancelled' => $this->cancelTransaction($paymentModel),
-            default => throw new InvalidArgumentException(),
+            default => throw new InvalidArgumentException,
         };
     }
 

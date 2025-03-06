@@ -16,7 +16,7 @@ class SettingServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             SettingsCacheFactorySpatie::class,
-            fn () => new SettingsCacheFactoryApp()
+            fn () => new SettingsCacheFactoryApp
         );
         $settingsContainer = app(SettingsContainer::class);
         $settingsContainer->registerBindings();

@@ -52,7 +52,7 @@ class RouteUrlController
 
             $queryRouteUrl->whereHas('model', function ($query) use ($siteId) {
 
-                if ($query->getModel()->getMorphClass() == app(TaxonomyTerm::class)->getMorphClass()) {
+                if ($query->getModel()->getMorphClass() === app(TaxonomyTerm::class)->getMorphClass()) {
 
                     return $query->whereHas('taxonomy', fn ($parentQuery) => $parentQuery->whereHas('sites', fn ($q) => $q->where('site_id', $siteId)));
                     // fn ($q) => $q->where('site_id', $siteId));
@@ -65,7 +65,7 @@ class RouteUrlController
 
         $queryRouteUrl->whereHas('model', function ($query) use ($notDraftableModels) {
 
-            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels)) {
+            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels, true)) {
 
                 return $query->where('draftable_id', null);
             }
@@ -91,7 +91,7 @@ class RouteUrlController
 
         abort_if($content->visibility === Visibility::AUTHENTICATED->value, 403);
 
-        abort_if($contentEntry->status == false, 404);
+        abort_if($contentEntry->status === false, 404);
 
         return ContentEntryResource::make($contentEntry);
     }

@@ -158,7 +158,7 @@ class EditTaxonomy extends EditRecord
         $segments = explode('/', $url);
 
         // Check if the first segment is a valid locale code from the array
-        if (in_array($segments[0], $locales)) {
+        if (in_array($segments[0], $locales, true)) {
             // Replace the existing locale with the new one
             $segments[0] = $locale;
         } else {

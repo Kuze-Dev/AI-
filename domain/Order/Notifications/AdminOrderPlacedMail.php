@@ -38,7 +38,7 @@ class AdminOrderPlacedMail extends Notification implements ShouldQueue
     /** Get the mail representation of the notification. */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->greeting('Hi Admin,')
             ->subject("New Order #$this->reference")
             ->line('A new order has been placed by a customer.')

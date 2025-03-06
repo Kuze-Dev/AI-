@@ -21,7 +21,7 @@ readonly class CreateCartLineAction
 
     public function execute(Cart $cart, CreateCartData $cartLineData): CartLine
     {
-        $product = Product::where((new Product())->getRouteKeyName(), $cartLineData->purchasable_id)->first();
+        $product = Product::where((new Product)->getRouteKeyName(), $cartLineData->purchasable_id)->first();
 
         if (! $product) {
             throw new BadRequestHttpException('Product not found');

@@ -139,18 +139,18 @@ class BlueprintData extends Model implements HasMedia
                     $fit = Fit::Contain;
                     if (isset($conversion->manipulations)) {
                         foreach ($conversion->manipulations as $manipulation) {
-                            if ($manipulation->type == ManipulationType::WIDTH) {
+                            if ($manipulation->type === ManipulationType::WIDTH) {
                                 $width = $manipulation->params[0];
                             }
-                            if ($manipulation->type == ManipulationType::HEIGHT) {
+                            if ($manipulation->type === ManipulationType::HEIGHT) {
                                 $height = $manipulation->params[0];
                             }
-                            if ($manipulation->type == ManipulationType::TYPE) {
+                            if ($manipulation->type === ManipulationType::TYPE) {
                                 if (! empty($manipulation->params[0])) {
                                     $type = $manipulation->params[0];
                                 }
                             }
-                            if ($manipulation->type == ManipulationType::FIT) {
+                            if ($manipulation->type === ManipulationType::FIT) {
                                 // $fit = $manipulation->params[0];
                                 /** @phpstan-ignore match.unhandled */
                                 $fit = match ($manipulation->params[0]) {

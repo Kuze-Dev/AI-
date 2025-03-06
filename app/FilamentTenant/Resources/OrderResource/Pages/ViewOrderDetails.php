@@ -63,7 +63,7 @@ class ViewOrderDetails extends ViewRecord
                                     ->label(trans('Variant'))
                                     ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
                                     ->formatStateUsing(function (OrderLine $record) {
-                                        if ($record->purchasable_type == ProductVariant::class) {
+                                        if ($record->purchasable_type === ProductVariant::class) {
                                             $combinations = array_values($record->purchasable_data['combination']);
                                             $optionValues = array_column($combinations, 'option_value');
 

@@ -46,7 +46,7 @@ readonly class GuestUpdateOrderAction
         }
 
         if (
-            $updateOrderData->type == 'bank-transfer' &&
+            $updateOrderData->type === 'bank-transfer' &&
             $updateOrderData->proof_of_payment !== null
         ) {
             $this->updateBankTransfer(
@@ -55,7 +55,7 @@ readonly class GuestUpdateOrderAction
                 $updateOrderData->notes
             );
         } else {
-            if ($updateOrderData->type != 'status') {
+            if ($updateOrderData->type !== 'status') {
                 return $this->updateWithGateway(
                     $orderWithPayment,
                     $updateOrderData->type
@@ -72,7 +72,7 @@ readonly class GuestUpdateOrderAction
             'status' => $status,
         ];
 
-        if ($status == OrderStatuses::CANCELLED->value) {
+        if ($status === OrderStatuses::CANCELLED->value) {
             $orderData['cancelled_reason'] = $notes;
             $orderData['cancelled_at'] = now();
 
@@ -105,13 +105,13 @@ readonly class GuestUpdateOrderAction
         $payment = $order->payments->first();
 
         if (
-            $payment->gateway != 'bank-transfer'
+            $payment->gateway !== 'bank-transfer'
         ) {
             throw new BadRequestHttpException('You cant upload a proof of payment in this gateway');
         }
 
         if (
-            $order->status != OrderStatuses::FORPAYMENT
+            $order->status !== OrderStatuses::FORPAYMENT
         ) {
             throw new BadRequestHttpException('Invalid action');
         }

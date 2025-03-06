@@ -47,7 +47,7 @@ final class Exports
                     $customer->gender?->value,
                     $customer->status?->value,
                     $customer->birth_date?->format(
-                        ($date_format == 'default' || $date_format == null) ?
+                        ($date_format === 'default' || $date_format === null) ?
                         config('tables.date_format') :
                             $date_format
                     ),
@@ -94,7 +94,7 @@ final class Exports
                     $customer->mobile,
                     $customer->status?->value,
                     $customer->birth_date?->format(
-                        ($date_format == 'default' || $date_format == null) ?
+                        ($date_format === 'default' || $date_format === null) ?
                         config('tables.date_format') :
                             $date_format
                     ),

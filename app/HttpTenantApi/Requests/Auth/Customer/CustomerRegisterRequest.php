@@ -44,7 +44,7 @@ class CustomerRegisterRequest extends FormRequest
                     'required',
                     'nullable'
                 ),
-                Rule::exists(Tier::class, (new Tier())->getRouteKeyName()),
+                Rule::exists(Tier::class, (new Tier)->getRouteKeyName()),
             ],
             'birth_date' => 'nullable|date',
             'password' => ['required', 'confirmed', Password::default()],
@@ -59,11 +59,11 @@ class CustomerRegisterRequest extends FormRequest
             $shippingRules = [
                 'shipping.country_id' => [
                     'required',
-                    Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+                    Rule::exists(Country::class, (new Country)->getRouteKeyName()),
                 ],
                 'shipping.state_id' => [
                     'required',
-                    Rule::exists(State::class, (new State())->getRouteKeyName())
+                    Rule::exists(State::class, (new State)->getRouteKeyName())
                         ->where(function (Builder $query) {
 
                             $country = app(Country::class)
@@ -81,11 +81,11 @@ class CustomerRegisterRequest extends FormRequest
             $billingRules = [
                 'billing.country_id' => [
                     'required_if:billing.same_as_shipping,0',
-                    Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+                    Rule::exists(Country::class, (new Country)->getRouteKeyName()),
                 ],
                 'billing.state_id' => [
                     'required_if:billing.same_as_shipping,0',
-                    Rule::exists(State::class, (new State())->getRouteKeyName())
+                    Rule::exists(State::class, (new State)->getRouteKeyName())
                         ->where(function (Builder $query) {
 
                             $country = app(Country::class)

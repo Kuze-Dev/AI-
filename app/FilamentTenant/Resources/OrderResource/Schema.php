@@ -85,7 +85,7 @@ final class Schema
                                 }
 
                                 if ($data['status'] === OrderStatuses::CANCELLED) {
-                                    if (! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])) {
+                                    if (! in_array($record->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT], true)) {
                                         Notification::make()
                                             ->title(trans("You can't cancel this order."))
                                             ->warning()
@@ -128,8 +128,8 @@ final class Schema
 
                             })
                             ->hidden(
-                                fn (Order $record) => $record->status == OrderStatuses::CANCELLED ||
-                                    $record->status == OrderStatuses::FULFILLED
+                                fn (Order $record) => $record->status === OrderStatuses::CANCELLED ||
+                                    $record->status === OrderStatuses::FULFILLED
                             ),
                     ]),
 
@@ -360,7 +360,7 @@ final class Schema
                         ->inlineLabel()
                         ->prefix(fn (Order $record) => $record->currency_symbol)
                         ->columnSpanFull()
-                        ->hidden(fn (Order $record) => $record->discount_total == 0),
+                        ->hidden(fn (Order $record) => $record->discount_total === 0),
 
                     Infolists\Components\TextEntry::make('discount_code')
                         ->translateLabel()

@@ -76,7 +76,7 @@ class AuthServiceProvider extends ServiceProvider
         VerifyEmailNotification::toMailUsing(function (mixed $notifiable, $url): MailMessage {
 
             if ($notifiable instanceof HasEmailVerificationOTP && $notifiable->isEmailVerificationUseOTP()) {
-                return (new MailMessage())
+                return (new MailMessage)
                     ->from(
                         TenantSupport::initialized() ?
                         (app(FormSettings::class)->sender_email ? config()->string('mail.from.address') : config()->string('mail.from.address')) :
@@ -90,7 +90,7 @@ class AuthServiceProvider extends ServiceProvider
 
             // copied from \Illuminate\Auth\Notifications\VerifyEmail::buildMailMessage($url)
             // https://github.com/laravel/framework/blob/v10.16.1/src/Illuminate/Auth/Notifications/VerifyEmail.php#L62
-            return (new MailMessage())
+            return (new MailMessage)
                 ->from(
                     TenantSupport::initialized() ?
                     (app(FormSettings::class)->sender_email ? config()->string('mail.from.address') : config()->string('mail.from.address')) :

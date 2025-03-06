@@ -52,7 +52,7 @@ class RouteUrlV2Controller
 
         $queryRouteUrl->whereHas('model', function ($query) use ($notDraftableModels) {
 
-            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels)) {
+            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels, true)) {
                 return $query->where('draftable_id', null);
             }
 
@@ -72,7 +72,7 @@ class RouteUrlV2Controller
 
     private function handleContentEntryResource(ContentEntry $contentEntry): ContentEntryResource
     {
-        abort_if($contentEntry->status == false, 404);
+        abort_if($contentEntry->status === false, 404);
 
         return ContentEntryResource::make($contentEntry);
     }

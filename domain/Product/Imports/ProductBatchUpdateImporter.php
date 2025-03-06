@@ -150,7 +150,7 @@ class ProductBatchUpdateImporter extends Importer
     public function resolveRecord(): ?Model
     {
         // ignore
-        return new Product();
+        return new Product;
     }
 
     /**

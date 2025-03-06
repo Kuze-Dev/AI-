@@ -17,7 +17,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Paypal']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new PaypalProvider());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new PaypalProvider);
 });
 
 it('update', function () {

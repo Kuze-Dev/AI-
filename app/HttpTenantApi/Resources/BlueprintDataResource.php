@@ -24,7 +24,7 @@ class BlueprintDataResource extends JsonApiResource
             'type' => $this->type,
         ];
 
-        if ($this->type == FieldType::MEDIA->value) {
+        if ($this->type === FieldType::MEDIA->value) {
             $data['media'] = MediaResource::collection($this->media);
         }
 

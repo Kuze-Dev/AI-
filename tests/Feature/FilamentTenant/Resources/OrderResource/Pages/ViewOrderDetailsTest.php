@@ -20,7 +20,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'cod', 'gateway' => 'manual']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment);
 
     PaymentFactory::new()->setPaymentMethod($paymentMethod->id)->createOne();
 });

@@ -151,7 +151,7 @@ class SyncTermTreeAction
 
                     foreach ($taxonomyCollection as $taxonomy_item) {
 
-                        if ($taxonomy->id == $taxonomy_item->id) {
+                        if ($taxonomy->id === $taxonomy_item->id) {
                             continue;
                         }
 
@@ -172,7 +172,7 @@ class SyncTermTreeAction
                             name: $termData->name,
                             data: $termData->data,
                             is_custom: $termData->is_custom,
-                            url: $termUrl ? ($defaultLocale == $taxonomy_item->locale ? $termUrl : "/$taxonomy_item->locale$termUrl") : null,
+                            url: $termUrl ? ($defaultLocale === $taxonomy_item->locale ? $termUrl : "/$taxonomy_item->locale$termUrl") : null,
                             translation_id: (string) $term->id
                             // children: $taxonomy
                         );
@@ -308,7 +308,7 @@ class SyncTermTreeAction
                 $taxonomyCollection as $taxonomy_item
             ) {
 
-                if ($taxonomy_item->id == $this->taxonomy->id) {
+                if ($taxonomy_item->id === $this->taxonomy->id) {
                     continue;
                 }
 

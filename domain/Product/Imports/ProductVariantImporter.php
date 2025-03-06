@@ -191,7 +191,7 @@ class ProductVariantImporter extends Importer
                         'product_option_id' => $foundProductOption->id,
                         'data' => [
                             'icon_type' => $i === 1 ? $iconType : 'text',
-                            'icon_value' => $i == 1 ? $iconValue : '',
+                            'icon_value' => $i === 1 ? $iconValue : '',
 
                         ],
                     ]);
@@ -214,7 +214,7 @@ class ProductVariantImporter extends Importer
                 $productOption = ProductOption::create([
                     'name' => $row["product_option_{$i}_name"],
                     'product_id' => $product->id,
-                    'is_custom' => $i == 1 ? strtolower((string) $row["product_option_{$i}_is_custom"]) === 'yes' : false,
+                    'is_custom' => $i === 1 ? strtolower((string) $row["product_option_{$i}_is_custom"]) === 'yes' : false,
                 ]);
 
                 $productOptionValue = ProductOptionValue::create([
@@ -222,7 +222,7 @@ class ProductVariantImporter extends Importer
                     'product_option_id' => $productOption->id,
                     'data' => [
                         'icon_type' => $i === 1 ? $iconType : 'text',
-                        'icon_value' => $i == 1 ? $iconValue : '',
+                        'icon_value' => $i === 1 ? $iconValue : '',
                     ],
                 ]);
 

@@ -68,7 +68,7 @@ class ServiceBillDueDateNotification extends Notification implements ShouldQueue
     {
         $subject = trans('Payment Reminder');
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject($subject)
             ->replyTo($this->replyTo)
             ->from($this->from)

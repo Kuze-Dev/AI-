@@ -44,7 +44,7 @@ readonly class CreateOrderAction
             $placeOrderData->serviceId
         );
 
-        $paymentMethod = $preparedOrderData->paymentMethod->gateway == 'manual'
+        $paymentMethod = $preparedOrderData->paymentMethod->gateway === 'manual'
             ? OrderStatuses::PENDING : OrderStatuses::FORPAYMENT;
 
         $order = Order::create([

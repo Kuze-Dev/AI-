@@ -47,7 +47,7 @@ class CreateBlueprintDataAction
             }
         }
 
-        if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
+        if ($blueprintDataData->type === FieldType::MEDIA && $blueprintData->value) {
 
             if (is_array($blueprintDataData->value)) {
                 foreach ($blueprintDataData->value as $value) {

@@ -37,7 +37,7 @@ class CreateS3Bucket implements ShouldQueue
         }
 
         if (
-            $this->tenant->getInternal('bucket_driver') == 'r2' ||
+            $this->tenant->getInternal('bucket_driver') === 'r2' ||
             ! is_null($this->tenant->getInternal('bucket_access_key')) ||
             ! is_null($this->tenant->getInternal('bucket_secret_key'))
         ) {

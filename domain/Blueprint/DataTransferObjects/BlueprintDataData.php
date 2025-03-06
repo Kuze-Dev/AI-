@@ -40,7 +40,7 @@ class BlueprintDataData
         } elseif ($model instanceof Customer) {
             $blueprintId = app(CustomerSettings::class)->blueprint_id;
         } else {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         return new self(

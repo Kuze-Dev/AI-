@@ -38,7 +38,7 @@ readonly class GuestCreateOrderAction
             $guestPlaceOrderData->serviceId
         );
 
-        $paymentMethod = $guestPreparedOrderData->paymentMethod->gateway == 'manual'
+        $paymentMethod = $guestPreparedOrderData->paymentMethod->gateway === 'manual'
             ? OrderStatuses::PENDING : OrderStatuses::FORPAYMENT;
 
         $order = Order::create([

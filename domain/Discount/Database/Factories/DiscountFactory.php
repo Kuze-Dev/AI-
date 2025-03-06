@@ -25,7 +25,7 @@ class DiscountFactory extends Factory
             'name' => $name,
             'slug' => $name,
             'description' => fake()->word(),
-            'code' => new AutoGenerateCode(),
+            'code' => new AutoGenerateCode,
             'max_uses' => 10,
             'status' => DiscountStatus::ACTIVE,
 

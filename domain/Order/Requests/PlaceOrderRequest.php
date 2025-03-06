@@ -22,7 +22,7 @@ class PlaceOrderRequest extends FormRequest
         return [
             'addresses.shipping' => [
                 'required',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
+                Rule::exists(Address::class, (new Address)->getRouteKeyName())->where(function ($query) {
                     /** @var \Domain\Customer\Models\Customer $customer */
                     $customer = auth()->user();
 
@@ -31,7 +31,7 @@ class PlaceOrderRequest extends FormRequest
             ],
             'addresses.billing' => [
                 'required',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
+                Rule::exists(Address::class, (new Address)->getRouteKeyName())->where(function ($query) {
 
                     /** @var \Domain\Customer\Models\Customer $customer */
                     $customer = auth()->user();
@@ -106,11 +106,11 @@ class PlaceOrderRequest extends FormRequest
             ],
             'payment_method' => [
                 'required',
-                Rule::exists(PaymentMethod::class, (new PaymentMethod())->getRouteKeyName()),
+                Rule::exists(PaymentMethod::class, (new PaymentMethod)->getRouteKeyName()),
             ],
             'shipping_method' => [
                 'required',
-                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+                Rule::exists(ShippingMethod::class, (new ShippingMethod)->getRouteKeyName()),
             ],
             'service_id' => [
                 'nullable',

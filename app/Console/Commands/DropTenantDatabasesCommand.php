@@ -33,7 +33,7 @@ class DropTenantDatabasesCommand extends Command
         $databases = collect(DB::select('SHOW DATABASES'))
             ->pluck('Database')
             ->filter(fn (string $database) => Str::startsWith($database, config()->string('tenancy.database.prefix')))
-            ->reject(fn (string $database) => in_array($database, $tenants->pluck('tenancy_db_name')->toArray()));
+            ->reject(fn (string $database) => in_array($database, $tenants->pluck('tenancy_db_name')->toArray(), true));
 
         if ($databases->isEmpty()) {
             (new Info($this->output))->render('Nothing to drop.');

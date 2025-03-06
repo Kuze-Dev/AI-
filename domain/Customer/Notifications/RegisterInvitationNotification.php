@@ -28,7 +28,7 @@ class RegisterInvitationNotification extends Notification implements ShouldQueue
     {
         $customerSettings = app(CustomerSettings::class);
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))
             ->subject(trans('Register Invitation'))
             ->greeting(new HtmlString($customerSettings->customer_register_invitation_greetings ?? '<b>Hello</b>'))

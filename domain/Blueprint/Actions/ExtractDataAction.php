@@ -25,7 +25,7 @@ class ExtractDataAction
         $fieldTypes = [];
         foreach ($fields as $field) {
             $newPath = $currentpath.'.'.$field->state_name;
-            if ($field->type == FieldType::REPEATER) {
+            if ($field->type === FieldType::REPEATER) {
                 $fieldTypes[$field->state_name] = array_merge($this->recursivelyExtractFields($field->fields, $newPath));
                 $fieldTypes[$field->state_name]['type'] = $field->type;
                 $fieldTypes[$field->state_name]['statepath'] = $newPath;
@@ -51,7 +51,7 @@ class ExtractDataAction
             'translatable' => $firstField['translatable'] ?? true,
         ];
         $statepath = $mergedFields['statepath'];
-        if ($firstField['type'] == FieldType::REPEATER) {
+        if ($firstField['type'] === FieldType::REPEATER) {
             if (is_array($mergedFields['value'])) {
                 foreach ($mergedFields['value'] as $mergedFieldkey => $mergedField) {
                     if (is_array($mergedField)) {
@@ -75,7 +75,7 @@ class ExtractDataAction
     public function processRepeaterField(array $field): array
     {
         $data = [];
-        if ($field['type'] == FieldType::REPEATER && $field['value'] !== null) {
+        if ($field['type'] === FieldType::REPEATER && $field['value'] !== null) {
 
             foreach ($field['value'] as $value) {
                 foreach ($value as $repeaterData) {
@@ -97,7 +97,7 @@ class ExtractDataAction
             if (is_array($item)) {
                 $lastArrays = array_merge($lastArrays, $this->flattenArray($item));
             } else {
-                if ($itemKey == 'type') {
+                if ($itemKey === 'type') {
                     $lastArrays[] = $array;
                 }
             }

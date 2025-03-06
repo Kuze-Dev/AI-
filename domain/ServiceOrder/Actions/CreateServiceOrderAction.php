@@ -40,7 +40,7 @@ class CreateServiceOrderAction
         $currency = Currency::whereEnabled(true)->firstOrFail();
 
         if (! $service->status) {
-            throw new ServiceStatusMustBeActive();
+            throw new ServiceStatusMustBeActive;
         }
 
         $subTotalPrice = $this->getSubTotalPrice(

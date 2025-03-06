@@ -197,13 +197,13 @@ class EditPage extends EditRecord
                     Action::make('published')
                         ->label(trans('Published Draft'))
                         ->action('published')
-                        ->hidden(fn () => $this->record->draftable_id == null ? true : false),
+                        ->hidden(fn () => $this->record->draftable_id === null ? true : false),
                     Action::make('draft')
                         ->label(trans('Save As Draft'))
                         ->action('draft')
                         ->hidden(function () {
 
-                            if ($this->record->draftable_id != null) {
+                            if ($this->record->draftable_id !== null) {
 
                                 return true;
                             }
@@ -368,7 +368,7 @@ class EditPage extends EditRecord
         /** @var Site */
         $site = Site::find($data['preview_microsite']);
 
-        if ($site->domain == null) {
+        if ($site->domain === null) {
 
             Notification::make()
                 ->danger()
@@ -534,7 +534,7 @@ class EditPage extends EditRecord
         $segments = explode('/', $url);
 
         // Check if the first segment is a valid locale code from the array
-        if (in_array($segments[0], $locales)) {
+        if (in_array($segments[0], $locales, true)) {
             // Replace the existing locale with the new one
             $segments[0] = $locale;
         } else {

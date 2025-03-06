@@ -223,7 +223,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
     #[\Override]
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmail());
+        $this->notify(new VerifyEmail);
     }
 
     #[\Override]

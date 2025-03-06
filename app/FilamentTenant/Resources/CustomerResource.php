@@ -106,7 +106,7 @@ class CustomerResource extends Resource
                         ->label(trans('Username'))
                         ->required(fn ($state) => ! is_null($state))
                         ->unique(ignoreRecord: true)
-                        ->formatStateUsing(fn ($state, Forms\Get $get) => $get('email') == $state ? null : $state)
+                        ->formatStateUsing(fn ($state, Forms\Get $get) => $get('email') === $state ? null : $state)
                         ->rules([
                             fn () => function (string $attribute, mixed $value, Closure $fail) {
                                 if (filter_var($value, FILTER_VALIDATE_EMAIL)) {

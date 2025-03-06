@@ -51,7 +51,7 @@ class CompletedServiceOrderNotification extends Notification implements ShouldQu
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service Completed')
             ->replyTo($this->replyTo)
             ->from($this->from)

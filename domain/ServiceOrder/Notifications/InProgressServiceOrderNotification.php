@@ -51,7 +51,7 @@ class InProgressServiceOrderNotification extends Notification implements ShouldQ
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service In Progress')
             ->replyTo($this->replyTo)
             ->from($this->from)

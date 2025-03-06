@@ -145,7 +145,7 @@ class SchemaFormBuilder extends Component
 
         return $fieldComponent
             ->label($field->title)
-            ->required(fn () => in_array('required', $field->rules))
+            ->required(fn () => in_array('required', $field->rules, true))
             ->helperText($field->helper_text)
             ->rules($field->rules);
     }

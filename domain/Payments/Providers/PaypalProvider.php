@@ -124,7 +124,7 @@ class PaypalProvider extends Provider
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
             'cancelled' => $this->cancelTransaction($paymentModel),
-            default => throw new \InvalidArgumentException(),
+            default => throw new \InvalidArgumentException,
         };
     }
 

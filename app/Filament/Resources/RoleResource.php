@@ -301,7 +301,7 @@ class RoleResource extends Resource
 
     private static function refreshPermissionGroupState(string $groupName, PermissionGroup $permissionGroup, Forms\Get $get, Forms\Set $set): void
     {
-        $set($groupName, $permissionGroup->abilities->pluck('id')->every(fn (int $id) => in_array($id, $get("{$groupName}_abilities"))));
+        $set($groupName, $permissionGroup->abilities->pluck('id')->every(fn (int $id) => in_array($id, $get("{$groupName}_abilities"), true)));
     }
 
     private static function refreshPermissionGroupAbilitiesState(string $groupName, PermissionGroup $permissionGroup, Forms\Get $get, Forms\Set $set): void

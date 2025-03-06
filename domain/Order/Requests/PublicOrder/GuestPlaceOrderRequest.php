@@ -99,11 +99,11 @@ class GuestPlaceOrderRequest extends AddressRequest
             ],
             'payment_method' => [
                 'required',
-                Rule::exists(PaymentMethod::class, (new PaymentMethod())->getRouteKeyName()),
+                Rule::exists(PaymentMethod::class, (new PaymentMethod)->getRouteKeyName()),
             ],
             'shipping_method' => [
                 'required',
-                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+                Rule::exists(ShippingMethod::class, (new ShippingMethod)->getRouteKeyName()),
             ],
             'service_id' => [
                 'nullable',

@@ -32,11 +32,11 @@ class AusPostResponse implements RateResponse
     {
 
         foreach ($this->package['service'] as $service) {
-            if ($service['code'] == $serviceID) {
+            if ($service['code'] === $serviceID) {
                 return (float) $service['price'];
             }
         }
 
-        throw new AusPostServiceNotFoundException();
+        throw new AusPostServiceNotFoundException;
     }
 }

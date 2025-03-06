@@ -57,8 +57,8 @@ class ListInviteCustomers extends ListCustomers
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'birth_date' => [
                             'nullable',
-                            ($date_format == 'default' ||
-                            $date_format == '') ? 'date' : 'date_format:'.$date_format],
+                            ($date_format === 'default' ||
+                            $date_format === '') ? 'date' : 'date_format:'.$date_format],
                         'password' => 'nullable',
                         'registered' => 'nullable',
                         'data' => 'nullable',

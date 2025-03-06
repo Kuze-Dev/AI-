@@ -26,7 +26,7 @@ it('can check if two factor is required', function () {
     //            getKey: fn () => 1,
     //        );
     $user = mock_expect(
-        new User(),
+        new User,
         hasEnabledTwoFactorAuthentication: fn () => true,
         getKey: fn () => 1
     );
@@ -57,7 +57,7 @@ it('proceeds through pipeline when two factor is disabled for user', function ()
     Event::fake(TwoFactorAuthenticationChallenged::class);
     //    $user = (new Mock(new User()))
     //        ->expect(hasEnabledTwoFactorAuthentication: fn () => false);
-    $user = mock_expect(new User(), hasEnabledTwoFactorAuthentication: fn () => false);
+    $user = mock_expect(new User, hasEnabledTwoFactorAuthentication: fn () => false);
 
     //    $userProvider = (new Mock(EloquentUserProvider::class))
     //        ->expect(
@@ -87,7 +87,7 @@ it('proceeds through pipeline when user is on safe device', function () {
     Event::fake(TwoFactorAuthenticationChallenged::class);
     //    $user = (new Mock(new User()))
     //        ->expect(hasEnabledTwoFactorAuthentication: fn () => true);
-    $user = mock_expect(new User(), hasEnabledTwoFactorAuthentication: fn () => true);
+    $user = mock_expect(new User, hasEnabledTwoFactorAuthentication: fn () => true);
 
     //    $userProvider = (new Mock(EloquentUserProvider::class))
     //        ->expect(
@@ -126,7 +126,7 @@ it('throws exception on invalid credentials', function () {
     //        );
     $userProvider = mock_expect(
         EloquentUserProvider::class,
-        retrieveByCredentials: fn () => new User(),
+        retrieveByCredentials: fn () => new User,
         validateCredentials: fn () => false
     );
 

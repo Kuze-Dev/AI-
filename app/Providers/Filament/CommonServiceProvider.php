@@ -59,9 +59,9 @@ class CommonServiceProvider extends ServiceProvider
 
     protected function registerMacros(): void
     {
-        MountableAction::mixin(new FilamentMountableActionMixin());
-        Tables\Columns\TextColumn::mixin(new FilamentTextColumnMixin());
-        Forms\Components\Select::mixin(new FilamentSelectFormMixin());
+        MountableAction::mixin(new FilamentMountableActionMixin);
+        Tables\Columns\TextColumn::mixin(new FilamentTextColumnMixin);
+        Forms\Components\Select::mixin(new FilamentSelectFormMixin);
     }
 
     protected function configureComponents(): void
@@ -108,13 +108,13 @@ class CommonServiceProvider extends ServiceProvider
                     'delete' => 'deleted',
                     'restore' => 'restored',
                     'forceDelete' => 'force-deleted',
-                    default => throw new Exception(),
+                    default => throw new Exception,
                 },
                 description: fn (PageAction|TableAction $action) => match ($action->getName()) {
                     'delete' => $action->getRecordTitle().' deleted',
                     'restore' => $action->getRecordTitle().' restored',
                     'forceDelete' => $action->getRecordTitle().' force deleted',
-                    default => throw new Exception(),
+                    default => throw new Exception,
                 }
             )
             ->modalDescription(
@@ -142,7 +142,7 @@ class CommonServiceProvider extends ServiceProvider
                     'delete' => 'deleted',
                     'restore' => 'restored',
                     'forceDelete' => 'force-deleted',
-                    default => throw new Exception(),
+                    default => throw new Exception,
                 })
             ->modalDescription(
                 fn (Tables\Actions\BulkAction $action) => trans(

@@ -80,7 +80,7 @@ class GuestCartMobileSummaryRequest extends AddressRequest
             ],
             'shipping_method_id' => [
                 'nullable',
-                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+                Rule::exists(ShippingMethod::class, (new ShippingMethod)->getRouteKeyName()),
             ],
             'service_id' => [
                 'nullable',
@@ -118,7 +118,7 @@ class GuestCartMobileSummaryRequest extends AddressRequest
             $id = $this->validated('billing_address')['country_id'];
 
             /** @var \Domain\Address\Models\Country $country */
-            $country = app(Country::class)->where((new Country())->getRouteKeyName(), $id)->first();
+            $country = app(Country::class)->where((new Country)->getRouteKeyName(), $id)->first();
 
             return $country;
         }
@@ -131,7 +131,7 @@ class GuestCartMobileSummaryRequest extends AddressRequest
         if ($this->validated('billing_address')) {
             $id = $this->validated('billing_address')['state_id'];
             /** @var \Domain\Address\Models\State $state */
-            $state = app(State::class)->where((new State())->getRouteKeyName(), $id)->first();
+            $state = app(State::class)->where((new State)->getRouteKeyName(), $id)->first();
 
             return $state;
         }
@@ -147,10 +147,10 @@ class GuestCartMobileSummaryRequest extends AddressRequest
             $countryId = $this->validated('shipping_address')['country_id'];
 
             /** @var \Domain\Address\Models\State $state */
-            $state = app(State::class)->where((new State())->getRouteKeyName(), $stateId)->first();
+            $state = app(State::class)->where((new State)->getRouteKeyName(), $stateId)->first();
 
             /** @var \Domain\Address\Models\Country $country */
-            $country = app(Country::class)->where((new Country())->getRouteKeyName(), $countryId)->first();
+            $country = app(Country::class)->where((new Country)->getRouteKeyName(), $countryId)->first();
 
             return new ShippingAddressData(
                 address: $shippingAddressData['address_line_1'],
@@ -177,7 +177,7 @@ class GuestCartMobileSummaryRequest extends AddressRequest
     public function getShippingMethod(): ?ShippingMethod
     {
         if ($id = $this->validated('shipping_method_id')) {
-            return app(ShippingMethod::class)->where((new ShippingMethod())->getRouteKeyName(), $id)->first();
+            return app(ShippingMethod::class)->where((new ShippingMethod)->getRouteKeyName(), $id)->first();
         }
 
         return null;

@@ -164,11 +164,11 @@ class UpdateProductOptionAction
             /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
             $variantCombination = $variant->combination;
             $newCombinations = collect($variantCombination)->map(function ($combination) use ($needle, $newValue, $field) {
-                if ($field == 'option_id' && strtolower($combination->option) === strtolower($needle)) {
+                if ($field === 'option_id' && strtolower($combination->option) === strtolower($needle)) {
                     return $combination->withOptionId($newValue, $combination);
                 }
 
-                if ($field == 'option_value_id' && strtolower($combination->option_value) === strtolower($needle)) {
+                if ($field === 'option_value_id' && strtolower($combination->option_value) === strtolower($needle)) {
                     return $combination->withOptionValueId($newValue, $combination);
                 }
 
@@ -185,12 +185,12 @@ class UpdateProductOptionAction
             /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
             $variantCombination = $variant->combination;
             $newCombinations = collect($variantCombination)->map(function ($combination) use ($needle, $newValue, $field) {
-                if ($combination->{$field} == $needle) {
-                    if ($field == 'option_id') {
+                if ($combination->{$field} === $needle) {
+                    if ($field === 'option_id') {
                         return $combination->withOptionId($newValue, $combination);
                     }
 
-                    if ($field == 'option_value_id') {
+                    if ($field === 'option_value_id') {
                         return $combination->withOptionValueId($newValue, $combination);
                     }
                 }

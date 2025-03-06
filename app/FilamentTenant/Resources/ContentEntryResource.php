@@ -114,7 +114,7 @@ class ContentEntryResource extends Resource
                                     }
 
                                     if ($livewire->record?->draftable_id &&
-                                        $livewire->record?->title == $livewire->record?->parentPage->title) {
+                                        $livewire->record?->title === $livewire->record?->parentPage->title) {
                                         return false;
                                     }
 
@@ -136,7 +136,7 @@ class ContentEntryResource extends Resource
                         RouteUrlFieldset::make()
                             ->generateModelForRouteUrlUsing(fn ($livewire, ContentEntry|string $model) => $model instanceof ContentEntry
                                 ? $model
-                                : tap(new ContentEntry())->setRelation('content', $livewire->ownerRecord)),
+                                : tap(new ContentEntry)->setRelation('content', $livewire->ownerRecord)),
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) Locale::where('is_default', true)->first()?->code)
@@ -160,9 +160,9 @@ class ContentEntryResource extends Resource
                                         $exist = ContentEntry::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
                                         )->where('locale', $selectedLocale)->first();
 
-                                        if (is_null($record->draftable_id) && $exist && $exist->id != $record->id) {
+                                        if (is_null($record->draftable_id) && $exist && $exist->id !== $record->id) {
                                             $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                        } elseif ($record->draftable_id != null && $exist && $exist->id != $record->draftable_id) {
+                                        } elseif ($record->draftable_id !== null && $exist && $exist->id !== $record->draftable_id) {
                                             $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
                                         }
                                     }
@@ -211,7 +211,7 @@ class ContentEntryResource extends Resource
 
                                 $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                                return ! in_array($value, $intersect);
+                                return ! in_array($value, $intersect, true);
                             })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
                                 if (! $record) {

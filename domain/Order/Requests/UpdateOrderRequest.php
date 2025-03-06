@@ -30,7 +30,7 @@ class UpdateOrderRequest extends FormRequest
                 Rule::in($slugs),
                 function ($attribute, $value, $fail) use ($order) {
 
-                    if (! in_array($value, ['status', 'bank-transfer'])) {
+                    if (! in_array($value, ['status', 'bank-transfer'], true)) {
 
                         $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
 
@@ -60,8 +60,8 @@ class UpdateOrderRequest extends FormRequest
                 Rule::requiredIf(fn () => $this->input('type') === 'status'),
                 function ($attribute, $value, $fail) use ($order) {
                     if (
-                        $value == OrderStatuses::CANCELLED->value &&
-                        ! in_array($order->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT])
+                        $value === OrderStatuses::CANCELLED->value &&
+                        ! in_array($order->status, [OrderStatuses::PENDING, OrderStatuses::FORPAYMENT], true)
                     ) {
                         $fail("You can't cancel this order");
 
@@ -69,7 +69,7 @@ class UpdateOrderRequest extends FormRequest
                     }
 
                     if (
-                        $value == OrderStatuses::FULFILLED->value &&
+                        $value === OrderStatuses::FULFILLED->value &&
                         $order->status !== OrderStatuses::DELIVERED
                     ) {
                         $fail("You can't fullfilled this order");

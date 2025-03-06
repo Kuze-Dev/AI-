@@ -53,7 +53,7 @@ class SiteSettings extends TenantBaseSettings
                     ->getUploadedFileNameForStorageUsing(static fn (TemporaryUploadedFile $file) => 'favicon.'.$file->extension()),
                 TextInput::make('front_end_domain')
                     ->required()
-                    ->rules([new FullyQualifiedDomainNameRule()])
+                    ->rules([new FullyQualifiedDomainNameRule])
                     ->maxLength(100)
                     ->columnSpan('full'),
             ])

@@ -33,7 +33,7 @@ class MicrositeContentEntryUniqueRouteUrlRule implements ValidationRule
                     ->where(
                         'updated_at',
                         fn ($query) => $query->select(DB::raw('MAX(`updated_at`)'))
-                            ->from((new RouteUrl())->getTable(), 'sub_query_table')
+                            ->from((new RouteUrl)->getTable(), 'sub_query_table')
                             ->whereColumn('sub_query_table.model_type', 'route_urls.model_type')
                             ->whereColumn('sub_query_table.model_id', 'route_urls.model_id')
                     )

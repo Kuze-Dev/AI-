@@ -70,7 +70,7 @@ class CheckoutServiceOrderAction
         }
 
         if ($serviceBill->is_paid) {
-            throw new ServiceBillAlreadyPaidException();
+            throw new ServiceBillAlreadyPaidException;
         }
 
         return $serviceBill;
@@ -92,7 +92,7 @@ class CheckoutServiceOrderAction
     private function proceedPayment(): PaymentAuthorize
     {
         if ($this->serviceOrder->status === ServiceOrderStatus::PENDING) {
-            throw new ServiceOrderStatusStillPendingException();
+            throw new ServiceOrderStatusStillPendingException;
         }
 
         $providerData = new CreatepaymentData(

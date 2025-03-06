@@ -82,6 +82,6 @@ readonly class SplitOrderAction
             return $result;
         }
 
-        throw new PaymentException();
+        throw new PaymentException;
     }
 }

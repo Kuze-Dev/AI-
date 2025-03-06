@@ -18,7 +18,7 @@ beforeEach()->skip('skip otp');
 it('can login a user', function () {
     //    $user = (new Mock(new User()))
     //        ->expect(hasEnabledTwoFactorAuthentication: fn () => false);
-    $user = mock_expect(new User(), hasEnabledTwoFactorAuthentication: fn () => false);
+    $user = mock_expect(new User, hasEnabledTwoFactorAuthentication: fn () => false);
 
     //    $userProvider = (new Mock(EloquentUserProvider::class))
     //        ->expect(

@@ -28,7 +28,7 @@ class UpdateServiceOrderProofOfPaymentAction
             throw new BadRequestHttpException('Payment not found!');
         }
 
-        if ($payment->gateway != 'bank-transfer') {
+        if ($payment->gateway !== 'bank-transfer') {
             throw new BadRequestHttpException('You cant upload a proof of payment in this gateway');
         }
 

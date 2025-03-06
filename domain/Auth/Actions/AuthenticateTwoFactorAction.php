@@ -72,11 +72,11 @@ class AuthenticateTwoFactorAction
         $user = $userProvider->retrieveById(Session::get('login.id'));
 
         if (! $user) {
-            throw new AuthenticationException();
+            throw new AuthenticationException;
         }
 
         if (! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException;
         }
 
         return $user;

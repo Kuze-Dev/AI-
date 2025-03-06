@@ -93,7 +93,7 @@ class DiscountResource extends Resource
                         ->suffixAction(
                             fn (?string $state): Action => Action::make('code')
                                 ->icon('heroicon-o-cog')
-                                ->action(fn (TextInput $component) => $component->state((new AutoGenerateCode())()))
+                                ->action(fn (TextInput $component) => $component->state((new AutoGenerateCode)()))
                                 ->tooltip(trans('auto generate code')),
                         )->unique(ignoreRecord: true)
                         ->required()

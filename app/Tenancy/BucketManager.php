@@ -38,7 +38,7 @@ readonly class BucketManager
 
         $buckets = Arr::pluck($result['Buckets'], 'Name');
 
-        return in_array($this->tenant->getInternal('bucket'), $buckets);
+        return in_array($this->tenant->getInternal('bucket'), $buckets, true);
     }
 
     public function createBucket(): void

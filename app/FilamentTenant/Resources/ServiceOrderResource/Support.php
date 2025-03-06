@@ -114,23 +114,23 @@ final class Support
                 $get('billing_address'))
         ));
 
-        if ($taxInfo->tax_display == PriceDisplay::INCLUSIVE) {
+        if ($taxInfo->tax_display === PriceDisplay::INCLUSIVE) {
             return PriceDisplay::INCLUSIVE->value;
         }
 
         $currency = 0.0;
 
-        if ($type == 'servicePrice') {
+        if ($type === 'servicePrice') {
             $currency = $servicePrice;
-        } elseif ($type == 'additionalCharges') {
+        } elseif ($type === 'additionalCharges') {
             $currency = $additionalCharges;
-        } elseif ($type == 'taxPercentage') {
+        } elseif ($type === 'taxPercentage') {
             return 'Tax ('.$taxInfo->tax_percentage.'%)';
-        } elseif ($type == 'totalPrice') {
+        } elseif ($type === 'totalPrice') {
             $currency = $taxInfo->total_price;
-        } elseif ($type == 'taxTotal') {
+        } elseif ($type === 'taxTotal') {
             $currency = $taxInfo->tax_total;
-        } elseif ($type == 'totalPriceFloat') {
+        } elseif ($type === 'totalPriceFloat') {
             return floatval($taxInfo->total_price);
         }
 

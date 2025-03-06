@@ -66,7 +66,7 @@ class ActivatedServiceOrderNotification extends Notification implements ShouldQu
     {
         $admin = Admin::first();
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Successfully Activated')
             ->replyTo($this->replyTo)
             ->from($this->from)

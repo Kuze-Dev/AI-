@@ -196,7 +196,7 @@ class ImportAction extends Action
         }
 
         if (is_string($importClass) && class_exists($importClass)) {
-            return new $importClass();
+            return new $importClass;
         }
 
         $admin = filament_admin();

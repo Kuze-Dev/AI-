@@ -21,7 +21,7 @@ readonly class CreateReviewAction
 
         $orderLine = OrderLine::find($createReviewData->order_line_id);
         if (! $orderLine) {
-            return new Review();
+            return new Review;
         }
 
         $order_id = $orderLine->order_id ?? null;
@@ -29,7 +29,7 @@ readonly class CreateReviewAction
         $product_id = null;
 
         if (! $orderLine->purchasable_data) {
-            return new Review();
+            return new Review;
         }
 
         if (isset($orderLine->purchasable_data['combination'])) {

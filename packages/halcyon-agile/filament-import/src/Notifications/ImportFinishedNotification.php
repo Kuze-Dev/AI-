@@ -32,7 +32,7 @@ class ImportFinishedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->greeting('Import finished');
     }
 

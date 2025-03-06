@@ -35,7 +35,7 @@ class VerifyEmailController extends Controller
         /** @var string $hash */
         $hash = $request->route('hash') ?? '';
         if (! hash_equals($hash, sha1($customer->getEmailForVerification()))) {
-            throw new AuthorizationException();
+            throw new AuthorizationException;
         }
 
         $params = http_build_query([

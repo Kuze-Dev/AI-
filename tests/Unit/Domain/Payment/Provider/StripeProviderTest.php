@@ -27,7 +27,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Stripe']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new StripeProvider());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new StripeProvider);
 });
 
 it('Stripe payment Gateway must be instance of StripeProvider  ', function () {

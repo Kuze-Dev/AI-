@@ -74,7 +74,7 @@ trait ExportsRecords
         if (is_array($this->writerType)) {
             $writeTypeOptions = array_filter(
                 $writeTypeOptions,
-                fn (string $key) => in_array($key, $this->writerType),
+                fn (string $key) => in_array($key, $this->writerType, true),
                 ARRAY_FILTER_USE_KEY
             );
         }
@@ -125,7 +125,7 @@ trait ExportsRecords
         }
 
         if (is_string($exportClass) && class_exists($exportClass)) {
-            return new $exportClass();
+            return new $exportClass;
         }
 
         /** @var class-string<\Illuminate\Database\Eloquent\Model>|null $model */

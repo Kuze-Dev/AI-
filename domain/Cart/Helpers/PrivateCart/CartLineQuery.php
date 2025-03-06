@@ -40,7 +40,7 @@ class CartLineQuery
                 $query->whereBelongsTo(customer_logged_in());
             })
             ->whereNull('checked_out_at')
-            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
+            ->whereIn((new CartLine)->getRouteKeyName(), $cartLineIds)
             ->get();
 
         return $cartLines;
@@ -55,7 +55,7 @@ class CartLineQuery
                 $query->where('session_id', $sessionId);
             })
             ->whereNull('checked_out_at')
-            ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
+            ->whereIn((new CartLine)->getRouteKeyName(), $cartLineIds)
             ->get();
 
         return $cartLines;

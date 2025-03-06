@@ -34,7 +34,7 @@ readonly class UpdateOrderPaymentAction
             'status' => $status,
         ];
 
-        if ($status == OrderStatuses::CANCELLED->value) {
+        if ($status === OrderStatuses::CANCELLED->value) {
             $orderData['cancelled_reason'] = $notes;
             $orderData['cancelled_at'] = now();
 
@@ -62,13 +62,13 @@ readonly class UpdateOrderPaymentAction
         $payment = $order->payments->first();
 
         if (
-            $payment->gateway != 'bank-transfer'
+            $payment->gateway !== 'bank-transfer'
         ) {
             throw new BadRequestHttpException('You cant upload a proof of payment in this gateway');
         }
 
         if (
-            $order->status != OrderStatuses::FORPAYMENT
+            $order->status !== OrderStatuses::FORPAYMENT
         ) {
             throw new BadRequestHttpException('Invalid action');
         }

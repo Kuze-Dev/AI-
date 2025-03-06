@@ -31,7 +31,7 @@ class CreateContentEntry extends CreateRecord
         $this->ownerRecord = app(Content::class)->resolveRouteBinding($ownerRecord)?->load('taxonomies.taxonomyTerms');
 
         if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel(Content::class, ['']);
+            throw (new ModelNotFoundException)->setModel(Content::class, ['']);
         }
 
         parent::mount();

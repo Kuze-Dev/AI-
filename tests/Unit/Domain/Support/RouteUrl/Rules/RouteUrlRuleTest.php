@@ -21,7 +21,7 @@ beforeEach(function () {
 
     DB::connection()
         ->getSchemaBuilder()
-        ->create((new TestModelForRouteUrl())->getTable(), function (Blueprint $table) {
+        ->create((new TestModelForRouteUrl)->getTable(), function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->timestamps();
@@ -33,7 +33,7 @@ beforeEach(function () {
 it('passes when valid', function () {
     $result = Validator::make(
         ['url' => 'test'],
-        ['url' => new UniqueActiveRouteUrlRule()]
+        ['url' => new UniqueActiveRouteUrlRule]
     )->passes();
 
     assertTrue($result);
@@ -66,7 +66,7 @@ it('passes with non active url', function () {
 
     $result = Validator::make(
         ['url' => 'old-one'],
-        ['url' => new UniqueActiveRouteUrlRule()]
+        ['url' => new UniqueActiveRouteUrlRule]
     )->passes();
 
     assertTrue($result);

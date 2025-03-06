@@ -74,11 +74,11 @@ class IntlRateV2ResponseData implements RateResponse
     public function getRate(int|string|null $serviceID = null): float
     {
         foreach ($this->package->services as $service) {
-            if ($service->id == $serviceID) {
+            if ($service->id === $serviceID) {
                 return $service->postage;
             }
         }
 
-        throw new USPSServiceNotFoundException();
+        throw new USPSServiceNotFoundException;
     }
 }

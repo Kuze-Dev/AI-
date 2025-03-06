@@ -44,7 +44,7 @@ class CMSSettings extends TenantBaseSettings
             Section::make([
                 TextInput::make('front_end_domain')
                     ->nullable()
-                    ->rules([new FullyQualifiedDomainNameRule()])
+                    ->rules([new FullyQualifiedDomainNameRule])
                     ->maxLength(100)
                     ->columnSpan('full'),
             ]),

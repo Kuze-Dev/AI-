@@ -83,7 +83,7 @@ class PageResource extends Resource
                                             return false;
                                         }
 
-                                        if ($livewire->record?->parentPage?->name == $state) {
+                                        if ($livewire->record?->parentPage?->name === $state) {
                                             return false;
                                         }
 
@@ -118,7 +118,7 @@ class PageResource extends Resource
                                             $exist = Page::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
                                             )->where('locale', $selectedLocale)->first();
 
-                                            if ($exist && $exist->id != $record->id) {
+                                            if ($exist && $exist->id !== $record->id) {
                                                 $fail("Page {$get('name')} has a existing ({$selectedLocale}) translation.");
                                             }
                                         }
@@ -177,7 +177,7 @@ class PageResource extends Resource
 
                                             foreach ($block_ids as $block_id) {
 
-                                                if (! in_array($block_id, $block_siteIds)) {
+                                                if (! in_array($block_id, $block_siteIds, true)) {
                                                     $fail('A block added to the page is not available with the selected sites. Please review the sites field or ensure that only blocks available for the selected sites are added.');
                                                 }
                                             }
@@ -202,7 +202,7 @@ class PageResource extends Resource
 
                                     $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                                    return ! in_array($value, $intersect);
+                                    return ! in_array($value, $intersect, true);
                                 })
                                 ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Page $record): void {
                                     if (! $record) {

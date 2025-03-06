@@ -78,7 +78,7 @@ class OrderPlacedMail extends Notification implements ShouldQueue
 
         $address = $this->getAddress();
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Order Being Placed')
             ->replyTo($this->replyTo)
             ->from($this->from)

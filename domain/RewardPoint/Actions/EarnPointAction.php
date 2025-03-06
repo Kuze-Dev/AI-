@@ -19,7 +19,7 @@ class EarnPointAction
     {
         $earnedPoints = ($order->total / $this->rewardPoint->minimum_amount) * $this->rewardPoint->equivalent_point;
 
-        $pointEarning = new PointEarning();
+        $pointEarning = new PointEarning;
 
         $pointEarning->create([
             'customer_type' => $customer->getMorphClass(),

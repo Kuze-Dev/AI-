@@ -94,10 +94,10 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                         ->extend(
                             $shippingMethod->driver->value,
                             fn () => match ($shippingMethod->driver) {
-                                Driver::STORE_PICKUP => new StorePickupDriver(),
-                                Driver::USPS => new UspsDriver(),
-                                Driver::UPS => new UpsDriver(),
-                                Driver::AUSPOST => new AusPostDriver(),
+                                Driver::STORE_PICKUP => new StorePickupDriver,
+                                Driver::USPS => new UspsDriver,
+                                Driver::UPS => new UpsDriver,
+                                Driver::AUSPOST => new AusPostDriver,
                             }
                         );
                 }
