@@ -11,6 +11,14 @@ final class TenantFeatureSupport
     private function __construct() {}
 
     /**
+     * @param  class-string<FeatureContract>|array<int, class-string<FeatureContract>>  $feature
+     */
+    public static function activate(string|array $feature): void
+    {
+        TenantSupport::model()->features()->activate($feature);
+    }
+
+    /**
      * @param  class-string<FeatureContract>  $feature
      */
     public static function active(string $feature): bool
