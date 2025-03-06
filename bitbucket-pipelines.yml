@@ -1,5 +1,5 @@
 image:
-  name: bitnami/laravel:latest
+  name: bitnami/laravel:11.3.3 # https://bitnami.com/stack/laravel w- 9.5.2 - 10.3.3
   run-as-user: 1000
 
 definitions:
