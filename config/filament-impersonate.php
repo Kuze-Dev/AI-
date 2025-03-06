@@ -1,5 +1,4 @@
 <?php
-
 return [
     // This is the guard used when logging in as the impersonated user.
     'guard' => env('FILAMENT_IMPERSONATE_GUARD', 'web'),
