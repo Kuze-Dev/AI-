@@ -342,16 +342,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.342.0",
+            "version": "3.342.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "5b8c837ab0c9754ab3408bd9afe6f0c67516b1fd"
+                "reference": "8a4ba50aa12ce509d0e598a7fd65d6b9309c39dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5b8c837ab0c9754ab3408bd9afe6f0c67516b1fd",
-                "reference": "5b8c837ab0c9754ab3408bd9afe6f0c67516b1fd",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/8a4ba50aa12ce509d0e598a7fd65d6b9309c39dd",
+                "reference": "8a4ba50aa12ce509d0e598a7fd65d6b9309c39dd",
                 "shasum": ""
             },
             "require": {
@@ -433,9 +433,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.342.0"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.342.1"
             },
-            "time": "2025-03-05T19:20:14+00:00"
+            "time": "2025-03-06T19:17:36+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -5786,21 +5786,21 @@
         },
         {
             "name": "mastani/laravel-google-static-map",
-            "version": "2.4",
+            "version": "2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mastani/laravel-google-static-map.git",
-                "reference": "c3c0841922112040175e776faee63a18a6ce6845"
+                "reference": "6a8f40872cbc46c3a7085cd06b70ee60c9391bde"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mastani/laravel-google-static-map/zipball/c3c0841922112040175e776faee63a18a6ce6845",
-                "reference": "c3c0841922112040175e776faee63a18a6ce6845",
+                "url": "https://api.github.com/repos/mastani/laravel-google-static-map/zipball/6a8f40872cbc46c3a7085cd06b70ee60c9391bde",
+                "reference": "6a8f40872cbc46c3a7085cd06b70ee60c9391bde",
                 "shasum": ""
             },
             "require": {
-                "illuminate/contracts": "5.*|6.*|7.*|8.*|^9.0|^10.0|^11.0",
-                "illuminate/support": "5.*|6.*|7.*|8.*|^9.0|^10.0|^11.0"
+                "illuminate/contracts": "5.*|6.*|7.*|8.*|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "5.*|6.*|7.*|8.*|^9.0|^10.0|^11.0|^12.0"
             },
             "type": "library",
             "extra": {
@@ -5838,9 +5838,9 @@
             ],
             "support": {
                 "issues": "https://github.com/mastani/laravel-google-static-map/issues",
-                "source": "https://github.com/mastani/laravel-google-static-map/tree/2.4"
+                "source": "https://github.com/mastani/laravel-google-static-map/tree/2.5"
             },
-            "time": "2024-03-22T08:26:04+00:00"
+            "time": "2025-03-06T18:14:40+00:00"
         },
         {
             "name": "masterminds/html5",
