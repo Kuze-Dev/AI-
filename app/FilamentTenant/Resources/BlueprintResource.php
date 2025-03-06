@@ -617,7 +617,7 @@ class BlueprintResource extends Resource
                             ->keys()
                             ->mapWithKeys(
                                 fn (string $model) =>
-                                    /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
+                                    /** @phpstan-ignore-next-line */
                                     [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()]
                             )
                             ->sort()
