@@ -11,7 +11,6 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Contracts\HasRelationshipTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
@@ -72,15 +71,14 @@ class TiersRelationManager extends RelationManager
                     ])
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['id', 'name'])
-                    ->using(fn ($livewire, array $data): ?Model =>
-                        $livewire->getRelationship()
-                            ->attach(
-                                $data['recordId'],
-                                [
-                                    'discount_amount_type' => $data['discount_amount_type'],
-                                    'discount' => $data['discount'],
-                                ]
-                            )),
+                    ->using(fn ($livewire, array $data): ?Model => $livewire->getRelationship()
+                        ->attach(
+                            $data['recordId'],
+                            [
+                                'discount_amount_type' => $data['discount_amount_type'],
+                                'discount' => $data['discount'],
+                            ]
+                        )),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

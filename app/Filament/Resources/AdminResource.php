@@ -18,9 +18,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
-use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -31,10 +29,10 @@ use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 class AdminResource extends Resource
 {
     use RequiresPasswordConfirmation;
+
     protected static ?string $model = Admin::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
-
 
     protected static ?string $recordTitleAttribute = 'full_name';
 
@@ -68,7 +66,7 @@ class AdminResource extends Resource
                     Forms\Components\TextInput::make('email')
                         ->translateLabel()
                         ->email()
-                        ->rules( fn () => Rule::email())
+                        ->rules(fn () => Rule::email())
                         ->unique(ignoreRecord: true)
                         ->required()
                         ->helperText(fn (?Admin $record) => ! empty($record) && ! config()->boolean('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')

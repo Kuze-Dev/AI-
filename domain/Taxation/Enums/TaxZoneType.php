@@ -15,7 +15,7 @@ enum TaxZoneType: string implements HasLabel
     {
         return match ($this) {
             self::COUNTRY => trans('Limit by Countries'),
-            self::STATE =>  trans('Limit by States/Provinces'),
+            self::STATE => trans('Limit by States/Provinces'),
         };
     }
 }

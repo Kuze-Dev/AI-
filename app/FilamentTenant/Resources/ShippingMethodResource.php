@@ -16,7 +16,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ShippingMethodResource extends Resource
@@ -62,10 +61,10 @@ class ShippingMethodResource extends Resource
                             /** @var ?Media $media */
                             $media = $mediaClass::findByUuid($file);
 
-                            if ( $media === null) {
+                            if ($media === null) {
                                 return null;
                             }
-                            
+
                             if (config()->string('filament.default_filesystem_disk') === 'r2') {
                                 return [
                                     'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
@@ -83,7 +82,7 @@ class ShippingMethodResource extends Resource
                                         'type' => $media->getAttributeValue('mime_type'),
                                         'url' => $media->getTemporaryUrl(now()->addMinutes(5)),
                                     ];
-                                    
+
                                 } catch (\Throwable) {
                                     // This driver does not support creating temporary URLs.
                                 }

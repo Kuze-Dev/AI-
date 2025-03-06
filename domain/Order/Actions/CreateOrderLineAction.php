@@ -21,8 +21,7 @@ readonly class CreateOrderLineAction
 {
     public function __construct(
         private CartSummaryAction $cartSummaryAction
-    ) {
-    }
+    ) {}
 
     public function execute(Order $order, PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): void
     {

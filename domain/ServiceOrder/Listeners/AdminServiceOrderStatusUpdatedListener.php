@@ -10,8 +10,6 @@ use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
-use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
-use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
@@ -27,8 +25,7 @@ class AdminServiceOrderStatusUpdatedListener
         private readonly ComputeServiceBillingCycleAction $computeServiceBillingCycleAction,
         private readonly ServiceSettings $serviceSettings,
         private bool $shouldNotifyCustomer = false,
-    ) {
-    }
+    ) {}
 
     public function handle(AdminServiceOrderStatusUpdatedEvent $event): void
     {

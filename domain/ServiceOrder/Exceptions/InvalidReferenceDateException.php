@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class InvalidReferenceDateException extends LogicException
-{
-}
+class InvalidReferenceDateException extends LogicException {}

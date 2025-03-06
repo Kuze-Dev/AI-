@@ -37,7 +37,7 @@ class EditTenant extends EditRecord
     {
         return Action::make('save')
             ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
-            ->requiresConfirmation(fn(self $livewire) => $livewire->data['is_suspended'] === true )
+            ->requiresConfirmation(fn (self $livewire) => $livewire->data['is_suspended'] === true)
             ->modalCancelActionLabel(trans('Cancel & Revert Changes'))
             ->modalHeading(fn (self $livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
             ->modalDescription(
@@ -45,7 +45,7 @@ class EditTenant extends EditRecord
                     ? trans('The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?')
                     : null
             )
-            ->action(fn() => $this->save())
+            ->action(fn () => $this->save())
             ->keyBindings(['mod+s']);
     }
 

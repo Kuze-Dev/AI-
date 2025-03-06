@@ -14,8 +14,7 @@ readonly class FormData
         public bool $uses_captcha = false,
         public array $form_email_notifications = [],
         public array $sites = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

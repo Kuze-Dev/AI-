@@ -11,6 +11,5 @@ readonly class PasswordResetSent
 {
     public function __construct(
         public Authenticatable&Model $user
-    ) {
-    }
+    ) {}
 }

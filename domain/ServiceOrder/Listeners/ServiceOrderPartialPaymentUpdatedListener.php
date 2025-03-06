@@ -23,9 +23,8 @@ class ServiceOrderPartialPaymentUpdatedListener
         private Payment $payment,
         private ServiceOrder $serviceOrder,
         private ServiceTransaction $serviceTransaction,
-        private readonly ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction
-    ) {
-    }
+        private readonly ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction,
+    ) {}
 
     /** @throws Throwable */
     public function handle(PaymentProcessEvent $event): void
@@ -65,7 +64,7 @@ class ServiceOrderPartialPaymentUpdatedListener
             'paid' => ServiceTransactionStatus::PAID,
             'refunded', => ServiceTransactionStatus::REFUNDED,
             'cancelled', => ServiceTransactionStatus::CANCELLED,
-            default => throw new PaymentException()
+            default => throw new PaymentException(),
         };
 
         $this->serviceTransaction->update(['status' => $serviceTransactionStatus]);

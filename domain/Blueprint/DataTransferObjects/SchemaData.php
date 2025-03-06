@@ -14,8 +14,7 @@ class SchemaData implements Arrayable
     /** @param  array<SectionData>  $sections */
     private function __construct(
         public readonly array $sections
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

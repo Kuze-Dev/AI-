@@ -11,6 +11,7 @@ trait HasPayments
 {
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Payments\Models\Payment, $this>
+     *
      * @phpstan-ignore method.childReturnType, method.childReturnType, method.childReturnType
      */
     public function payments(): MorphMany

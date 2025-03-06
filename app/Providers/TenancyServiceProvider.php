@@ -118,9 +118,7 @@ class TenancyServiceProvider extends ServiceProvider
     }
 
     #[\Override]
-    public function register(): void
-    {
-    }
+    public function register(): void {}
 
     public function boot(): void
     {

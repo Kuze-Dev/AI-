@@ -12,8 +12,7 @@ readonly class ImportBlueprintAction
 {
     public function __construct(
         private CreateBlueprintAction $createBlueprintAction,
-    ) {
-    }
+    ) {}
 
     public function execute(array $row): Blueprint
     {

@@ -10,7 +10,6 @@ use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
 use App\Settings\PaymentSettings as SettingsPaymentSettings;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
-use Illuminate\Auth\Middleware\RequirePassword;
 use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
 
 class PaymentSettings extends TenantBaseSettings

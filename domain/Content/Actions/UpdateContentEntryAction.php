@@ -25,8 +25,7 @@ class UpdateContentEntryAction
         protected UpdateMetaDataAction $updateMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /**
      * Execute operations for updating

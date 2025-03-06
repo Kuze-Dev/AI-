@@ -9,8 +9,7 @@ readonly class CartSummaryTaxData
     public function __construct(
         public ?int $countryId,
         public ?int $stateId,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -24,17 +24,14 @@ use Domain\Tenant\TenantFeatureSupport;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
@@ -111,7 +108,7 @@ class PageResource extends Resource
                                 ->default((string) Locale::where('is_default', true)->first()?->code)
                                 ->searchable()
                                 ->rules([
-                                    fn(?Page $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                    fn (?Page $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
                                         if ($record) {
                                             $selectedLocale = $value;
@@ -165,7 +162,7 @@ class PageResource extends Resource
                                 ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                                 ->rules([
                                     fn (?Page $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')),
-                                    fn(?Page $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($get) {
+                                    fn (?Page $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($get) {
 
                                         if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
@@ -176,7 +173,7 @@ class PageResource extends Resource
                                             $siteIDs = $value;
 
                                             $block_siteIds = self::getCachedBlocks()
-                                                ->filter(fn($block) => $block->sites->pluck('id')->intersect($siteIDs)->isNotEmpty())->pluck('id')->toArray();
+                                                ->filter(fn ($block) => $block->sites->pluck('id')->intersect($siteIDs)->isNotEmpty())->pluck('id')->toArray();
 
                                             foreach ($block_ids as $block_id) {
 
@@ -189,7 +186,7 @@ class PageResource extends Resource
 
                                     },
                                 ])
-                                ->options(fn() => Site::orderBy('name')
+                                ->options(fn () => Site::orderBy('name')
                                     ->pluck('name', 'id')
                                     ->toArray())
                                 ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
@@ -233,15 +230,15 @@ class PageResource extends Resource
 
                                 $component->state(
                                     $record->blockContents->sortBy('order')
-                                    ->mapWithKeys(fn (BlockContent $item) => [
-                                        "record-{$item->getKey()}" => array_merge(
-                                            $item->toArray(),
-                                            [
-                                                'data' => (array) $item->data,
-                                                'block' => [],
-                                            ]
-                                        ),
-                                    ])
+                                        ->mapWithKeys(fn (BlockContent $item) => [
+                                            "record-{$item->getKey()}" => array_merge(
+                                                $item->toArray(),
+                                                [
+                                                    'data' => (array) $item->data,
+                                                    'block' => [],
+                                                ]
+                                            ),
+                                        ])
                                         ->toArray()
                                 );
 
@@ -262,13 +259,13 @@ class PageResource extends Resource
                                     ->required()
                                     ->view('filament.forms.components.block-picker')
                                     ->datafilter(fn (\Filament\Forms\Get $get) => self::getCachedBlocks()
-                                        ->filter(fn($block) => $block->sites->pluck('id')->intersect($get('../../sites'))->isNotEmpty())
+                                        ->filter(fn ($block) => $block->sites->pluck('id')->intersect($get('../../sites'))->isNotEmpty())
                                         ->pluck('id')->toArray()
                                     )
                                     ->viewData(fn () => [
                                         'blocks' => self::getCachedBlocks()
                                             ->sortBy('name')
-                                            ->mapWithKeys(fn(Block $block) => [
+                                            ->mapWithKeys(fn (Block $block) => [
                                                 $block->id => [
                                                     'name' => $block['name'],
                                                     'image' => $block->getFirstMediaUrl('image'),
@@ -464,7 +461,7 @@ class PageResource extends Resource
 
         if (! isset(self::$cachedBlocks)) {
 
-            self::$cachedBlocks = Block::with([ 'media', 'sites'])->get();
+            self::$cachedBlocks = Block::with(['media', 'sites'])->get();
         }
 
         return self::$cachedBlocks;

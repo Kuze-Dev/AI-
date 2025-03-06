@@ -76,7 +76,7 @@ class MediaresourceResource extends Resource
             ->columns([
                 Tables\Columns\Layout\Stack::make([
                     Tables\Columns\ImageColumn::make('original_url')
-                        ->getStateUsing(fn($record) => match ($record->getTypeFromMime()) {
+                        ->getStateUsing(fn ($record) => match ($record->getTypeFromMime()) {
                             'image' => $record->original_url,
                             default => 'https://dummyimage.com/600x400/000/fff&text='.$record->getTypeFromMime(),
                         })
@@ -85,7 +85,7 @@ class MediaresourceResource extends Resource
                         ->extraAttributes(['class' => 'rounded-lg w-full overflow-hidden bg-neutral-800'])
                         ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
                     Tables\Columns\TextColumn::make('model_type')
-                        ->formatStateUsing(fn($record) => match ($record->model_type) {
+                        ->formatStateUsing(fn ($record) => match ($record->model_type) {
                             app(MetaData::class)->getMorphClass() => 'MetaData',
                             app(Block::class)->getMorphClass() => 'Blocks',
                             app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.BlueprintData::select(['id', 'model_type'])->where('id', $record->model_id)->first()?->model_type.')',
@@ -93,7 +93,7 @@ class MediaresourceResource extends Resource
                         })
                         ->searchable(),
                     Tables\Columns\TextColumn::make('name')
-                        ->url(fn(Media $record) => match ($record->model_type) {
+                        ->url(fn (Media $record) => match ($record->model_type) {
                             app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
                             app(Block::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.blocks.edit', Block::find($record->model_id)),
                             app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),

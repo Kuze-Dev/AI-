@@ -9,8 +9,7 @@ readonly class UpdateCartLineData
     public function __construct(
         public ?int $quantity,
         public ?CartRemarksData $remarks,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

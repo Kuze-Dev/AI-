@@ -9,8 +9,7 @@ class FavoriteData
     public function __construct(
         public readonly int $customer_id,
         public readonly int $product_id,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -11,8 +11,7 @@ readonly class VariantCombinationData
         public int|string $option_id,
         public string $option_value,
         public int|string $option_value_id,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

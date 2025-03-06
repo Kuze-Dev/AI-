@@ -29,8 +29,7 @@ class FileFieldData extends FieldData
         public readonly ?int $min_files = null,
         public readonly ?int $max_files = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

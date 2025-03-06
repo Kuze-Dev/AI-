@@ -12,8 +12,7 @@ class TransactionData
         public readonly ?array $item_list = null,
         public readonly ?string $description = null,
         public readonly ?string $order_url = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

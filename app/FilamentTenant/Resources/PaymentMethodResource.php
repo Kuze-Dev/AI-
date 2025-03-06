@@ -66,9 +66,9 @@ class PaymentMethodResource extends Resource
                             if (! $media) {
                                 return null;
                             }
-                            
+
                             if (config()->string('filament.default_filesystem_disk') === 'r2') {
-                                
+
                                 return [
                                     'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
                                     'size' => $media->getAttributeValue('size'),

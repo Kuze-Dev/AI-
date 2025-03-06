@@ -11,8 +11,7 @@ readonly class GuestCustomerData
         public string $last_name,
         public string $mobile,
         public string $email,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

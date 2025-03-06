@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * @template TServiceBill of \Domain\ServiceOrder\Models\ServiceBill
- * @extends \Illuminate\Database\Eloquent\Builder<TServiceBill> 
+ *
+ * @extends \Illuminate\Database\Eloquent\Builder<TServiceBill>
  * */
 class ServiceBillQueryBuilder extends Builder
 {

@@ -18,8 +18,7 @@ readonly class ProductVariantOrderData
         public bool $status,
         public ProductOrderData $product,
         public ?int $stock,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -68,7 +67,7 @@ readonly class ProductVariantOrderData
         /** @var \Domain\Product\Models\Product $product */
         $product = $productVariant->product;
 
-        //product tiering discount
+        // product tiering discount
         $selling_price = $productVariant->selling_price;
         if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
             $selling_price = app(ComputedTierSellingPrice::class)->execute($product, (float) $selling_price);

@@ -11,8 +11,7 @@ readonly class MediaData
     public function __construct(
         public UploadedFile|string $media,
         public array $custom_properties = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

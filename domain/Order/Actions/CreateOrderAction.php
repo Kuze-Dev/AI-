@@ -17,8 +17,7 @@ readonly class CreateOrderAction
     public function __construct(
         private CartSummaryAction $cartSummaryAction,
         private CreateOrderReference $createOrderReference
-    ) {
-    }
+    ) {}
 
     public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): Order
     {

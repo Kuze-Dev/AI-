@@ -14,7 +14,6 @@ use Domain\ServiceOrder\Notifications\ConfirmationServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ExpiredServiceOrderNotification;
 use Domain\ServiceOrder\Notifications\ForPaymentNotification;
 use Domain\ServiceOrder\Notifications\InProgressServiceOrderNotification;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification as FacadesNotification;
 use Throwable;

@@ -29,8 +29,7 @@ class CreateServiceOrderAction
         private readonly GetTaxableInfoAction $getTaxableInfoAction,
         private readonly ServiceOrderCreatedPipelineAction $serviceOrderCreatedPipelineAction,
         private readonly ServiceOrderMilestoneCreatedPipelineAction $serviceOrderMilestoneCreatedPipelineAction
-    ) {
-    }
+    ) {}
 
     public function execute(ServiceOrderData $serviceOrderData): ServiceOrder
     {
@@ -182,6 +181,7 @@ class CreateServiceOrderAction
                                     (int) $additionalCharge['quantity']
                                 );
                             }
+
                             return null;
                         },
                         $additionalCharges

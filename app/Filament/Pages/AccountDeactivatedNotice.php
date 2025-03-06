@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Domain\Auth\Contracts\HasActiveState;
 use Filament\Facades\Filament;
 use Filament\Pages\SimplePage;
 

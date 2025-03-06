@@ -11,8 +11,7 @@ readonly class RoleData
         public string $name,
         public ?string $guard_name = null,
         public array $permissions = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

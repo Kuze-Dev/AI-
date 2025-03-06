@@ -15,8 +15,7 @@ readonly class PaymentMethodOrderData
         public ?string $subtitle,
         public ?string $description,
         public ?string $instruction,
-    ) {
-    }
+    ) {}
 
     public static function fromPaymentMethod(PaymentMethod $paymentMethod): self
     {

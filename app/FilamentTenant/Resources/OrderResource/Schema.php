@@ -19,9 +19,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class Schema
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function summarySchema(): array
     {

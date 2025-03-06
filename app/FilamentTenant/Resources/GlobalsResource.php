@@ -22,11 +22,9 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Unique;
 
 class GlobalsResource extends Resource
@@ -93,7 +91,7 @@ class GlobalsResource extends Resource
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        fn(?Globals $record, Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                        fn (?Globals $record, Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
                             if ($record) {
                                 $selectedLocale = $value;

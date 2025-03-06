@@ -10,7 +10,5 @@ class AdminOrderFailedNotificationEvent
 {
     use SerializesModels;
 
-    public function __construct(public string $body, public string $permission)
-    {
-    }
+    public function __construct(public string $body, public string $permission) {}
 }

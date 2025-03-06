@@ -132,7 +132,7 @@ it('can clone page', function () {
     Livewire::withQueryParams(['clone' => $page->slug]);
 
     $block_content = $page->blockContents->toArray();
-    
+
     unset($block_content['0']['block']);
 
     // dd($block_content);

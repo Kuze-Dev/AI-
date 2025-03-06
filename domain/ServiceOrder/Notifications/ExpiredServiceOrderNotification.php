@@ -48,9 +48,9 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
         $this->logo = $siteSettings->getLogoUrl();
         $this->title = $siteSettings->name;
         $this->description = $siteSettings->description;
-        $this->url = 'http://' . $siteSettings->front_end_domain . '/' . $serviceSettings->domain_path_segment .
-                    '?ServiceOrder=' . $this->serviceOrder?->reference . '&ServiceBill=' . $this->serviceBill->reference .
-                    '&payment_method=' . $this->payment_method;
+        $this->url = 'http://'.$siteSettings->front_end_domain.'/'.$serviceSettings->domain_path_segment.
+                    '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$this->serviceBill->reference.
+                    '&payment_method='.$this->payment_method;
         $this->from = $serviceSettings->email_sender_name;
 
         $sanitizedReplyToEmails = $this->sanitizeEmailArray($serviceSettings->email_reply_to ?? []);

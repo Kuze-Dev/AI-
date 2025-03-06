@@ -23,8 +23,7 @@ class HandleDataTranslation
     public function __construct(
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create content query.
      *
@@ -42,9 +41,10 @@ class HandleDataTranslation
             $blueprintfieldtype = $model->block->blueprint->schema;
         } elseif ($model instanceof TaxonomyTerm) {
             $blueprintfieldtype = $model->taxonomy->blueprint->schema;
-        /**
-         *  suggested by copilot
-         *  @phpstan-ignore instanceof.alwaysTrue */
+            /**
+             *  suggested by copilot
+             *
+             *  @phpstan-ignore instanceof.alwaysTrue */
         } elseif ($model instanceof Globals) {
             $blueprintfieldtype = $model->blueprint->schema;
         } else {
@@ -72,7 +72,7 @@ class HandleDataTranslation
 
         $flattenData = app(ExtractDataAction::class)->flattenArray($data);
 
-        $filtered = array_filter($flattenData, fn($item) => isset($item['translatable']) && $item['translatable'] === false);
+        $filtered = array_filter($flattenData, fn ($item) => isset($item['translatable']) && $item['translatable'] === false);
 
         if (
             count($filtered) > 0

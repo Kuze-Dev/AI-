@@ -10,6 +10,5 @@ class TwoFactorAuthenticationChallenged
 {
     public function __construct(
         public TwoFactorAuthenticatable $user
-    ) {
-    }
+    ) {}
 }

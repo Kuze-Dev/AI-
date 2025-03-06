@@ -12,12 +12,10 @@ use Domain\Taxation\Enums\PriceDisplay;
 use Domain\Taxation\Enums\TaxZoneType;
 use Domain\Taxation\Models\TaxZone;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
 class TaxZoneResource extends Resource
 {
@@ -66,8 +64,8 @@ class TaxZoneResource extends Resource
                             ->columnSpan(1),
                     ])->columns(2),
                     Forms\Components\Select::make('type')
-                        ->options( TaxZoneType::class)
-                        ->enum( TaxZoneType::class)
+                        ->options(TaxZoneType::class)
+                        ->enum(TaxZoneType::class)
                         ->required()
                         ->enum(TaxZoneType::class)
                         ->reactive(),

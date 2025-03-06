@@ -25,7 +25,6 @@ use Spatie\QueryBuilder\Exceptions\InvalidFilterValue;
 use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
-use Stancl\Tenancy\Middleware as TenancyMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withEvents([
@@ -52,8 +51,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 'tenant.suspended' => EnsureTenantIsNotSuspended::class,
             ])
             ->throttleApi()
-            ->group( 'universal', [])
-            ->group( 'tenant', [
+            ->group('universal', [])
+            ->group('tenant', [
                 InitializeTenancyByDomain::class,
                 PreventAccessFromCentralDomains::class,
                 EnsureTenantIsNotSuspended::class,
@@ -69,7 +68,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 CheckDidNotComplete::class,
                 FileIsTooBig::class,
                 InvalidFilterValue::class,
-                TenantCouldNotBeIdentifiedOnDomainException::class
+                TenantCouldNotBeIdentifiedOnDomainException::class,
             ])
             ->render(function (InvalidFilterValue $e, Request $request) {
                 abort(400, $e->getMessage());
@@ -98,8 +97,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 $schedule->command(
                     ClearResetsTenancyAwareSchedulerCommand::class, [
-                    'customer',
-                ]);
+                        'customer',
+                    ]);
             });
 
         // $schedule->command(DispatchQueueCheckJobsCommand::class)->everyMinute();

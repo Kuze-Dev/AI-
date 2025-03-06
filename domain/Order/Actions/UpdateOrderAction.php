@@ -18,8 +18,7 @@ readonly class UpdateOrderAction
 {
     public function __construct(
         private UpdateOrderPaymentAction $updateOrderPaymentAction,
-    ) {
-    }
+    ) {}
 
     public function execute(
         Order $order,

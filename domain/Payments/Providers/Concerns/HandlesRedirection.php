@@ -1,11 +1,13 @@
 <?php
+
+declare(strict_types=1);
 //
-//declare(strict_types=1);
+// declare(strict_types=1);
 //
-//namespace Domain\Payments\Providers\Concerns;
+// namespace Domain\Payments\Providers\Concerns;
 //
-//trait HandlesRedirection
-//{
+// trait HandlesRedirection
+// {
 //    protected string $transactionId;
 //
 //    protected string $redirectUrl;
@@ -19,4 +21,4 @@
 //    {
 //        return $this->redirectUrl;
 //    }
-//}
+// }

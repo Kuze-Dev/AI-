@@ -5,9 +5,9 @@ declare(strict_types=1);
 use App\Filament\Resources\AdminResource\Pages\EditAdmin;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
-
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
@@ -20,7 +20,7 @@ it('can show edit', function () {
 
     $role = app(Role::class)
         ->create(['name' => fake()->name]);
-   $permission= app(Permission::class)
+    $permission = app(Permission::class)
         ->create(['name' => fake()->name]);
 
     $admin->assignRole($role);

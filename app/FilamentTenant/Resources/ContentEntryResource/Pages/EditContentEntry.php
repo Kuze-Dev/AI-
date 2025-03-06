@@ -32,7 +32,6 @@ use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportRedirects\Redirector;
@@ -48,7 +47,6 @@ class EditContentEntry extends EditRecord
     protected static string $resource = ContentEntryResource::class;
 
     public mixed $ownerRecord;
-
 
     #[\Override]
     public function mount(int|string $record, string $ownerRecord = ''): void
@@ -311,11 +309,10 @@ class EditContentEntry extends EditRecord
         $contentEntryData = ContentEntryData::fromArray($data);
 
         $contentEntry = app(PublishedContentEntryDraftAction::class)->execute(
-                $parentPage,
-                $pageDraft,
-                $contentEntryData
-            )
-        ;
+            $parentPage,
+            $pageDraft,
+            $contentEntryData
+        );
 
         return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }

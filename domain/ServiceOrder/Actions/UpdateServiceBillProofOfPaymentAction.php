@@ -17,8 +17,7 @@ class UpdateServiceBillProofOfPaymentAction
 {
     public function __construct(
         private readonly UploadProofofPaymentAction $uploadProofofPaymentAction,
-    ) {
-    }
+    ) {}
 
     public function execute(ServiceBankTransferData $serviceBankTransferData): ServiceBill
     {

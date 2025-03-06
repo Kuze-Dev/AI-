@@ -10,6 +10,5 @@ readonly class TierData
         public string $name,
         public string $description,
         public bool $has_approval
-    ) {
-    }
+    ) {}
 }

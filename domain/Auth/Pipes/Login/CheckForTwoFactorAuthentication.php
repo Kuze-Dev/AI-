@@ -23,8 +23,7 @@ class CheckForTwoFactorAuthentication
     public function __construct(
         protected RateLimiter $limiter,
         protected CheckIfOnSafeDeviceAction $checkIfOnSafeDevice
-    ) {
-    }
+    ) {}
 
     public function handle(LoginData $loginData, callable $next): LoginResult
     {

@@ -10,8 +10,7 @@ class StorePickupResponseData implements RateResponse
 {
     public function __construct(
         public readonly float $rate = 0.00
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function getRateResponseAPI(): array

@@ -7,7 +7,6 @@ namespace Domain\Blueprint\Actions;
 use App\Settings\CustomerSettings;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
@@ -24,8 +23,7 @@ class UpdateBlueprintDataAction
     public function __construct(
         protected ExtractDataAction $extractDataAction,
         protected CreateBlueprintDataAction $createBlueprintData,
-    ) {
-    }
+    ) {}
 
     public function execute(Model $model): void
     {
@@ -153,7 +151,7 @@ class UpdateBlueprintDataAction
                 $toUpload = $blueprintDataData->value;
                 $currentUploaded = $blueprintDataData->value;
 
-                //filter array with value that has filename extension
+                // filter array with value that has filename extension
 
                 $filtered = array_filter($toUpload, function ($value) {
                     $pathInfo = pathinfo($value);

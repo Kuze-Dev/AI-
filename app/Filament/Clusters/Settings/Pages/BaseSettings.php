@@ -8,7 +8,6 @@ use App\Filament\Clusters\Settings;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
 use Filament\Pages\SettingsPage;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
@@ -34,6 +33,6 @@ abstract class BaseSettings extends SettingsPage
             return true;
         }
 
-        return filament_admin()->can('settings.'.self::getSlug()) ;
+        return filament_admin()->can('settings.'.self::getSlug());
     }
 }

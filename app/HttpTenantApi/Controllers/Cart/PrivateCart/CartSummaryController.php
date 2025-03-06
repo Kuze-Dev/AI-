@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
@@ -15,6 +14,7 @@ use Domain\Cart\Requests\CartSummaryRequest;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Throwable;
@@ -56,11 +56,10 @@ class CartSummaryController extends Controller
     }
 
     #[Get('carts/summary', name: 'carts.summary')]
-    public function summary(CartSummaryRequest $request,#[CurrentUser('sanctum')] Customer $customer): mixed
+    public function summary(CartSummaryRequest $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
-
 
         $cartLines = $request->getCartLines();
 

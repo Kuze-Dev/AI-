@@ -33,8 +33,7 @@ readonly class DefaultExport implements FromQuery, ShouldQueue, WithCustomChunkS
         private ?SerializableClosure $query = null,
         private ?array $recordIds = null,
         private array $tags = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @return Builder<RowType>

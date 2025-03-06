@@ -85,7 +85,7 @@ it('can create service', function () {
         'name' => 'Test',
         'blueprint_id' => $blueprint->getKey(),
     ]);
-  
+
     assertDatabaseHas(TaxonomyTerm::class, [
         'name' => 'category',
     ]);

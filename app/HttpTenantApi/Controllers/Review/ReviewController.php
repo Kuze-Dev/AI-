@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Review;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\HttpTenantApi\Resources\ReviewResource;
 use Domain\Customer\Models\Customer;
 use Domain\Review\Actions\CreateReviewAction;
@@ -12,6 +11,7 @@ use Domain\Review\Actions\DestroyReviewAction;
 use Domain\Review\DataTransferObjects\CreateReviewData;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
+use Illuminate\Container\Attributes\CurrentUser;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -28,7 +28,6 @@ class ReviewController
     {
 
         $validatedData = $request->validated();
-
 
         $createReviewAction->execute(CreateReviewData::fromArray($validatedData), $customer);
 

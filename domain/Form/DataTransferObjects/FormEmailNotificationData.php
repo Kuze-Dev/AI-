@@ -17,6 +17,5 @@ readonly class FormEmailNotificationData
         public array $cc = [],
         public array $bcc = [],
         public array $reply_to = [],
-    ) {
-    }
+    ) {}
 }

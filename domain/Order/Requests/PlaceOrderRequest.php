@@ -32,7 +32,7 @@ class PlaceOrderRequest extends FormRequest
             'addresses.billing' => [
                 'required',
                 Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
-                    
+
                     /** @var \Domain\Customer\Models\Customer $customer */
                     $customer = auth()->user();
 
@@ -73,14 +73,14 @@ class PlaceOrderRequest extends FormRequest
                     /** @var int|string $userId */
                     $userId = $customer->id;
 
-                    //auth check
+                    // auth check
                     $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($cartLineIds, $userId, $type);
                     if ($checkAuth !== count($cartLineIds)) {
                         $fail('Invalid cart line IDs.');
                     }
 
                     try {
-                        //stock check
+                        // stock check
                         $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($cartLineIds, $userId, $type);
                         if ($checkStocks !== count($cartLineIds)) {
                             $fail('Invalid stocks');

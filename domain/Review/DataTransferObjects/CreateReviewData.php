@@ -12,8 +12,7 @@ readonly class CreateReviewData
         public bool $is_anonymous,
         public ?string $comment,
         public ?array $media,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

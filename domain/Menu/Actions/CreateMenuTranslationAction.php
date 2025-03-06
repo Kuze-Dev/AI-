@@ -11,8 +11,7 @@ class CreateMenuTranslationAction
 {
     public function __construct(
         protected SyncNodeTreeAction $syncNodeAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Menu $menu, MenuData $menuData): Menu
     {

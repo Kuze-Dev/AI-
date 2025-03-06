@@ -11,8 +11,7 @@ class AusPostResponse implements RateResponse
 {
     public function __construct(
         public readonly array $package,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

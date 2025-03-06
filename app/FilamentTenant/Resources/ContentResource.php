@@ -17,15 +17,12 @@ use Domain\Site\Models\Site;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
@@ -58,7 +55,6 @@ class ContentResource extends Resource
 
     /**
      * @param  Content  $record
-     *
      * @return array<string, int<min, -1>|int<1, max>|string>
      * */
     #[\Override]
@@ -99,7 +95,7 @@ class ContentResource extends Resource
                         ->maxLength(255)
                         ->alphaDash()
                         ->rules([
-                            fn(?Content $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                            fn (?Content $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
                                 $prefix = $value;
 

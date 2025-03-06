@@ -12,8 +12,7 @@ class VerifyProofOfPaymentData
         public readonly string $remarks,
         public readonly ?string $message = null,
         public readonly UploadedFile|string|null $proof_of_payment = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -94,8 +94,10 @@ class Service extends Model implements HasMedia, HasMetaDataContract
     use ConstraintsRelationships;
     use HasMetaData;
     use HasUuids;
+
     /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
     use SoftDeletes;
 
@@ -142,6 +144,7 @@ class Service extends Model implements HasMedia, HasMetaDataContract
     {
         return ['uuid'];
     }
+
     //    protected $with = [
     //        'taxonomyTerms',
     //    ];

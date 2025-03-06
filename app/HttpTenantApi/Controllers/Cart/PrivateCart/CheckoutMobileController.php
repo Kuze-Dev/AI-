@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartLineResource;
 use Domain\Cart\Actions\CartSummaryAction;
@@ -14,6 +13,7 @@ use Domain\Cart\Requests\CartMobileSummaryRequest;
 use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Throwable;
@@ -24,12 +24,11 @@ use Throwable;
 class CheckoutMobileController extends Controller
 {
     #[Get('/v2/carts/summary', name: 'v2.carts.summary')]
-    public function summary(CartMobileSummaryRequest $request,#[CurrentUser('sanctum')] Customer $customer): mixed
+    public function summary(CartMobileSummaryRequest $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
         $reference = $validated['reference'];
-
 
         $cartLines = $request->getCartLines();
 

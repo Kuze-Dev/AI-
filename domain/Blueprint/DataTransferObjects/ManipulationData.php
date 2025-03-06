@@ -15,8 +15,7 @@ class ManipulationData implements Arrayable
     public function __construct(
         public readonly ManipulationType $type,
         public readonly array $params = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

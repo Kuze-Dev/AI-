@@ -12,8 +12,7 @@ class CreateServiceOrderAddressPipe
 {
     public function __construct(
         private readonly CreateServiceOrderAddressAction $createServiceOrderAddressAction
-    ) {
-    }
+    ) {}
 
     public function handle(
         ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData,

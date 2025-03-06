@@ -12,7 +12,5 @@ class OrderStatusUpdatedEvent
 {
     use SerializesModels;
 
-    public function __construct(public Order $order, public string $status, public ?Customer $customer = null)
-    {
-    }
+    public function __construct(public Order $order, public string $status, public ?Customer $customer = null) {}
 }

@@ -17,8 +17,7 @@ class ToggleFieldData extends FieldData
         public readonly array $rules = [],
         public readonly bool $translatable = true,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

@@ -15,8 +15,7 @@ class PaymentDetailsData
         public readonly ?string $insurance = null,
         public readonly ?string $gift_wrap = null,
         public readonly ?string $fee = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

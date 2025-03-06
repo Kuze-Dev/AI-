@@ -55,7 +55,7 @@ enum ServiceOrderStatus: string implements HasColor, HasLabel
             self::PENDING,
             self::FORPAYMENT,
         ];
-    
+
         if ($serviceOrder->billing_cycle === null) {
             $additionalStatuses = [
                 self::INPROGRESS,
@@ -67,9 +67,9 @@ enum ServiceOrderStatus: string implements HasColor, HasLabel
                 self::CLOSED,
             ];
         }
-    
+
         $cases = array_merge($cases, $additionalStatuses);
-    
+
         return collect($cases)
             ->mapWithKeys(fn (self $case) => [
                 $case->value => $case->getLabel(),

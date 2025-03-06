@@ -18,7 +18,6 @@ use Filament\Actions\Action;
 // use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class EditContent extends EditRecord
 {
@@ -57,17 +56,17 @@ class EditContent extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(UpdateContentAction::class)
-                ->execute($record, new ContentData(
-                    name: $data['name'],
-                    blueprint_id: $data['blueprint_id'],
-                    prefix: $data['prefix'],
-                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
-                    taxonomies: $data['taxonomies'],
-                    past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
-                    future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
-                    is_sortable: $data['is_sortable'],
-                    sites: $data['sites'] ?? [],
-                )
-        );
+            ->execute($record, new ContentData(
+                name: $data['name'],
+                blueprint_id: $data['blueprint_id'],
+                prefix: $data['prefix'],
+                visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
+                taxonomies: $data['taxonomies'],
+                past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
+                future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
+                is_sortable: $data['is_sortable'],
+                sites: $data['sites'] ?? [],
+            )
+            );
     }
 }

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 //
-//namespace Domain\Product\Imports;
+// namespace Domain\Product\Imports;
 //
-//use Domain\Product\Models\Product;
-//use Filament\Actions\Imports\Importer;
-//use Filament\Actions\Imports\Models\Import;
+// use Domain\Product\Models\Product;
+// use Filament\Actions\Imports\Importer;
+// use Filament\Actions\Imports\Models\Import;
 //
-//class ProductImporter extends Importer
-//{
+// class ProductImporter extends Importer
+// {
 //    protected static ?string $model = Product::class;
 //
 //    public static function getColumns(): array
@@ -39,4 +39,4 @@ declare(strict_types=1);
 //
 //        return $body;
 //    }
-//}
+// }

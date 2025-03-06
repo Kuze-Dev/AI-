@@ -10,7 +10,5 @@ class SanitizeCartEvent
 {
     use SerializesModels;
 
-    public function __construct(public array $cartLineIds)
-    {
-    }
+    public function __construct(public array $cartLineIds) {}
 }

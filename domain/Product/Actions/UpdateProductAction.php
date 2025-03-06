@@ -20,8 +20,7 @@ class UpdateProductAction
         protected UpdateProductOptionAction $updateProductOption,
         protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariant,
         protected SyncMediaCollectionAction $syncMediaCollection,
-    ) {
-    }
+    ) {}
 
     public function execute(Product $product, ProductData $productData): Product
     {

@@ -4,24 +4,22 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\MenuResource\Pages;
 
-use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\MenuResource;
 use Domain\Internationalization\Models\Locale;
 use Domain\Menu\Actions\CreateMenuTranslationAction;
 use Domain\Menu\Actions\UpdateMenuAction;
 use Domain\Menu\DataTransferObjects\MenuData;
-use Livewire\Features\SupportRedirects\Redirector;
-use Illuminate\Http\RedirectResponse;
 use Domain\Menu\Models\Menu;
-use Filament\Forms;
-use Filament\Notifications\Notification;
-use Filament\Pages\Actions;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
+use Livewire\Features\SupportRedirects\Redirector;
 
 class EditMenu extends EditRecord
 {
@@ -43,7 +41,7 @@ class EditMenu extends EditRecord
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    ->action(fn (Action $action) => $this->createTranslation($action->getFormData()) )
+                    ->action(fn (Action $action) => $this->createTranslation($action->getFormData()))
                     ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
@@ -55,9 +53,9 @@ class EditMenu extends EditRecord
                             ->required(),
                     ]),
             ])
-            ->button()
-            ->icon('')
-            ->label(trans('More Actions')),
+                ->button()
+                ->icon('')
+                ->label(trans('More Actions')),
         ];
     }
 

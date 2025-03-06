@@ -12,7 +12,5 @@ class AdminOrderStatusUpdatedEvent
 {
     use SerializesModels;
 
-    public function __construct(public Order $order, public bool $shouldSendEmail, public string $status, public ?string $emailRemarks, public ?Customer $customer = null)
-    {
-    }
+    public function __construct(public Order $order, public bool $shouldSendEmail, public string $status, public ?string $emailRemarks, public ?Customer $customer = null) {}
 }

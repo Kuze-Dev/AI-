@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
@@ -13,6 +12,7 @@ use Domain\Customer\Models\Customer;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Tier\Models\Tier;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\QueryBuilder\QueryBuilder;

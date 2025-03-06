@@ -22,8 +22,7 @@ readonly class PageData
         public bool $published_draft = false,
         public array $block_contents = [],
         public array $sites = []
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -118,7 +118,7 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
         ];
     }
 
-    //create a titleAttribute for name field
+    // create a titleAttribute for name field
     public function getTitleAttribute(): string
     {
         return $this->draftable_id ? $this->name.' (Draft)' : $this->name;

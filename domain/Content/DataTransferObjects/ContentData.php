@@ -18,6 +18,5 @@ readonly class ContentData
         public ?PublishBehavior $future_publish_date_behavior = null,
         public bool $is_sortable = false,
         public array $sites = [],
-    ) {
-    }
+    ) {}
 }

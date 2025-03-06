@@ -13,8 +13,7 @@ class AddressValidateResponseData
         public readonly string $city,
         public readonly ?string $address1 = null,
         public readonly ?string $address2 = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

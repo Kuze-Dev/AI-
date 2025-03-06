@@ -13,8 +13,7 @@ readonly class UniqueDomainRule implements ValidationRule
     public function __construct(
         protected string $table,
         protected string $column = 'domain',
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void

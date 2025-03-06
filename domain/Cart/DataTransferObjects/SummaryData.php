@@ -23,8 +23,7 @@ readonly class SummaryData
         public ?TaxZone $taxZone,
         public ?PriceDisplay $taxDisplay,
         public ?float $taxPercentage,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

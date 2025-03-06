@@ -12,9 +12,7 @@ use Illuminate\Support\Carbon;
 
 class EarnPointAction
 {
-    public function __construct(private readonly RewardPointsSettings $rewardPoint)
-    {
-    }
+    public function __construct(private readonly RewardPointsSettings $rewardPoint) {}
 
     /** Execute create collection query. */
     public function execute(Customer $customer, Order $order): PointEarning

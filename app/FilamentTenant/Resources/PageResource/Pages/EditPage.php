@@ -9,7 +9,6 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\PageResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
-use Closure;
 use Domain\Internationalization\Models\Locale;
 use Domain\Page\Actions\CreatePageDraftAction;
 use Domain\Page\Actions\CreatePageTranslationAction;
@@ -30,7 +29,6 @@ use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 // use Livewire\Redirector;
@@ -436,12 +434,11 @@ class EditPage extends EditRecord
 
         $pageData = PageData::fromArray($data);
 
-        $page =  app(PublishedPageDraftAction::class)->execute(
-                $parentPage,
-                $pageDraft,
-                $pageData
-            )
-        ;
+        $page = app(PublishedPageDraftAction::class)->execute(
+            $parentPage,
+            $pageDraft,
+            $pageData
+        );
 
         return redirect(PageResource::getUrl('edit', ['record' => $page]));
     }
@@ -454,7 +451,7 @@ class EditPage extends EditRecord
 
         $pageData = PageData::fromArray($data);
 
-        //check if page has existing draft
+        // check if page has existing draft
 
         if (! is_null($record->pageDraft)) {
 

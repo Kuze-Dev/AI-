@@ -20,8 +20,7 @@ class CreateContentEntryDraftAction
         protected CreateMetaDataAction $createMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateBlueprintDataAction $createBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create content entry query. */
     public function execute(ContentEntry $content, ContentEntryData $contentEntryData): ContentEntry

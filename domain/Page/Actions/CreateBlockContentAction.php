@@ -19,8 +19,7 @@ class CreateBlockContentAction
     public function __construct(
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Page $page, BlockContentData $blockContentData): BlockContent
     {

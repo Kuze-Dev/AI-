@@ -14,8 +14,7 @@ readonly class LoginData
         public string $password,
         public bool $remember = false,
         public ?string $guard = null,
-    ) {
-    }
+    ) {}
 
     public function throttleKey(): string
     {

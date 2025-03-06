@@ -11,8 +11,7 @@ class DeletePageAction
 {
     public function __construct(
         protected DeleteBlockContentAction $deleteBlockContentAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Page $page): ?bool
     {

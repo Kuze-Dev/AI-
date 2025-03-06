@@ -8,12 +8,11 @@ use Domain\Role\Database\Factories\RoleFactory;
 use Filament\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Spatie\Permission\Models\Permission;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Tests\TestSeeder;
-use function Pest\Laravel\seed;
 
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\assertModelMissing;
+use function Pest\Laravel\seed;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -61,5 +60,5 @@ it('can not delete role with existing user', function () {
         ->callTableAction(DeleteAction::class, $role)
         ->assertNotified(trans(
             'Cannot Delete this Record',
-           ));
+        ));
 });

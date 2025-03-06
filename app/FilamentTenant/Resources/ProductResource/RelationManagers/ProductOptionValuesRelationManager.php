@@ -153,12 +153,12 @@ class ProductOptionValuesRelationManager extends RelationManager
                     ->successNotificationTitle(trans('Option value has been removed.'))
                     ->using(function (ProductOptionValue $record, Tables\Actions\Action $action): bool {
 
-//                        if (! $record->productOption instanceof ProductOption) {
-//                            $action
-//                                ->failureNotificationTitle(trans('The option value is unlinked from an option.'));
-//
-//                            return false;
-//                        }
+                        //                        if (! $record->productOption instanceof ProductOption) {
+                        //                            $action
+                        //                                ->failureNotificationTitle(trans('The option value is unlinked from an option.'));
+                        //
+                        //                            return false;
+                        //                        }
 
                         try {
 

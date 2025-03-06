@@ -5,8 +5,8 @@ declare(strict_types=1);
 use App\Filament\Resources\RoleResource\Pages\CreateRole;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Spatie\Permission\Models\Role;
-
 use Tests\TestSeeder;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\seed;
 use function Pest\Livewire\livewire;
@@ -18,7 +18,7 @@ beforeEach(function () {
 
 it('can create', function () {
 
-   livewire(CreateRole::class)
+    livewire(CreateRole::class)
         ->fillForm([
             'name' => 'Foo',
             'guard_name' => 'admin',

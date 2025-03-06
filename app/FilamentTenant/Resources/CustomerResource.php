@@ -20,13 +20,11 @@ use Domain\RewardPoint\Models\PointEarning;
 use Domain\Tenant\TenantFeatureSupport;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Exception;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -110,7 +108,7 @@ class CustomerResource extends Resource
                         ->unique(ignoreRecord: true)
                         ->formatStateUsing(fn ($state, Forms\Get $get) => $get('email') == $state ? null : $state)
                         ->rules([
-                            fn() => function (string $attribute, mixed $value, Closure $fail) {
+                            fn () => function (string $attribute, mixed $value, Closure $fail) {
                                 if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
 
                                     $fail('email is not allowed.');
@@ -129,15 +127,15 @@ class CustomerResource extends Resource
                         ->translateLabel()
                         ->nullable()
                         ->before(fn () => null)
-                        /**
-                         * Important Note:
-                         *
-                         * Base the data on set timezone on config to avoid data
-                         * incosistency specially in importing process need to
-                         * set timezone on tenancy to maintain data consistency
-                         * in both application and database.
-                        */
-                         ->timezone(config()->string('app.timezone')),
+                         /**
+                          * Important Note:
+                          *
+                          * Base the data on set timezone on config to avoid data
+                          * incosistency specially in importing process need to
+                          * set timezone on tenancy to maintain data consistency
+                          * in both application and database.
+                          */
+                        ->timezone(config()->string('app.timezone')),
                     Forms\Components\Select::make('tier_id')
                         ->translateLabel()
                         ->hidden(fn () => TenantFeatureSupport::inactive(TierBase::class))

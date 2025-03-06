@@ -12,8 +12,7 @@ class CaptchaRule implements ValidationRule
 {
     public function __construct(
         protected ?string $ip = null
-    ) {
-    }
+    ) {}
 
     /**
      * Run the validation rule.

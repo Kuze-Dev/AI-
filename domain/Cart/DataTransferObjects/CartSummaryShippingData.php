@@ -14,8 +14,7 @@ readonly class CartSummaryShippingData
         public Customer $customer,
         public ?Address $shippingAddress,
         public ?ShippingMethod $shippingMethod,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -38,7 +38,7 @@ class PaypalProvider extends Provider
             ],
             'payment_action' => 'Sale',
             'currency' => 'USD',
-            'notify_url' => '', //?
+            'notify_url' => '', // ?
             'locale' => 'en_US',
             'validate_ssl' => true,
         ];

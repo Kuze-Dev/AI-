@@ -23,8 +23,7 @@ class CheckBoxFieldData extends FieldData
         public readonly array $options = [],
         public readonly bool $bulk_toggleable = false,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

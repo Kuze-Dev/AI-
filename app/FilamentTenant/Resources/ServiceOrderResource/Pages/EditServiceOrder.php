@@ -30,13 +30,11 @@ use Domain\ServiceOrder\Models\ServiceOrderAddress;
 use Domain\Taxation\Enums\PriceDisplay;
 use Exception;
 use Filament\Actions\Action;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Get;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 

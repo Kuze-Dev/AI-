@@ -17,8 +17,7 @@ readonly class SectionData implements Arrayable
         public string $title,
         public string $state_name,
         public array $fields
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

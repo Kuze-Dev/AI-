@@ -19,7 +19,7 @@ class LocationPickerField extends Field
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->schema([
             Group::make([
                 Group::make([
@@ -68,32 +68,30 @@ class LocationPickerField extends Field
                     ->height(fn () => '400px') // map height (width is controlled by Filament options)
                     ->defaultZoom(18) // default zoom level when opening form
                     ->autocomplete(
-                        fieldName:'full_address',
+                        fieldName: 'full_address',
                         types: ['airport'],
                         placeField: 'name',
-                        ) // field on form to use as Places geocompletion field
+                    ) // field on form to use as Places geocompletion field
                     ->autocompleteReverse(true) // reverse geocode marker location to autocomplete field
                     ->draggable() // allow dragging to move marker
                     ->defaultLocation([
-                        '14.5454321',
-                        '121.0686773'
-                    ]) 
+                    '14.5454321',
+                    '121.0686773',
+                    ])
                     ->afterStateUpdated(function ($state, Get $get, Set $set) {
-                       
+
                         $set('latitude', $state['lat']);
                         $set('longitude', $state['lng']);
                     })
                     ->afterStateHydrated(function (Map $component, Get $get, Set $set) {
-
 
                         // $component->state([
                         //     'lat' => floatval($get('latitude')),
                         //     'lng' => floatval($get('longitude')),
                         // ]);
 
-                    
                     }),
-               
+
             ])
                 ->columns(2),
             Divider::make('div')

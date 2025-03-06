@@ -23,9 +23,7 @@ class InactivateServiceOrderStatusJob implements ShouldBeUnique, ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public function __construct(private ServiceOrder $serviceOrder)
-    {
-    }
+    public function __construct(private ServiceOrder $serviceOrder) {}
 
     public function uniqueId(): string
     {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace HalcyonAgile\FilamentExport\Actions\Concerns;
 
 use Closure;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use HalcyonAgile\FilamentExport\Events\ExportFinishedEvent;

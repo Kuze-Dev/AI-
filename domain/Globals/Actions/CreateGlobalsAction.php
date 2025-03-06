@@ -12,8 +12,7 @@ class CreateGlobalsAction
 {
     public function __construct(
         protected CreateBlueprintDataAction $createBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create collection query. */
     public function execute(GlobalsData $globalData): Globals

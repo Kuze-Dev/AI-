@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
@@ -25,7 +24,6 @@ use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
 use Support\RouteUrl\Contracts\HasRouteUrl as HasRouteUrlContract;
 use Support\RouteUrl\HasRouteUrl;
-use Support\RouteUrl\Models\RouteUrl;
 
 /**
  * Domain\Taxonomy\Models\TaxonomyTerm
@@ -64,7 +62,6 @@ use Support\RouteUrl\Models\RouteUrl;
  * @method static Builder|TaxonomyTerm whereSlug($value)
  * @method static Builder|TaxonomyTerm whereTaxonomyId($value)
  * @method static Builder|TaxonomyTerm whereUpdatedAt($value)
- *
  *
  * @mixin \Eloquent
  */
@@ -167,6 +164,7 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
     {
         /**
          * Method Domain\Taxonomy\Models\TaxonomyTerm::buildSortQuery() should return Illuminate\Database\Eloquent\Builder<Domain\Taxonomy\Models\TaxonomyTerm> but returns Illuminate\Database\Eloquent\Builder<static(Domain\Taxonomy\Models\TaxonomyTerm)>domain/Taxonomy/Models/TaxonomyTerm.php
+         *
          *  @phpstan-ignore return.type */
         return static::query()->whereTaxonomyId($this->taxonomy_id)->whereParentId($this->parent_id);
     }

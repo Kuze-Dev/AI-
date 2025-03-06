@@ -11,8 +11,7 @@ class MinimumValueRule implements ValidationRule
 {
     public function __construct(
         protected readonly int|float $minimum = 1
-    ) {
-    }
+    ) {}
 
     /** @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail */
     #[\Override]

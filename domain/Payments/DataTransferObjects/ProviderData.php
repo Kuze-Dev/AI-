@@ -12,6 +12,5 @@ class ProviderData
         public readonly TransactionData $transactionData,
         public readonly Payment $paymentModel,
         public readonly int $payment_method_id,
-    ) {
-    }
+    ) {}
 }

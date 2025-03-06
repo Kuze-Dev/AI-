@@ -33,13 +33,13 @@ it('can render view order page', function () {
     $orderDate = Carbon::parse($order->created_at)
         ->setTimezone(Auth::user()?->timezone)
         ->translatedFormat('F d, Y g:i A');
-        
+
     livewire(ViewOrder::class, ['record' => $order->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful()
         ->assertOk()
         ->assertSee([
-            //placeholder testing
+            // placeholder testing
             trans(ucfirst((string) $order->status->value)),
             $order->customer_first_name,
             $order->customer_last_name,

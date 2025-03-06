@@ -7,7 +7,6 @@ namespace App\Providers\Mixin;
 use Closure;
 use Filament\Actions\Contracts\HasRecord;
 use Filament\Actions\MountableAction;
-use Filament\Facades\Filament;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Model;

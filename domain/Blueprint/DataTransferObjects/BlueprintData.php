@@ -9,6 +9,5 @@ class BlueprintData
     public function __construct(
         public readonly string $name,
         public readonly SchemaData $schema,
-    ) {
-    }
+    ) {}
 }

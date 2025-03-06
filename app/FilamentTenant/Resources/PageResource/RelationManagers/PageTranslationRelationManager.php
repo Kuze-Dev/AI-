@@ -10,12 +10,10 @@ use Domain\Page\Models\Page;
 use Filament\Resources\RelationManagers\RelationManager;
 // use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 // use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
@@ -67,7 +65,7 @@ class PageTranslationRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sites.name')
                     ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: fn() => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
                     ->icons([

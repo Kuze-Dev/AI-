@@ -23,8 +23,7 @@ class RichtextFieldData extends FieldData
         public readonly bool $translatable = true,
         public readonly array $buttons = [],
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

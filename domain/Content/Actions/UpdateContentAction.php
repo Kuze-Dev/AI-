@@ -8,7 +8,6 @@ use App\Features\CMS\SitesManagement;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Models\Content;
 use Domain\Tenant\TenantFeatureSupport;
-use Illuminate\Support\Facades\Auth;
 
 class UpdateContentAction
 {

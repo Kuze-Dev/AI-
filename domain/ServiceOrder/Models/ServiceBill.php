@@ -76,8 +76,10 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class ServiceBill extends Model implements HasMedia, PayableInterface
 {
     use HasPayments;
+
     /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use SoftDeletes;
 
     protected $fillable = [

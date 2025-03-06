@@ -28,7 +28,7 @@ class EditMediaResource extends EditRecord
     }
 
     /**
-     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Media   $record
+     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Media  $record
      */
     #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model

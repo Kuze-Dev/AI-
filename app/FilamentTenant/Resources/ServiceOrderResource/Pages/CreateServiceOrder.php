@@ -27,7 +27,6 @@ use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Filament\Actions\Action;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
@@ -73,7 +72,6 @@ class CreateServiceOrder extends CreateRecord
     {
         /** @var array */
         $rawData = $this->form->getRawState();
-
 
         $data['admin_id'] = filament_admin()->getKey();
         $data['reference'] = app(GenerateReferenceNumberAction::class)
@@ -535,22 +533,22 @@ class CreateServiceOrder extends CreateRecord
         return app(CalculateServiceOrderTotalPriceAction::class)
             ->execute(
                 $sellingPrice,
-                    array_map(
-                        function ($additionalCharge) {
-                            if (
-                                isset($additionalCharge['price']) &&
-                                is_numeric($additionalCharge['price']) &&
-                                isset($additionalCharge['quantity']) &&
-                                is_numeric($additionalCharge['quantity'])
-                            ) {
-                                return new ServiceOrderAdditionalChargeData(
-                                    (float) $additionalCharge['price'],
-                                    (int) $additionalCharge['quantity']
-                                );
-                            }
-                        },
-                        $additionalCharges
-                    )
+                array_map(
+                    function ($additionalCharge) {
+                        if (
+                            isset($additionalCharge['price']) &&
+                            is_numeric($additionalCharge['price']) &&
+                            isset($additionalCharge['quantity']) &&
+                            is_numeric($additionalCharge['quantity'])
+                        ) {
+                            return new ServiceOrderAdditionalChargeData(
+                                (float) $additionalCharge['price'],
+                                (int) $additionalCharge['quantity']
+                            );
+                        }
+                    },
+                    $additionalCharges
+                )
             )
             ->getAmount();
     }

@@ -13,7 +13,6 @@ use Domain\Page\Enums\Visibility;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateContent extends CreateRecord
 {
@@ -35,18 +34,18 @@ class CreateContent extends CreateRecord
     #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
-        return  app(CreateContentAction::class)
-                ->execute(new ContentData(
-                    name: $data['name'],
-                    blueprint_id: $data['blueprint_id'],
-                    prefix: $data['prefix'],
-                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
-                    taxonomies: $data['taxonomies'],
-                    past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
-                    future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
-                    is_sortable: $data['is_sortable'],
-                    sites: $data['sites'] ?? [],
-                )
-        );
+        return app(CreateContentAction::class)
+            ->execute(new ContentData(
+                name: $data['name'],
+                blueprint_id: $data['blueprint_id'],
+                prefix: $data['prefix'],
+                visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
+                taxonomies: $data['taxonomies'],
+                past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
+                future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
+                is_sortable: $data['is_sortable'],
+                sites: $data['sites'] ?? [],
+            )
+            );
     }
 }

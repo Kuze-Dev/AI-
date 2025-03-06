@@ -6,6 +6,4 @@ namespace App\FilamentTenant\Pages;
 
 use App\Filament\Pages\AccountDeactivatedNotice as BaseAccountDeactivatedNotice;
 
-class AccountDeactivatedNotice extends BaseAccountDeactivatedNotice
-{
-}
+class AccountDeactivatedNotice extends BaseAccountDeactivatedNotice {}

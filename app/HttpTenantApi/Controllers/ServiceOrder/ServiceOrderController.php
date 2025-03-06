@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\ServiceOrder;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\HttpTenantApi\Resources\ServiceOrderResource;
 use Domain\Customer\Models\Customer;
 use Domain\ServiceOrder\Actions\CreateServiceOrderAction;
@@ -14,6 +13,7 @@ use Domain\ServiceOrder\Exceptions\ServiceStatusMustBeActive;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Requests\ServiceOrderStoreRequest;
 use Exception;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -41,7 +41,7 @@ class ServiceOrderController
         );
     }
 
-    public function show(string $serviceOrder,#[CurrentUser('sanctum')] Customer $customer): ServiceOrderResource
+    public function show(string $serviceOrder, #[CurrentUser('sanctum')] Customer $customer): ServiceOrderResource
     {
 
         return ServiceOrderResource::make(

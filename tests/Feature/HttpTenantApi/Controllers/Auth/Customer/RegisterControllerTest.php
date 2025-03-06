@@ -132,9 +132,9 @@ it('can register with wholesaler tier', function () {
 
     $tier = app(Tier::class)->firstOrCreate(
         [
-            'name' => config('domain.tier.wholesaler-domestic')
-        ],[
-            'description' => 'wholesaler'
+            'name' => config('domain.tier.wholesaler-domestic'),
+        ], [
+            'description' => 'wholesaler',
         ]
     );
 

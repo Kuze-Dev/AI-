@@ -10,9 +10,7 @@ use Illuminate\Http\Response;
 
 class SuspendTenantException extends Exception
 {
-    public function report(): void
-    {
-    }
+    public function report(): void {}
 
     public function render(Request $request): Response
     {

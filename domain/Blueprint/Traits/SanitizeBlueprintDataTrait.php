@@ -26,7 +26,7 @@ trait SanitizeBlueprintDataTrait
             if (is_array($value)) {
                 if (isset($array[$key]) && is_array($array[$key])) {
                     if (isset($array[$key][0]) && is_array($array[$key][0])) {
-                        $filteredArray[$key] = array_map(fn($item) => $this->sanitizeBlueprintData($item, $value[0]), $array[$key]);
+                        $filteredArray[$key] = array_map(fn ($item) => $this->sanitizeBlueprintData($item, $value[0]), $array[$key]);
                     } else {
                         $filteredArray[$key] = $this->sanitizeBlueprintData($array[$key], $value);
                     }

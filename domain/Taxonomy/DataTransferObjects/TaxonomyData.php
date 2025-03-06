@@ -17,8 +17,7 @@ class TaxonomyData
         public readonly array $terms = [],
         public readonly array $sites = [],
         public readonly bool $has_route = false,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -15,8 +15,7 @@ class ApiCallTrackMiddleware
 {
     public function __construct(
         protected CreateApiCallLogAction $createApiCallLogAction
-    ) {
-    }
+    ) {}
 
     /**
      * Handle an incoming request.

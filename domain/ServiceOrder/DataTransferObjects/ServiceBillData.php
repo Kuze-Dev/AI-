@@ -24,8 +24,7 @@ class ServiceBillData
         public readonly ServiceBillStatus $status,
         public readonly ?Carbon $bill_date = null,
         public readonly ?Carbon $due_date = null,
-    ) {
-    }
+    ) {}
 
     public static function paymentMilestone(ServiceOrder $serviceOrder, array $updatedValue): self
     {

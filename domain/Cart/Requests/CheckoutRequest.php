@@ -26,14 +26,14 @@ class CheckoutRequest extends FormRequest
                     /** @var int|string $userId */
                     $userId = $customer ? $customer->id : $this->bearerToken();
 
-                    //auth check
+                    // auth check
                     $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($value, $userId, $type);
                     if ($checkAuth !== count($value)) {
                         $fail('Invalid cart line IDs.');
                     }
 
                     try {
-                        //stock check
+                        // stock check
                         $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($value, $userId, $type);
                         if ($checkStocks !== count($value)) {
                             $fail('Invalid stocks');

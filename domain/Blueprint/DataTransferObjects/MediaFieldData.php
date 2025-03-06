@@ -29,8 +29,7 @@ class MediaFieldData extends FieldData
         public readonly ?int $max_files = null,
         public readonly ?string $helper_text = null,
         public readonly array $conversions = [],
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

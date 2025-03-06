@@ -78,6 +78,7 @@ class OrderLine extends Model implements HasMedia
 {
     /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
 
     protected $fillable = [
@@ -155,6 +156,7 @@ class OrderLine extends Model implements HasMedia
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
+
     /** @return MorphTo<Model, $this> */
     public function purchasable(): MorphTo
     {

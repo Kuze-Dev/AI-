@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\Fixtures\User;
 
 use function Pest\Laravel\assertDatabaseCount;
+
 beforeEach()->skip('skip otp');
 
 it('can flush safe devices', function () {

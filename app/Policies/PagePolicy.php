@@ -11,7 +11,6 @@ use Domain\Page\Models\Page;
 use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\Auth;
 
 class PagePolicy
 {

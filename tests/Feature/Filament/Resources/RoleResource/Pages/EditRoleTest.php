@@ -7,8 +7,8 @@ use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Domain\Role\Database\Factories\RoleFactory;
 use Tests\TestSeeder;
 
-use function Pest\Livewire\livewire;
 use function Pest\Laravel\seed;
+use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     seed(TestSeeder::class);

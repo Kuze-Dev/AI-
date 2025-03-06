@@ -16,8 +16,7 @@ readonly class ProductOptionValueData
         public ?string $icon_value = null,
         public ?string $icon_type = 'text',
         // public readonly UploadedFile|string|null|array $images = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

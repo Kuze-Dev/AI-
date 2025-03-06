@@ -9,6 +9,5 @@ readonly class SafeDeviceData
     public function __construct(
         public string $ip,
         public string $userAgent,
-    ) {
-    }
+    ) {}
 }

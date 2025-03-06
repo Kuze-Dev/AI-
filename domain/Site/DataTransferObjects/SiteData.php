@@ -11,8 +11,7 @@ readonly class SiteData
         public ?string $domain = null,
         public ?string $deploy_hook = null,
         public ?array $site_manager = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

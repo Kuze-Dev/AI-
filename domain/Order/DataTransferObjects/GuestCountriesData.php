@@ -11,8 +11,7 @@ readonly class GuestCountriesData
     public function __construct(
         public Country $shippingCountry,
         public Country $billingCountry,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -11,7 +11,5 @@ class PaymentProcessEvent
 {
     use SerializesModels;
 
-    public function __construct(public Payment $payment)
-    {
-    }
+    public function __construct(public Payment $payment) {}
 }

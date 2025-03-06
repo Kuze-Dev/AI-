@@ -7,12 +7,12 @@ namespace Support\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use ReflectionClass;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 use Support\ConstraintsRelationships\Exceptions\InvalidRelationshipConstraintException;
+
 trait ConstraintsRelationships
 {
     protected static function bootConstraintsRelationships(): void

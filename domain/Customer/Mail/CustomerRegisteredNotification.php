@@ -31,8 +31,7 @@ class CustomerRegisteredNotification extends Mailable implements ShouldQueue
         protected readonly Customer $customer,
         protected readonly CustomerNotificationData $notfi_data,
         protected readonly array $data = [],
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders\Tenant\Notification;
 
 use Illuminate\Database\Seeder;

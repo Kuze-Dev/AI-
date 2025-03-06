@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  *
  * @template TRelatedModel of \Support\RouteUrl\Models\RouteUrl
  * @template THasRouteModel of \Illuminate\Database\Eloquent\Model
- *
  */
 interface HasRouteUrl
 {

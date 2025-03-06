@@ -40,8 +40,7 @@ final readonly class CustomerData
         public ?TierApprovalStatus $tier_approval_status = null,
         public readonly ?array $data = [],
         public bool $through_api_registration = false,
-    ) {
-    }
+    ) {}
 
     public static function fromRegistrationRequest(
         CustomerRegisterRequest $request,
@@ -144,7 +143,6 @@ final readonly class CustomerData
     //                tier_approval_status: TierApprovalStatus::APPROVED,
     //            );
     //        }
-
 
     //    public static function fromArrayEditByAdmin(Customer $customer, array $data, ?Tier $tier = null): self
     //    {

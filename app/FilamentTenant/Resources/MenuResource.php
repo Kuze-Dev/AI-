@@ -20,16 +20,13 @@ use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 
@@ -168,7 +165,7 @@ class MenuResource extends Resource
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        fn(?Menu $record, Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                        fn (?Menu $record, Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
                             if ($record) {
                                 $selectedLocale = $value;

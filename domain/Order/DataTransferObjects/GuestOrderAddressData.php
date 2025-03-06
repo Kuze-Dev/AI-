@@ -13,8 +13,7 @@ readonly class GuestOrderAddressData
         public string $zip_code,
         public string $city,
         public string $label_as,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

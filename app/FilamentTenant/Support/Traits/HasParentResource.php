@@ -1,20 +1,22 @@
 <?php
+
+declare(strict_types=1);
 //
-//declare(strict_types=1);
+// declare(strict_types=1);
 //
-//namespace App\FilamentTenant\Support\Traits;
+// namespace App\FilamentTenant\Support\Traits;
 //
-//use Exception;
-//use Illuminate\Database\Eloquent\Builder;
-//use Illuminate\Database\Eloquent\Model;
-//use Illuminate\Database\Eloquent\ModelNotFoundException;
+// use Exception;
+// use Illuminate\Database\Eloquent\Builder;
+// use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\ModelNotFoundException;
 //
-///**
+// /**
 // * @property string|null $relationshipKey Define custom relationship key (if it does not match the table name pattern).
 // * @property string|null $pageNamePrefix Define custom child page name prefix (if it does not match the resource's slug).
 // */
-//trait HasParentResource
-//{
+// trait HasParentResource
+// {
 //    public Model|null $ownerRecord = null;
 //
 //    public function bootHasParentResource(): void
@@ -83,4 +85,4 @@
 //
 //        return $breadcrumbs;
 //    }
-//}
+// }

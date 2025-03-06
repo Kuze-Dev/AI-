@@ -40,7 +40,7 @@ it('can render page', function () {
         ->assertOk();
 });
 
-it('can create customer'/* w/ same address'*/, function () {
+it('can create customer'/* w/ same address' */, function () {
 
     $data = CustomerRequestFactory::new()
         ->withTier(Tier::first())

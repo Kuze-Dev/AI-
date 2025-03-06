@@ -14,8 +14,7 @@ class CreateMetaDataAction
 {
     public function __construct(
         protected SyncMediaCollectionAction $syncMediaCollectionAction
-    ) {
-    }
+    ) {}
 
     public function execute(Model&HasMetaData $model, MetaDataData $metaDataData): Model
     {

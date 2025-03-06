@@ -7,15 +7,13 @@ namespace Domain\ServiceOrder\Pipes\ServiceOrderPaymentUpdated;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\DataTransferObjects\GetServiceBillingAndDueData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentUpdatedPipelineData;
-use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 
 class CreateServiceBillPipe
 {
     public function __construct(
         private readonly GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
-    ) {
-    }
+    ) {}
 
     public function handle(
         ServiceOrderPaymentUpdatedPipelineData $serviceOrderPaymentUpdatedPipelineData,

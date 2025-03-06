@@ -62,14 +62,14 @@ class DiscountLimit extends Model
     /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Customer\Models\Customer, $this> */
     public function customer(): MorphTo
     {
-         /** @phpstan-ignore return.type */
+        /** @phpstan-ignore return.type */
         return $this->morphTo(Customer::class);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Order\Models\Order, $this>*/
     public function order(): MorphTo
     {
-         /** @phpstan-ignore return.type */
+        /** @phpstan-ignore return.type */
         return $this->morphTo(Order::class);
     }
 }

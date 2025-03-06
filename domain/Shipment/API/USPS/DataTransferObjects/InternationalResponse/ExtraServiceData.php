@@ -12,8 +12,7 @@ class ExtraServiceData
         public readonly bool $available,
         public readonly float $price,
         public readonly bool $declared_value_required,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

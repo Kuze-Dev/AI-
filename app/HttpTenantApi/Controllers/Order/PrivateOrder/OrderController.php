@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Order\PrivateOrder;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;
 use Domain\Customer\Models\Customer;
@@ -23,6 +22,7 @@ use Domain\Payments\Exceptions\PaymentException;
 use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Exception;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -64,7 +64,7 @@ class OrderController extends Controller
                 $order = app(PlaceOrderAction::class)
                     ->execute(PlaceOrderData::fromArray($validatedData));
 
-                if ( $order['order'] instanceof Order) {
+                if ($order['order'] instanceof Order) {
 
                     return [
                         'message' => 'Order placed successfully',
@@ -119,7 +119,7 @@ class OrderController extends Controller
         }
     }
 
-    public function show(Order $order,#[CurrentUser('sanctum')] Customer $customer): OrderResource
+    public function show(Order $order, #[CurrentUser('sanctum')] Customer $customer): OrderResource
     {
 
         $model = QueryBuilder::for(

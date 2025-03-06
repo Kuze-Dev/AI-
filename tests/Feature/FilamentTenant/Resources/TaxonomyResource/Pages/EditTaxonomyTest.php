@@ -6,12 +6,11 @@ use App\FilamentTenant\Resources\TaxonomyResource\Pages\EditTaxonomy;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
-use Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
+use Support\RouteUrl\Models\RouteUrl;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;

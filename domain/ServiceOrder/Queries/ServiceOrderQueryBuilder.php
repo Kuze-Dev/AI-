@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  *  @template TServiceOrder of \Domain\ServiceOrder\Models\ServiceOrder
+ *
  *  @extends \Illuminate\Database\Eloquent\Builder<TServiceOrder> */
 class ServiceOrderQueryBuilder extends Builder
 {

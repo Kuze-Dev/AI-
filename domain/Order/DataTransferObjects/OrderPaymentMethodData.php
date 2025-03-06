@@ -13,8 +13,7 @@ readonly class OrderPaymentMethodData
         public string $gateway,
         public ?string $description,
         public ?string $instruction,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

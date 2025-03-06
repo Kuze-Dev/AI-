@@ -19,6 +19,5 @@ readonly class AdminData
         public ?bool $active = null,
         public ?array $roles = null,
         public ?array $permissions = null,
-    ) {
-    }
+    ) {}
 }

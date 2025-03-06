@@ -13,7 +13,6 @@ use Domain\Cart\Actions\UpdateCartLineAction;
 use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Helpers\PublicCart\AuthorizeGuestCart;
-use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CreateCartLineRequest;
 use Domain\Cart\Requests\UpdateCartLineRequest;
@@ -84,13 +83,13 @@ class GuestCartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $cartline) {
-                 app(UpdateCartLineAction::class)
+                app(UpdateCartLineAction::class)
                     ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
-                    return [
-                        'message' => 'Cart updated successfully',
-                    ];
-                
+                return [
+                    'message' => 'Cart updated successfully',
+                ];
+
             });
 
             return response()->json($dbResult);

@@ -11,8 +11,7 @@ class CreateFormAction
 {
     public function __construct(
         protected CreateFormEmailNotificationAction $createFormEmailNotification
-    ) {
-    }
+    ) {}
 
     public function execute(FormData $formData): Form
     {

@@ -20,8 +20,7 @@ class ServiceOrderData
         public readonly ?string $payment_type = null,
         public readonly ?string $payment_value = null,
         public readonly ?array $payment_plan = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

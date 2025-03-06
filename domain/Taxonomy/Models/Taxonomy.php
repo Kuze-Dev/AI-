@@ -7,12 +7,10 @@ namespace Domain\Taxonomy\Models;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Models\Content;
 use Domain\Site\Traits\Sites;
-use Support\RouteUrl\Models\RouteUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -54,7 +52,6 @@ use Support\RouteUrl\HasRouteUrl;
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Taxonomy whereUpdatedAt($value)
- *
  *
  * @mixin \Eloquent
  */

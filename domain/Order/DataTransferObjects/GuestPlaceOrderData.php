@@ -15,8 +15,7 @@ readonly class GuestPlaceOrderData
         public ?string $notes,
         public ?string $discountCode,
         public int|string|null $serviceId = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

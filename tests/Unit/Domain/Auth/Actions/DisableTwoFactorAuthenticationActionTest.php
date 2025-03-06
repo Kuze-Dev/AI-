@@ -37,8 +37,8 @@ it('can disable two factor authentication', function () {
 it('will reload two factor authentication if loaded in relations', function () {
     $this->user->load('twoFactorAuthentication');
 
-//    $user = (new Mock($this->user))->expect(load: fn () => $this->user);
-    $user = mock_expect($this->user,load: fn () => $this->user);
+    //    $user = (new Mock($this->user))->expect(load: fn () => $this->user);
+    $user = mock_expect($this->user, load: fn () => $this->user);
 
     $result = app(DisableTwoFactorAuthenticationAction::class)->execute($user);
 

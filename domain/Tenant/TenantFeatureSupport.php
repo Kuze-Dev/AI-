@@ -8,9 +8,7 @@ use App\Features\FeatureContract;
 
 final class TenantFeatureSupport
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * @param  class-string<FeatureContract>  $feature

@@ -23,8 +23,7 @@ class AuthenticateTwoFactorAction
         protected ValidateRecoveryCodeAction $recoveryCodeValidator,
         protected ValidateTotpCodeAction $totpValidator,
         protected AddSafeDeviceAction $addSafeDevice,
-    ) {
-    }
+    ) {}
 
     /** @throws \Illuminate\Auth\AuthenticationException */
     public function execute(TwoFactorData $twoFactorData): bool

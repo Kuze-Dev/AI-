@@ -11,8 +11,7 @@ readonly class UpdateOrderData
         public ?string $status,
         public ?string $notes,
         public ?string $proof_of_payment,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

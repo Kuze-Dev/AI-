@@ -6,7 +6,6 @@ namespace HalcyonAgile\FilamentImport\Actions;
 
 use Closure;
 use Filament\Actions\Action;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use HalcyonAgile\FilamentImport\DefaultImport;
@@ -163,9 +162,6 @@ class ImportAction extends Action
         return $this;
     }
 
-     /**
-     * @param string $disk
-     */
     public function disk(string $disk): self
     {
         $this->disk = $disk;

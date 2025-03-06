@@ -23,9 +23,7 @@ class DeleteS3FilesFromDeletedBlueprintDataJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(protected array $files)
-    {
-    }
+    public function __construct(protected array $files) {}
 
     /**
      * Execute the job.

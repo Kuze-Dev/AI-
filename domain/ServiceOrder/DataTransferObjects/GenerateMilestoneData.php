@@ -11,8 +11,7 @@ class GenerateMilestoneData
     public function __construct(
         public readonly ServiceOrder $service_order,
         public readonly array $state,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

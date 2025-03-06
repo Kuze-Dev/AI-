@@ -19,7 +19,6 @@ use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Image\Enums\Fit;
-use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\File;
@@ -102,8 +101,10 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     use ConstraintsRelationships;
     use HasMetaData;
     use HasSlug;
+
     /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
 
     protected $fillable = [
@@ -276,7 +277,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
 
     public function isFavorite(): bool
     {
-       $customer = guest_customer_logged_in();
+        $customer = guest_customer_logged_in();
 
         if ($customer === null) {
             return false;

@@ -14,9 +14,7 @@ use Domain\ShippingMethod\Models\ShippingMethod;
 
 class GetShippingRateAction
 {
-    public function __construct(private readonly ShippingManagerInterface $shippingManager)
-    {
-    }
+    public function __construct(private readonly ShippingManagerInterface $shippingManager) {}
 
     public function execute(
         ParcelData $parcelData,

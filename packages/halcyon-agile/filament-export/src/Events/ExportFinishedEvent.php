@@ -11,6 +11,5 @@ readonly class ExportFinishedEvent
     public function __construct(
         public Model $notifiable,
         public string $filename,
-    ) {
-    }
+    ) {}
 }

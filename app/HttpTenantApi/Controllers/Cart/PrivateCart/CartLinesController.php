@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Cart\PrivateCart;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\Http\Controllers\Controller;
 use Domain\Cart\Actions\CreateCartAction;
 use Domain\Cart\Actions\CreateCartLineAction;
@@ -12,12 +11,12 @@ use Domain\Cart\Actions\DestroyCartLineAction;
 use Domain\Cart\Actions\UpdateCartLineAction;
 use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
-use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CreateCartLineRequest;
 use Domain\Cart\Requests\UpdateCartLineRequest;
 use Domain\Customer\Models\Customer;
 use Exception;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
@@ -32,10 +31,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 ]
 class CartLinesController extends Controller
 {
-    public function store(CreateCartLineRequest $request,#[CurrentUser('sanctum')] Customer $customer): mixed
+    public function store(CreateCartLineRequest $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validatedData = $request->validated();
-
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $customer) {
@@ -75,14 +73,14 @@ class CartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $cartline) {
-                
+
                 app(UpdateCartLineAction::class)
                     ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
-              
+
                 return [
                     'message' => 'Cart updated successfully',
                 ];
-                
+
             });
 
             return response()->json($dbResult);

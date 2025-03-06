@@ -13,9 +13,9 @@ enum CaptchaProvider: string implements HasLabel
 
     public function getLabel(): string
     {
-       return match ($this) {
-           self::GOOGLE_RECAPTCHA => 'Google reCAPTCHA',
-           self::CLOUDFLARE_TURNSTILE => 'Cloudflare Turnstile',
-       };
+        return match ($this) {
+            self::GOOGLE_RECAPTCHA => 'Google reCAPTCHA',
+            self::CLOUDFLARE_TURNSTILE => 'Cloudflare Turnstile',
+        };
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Notification;
 
 use Domain\Customer\Models\Customer;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;

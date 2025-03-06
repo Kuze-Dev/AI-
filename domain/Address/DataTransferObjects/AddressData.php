@@ -17,8 +17,7 @@ readonly class AddressData
         public ?bool $is_default_shipping = null,
         public ?bool $is_default_billing = null,
         public ?int $customer_id = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

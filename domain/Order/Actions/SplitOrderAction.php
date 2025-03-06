@@ -24,8 +24,7 @@ readonly class SplitOrderAction
         private CreateOrderLineAction $createOrderLineAction,
         private CreateOrderAddressAction $createOrderAddressAction,
         private CreatePaymentAction $createPaymentAction,
-    ) {
-    }
+    ) {}
 
     public function execute(PreparedOrderData $preparedOrderData, PlaceOrderData $placeOrderData): array
     {

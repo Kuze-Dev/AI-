@@ -12,8 +12,7 @@ readonly class CreateCartData
         public int $quantity,
         public ?int $variant_id,
         public ?CartRemarksData $remarks,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

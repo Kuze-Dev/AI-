@@ -15,7 +15,6 @@ use Filament\Tables\Table;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class FormSubmissionsRelationManager extends RelationManager
 {
@@ -59,7 +58,7 @@ class FormSubmissionsRelationManager extends RelationManager
                         Forms\Components\DatePicker::make('created_until')
                             ->label(trans('Submitted until')),
                     ])
-                    ->query(fn(Builder $query, array $data): Builder => $query
+                    ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
                             $data['created_from'],
                             fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),

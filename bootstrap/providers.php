@@ -48,7 +48,6 @@ return [
     /**
      * Self hosts packages
      */
-
     HalcyonAgile\FilamentImport\ImportEventServiceProvider::class,
     HalcyonAgile\FilamentImport\ImportServiceProvider::class,
 

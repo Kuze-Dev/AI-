@@ -6,7 +6,6 @@ namespace App\HttpTenantApi\Controllers\Notification;
 
 use App\HttpApi\Resources\NotificationResource;
 use Domain\Customer\Models\Customer;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;

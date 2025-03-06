@@ -21,8 +21,7 @@ class CreateContentEntryTranslationAction
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create content entry query. */
     public function execute(ContentEntry $content, ContentEntryData $contentEntryData): ContentEntry

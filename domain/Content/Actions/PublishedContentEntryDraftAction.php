@@ -22,8 +22,7 @@ class PublishedContentEntryDraftAction
         protected UpdateMetaDataAction $updateMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected DeleteContentEntryAction $deleteContentEntry,
-    ) {
-    }
+    ) {}
 
     /** Execute create content entry query. */
     public function execute(ContentEntry $contentEntry, ContentEntry $draft_content_entry, ContentEntryData $contentEntryData): ContentEntry

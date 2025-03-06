@@ -17,8 +17,7 @@ readonly class CreateCartLineAction
 {
     public function __construct(
         private CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
-    ) {
-    }
+    ) {}
 
     public function execute(Cart $cart, CreateCartData $cartLineData): CartLine
     {

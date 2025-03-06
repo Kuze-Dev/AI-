@@ -36,11 +36,11 @@ class CartPurchasableValidatorAction
         // $this->validateMinimumQuantity($product, $quantity, $cartLine);
 
         if ($type === CartUserType::GUEST) {
-            //purchasable by guest
+            // purchasable by guest
             $this->validatePurchasableByGuest($product);
         }
 
-        //stock control
+        // stock control
         if (! $product->allow_stocks) {
             return;
         }
@@ -81,11 +81,11 @@ class CartPurchasableValidatorAction
         // $this->validateMinimumQuantity($product, $quantity, $cartLine);
 
         if ($type === CartUserType::GUEST) {
-            //purchasable by guest
+            // purchasable by guest
             $this->validatePurchasableByGuest($product);
         }
 
-        //stock control
+        // stock control
         if (! $product->allow_stocks) {
             return;
         }
@@ -141,7 +141,7 @@ class CartPurchasableValidatorAction
                 $this->validateMinimumQuantity($product, 0, $cartLine);
 
                 if ($type === CartUserType::GUEST) {
-                    //purchasable by guest
+                    // purchasable by guest
                     $this->validatePurchasableByGuest($product);
                 }
 
@@ -166,7 +166,7 @@ class CartPurchasableValidatorAction
                 $this->validateMinimumQuantity($product, 0, $cartLine);
 
                 if ($type === CartUserType::GUEST) {
-                    //purchasable by guest
+                    // purchasable by guest
                     $this->validatePurchasableByGuest($product);
                 }
 
@@ -194,7 +194,7 @@ class CartPurchasableValidatorAction
 
     public function validateMinimumQuantity(Product $product, int $quantity, ?CartLine $cartLine = null): void
     {
-        //minimum order quantity
+        // minimum order quantity
         if (! is_null($cartLine)) {
             $payloadQuantity = $cartLine->quantity + $quantity;
             if ($payloadQuantity < $product->minimum_order_quantity) {

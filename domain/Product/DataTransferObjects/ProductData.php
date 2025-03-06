@@ -37,8 +37,7 @@ class ProductData
         public readonly UploadedFile|string|null|array $images = null,
         public readonly UploadedFile|string|null|array $videos = null,
         public readonly array $media_collection = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

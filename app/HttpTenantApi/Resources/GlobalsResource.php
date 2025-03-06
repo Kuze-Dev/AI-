@@ -26,7 +26,6 @@ class GlobalsResource extends JsonApiResource
         ];
     }
 
-
     /** @return array<string, callable> */
     #[\Override]
     public function toRelationships(Request $request): array

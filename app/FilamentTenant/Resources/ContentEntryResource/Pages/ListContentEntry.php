@@ -7,14 +7,12 @@ namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
-use App\FilamentTenant\Support\Traits\HasParentResource;
 use Domain\Content\Models\Content;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ListContentEntry extends ListRecords

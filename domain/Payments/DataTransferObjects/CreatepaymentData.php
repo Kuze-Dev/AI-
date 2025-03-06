@@ -9,6 +9,5 @@ class CreatepaymentData
     public function __construct(
         public readonly TransactionData $transactionData,
         public readonly string $payment_driver,
-    ) {
-    }
+    ) {}
 }

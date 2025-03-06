@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AdminResource\Pages\CreateAdmin;
 use Domain\Admin\Models\Admin;
-
 use Spatie\Permission\Contracts\Permission;
 use Spatie\Permission\Contracts\Role;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 use function PHPUnit\Framework\assertCount;

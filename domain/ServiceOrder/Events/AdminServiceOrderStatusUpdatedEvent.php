@@ -14,6 +14,5 @@ class AdminServiceOrderStatusUpdatedEvent
     public function __construct(
         public ServiceOrder $serviceOrder,
         public bool $shouldNotifyCustomer
-    ) {
-    }
+    ) {}
 }

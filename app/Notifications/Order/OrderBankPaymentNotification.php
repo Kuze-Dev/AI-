@@ -13,9 +13,7 @@ class OrderBankPaymentNotification extends Notification
     use Queueable;
 
     /** Create a new notification instance. */
-    public function __construct(private Order $order, private string $paymentRemarks)
-    {
-    }
+    public function __construct(private Order $order, private string $paymentRemarks) {}
 
     /**
      * Get the notification's delivery channels.

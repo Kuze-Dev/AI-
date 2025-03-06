@@ -32,8 +32,7 @@ class CheckoutServiceOrderPartialPaymentAction
         private ServiceOrder $serviceOrder,
         private readonly CreatePaymentAction $createPaymentAction,
         private readonly CreateServiceTransactionAction $createServiceTransactionAction
-    ) {
-    }
+    ) {}
 
     /** @throws Throwable */
     public function execute(CheckoutServiceOrderData $checkoutServiceOrderData): PaymentAuthorize

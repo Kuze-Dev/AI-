@@ -25,8 +25,7 @@ readonly class GuestSplitOrderAction
         private GuestCreateOrderLineAction $guestCreateOrderLineAction,
         private GuestCreateOrderAddressAction $guestCreateOrderAddressAction,
         private CreatePaymentAction $createPaymentAction,
-    ) {
-    }
+    ) {}
 
     public function execute(GuestPreparedOrderData $guestPreparedOrderData, GuestPlaceOrderData $guestPlaceOrderData): array|Exception
     {

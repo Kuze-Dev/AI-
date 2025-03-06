@@ -22,17 +22,14 @@ use Domain\Tenant\TenantFeatureSupport;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
@@ -66,7 +63,7 @@ class ContentEntryResource extends Resource
                 ->middleware(static::getRouteMiddleware(Filament::getCurrentPanel() ?? throw new \LogicException('This should not happen.')))
                 ->group(function () {
                     foreach (static::getPages() as $name => $page) {
-                        /** @var array{route:string, class:string} $page*/
+                        /** @var array{route:string, class:string} $page */
                         Route::get($page['route'], $page['class'])->name($name);
                     }
                 });
@@ -145,7 +142,7 @@ class ContentEntryResource extends Resource
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
                             ->rules([
-                                fn(?ContentEntry $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                fn (?ContentEntry $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
                                     if ($record) {
                                         $selectedLocale = $value;
@@ -262,7 +259,7 @@ class ContentEntryResource extends Resource
                         ])
                         ->hidden(
                             // fn ($livewire) => ! empty($livewire->ownerRecord->taxonomies->toArray())
-                            fn($livewire) => empty($livewire->ownerRecord->taxonomies->toArray())
+                            fn ($livewire) => empty($livewire->ownerRecord->taxonomies->toArray())
                         ),
                     Forms\Components\Section::make(trans('Publishing'))
                         ->schema([

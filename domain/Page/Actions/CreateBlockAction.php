@@ -37,7 +37,7 @@ class CreateBlockAction
         //     $block->clearMediaCollection('image');
         // }
 
-        if (!is_null($blockData->image)) {
+        if (! is_null($blockData->image)) {
             /** @var array */
             $images = $blockData->image;
 
@@ -45,15 +45,14 @@ class CreateBlockAction
                 model: $block,
                 mediaCollectionData: MediaCollectionData::fromArray([
                     'collection' => 'image',
-                    'media' => array_map(fn($image) => [
+                    'media' => array_map(fn ($image) => [
                         'media' => $image,
                         'custom_properties' => ['alt_text' => null],
-                    ], $images)
+                    ], $images),
 
                 ])
             );
         }
-
 
         // if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
         $block->sites()

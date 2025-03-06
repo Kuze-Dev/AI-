@@ -11,6 +11,5 @@ readonly class TwoFactorData
         public ?string $recovery_code = null,
         public bool $remember_device = false,
         public ?string $guard = null,
-    ) {
-    }
+    ) {}
 }

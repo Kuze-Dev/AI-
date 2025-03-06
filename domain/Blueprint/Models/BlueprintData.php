@@ -14,10 +14,10 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\Image\Enums\Fit;
 
 /**
  * Domain\Blueprint\Models\BlueprintData
@@ -64,6 +64,7 @@ class BlueprintData extends Model implements HasMedia
         'value',
         'type',
     ];
+
     protected function casts(): array
     {
         return [
@@ -151,7 +152,7 @@ class BlueprintData extends Model implements HasMedia
                             }
                             if ($manipulation->type == ManipulationType::FIT) {
                                 // $fit = $manipulation->params[0];
-                                 /** @phpstan-ignore match.unhandled */
+                                /** @phpstan-ignore match.unhandled */
                                 $fit = match ($manipulation->params[0]) {
                                     'contain' => Fit::Contain,
                                     'max' => Fit::Max,

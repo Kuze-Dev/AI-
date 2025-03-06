@@ -17,6 +17,5 @@ class CreateServiceTransactionData
         public readonly ?float $total_amount,
         public readonly ServiceTransactionStatus $service_transaction_status,
         public readonly Payment $payment,
-    ) {
-    }
+    ) {}
 }

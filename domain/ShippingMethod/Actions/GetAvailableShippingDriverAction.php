@@ -21,17 +21,18 @@ class GetAvailableShippingDriverAction
                 ->mapWithKeys(
                     function (Driver $target) {
 
-                        $shippingDriver = match($target) {
+                        $shippingDriver = match ($target) {
                             Driver::USPS => ShippingUsps::class,
                             Driver::UPS => ShippingUps::class,
                             Driver::STORE_PICKUP => ShippingStorePickup::class,
                             Driver::AUSPOST => ShippingAusPost::class,
                         };
+
                         return [
                             $target->value => TenantFeatureSupport::active($shippingDriver) ?
                              Str::of($target->value)->headline()->upper() : false,
                         ];
-                    } 
+                    }
                 )
                 ->toArray(),
             fn ($value) => $value !== false

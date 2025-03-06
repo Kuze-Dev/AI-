@@ -22,8 +22,7 @@ class RepeaterFieldData extends FieldData
         public readonly ?int $min = null,
         public readonly ?int $max = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

@@ -15,8 +15,7 @@ readonly class ProductVariantData
         public ?bool $status = false,
         public ?int $stock = null,
         public ?int $product_id = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

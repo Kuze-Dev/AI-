@@ -11,8 +11,7 @@ class IntlRateV2ResponseData implements RateResponse
 {
     public function __construct(
         public readonly PackageData $package
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

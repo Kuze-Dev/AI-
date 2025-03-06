@@ -55,7 +55,3 @@ it('can create product', function () {
         ->instance()
         ->record;
 });
-
-
-
-

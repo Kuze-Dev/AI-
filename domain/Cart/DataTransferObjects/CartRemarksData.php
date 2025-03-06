@@ -9,8 +9,7 @@ readonly class CartRemarksData
     public function __construct(
         public ?string $notes,
         public ?array $medias,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

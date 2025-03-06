@@ -11,8 +11,7 @@ class UpdateSiteAction
 {
     public function __construct(
         protected SyncSiteManagersAction $syncSiteManagers,
-    ) {
-    }
+    ) {}
 
     public function execute(Site $site, SiteData $siteData): Site
     {

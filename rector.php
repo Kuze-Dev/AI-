@@ -15,11 +15,11 @@ return Rector\Config\RectorConfig::configure()
         __DIR__.'/tests',
     ])
 //    ->withSkip([
-////        Rector\Php81\Rector\Array_\FirstClassCallableRector::class => [
-////            __DIR__.'/app/Http/Controllers/Backend/Dev/ArtisanController.php',
-////            __DIR__.'/app/Http/Controllers/Backend/Dev/QueueDatabaseMonitoringController.php',
-////            __DIR__.'/routes',
-////        ],
+// //        Rector\Php81\Rector\Array_\FirstClassCallableRector::class => [
+// //            __DIR__.'/app/Http/Controllers/Backend/Dev/ArtisanController.php',
+// //            __DIR__.'/app/Http/Controllers/Backend/Dev/QueueDatabaseMonitoringController.php',
+// //            __DIR__.'/routes',
+// //        ],
 //        //        Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
 //        //            __DIR__.'/domain/Http/Actions/Order/ConfirmOrderComputationAction.php',
 //        //            __DIR__.'/domain/Http/Actions/Order/PurchaseOrderComputationAction.php',

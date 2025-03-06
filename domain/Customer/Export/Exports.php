@@ -14,9 +14,7 @@ use Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException;
 
 final class Exports
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * @param  array<int, \Domain\Customer\Enums\RegisterStatus>  $registerStatues

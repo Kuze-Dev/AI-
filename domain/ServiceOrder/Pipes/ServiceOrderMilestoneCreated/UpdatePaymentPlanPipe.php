@@ -11,8 +11,7 @@ class UpdatePaymentPlanPipe
 {
     public function __construct(
         private readonly UpdatePaymentPlanAction $updatePaymentPlanAction,
-    ) {
-    }
+    ) {}
 
     public function handle(
         ServiceBillMilestonePipelineData $serviceBillMilestonePipelineData,

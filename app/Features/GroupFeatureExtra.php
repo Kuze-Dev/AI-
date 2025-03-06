@@ -15,8 +15,7 @@ final readonly class GroupFeatureExtra
     public function __construct(
         public array $extra,
         public ?string $groupLabel = null,
-    ) {
-    }
+    ) {}
 
     public function fieldName(): string
     {

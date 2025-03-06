@@ -8,14 +8,12 @@ use Domain\ServiceOrder\Actions\UpdateServiceOrderStatusAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentUpdatedPipelineData;
 use Domain\ServiceOrder\DataTransferObjects\UpdateServiceOrderStatusData;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
-use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 
 class UpdateServiceOrderStatusPipe
 {
     public function __construct(
         private readonly UpdateServiceOrderStatusAction $updateServiceOrderStatusAction
-    ) {
-    }
+    ) {}
 
     public function handle(
         ServiceOrderPaymentUpdatedPipelineData $serviceOrderPaymentUpdatedPipelineData,

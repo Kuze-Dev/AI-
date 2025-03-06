@@ -21,7 +21,6 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 // use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -29,7 +28,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
@@ -60,7 +58,7 @@ class TaxonomyResource extends Resource
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
-          /** @phpstan-ignore return.type */
+        /** @phpstan-ignore return.type */
         return array_filter([
             'Total terms' => $record->taxonomy_terms_count,
             'Selected Sites' => implode(',', $record->sites()->pluck('name')->toArray()),
@@ -90,7 +88,7 @@ class TaxonomyResource extends Resource
             /** @phpstan-ignore booleanNot.alwaysTrue */
             ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', fn($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));
+            return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();
@@ -162,7 +160,7 @@ class TaxonomyResource extends Resource
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        fn(?Taxonomy $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                        fn (?Taxonomy $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
                             if ($record) {
                                 $selectedLocale = $value;
@@ -188,7 +186,7 @@ class TaxonomyResource extends Resource
                         ->reactive()
                         ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                         ->rule(fn (?Taxonomy $record, \Filament\Forms\Get $get) => new MicroSiteUniqueRouteUrlRule($record, $get('route_url')))
-                        ->options(fn() => Site::orderBy('name')
+                        ->options(fn () => Site::orderBy('name')
                             ->pluck('name', 'id')
                             ->toArray())
                         ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
@@ -304,7 +302,7 @@ class TaxonomyResource extends Resource
 
                                                             return function (string $attribute, $value, Closure $fail) use ($datas, $current_item_id) {
 
-                                                                $filtered = array_filter($datas, fn($item) => isset($item['url']) && $item['url'] === $value && $item['id'] != $current_item_id);
+                                                                $filtered = array_filter($datas, fn ($item) => isset($item['url']) && $item['url'] === $value && $item['id'] != $current_item_id);
 
                                                                 if (! empty($filtered)) {
                                                                     $fail(trans('The :value is already been used.', ['value' => $value]));

@@ -11,8 +11,7 @@ class CreateServiceBillAction
 {
     public function __construct(
         private readonly GenerateReferenceNumberAction $generateReferenceNumberAction,
-    ) {
-    }
+    ) {}
 
     public function execute(ServiceBillData $serviceBillData): ServiceBill
     {

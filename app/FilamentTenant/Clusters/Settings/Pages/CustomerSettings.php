@@ -9,15 +9,12 @@ use App\FilamentTenant\Support\DataInterpolation;
 use App\FilamentTenant\Support\Divider;
 use App\FilamentTenant\Support\SchemaInterpolations;
 use App\Settings\CustomerSettings as SettingCustomer;
-use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Enums\CustomerEvent;
 use Domain\Customer\Models\Customer;
 use Filament\Forms;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -101,7 +98,7 @@ class CustomerSettings extends TenantBaseSettings
 
                             DataInterpolation::make('customer')
                                 ->label('customer')
-                                ->schemaData(fn() => app(Customer::class)->with('addresses')->latest()->first()?->toArray() ?? []),
+                                ->schemaData(fn () => app(Customer::class)->with('addresses')->latest()->first()?->toArray() ?? []),
                         ])
                         ->columnSpan(['md' => 1])
                         ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),

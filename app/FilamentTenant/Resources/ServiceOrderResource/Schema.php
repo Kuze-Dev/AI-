@@ -11,9 +11,7 @@ use Filament\Forms\Get;
 
 final class Schema
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function address(string $field, ServiceOrderAddressType $type): array
     {

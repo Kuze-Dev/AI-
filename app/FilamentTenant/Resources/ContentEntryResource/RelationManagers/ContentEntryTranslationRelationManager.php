@@ -9,11 +9,9 @@ use Domain\Content\Models\ContentEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 // use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 
 class ContentEntryTranslationRelationManager extends RelationManager
 {
@@ -68,7 +66,7 @@ class ContentEntryTranslationRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('sites.name')
                     ->badge()
                     ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: fn() => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime()
                     ->sortable()

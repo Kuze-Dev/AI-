@@ -13,7 +13,7 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
 {
     use RefreshDatabaseWithTenant;
 
-//    private string $seeder = TestSeeder::class;
+    //    private string $seeder = TestSeeder::class;
 
     #[\Override]
     protected function setUp(): void
@@ -35,5 +35,4 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
         Tenant::all()->each->delete();
         parent::tearDown();
     }
-
 }

@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 //
-//declare(strict_types=1);
+// declare(strict_types=1);
 //
-//namespace Domain\Product\Imports;
+// namespace Domain\Product\Imports;
 //
-//use Domain\Product\Actions\CreateProductAction;
-//use Domain\Product\Actions\UpdateProductAction;
-//use Domain\Product\DataTransferObjects\ProductData;
-//use Domain\Product\Models\Product;
-//use Domain\Product\Models\ProductOption;
-//use Domain\Product\Models\ProductOptionValue;
-//use Domain\Product\Models\ProductVariant;
-//use Domain\Taxonomy\Models\Taxonomy;
-//use Domain\Taxonomy\Models\TaxonomyTerm;
-//use HalcyonAgile\FilamentImport\Actions\ImportAction;
-//use Illuminate\Validation\ValidationException;
-//use Log;
-//use Support\Common\Rules\MinimumValueRule;
+// use Domain\Product\Actions\CreateProductAction;
+// use Domain\Product\Actions\UpdateProductAction;
+// use Domain\Product\DataTransferObjects\ProductData;
+// use Domain\Product\Models\Product;
+// use Domain\Product\Models\ProductOption;
+// use Domain\Product\Models\ProductOptionValue;
+// use Domain\Product\Models\ProductVariant;
+// use Domain\Taxonomy\Models\Taxonomy;
+// use Domain\Taxonomy\Models\TaxonomyTerm;
+// use HalcyonAgile\FilamentImport\Actions\ImportAction;
+// use Illuminate\Validation\ValidationException;
+// use Log;
+// use Support\Common\Rules\MinimumValueRule;
 //
-//class ImportProductAction
-//{
+// class ImportProductAction
+// {
 //    public static function proceed(): ImportAction
 //    {
 //        return ImportAction::make('Product Import')
@@ -442,4 +442,4 @@ declare(strict_types=1);
 //            return [];
 //        })->toArray();
 //    }
-//}
+// }

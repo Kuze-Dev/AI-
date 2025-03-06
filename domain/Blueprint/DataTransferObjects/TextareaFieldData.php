@@ -22,8 +22,7 @@ class TextareaFieldData extends FieldData
         public readonly ?int $rows = null,
         public readonly ?int $cols = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

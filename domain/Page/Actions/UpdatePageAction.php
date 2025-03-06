@@ -22,8 +22,7 @@ class UpdatePageAction
         protected CreateMetaDataAction $createMetaData,
         protected UpdateMetaDataAction $updateMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
-    ) {
-    }
+    ) {}
 
     public function execute(Page $page, PageData $pageData): Page
     {

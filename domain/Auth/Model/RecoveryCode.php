@@ -32,7 +32,6 @@ class RecoveryCode extends Model
 {
     protected $fillable = ['code'];
 
-
     protected function casts(): array
     {
         return [

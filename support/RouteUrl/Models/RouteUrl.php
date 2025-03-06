@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Support\RouteUrl\Models;
 
 use Eloquent;
-use Illuminate\Database\Eloquent\HasBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Stringable;
@@ -37,7 +36,6 @@ use Stringable;
  */
 class RouteUrl extends Model implements Stringable
 {
-
     protected $fillable = [
         'model_type',
         'model_id',

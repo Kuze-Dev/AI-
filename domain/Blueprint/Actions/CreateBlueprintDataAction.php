@@ -21,8 +21,7 @@ class CreateBlueprintDataAction
 {
     public function __construct(
         protected ExtractDataAction $extractDataAction,
-    ) {
-    }
+    ) {}
 
     public function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Image\Enums\Fit;
-use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -47,6 +46,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
 class ProductVariant extends Model implements HasMedia
 {
     use ConstraintsRelationships;
+
     /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
@@ -71,6 +71,7 @@ class ProductVariant extends Model implements HasMedia
             'status' => 'boolean',
         ];
     }
+
     /**
      * Get the stringify combination (array)
      *

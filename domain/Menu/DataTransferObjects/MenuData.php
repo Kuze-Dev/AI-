@@ -12,8 +12,7 @@ readonly class MenuData
         public array $nodes = [],
         public array $sites = [],
         public ?string $locale = 'en',
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

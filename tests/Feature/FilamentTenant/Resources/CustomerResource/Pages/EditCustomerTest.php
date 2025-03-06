@@ -8,7 +8,6 @@ use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\CustomerResource\Pages\EditCustomer;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Customer\Models\Customer;
-use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
 
@@ -27,15 +26,14 @@ beforeEach(function () {
 
     $this->tier = app(Tier::class)->firstOrCreate(
         [
-            'name' => config('domain.tier.default')
-        ],[
-            'description' => 'test'
+            'name' => config('domain.tier.default'),
+        ], [
+            'description' => 'test',
         ]
     );
 });
 
 it('can render page', function () {
-   
 
     $customer = CustomerFactory::new()
         ->createOne([
@@ -56,7 +54,6 @@ it('can render page', function () {
 });
 
 it('can edit tier', function () {
-   
 
     $customer = CustomerFactory::new()
         ->createOne([

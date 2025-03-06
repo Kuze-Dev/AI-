@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\BlockResource\Blocks\CreateBlock;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Models\Block;
 use Illuminate\Http\UploadedFile;

@@ -10,9 +10,7 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 
 class NotifyCustomerServiceBillDueDateAction
 {
-    public function __construct(private readonly ServiceSettings $serviceSettings)
-    {
-    }
+    public function __construct(private readonly ServiceSettings $serviceSettings) {}
 
     public function execute(): void
     {

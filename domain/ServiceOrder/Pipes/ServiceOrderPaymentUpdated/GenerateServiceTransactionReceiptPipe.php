@@ -13,8 +13,7 @@ class GenerateServiceTransactionReceiptPipe
     public function __construct(
         private readonly GenerateServiceTransactionReceiptAction $generateServiceTransactionReceiptAction,
         private readonly SendToCustomerServiceTransactionReceiptEmailAction $sendToCustomerServiceTransactionReceiptEmailAction
-    ) {
-    }
+    ) {}
 
     public function handle(
         ServiceOrderPaymentUpdatedPipelineData $serviceOrderPaymentUpdatedPipelineData,

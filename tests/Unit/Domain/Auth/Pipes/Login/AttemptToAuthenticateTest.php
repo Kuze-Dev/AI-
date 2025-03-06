@@ -54,8 +54,8 @@ it('hits throttle with invalid credentials', function () {
 
 function mockAuthAttempt(bool $return): void
 {
-//    $guard = (new Mock(StatefulGuard::class))
-//        ->expect(attempt: fn () => $return);
+    //    $guard = (new Mock(StatefulGuard::class))
+    //        ->expect(attempt: fn () => $return);
     $guard = mock_expect(StatefulGuard::class, attempt: fn () => $return);
 
     Auth::shouldReceive('guard')

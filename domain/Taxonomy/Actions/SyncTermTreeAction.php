@@ -28,8 +28,7 @@ class SyncTermTreeAction
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** @param  array<TaxonomyTermData>  $taxonomyTermDataSet */
     public function execute(Taxonomy $taxonomy, array $taxonomyTermDataSet): Taxonomy

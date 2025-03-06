@@ -14,8 +14,7 @@ readonly class GuestCartSummaryShippingData
         public ?ReceiverData $receiverData,
         public ?ShippingAddressData $shippingAddress,
         public ?ShippingMethod $shippingMethod,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

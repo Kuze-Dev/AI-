@@ -6,7 +6,6 @@ namespace Domain\ServiceOrder\Pipes\ServiceOrderCreated;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderCreatedPipelineData;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
-use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 
 class NotifyCustomerPipe
 {

@@ -30,8 +30,7 @@ class HandleUpdateDataTranslation
     public function __construct(
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create content query. */
     public function execute(
@@ -74,7 +73,7 @@ class HandleUpdateDataTranslation
 
         $flattenData = app(ExtractDataAction::class)->flattenArray($data);
 
-        $filtered = array_filter($flattenData, fn($item) => isset($item['translatable']) && $item['translatable'] === false);
+        $filtered = array_filter($flattenData, fn ($item) => isset($item['translatable']) && $item['translatable'] === false);
 
         if (
             count($filtered) > 0
@@ -275,18 +274,17 @@ class HandleUpdateDataTranslation
          * TODO::
          *
          * Revisit Transalation Generation for other models
-         *
          */
-         /** @phpstan-ignore property.notFound  */
+        /** @phpstan-ignore property.notFound  */
         if ($model->translation_id) {
-             /** @phpstan-ignore method.notFound */
+            /** @phpstan-ignore method.notFound */
             $translation_collection = $model->dataTranslation()
                 ->orwhere('id', $model->translation_id)
                 ->orwhere('translation_id', $model->translation_id)
                 ->get();
 
         } else {
-             /** @phpstan-ignore method.notFound  */
+            /** @phpstan-ignore method.notFound  */
             $translation_collection = $model->dataTranslation()
                 ->orwhere('id', $model->id)
                 ->get();

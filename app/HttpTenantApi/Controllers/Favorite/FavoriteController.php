@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Favorite;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\HttpTenantApi\Resources\FavoriteResource;
 use Domain\Customer\Models\Customer;
 use Domain\Favorite\Actions\CreateFavoriteAction;
@@ -12,7 +11,7 @@ use Domain\Favorite\Actions\DestroyFavoriteAction;
 use Domain\Favorite\DataTransferObjects\FavoriteData;
 use Domain\Favorite\Models\Favorite;
 use Domain\Favorite\Requests\FavoriteStoreRequest;
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -58,7 +57,7 @@ class FavoriteController
         }
     }
 
-    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction,#[CurrentUser('sanctum')] Customer $customer): JsonResponse
+    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction, #[CurrentUser('sanctum')] Customer $customer): JsonResponse
     {
 
         $favoriteData = FavoriteData::fromArray([

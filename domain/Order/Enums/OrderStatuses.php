@@ -11,7 +11,7 @@ use Filament\Support\Contracts\HasLabel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-enum OrderStatuses: string implements HasColor, HasLabel //, HasIcon
+enum OrderStatuses: string implements HasColor, HasLabel // , HasIcon
 {
     case PROCESSING = 'processing';
     case PENDING = 'pending';

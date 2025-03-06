@@ -118,7 +118,6 @@ class AdminPanelProvider extends PanelProvider
                     ->middleware('guest:admin')
                     ->name('two-factor');
 
-
                 Route::middleware(Authenticate::class)
                     ->group(function () {
                         Route::get('account-deactivated', AccountDeactivatedNotice::class)

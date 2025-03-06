@@ -46,7 +46,7 @@ final class Client
         }
 
         /** @var string $token */
-        $token = Cache::remember('vision_pay_token', 60, fn() => $this->generateToken());
+        $token = Cache::remember('vision_pay_token', 60, fn () => $this->generateToken());
 
         $this->jwtToken = $token;
 

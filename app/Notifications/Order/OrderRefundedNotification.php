@@ -13,9 +13,7 @@ class OrderRefundedNotification extends Notification
     use Queueable;
 
     /** Create a new notification instance. */
-    public function __construct(private Order $order)
-    {
-    }
+    public function __construct(private Order $order) {}
 
     /**
      * Get the notification's delivery channels.

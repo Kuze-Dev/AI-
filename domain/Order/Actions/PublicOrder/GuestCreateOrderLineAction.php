@@ -20,8 +20,7 @@ readonly class GuestCreateOrderLineAction
 {
     public function __construct(
         private GuestCartSummaryAction $guestCartSummaryAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Order $order, GuestPlaceOrderData $placeOrderData, GuestPreparedOrderData $guestPreparedOrderData): void
     {

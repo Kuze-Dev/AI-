@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         if (! app()->runningUnitTests()) {
             Artisan::call(DropTenantDatabasesCommand::class);
         }
-        
+
         Storage::disk(config('media-library.disk_name'))
             ->deleteDirectory(config('media-library.prefix'));
 

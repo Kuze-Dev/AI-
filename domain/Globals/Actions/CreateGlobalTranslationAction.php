@@ -20,8 +20,7 @@ class CreateGlobalTranslationAction
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create content entry query. */
     public function execute(Globals $global, GlobalsData $globalData): Globals

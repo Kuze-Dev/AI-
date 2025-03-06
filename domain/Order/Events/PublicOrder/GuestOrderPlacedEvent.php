@@ -13,7 +13,5 @@ class GuestOrderPlacedEvent
 {
     use SerializesModels;
 
-    public function __construct(public Order $order, public GuestPreparedOrderData $guestPreparedOrderData, public GuestPlaceOrderData $guestPlaceOrderData)
-    {
-    }
+    public function __construct(public Order $order, public GuestPreparedOrderData $guestPreparedOrderData, public GuestPlaceOrderData $guestPlaceOrderData) {}
 }

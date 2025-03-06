@@ -24,8 +24,7 @@ class PublishedPageDraftAction
         protected UpdateMetaDataAction $updateMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected DeletePageAction $deletePage,
-    ) {
-    }
+    ) {}
 
     public function execute(Page $page, Page $pageDraft, PageData $pageData): Page
     {

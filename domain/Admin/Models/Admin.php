@@ -15,12 +15,10 @@ use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\CausesActivity;
@@ -90,6 +88,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
 #[OnDeleteCascade(['twoFactorAuthentication', 'roles', 'permissions', 'tokens'])]
 class Admin extends Authenticatable implements FilamentUser, HasActiveStateContract, HasName, MustVerifyEmail, TwoFactorAuthenticatableContract
 {
+    use CausesActivity;
     use ConstraintsRelationships;
     use HasActiveState;
     use HasApiTokens;
@@ -98,7 +97,6 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
     use Notifiable;
     use SoftDeletes;
     use TwoFactorAuthenticatable;
-    use CausesActivity;
 
     protected $fillable = [
         'first_name',

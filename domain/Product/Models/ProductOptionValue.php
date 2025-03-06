@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Image\Enums\Fit;
-use Spatie\Image\Manipulations;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
@@ -38,6 +37,7 @@ class ProductOptionValue extends Model implements HasMedia
 {
     use ConstraintsRelationships;
     use HasSlug;
+
     /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
@@ -76,13 +76,14 @@ class ProductOptionValue extends Model implements HasMedia
     {
         return Attribute::make(
             get: function ($value) {
-                 /** @phpstan-ignore offsetAccess.notFound */
+                /** @phpstan-ignore offsetAccess.notFound */
                 if (is_null($this->data) || $this->data['icon_type'] == 'text') {
                     return 'Type: Text | Value: N/A';
                 } else {
-                     /** @phpstan-ignore offsetAccess.notFound */
+                    /** @phpstan-ignore offsetAccess.notFound */
                     $iconTypeTransformed = ucwords(str_replace('_', ' ', (string) $this->data['icon_type']));
-                     /** @phpstan-ignore offsetAccess.notFound */
+
+                    /** @phpstan-ignore offsetAccess.notFound */
                     return "Type: {$iconTypeTransformed} | Value: {$this->data['icon_value']}";
                 }
             }

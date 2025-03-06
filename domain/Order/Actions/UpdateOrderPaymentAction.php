@@ -26,8 +26,7 @@ readonly class UpdateOrderPaymentAction
     public function __construct(
         private UploadProofofPaymentAction $uploadProofofPaymentAction,
         private CreatePaymentLink $createPaymentLink,
-    ) {
-    }
+    ) {}
 
     public function status(Order $order, string|OrderStatuses $status, ?string $notes = null): Order
     {

@@ -17,9 +17,7 @@ use Filament\Forms\Get;
 
 final class Support
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function customer(Get $get): Customer
     {
@@ -58,22 +56,22 @@ final class Support
         $subTotal = app(CalculateServiceOrderTotalPriceAction::class)
             ->execute(
                 $selling_price,
-                    array_map(
-                        function ($additionalCharge) {
-                            if (
-                                isset($additionalCharge['price']) &&
-                                is_numeric($additionalCharge['price']) &&
-                                isset($additionalCharge['quantity']) &&
-                                is_numeric($additionalCharge['quantity'])
-                            ) {
-                                return new ServiceOrderAdditionalChargeData(
-                                    (float) $additionalCharge['price'],
-                                    (int) $additionalCharge['quantity']
-                                );
-                            }
-                        },
-                        $additionalCharges
-                    )
+                array_map(
+                    function ($additionalCharge) {
+                        if (
+                            isset($additionalCharge['price']) &&
+                            is_numeric($additionalCharge['price']) &&
+                            isset($additionalCharge['quantity']) &&
+                            is_numeric($additionalCharge['quantity'])
+                        ) {
+                            return new ServiceOrderAdditionalChargeData(
+                                (float) $additionalCharge['price'],
+                                (int) $additionalCharge['quantity']
+                            );
+                        }
+                    },
+                    $additionalCharges
+                )
             )
             ->getAmount();
 

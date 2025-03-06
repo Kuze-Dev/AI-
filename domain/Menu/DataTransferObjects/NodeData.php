@@ -19,8 +19,7 @@ readonly class NodeData
         public ?int $model_id = null,
         public ?string $translation_id = null,
         public ?array $children = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

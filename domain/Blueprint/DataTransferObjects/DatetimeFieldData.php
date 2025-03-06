@@ -21,8 +21,7 @@ class DatetimeFieldData extends FieldData
         public readonly ?Carbon $max = null,
         public readonly ?string $format = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

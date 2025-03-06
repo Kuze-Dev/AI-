@@ -16,6 +16,5 @@ readonly class BlockData
         public UploadedFile|string|array|null $image = null,
         public ?array $data = null,
         public array $sites = []
-    ) {
-    }
+    ) {}
 }

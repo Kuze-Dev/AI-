@@ -43,7 +43,7 @@ it('can not render page', function () {
         ->assertForbidden();
 });
 
-//it('can create customer w/ different address', function () {
+// it('can create customer w/ different address', function () {
 //
 //    $data = CustomerRequestFactory::new()
 //        ->withTier(Tier::first())
@@ -83,4 +83,4 @@ it('can not render page', function () {
 //        'is_default_shipping' => 0,
 //        'is_default_billing' => 1,
 //    ]);
-//});
+// });

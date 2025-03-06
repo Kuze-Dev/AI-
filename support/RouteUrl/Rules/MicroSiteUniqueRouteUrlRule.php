@@ -10,7 +10,6 @@ use Domain\Page\Models\Page;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Support\RouteUrl\Contracts\HasRouteUrl;
 use Support\RouteUrl\Models\RouteUrl;
 
@@ -19,8 +18,7 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
     public function __construct(
         protected readonly ?HasRouteUrl $ignoreModel,
         protected readonly array $route_url,
-    ) {
-    }
+    ) {}
 
     /** @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail */
     #[\Override]
@@ -29,21 +27,21 @@ class MicroSiteUniqueRouteUrlRule implements ValidationRule
 
         $pages = Page::select('id')
             ->whereRelation('sites', 'site_id', $value)
-            ->whereRelation('routeUrls','url', $this->route_url['url'])
+            ->whereRelation('routeUrls', 'url', $this->route_url['url'])
             ->pluck('id')->toArray();
 
         $contentEntriesIds = ContentEntry::select('id')
             ->whereRelation('sites', 'site_id', $value)
-            ->whereRelation('routeUrls','url', $this->route_url['url'])
+            ->whereRelation('routeUrls', 'url', $this->route_url['url'])
             ->pluck('id')->toArray();
 
         $taxonomyIds = Taxonomy::select('id')
             ->whereRelation('sites', 'site_id', $value)
-            ->whereRelation('routeUrls','url', $this->route_url['url'])
+            ->whereRelation('routeUrls', 'url', $this->route_url['url'])
             ->pluck('id')->toArray();
 
         $taxonomyTermsId = TaxonomyTerm::select('id')
-            ->whereRelation('routeUrls','url', $this->route_url['url'])
+            ->whereRelation('routeUrls', 'url', $this->route_url['url'])
             ->pluck('id')->toArray();
 
         $pagesIds = array_merge($pages, $contentEntriesIds, $taxonomyIds, $taxonomyTermsId);

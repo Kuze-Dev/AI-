@@ -6,7 +6,6 @@ namespace App\Providers\Filament;
 
 use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
 use App\FilamentTenant\Pages\AccountDeactivatedNotice;
-use App\FilamentTenant\Pages\EditProfile;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\FilamentTenant\Widgets\Report as ReportWidget;
 use App\Settings\SiteSettings;
@@ -115,7 +114,6 @@ class TenantPanelProvider extends PanelProvider
                 Route::get('two-factor', TwoFactorAuthentication::class)
                     ->middleware('guest:admin')
                     ->name('two-factor');
-
 
                 Route::middleware(Authenticate::class)
                     ->group(function () {

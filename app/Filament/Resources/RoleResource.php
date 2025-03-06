@@ -23,7 +23,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
@@ -41,7 +40,6 @@ class RoleResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
-
 
     #[\Override]
     public static function getNavigationGroup(): ?string
@@ -139,7 +137,7 @@ class RoleResource extends Resource
                             }
                         })
                         ->authorize('delete'),
-                    ]),
+                ]),
             ])
             ->bulkActions([])
             ->defaultSort('updated_at', 'desc');

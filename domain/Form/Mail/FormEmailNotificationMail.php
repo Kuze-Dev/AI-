@@ -31,8 +31,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         protected readonly array $data,
         protected readonly ?array $form_attachments = [],
         protected readonly ?int $form_submission_id = null,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {

@@ -13,8 +13,7 @@ class TwoFactorAuthenticationProvider implements TwoFactorAuthenticationProvider
     public function __construct(
         protected Google2FA $engine,
         protected ?Repository $cache = null
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function generateSecretKey(): string

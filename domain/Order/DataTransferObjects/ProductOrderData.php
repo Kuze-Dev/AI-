@@ -26,8 +26,7 @@ readonly class ProductOrderData
         public ?bool $allow_stocks,
         public ?int $minimum_order_quantity,
         public ?bool $allow_guest_purchase,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -53,7 +52,7 @@ readonly class ProductOrderData
 
     public static function fromProduct(Product $product): self
     {
-        //product tiering discount
+        // product tiering discount
         $selling_price = $product->selling_price;
 
         if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {

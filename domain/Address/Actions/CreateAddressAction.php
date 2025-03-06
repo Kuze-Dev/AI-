@@ -12,8 +12,7 @@ readonly class CreateAddressAction
     public function __construct(
         private SetAddressAsDefaultShippingAction $setAddressAsDefaultShipping,
         private SetAddressAsDefaultBillingAction $setAddressAsDefaultBilling,
-    ) {
-    }
+    ) {}
 
     public function execute(AddressData $addressData): Address
     {

@@ -32,6 +32,7 @@ trait TwoFactorAuthenticatable
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Auth\Model\TwoFactorAuthentication, $this>
+     *
      *  @phpstan-ignore method.childReturnType */
     public function twoFactorAuthentication(): MorphOne
     {

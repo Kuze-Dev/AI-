@@ -14,8 +14,7 @@ readonly class BucketManager
 {
     public function __construct(
         protected Tenant $tenant
-    ) {
-    }
+    ) {}
 
     public function makeS3Client(): S3Client
     {

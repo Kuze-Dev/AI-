@@ -209,6 +209,7 @@ class AppServiceProvider extends ServiceProvider
             ) {
                 return Limit::none();
             }
+
             /** @phpstan-ignore class.notFound */
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });

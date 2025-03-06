@@ -8,9 +8,7 @@ use Domain\Tenant\Models\Tenant;
 
 final class TenantSupport
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function initialized(): bool
     {
@@ -22,13 +20,13 @@ final class TenantSupport
         /** @phpstan-ignore return.type */
         return tenancy()->tenant;
     }
-//
-//    public static function modelNullable(): ?Tenant
-//    {
-//        if (self::initialized()) {
-//            return self::model();
-//        }
-//
-//        return null;
-//    }
+    //
+    //    public static function modelNullable(): ?Tenant
+    //    {
+    //        if (self::initialized()) {
+    //            return self::model();
+    //        }
+    //
+    //        return null;
+    //    }
 }

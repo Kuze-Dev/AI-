@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Support\Concerns;
 
 use App\Filament\Resources\RoleResource\Support\PermissionGroup;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;

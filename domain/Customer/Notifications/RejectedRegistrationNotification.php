@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 //
-//declare(strict_types=1);
+// declare(strict_types=1);
 //
-//namespace Domain\Customer\Notifications;
+// namespace Domain\Customer\Notifications;
 //
-//use App\Settings\ECommerceSettings;
-//use App\Settings\SiteSettings;
-//use Illuminate\Bus\Queueable;
-//use Illuminate\Contracts\Queue\ShouldQueue;
-//use Illuminate\Notifications\Messages\MailMessage;
-//use Illuminate\Notifications\Notification;
+// use App\Settings\ECommerceSettings;
+// use App\Settings\SiteSettings;
+// use Illuminate\Bus\Queueable;
+// use Illuminate\Contracts\Queue\ShouldQueue;
+// use Illuminate\Notifications\Messages\MailMessage;
+// use Illuminate\Notifications\Notification;
 //
-//class RejectedRegistrationNotification extends Notification implements ShouldQueue
-//{
+// class RejectedRegistrationNotification extends Notification implements ShouldQueue
+// {
 //    use Queueable;
 //
 //    public function via(): array
@@ -38,4 +38,4 @@ declare(strict_types=1);
 //
 //        return $baseUrl.'/register';
 //    }
-//}
+// }

@@ -14,8 +14,7 @@ class DatabaseTenancyBootstrapper implements TenancyBootstrapper
 {
     public function __construct(
         protected DatabaseManager $database
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function bootstrap(Tenant $tenant): void

@@ -65,7 +65,7 @@ class SearchController
                 ->whereNotNull('published_at')
                 ->when(
                     $filter['sites.id'] ?? null,
-                    fn($query, $siteIds) => $query->wherehas('sites', fn($q) => $q->whereIn('site_id', explode(',', (string) $siteIds)))
+                    fn ($query, $siteIds) => $query->wherehas('sites', fn ($q) => $q->whereIn('site_id', explode(',', (string) $siteIds)))
                 )
                 ->limit(20)
                 ->get()
@@ -86,7 +86,7 @@ class SearchController
                 )
                 ->when(
                     $filter['sites.id'] ?? null,
-                    fn($query, $siteIds) => $query->wherehas('sites', fn($q) => $q->whereIn('site_id', explode(',', (string) $siteIds)))
+                    fn ($query, $siteIds) => $query->wherehas('sites', fn ($q) => $q->whereIn('site_id', explode(',', (string) $siteIds)))
                 )
                 ->limit(20)
                 ->get()

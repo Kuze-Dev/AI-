@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class InvalidServiceTransactionException extends LogicException
-{
-}
+class InvalidServiceTransactionException extends LogicException {}

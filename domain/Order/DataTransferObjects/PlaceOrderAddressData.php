@@ -9,6 +9,5 @@ readonly class PlaceOrderAddressData
     public function __construct(
         public int $shipping,
         public int $billing
-    ) {
-    }
+    ) {}
 }

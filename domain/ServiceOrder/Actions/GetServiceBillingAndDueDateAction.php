@@ -19,8 +19,7 @@ class GetServiceBillingAndDueDateAction
 {
     public function __construct(
         private readonly ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
-    ) {
-    }
+    ) {}
 
     /** @throws Throwable */
     public function execute(

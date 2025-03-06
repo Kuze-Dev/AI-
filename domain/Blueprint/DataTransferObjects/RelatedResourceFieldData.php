@@ -29,8 +29,7 @@ class RelatedResourceFieldData extends FieldData
         public readonly ?int $min = null,
         public readonly ?int $max = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self
@@ -99,7 +98,8 @@ class RelatedResourceFieldData extends FieldData
 
         foreach ($this->relation_scopes as $relationName => $value) {
             /**
-             *  @var Relation<Model> $relationship
+             * @var Relation<Model> $relationship
+             *
              * @phpstan-ignore generics.lessTypes */
             $relationship = $model->{$relationName}();
 

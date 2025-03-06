@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('api_calls', function (Blueprint $table) {
             $table->id();
-            $table->string('request_type'); //request from api or admin side
+            $table->string('request_type'); // request from api or admin side
             $table->text('request_url')->nullable();
             $table->longText('request_response')->nullable();
             $table->timestamps();

@@ -13,8 +13,7 @@ class UpdateTaxonomyAction
     public function __construct(
         protected SyncTermTreeAction $syncTermAction,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
-    ) {
-    }
+    ) {}
 
     public function execute(Taxonomy $taxonomy, TaxonomyData $taxonomyData): Taxonomy
     {

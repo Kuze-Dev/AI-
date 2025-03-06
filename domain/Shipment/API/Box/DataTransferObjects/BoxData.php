@@ -11,8 +11,7 @@ class BoxData
     /** @param  \Domain\Shipment\API\Box\DataTransferObjects\BoxItem[]  $boxitems*/
     public function __construct(
         public readonly array $boxitems = [],
-    ) {
-    }
+    ) {}
 
     public function getTotalVolume(): int|float
     {

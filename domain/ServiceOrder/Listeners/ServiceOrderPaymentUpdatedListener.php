@@ -25,9 +25,8 @@ class ServiceOrderPaymentUpdatedListener
         private ServiceBill $serviceBill,
         private ServiceOrder $serviceOrder,
         private ServiceTransaction $serviceTransaction,
-        private readonly ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction
-    ) {
-    }
+        private readonly ServiceOrderPaymentUpdatedPipelineAction $serviceOrderPaymentUpdatedPipelineAction,
+    ) {}
 
     /** @throws Throwable */
     public function handle(PaymentProcessEvent $event): void
@@ -76,12 +75,12 @@ class ServiceOrderPaymentUpdatedListener
 
     private function handleServiceBillStatusUpdate(): void
     {
-        
+
         $serviceTransactionStatus = match ($this->payment->status) {
             'paid' => ServiceTransactionStatus::PAID,
             'refunded', => ServiceTransactionStatus::REFUNDED,
             'cancelled', => ServiceTransactionStatus::CANCELLED,
-            default => throw new PaymentException()
+            default => throw new PaymentException(),
         };
 
         $this->serviceTransaction->update(['status' => $serviceTransactionStatus]);

@@ -8,8 +8,7 @@ readonly class CheckoutData
 {
     public function __construct(
         public array $cart_line_ids
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -9,7 +9,6 @@ use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Http;
-use Livewire\Redirector;
 use Spatie\Activitylog\ActivityLogger;
 
 class DeployStaticSite extends Widget

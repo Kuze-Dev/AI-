@@ -18,7 +18,7 @@ class AdminOrderFailedNotificationListener
         $body = $event->body;
         $permission = $event->permission;
 
-        //superadmin
+        // superadmin
         /** @var Admin $admin */
         $admin = Admin::first();
 
@@ -29,7 +29,7 @@ class AdminOrderFailedNotificationListener
                 ->toDatabase(),
         );
 
-        //admins
+        // admins
         $adminsWithPermission = Admin::whereHas('roles.permissions', function ($query) use ($permission) {
             $query->where('name', $permission);
         })->get();

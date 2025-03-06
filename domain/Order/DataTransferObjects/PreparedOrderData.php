@@ -25,8 +25,7 @@ readonly class PreparedOrderData
         public ?TaxZone $taxZone,
         public ?string $notes,
         public ?Discount $discount,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

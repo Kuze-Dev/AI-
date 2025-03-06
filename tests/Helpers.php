@@ -8,7 +8,6 @@ use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Customer\Models\Customer;
-use Domain\Role\Database\Factories\RoleFactory;
 use Domain\Tenant\Models\Tenant;
 use Domain\Tenant\TenantSupport;
 use Filament\Facades\Filament;
@@ -18,21 +17,21 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
-
 use Spatie\Permission\Contracts\Role;
+
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 
 function loginAsSuperAdmin(?Admin $admin = null): Admin
 {
-    return loginAsAdmin($admin);//->assignRole(config()->string('domain.role.super_admin'));
+    return loginAsAdmin($admin); // ->assignRole(config()->string('domain.role.super_admin'));
 }
 
 function loginAsAdmin(?Admin $admin = null): Admin
 {
     $admin ??= (
         Admin::where(['email' => 'admin@admin.com'])->first()
-        ?? AdminFactory::new() ->createOne(['email' => 'admin@admin.com',])
+        ?? AdminFactory::new()->createOne(['email' => 'admin@admin.com'])
     );
 
     $role = app(Role::class)
@@ -178,12 +177,11 @@ function mock_expect(string|object $object, callable ...$methods): mixed
 
     return $mock;
 
-//
-//    return mock($object)
-//        ->shouldReceive((string) $method)
-//        ->atLeast()
-//        ->once()
-//        ->andReturnUsing($expectation);
-
+    //
+    //    return mock($object)
+    //        ->shouldReceive((string) $method)
+    //        ->atLeast()
+    //        ->once()
+    //        ->andReturnUsing($expectation);
 
 }

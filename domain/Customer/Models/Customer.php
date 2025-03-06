@@ -116,8 +116,10 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
     use EmailVerificationOTP;
     use HasApiTokens;
     use HasUuids;
+
     /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
     use Notifiable;
     use SoftDeletes;

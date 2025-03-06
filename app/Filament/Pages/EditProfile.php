@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use Domain\Admin\Models\Admin;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;

@@ -8,7 +8,6 @@ use App\FilamentTenant\Resources\SiteResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
 
 class ListSites extends ListRecords
 {

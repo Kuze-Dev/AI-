@@ -37,8 +37,8 @@ class CommonServiceProvider extends ServiceProvider
 
         $this->configureComponents();
 
-//        Infolist::$defaultCurrency =
-//        Tables\Table::$defaultCurrency = 'PHP';
+        //        Infolist::$defaultCurrency =
+        //        Tables\Table::$defaultCurrency = 'PHP';
 
         Infolist::$defaultDateTimeDisplayFormat =
         Tables\Table::$defaultDateTimeDisplayFormat = 'M d, Y h:i A';

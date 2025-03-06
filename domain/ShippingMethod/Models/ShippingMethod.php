@@ -71,8 +71,10 @@ class ShippingMethod extends Model implements HasMedia
 {
     use ConstraintsRelationships;
     use HasSlug;
+
     /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
 
     protected $fillable = [

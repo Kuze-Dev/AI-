@@ -17,8 +17,7 @@ class UpdateBlockContentAction
 
     public function __construct(
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     public function execute(BlockContent $blockContent, BlockContentData $blockContentData): BlockContent
     {

@@ -26,8 +26,7 @@ class CreateDatabase implements ShouldQueue
 
     public function __construct(
         protected Tenant $tenant
-    ) {
-    }
+    ) {}
 
     public function handle(DatabaseManager $databaseManager): ?bool
     {

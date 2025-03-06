@@ -14,8 +14,7 @@ readonly class CreateReviewAction
 {
     public function __construct(
         private CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
-    ) {
-    }
+    ) {}
 
     public function execute(CreateReviewData $createReviewData, Customer $customer): Review
     {

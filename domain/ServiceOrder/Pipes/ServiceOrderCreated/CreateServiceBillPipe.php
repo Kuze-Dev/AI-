@@ -12,8 +12,7 @@ class CreateServiceBillPipe
 {
     public function __construct(
         private readonly CreateServiceBillAction $createServiceBillAction
-    ) {
-    }
+    ) {}
 
     public function handle(
         ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData,

@@ -28,8 +28,8 @@ class GetAvailablePaymentDriverAction
             'bank-transfer' => TenantFeatureSupport::active(BankTransfer::class)
                 ? app(BankTransfer::class)->getLabel()
                 : false,
-            'vision-pay' => TenantFeatureSupport::active(VisionpayGateway::class) 
-                ? app(VisionpayGateway::class)->getLabel() 
+            'vision-pay' => TenantFeatureSupport::active(VisionpayGateway::class)
+                ? app(VisionpayGateway::class)->getLabel()
                 : false,
         ], fn ($value) => $value !== false);
 

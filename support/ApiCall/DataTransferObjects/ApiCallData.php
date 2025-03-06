@@ -10,8 +10,7 @@ readonly class ApiCallData
         public string $requestType,
         public string $requestUrl,
         public array $requestResponse,
-    ) {
-    }
+    ) {}
 
     public function toArray(): array
     {

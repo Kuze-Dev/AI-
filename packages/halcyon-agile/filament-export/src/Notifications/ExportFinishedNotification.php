@@ -18,9 +18,7 @@ class ExportFinishedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(private readonly string $fileName)
-    {
-    }
+    public function __construct(private readonly string $fileName) {}
 
     public function via(Model $notifiable): array
     {

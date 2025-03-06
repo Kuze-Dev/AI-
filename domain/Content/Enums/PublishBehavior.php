@@ -15,6 +15,6 @@ enum PublishBehavior: string implements HasLabel
 
     public function getLabel(): string
     {
-       return Str::headline($this->value);
+        return Str::headline($this->value);
     }
 }

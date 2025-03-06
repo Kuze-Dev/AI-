@@ -18,8 +18,7 @@ class LocationPickerData extends FieldData
         public readonly array $hidden_option = [],
         public readonly bool $translatable = true,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

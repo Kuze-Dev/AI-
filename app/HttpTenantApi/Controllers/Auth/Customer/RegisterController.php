@@ -26,9 +26,7 @@ use Throwable;
 #[Middleware('feature.tenant:'.CustomerBase::class)]
 class RegisterController
 {
-    public function __construct(protected CreateCustomerAction $createCustomerAction, protected EditCustomerAction $editCustomerAction, protected VerifyEmailAction $verifyEmailAction, protected SendForApprovalRegistrationAction $sendForApprovalRegistrationAction)
-    {
-    }
+    public function __construct(protected CreateCustomerAction $createCustomerAction, protected EditCustomerAction $editCustomerAction, protected VerifyEmailAction $verifyEmailAction, protected SendForApprovalRegistrationAction $sendForApprovalRegistrationAction) {}
 
     /** @throws Throwable */
     #[Post('register', name: 'customer.register')]

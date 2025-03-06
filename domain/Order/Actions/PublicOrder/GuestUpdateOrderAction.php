@@ -28,8 +28,7 @@ readonly class GuestUpdateOrderAction
     public function __construct(
         private UploadProofofPaymentAction $uploadProofofPaymentAction,
         private CreatePaymentLink $createPaymentLink,
-    ) {
-    }
+    ) {}
 
     public function execute(
         Order $order,

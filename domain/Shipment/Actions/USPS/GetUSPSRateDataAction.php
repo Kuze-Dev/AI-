@@ -18,8 +18,7 @@ class GetUSPSRateDataAction
     public function __construct(
         private readonly RateClient $rateClient,
         private readonly AddressClient $addressClient
-    ) {
-    }
+    ) {}
 
     public function execute(
         ParcelData $parcelData,

@@ -12,6 +12,5 @@ class BlockContentData extends TranslationDTO
         public readonly int $block_id,
         public readonly ?array $data = [],
         public readonly ?int $id = null,
-    ) {
-    }
+    ) {}
 }

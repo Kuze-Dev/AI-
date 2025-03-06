@@ -131,8 +131,8 @@ it('can impersonate', function () {
             ->create(['name' => 'admin.viewAny']),
 
         app(Permission::class)
-        ->create(['name' => 'admin.impersonate']),
-   ] );
+            ->create(['name' => 'admin.impersonate']),
+    ]);
 
     $admin = AdminFactory::new()->createOne();
 

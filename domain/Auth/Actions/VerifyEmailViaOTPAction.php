@@ -12,8 +12,7 @@ readonly class VerifyEmailViaOTPAction
 {
     public function __construct(
         private VerifyEmailAction $verifyEmail
-    ) {
-    }
+    ) {}
 
     public function execute(HasEmailVerificationOTP&MustVerifyEmail $user, string $otp): ?bool
     {

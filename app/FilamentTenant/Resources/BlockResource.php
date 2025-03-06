@@ -14,14 +14,12 @@ use Domain\Page\Models\Block;
 use Domain\Site\Models\Site;
 use Exception;
 use Filament\Forms;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
@@ -68,6 +66,7 @@ class BlockResource extends Resource
                         if ($record) {
                             return $record->media->pluck('uuid')->toArray();
                         }
+
                         return [];
                     })
                     ->getUploadedFileUsing(function ($file) {
@@ -85,11 +84,11 @@ class BlockResource extends Resource
                                     'url' => $mediaModel->getUrl(),
                                 ];
 
-//                                $storage = Storage::disk(config('filament.default_filesystem_disk'));
-//
-//                                if ($storage->exists($file)) {
-//                                    return $storage->url($file);
-//                                }
+                                //                                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                                //
+                                //                                if ($storage->exists($file)) {
+                                //                                    return $storage->url($file);
+                                //                                }
 
                             }
                         }
@@ -113,7 +112,7 @@ class BlockResource extends Resource
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
                         ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
-                            fn(?Block $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                            fn (?Block $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
                                 $siteIDs = $value;
 

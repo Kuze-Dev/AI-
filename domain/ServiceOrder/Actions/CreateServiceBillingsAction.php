@@ -15,8 +15,7 @@ class CreateServiceBillingsAction
 {
     public function __construct(
         private readonly ComputeServiceBillingCycleAction $computeServiceBillingCycleAction
-    ) {
-    }
+    ) {}
 
     public function execute(): void
     {

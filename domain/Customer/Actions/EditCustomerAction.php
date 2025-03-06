@@ -18,8 +18,7 @@ class EditCustomerAction
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Customer $customer, CustomerData $customerData): mixed
     {

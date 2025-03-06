@@ -119,7 +119,7 @@ class SchemaFormBuilder extends Component
             FileFieldData::class => $this->makeFileUploadComponent($field),
             MarkdownFieldData::class => MarkdownEditor::make($field->state_name)
                 ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons
-            )),
+                )),
             RichtextFieldData::class => $this->makeRichTextComponent($field),
             SelectFieldData::class => $this->makeSelectComponent($field),
             CheckBoxFieldData::class => $this->makeCheckBoxListComponent($field),
@@ -272,24 +272,24 @@ class SchemaFormBuilder extends Component
                         'url' => $mediaModel->getUrl(),
                     ];
 
-                // $media = Media::where('uuid', $file)
-                //     ->orWhere('file_name', $file)
-                //     ->first();
+                    // $media = Media::where('uuid', $file)
+                    //     ->orWhere('file_name', $file)
+                    //     ->first();
 
-                // if ($media) {
-                //     return $media->getUrl();
-                // }
+                    // if ($media) {
+                    //     return $media->getUrl();
+                    // }
 
-//                $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
+                    //                $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
-//                if ($storage->exists($file)) {
-//                    return $storage->url($file);
-//                }
+                    //                if ($storage->exists($file)) {
+                    //                    return $storage->url($file);
+                    //                }
 
+                }
+
+                return [];
             }
-
-            return [];
-        }
         });
 
         if (! empty($mediaFieldData->accept)) {

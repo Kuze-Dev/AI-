@@ -13,9 +13,7 @@ class NewRegisterNotification extends Notification
     use Queueable;
 
     /** Create a new notification instance. */
-    public function __construct(private Customer $customer)
-    {
-    }
+    public function __construct(private Customer $customer) {}
 
     /**
      * Get the notification's delivery channels.

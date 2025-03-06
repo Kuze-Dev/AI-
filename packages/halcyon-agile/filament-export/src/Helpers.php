@@ -9,9 +9,7 @@ use Illuminate\Support\Carbon;
 
 final class Helpers
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function fullPath(string $fileName): string
     {

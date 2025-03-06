@@ -13,8 +13,7 @@ readonly class PaymentPlanAmountRule implements ValidationRule
     public function __construct(
         protected float $total_price,
         protected PaymentPlanValue $payment_value,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void

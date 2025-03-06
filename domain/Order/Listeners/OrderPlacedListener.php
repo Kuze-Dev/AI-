@@ -17,8 +17,7 @@ readonly class OrderPlacedListener
 {
     public function __construct(
         private OrderSettings $orderSettings
-    ) {
-    }
+    ) {}
 
     /**
      * Handle the event.

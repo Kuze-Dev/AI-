@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Auth\Customer;
 
-use Illuminate\Container\Attributes\CurrentUser;
 use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use Domain\Customer\Actions\UpdateCustomerProfileImageAction;
 use Domain\Customer\Models\Customer;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;

@@ -14,8 +14,7 @@ class UpdateFormAction
         protected CreateFormEmailNotificationAction $createFormEmailNotification,
         protected UpdateFormEmailNotificationAction $updateFormEmailNotification,
         protected DeleteFormEmailNotificationAction $deleteFormEmailNotification
-    ) {
-    }
+    ) {}
 
     public function execute(Form $form, FormData $formData): Form
     {

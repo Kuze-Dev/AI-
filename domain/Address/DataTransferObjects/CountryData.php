@@ -12,6 +12,5 @@ readonly class CountryData
         public string $capital,
         public string $timezone,
         public bool $active,
-    ) {
-    }
+    ) {}
 }

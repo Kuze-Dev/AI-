@@ -23,8 +23,7 @@ class ContentEntryData extends TranslationDTO
         public readonly ?array $data = [],
         public readonly ?int $author_id = null,
         public readonly array $sites = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

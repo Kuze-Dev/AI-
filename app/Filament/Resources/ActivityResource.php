@@ -184,11 +184,11 @@ class ActivityResource extends Resource
                     ->description(trans('Properties'))
                     ->visible(
                         fn (Activity $record): bool => ! ActivityLogEvent::isApiPayload($record->event) && (
-                                $record
-                                    ->properties
-                                    ?->except('old', 'attributes')
-                                    ->isNotEmpty() ?? false
-                            )
+                            $record
+                                ->properties
+                                ?->except('old', 'attributes')
+                                ->isNotEmpty() ?? false
+                        )
                     )
                     ->schema([
 
@@ -225,10 +225,10 @@ class ActivityResource extends Resource
                     ->description(trans('Changes'))
                     ->visible(
                         fn (Activity $record): bool => ! ActivityLogEvent::isApiPayload($record->event) && (
-                                $record
-                                    ->properties
-                                    ?->hasAny('old', 'attributes') ?? false
-                            )
+                            $record
+                                ->properties
+                                ?->hasAny('old', 'attributes') ?? false
+                        )
                     )
                     ->schema([
 

@@ -14,8 +14,7 @@ class CreateServiceBillMilestonePipe
     public function __construct(
         private readonly CreateServiceBillAction $createServiceBillAction,
         private readonly UpdateServiceBillMilestoneAction $updateServiceBillMilestoneAction,
-    ) {
-    }
+    ) {}
 
     public function handle(
         ServiceBillMilestonePipelineData $serviceBillMilestonePipelineData,

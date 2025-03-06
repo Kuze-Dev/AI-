@@ -23,8 +23,7 @@ class TipTapEditorData extends FieldData
         public readonly ?int $min_length = null,
         public readonly ?int $max_length = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     #[\Override]
     public static function fromArray(array $data): self

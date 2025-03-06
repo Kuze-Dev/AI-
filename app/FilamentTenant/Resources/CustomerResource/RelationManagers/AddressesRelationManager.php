@@ -16,17 +16,15 @@ use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Exception;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
-use Filament\Notifications\Notification;
 
 class AddressesRelationManager extends RelationManager
 {
@@ -139,11 +137,11 @@ class AddressesRelationManager extends RelationManager
                     ->sortable()
                     ->updateStateUsing(function (Address $record) {
 
-                            app(SetAddressAsDefaultShippingAction::class)->execute($record);
-                            Notification::make()
-                                ->title(trans('Address set to default shipping successfully!'))
-                                ->success()
-                                ->send();
+                        app(SetAddressAsDefaultShippingAction::class)->execute($record);
+                        Notification::make()
+                            ->title(trans('Address set to default shipping successfully!'))
+                            ->success()
+                            ->send();
 
                     })
                     ->disabled(fn (Address $record) => $record->is_default_shipping),
@@ -152,11 +150,11 @@ class AddressesRelationManager extends RelationManager
                     ->sortable()
                     ->updateStateUsing(function (Address $record) {
 
-                            app(SetAddressAsDefaultBillingAction::class)->execute($record);
-                            Notification::make()
-                                ->title( trans('Address set to default billing successfully!'))
-                                ->success()
-                                ->send();
+                        app(SetAddressAsDefaultBillingAction::class)->execute($record);
+                        Notification::make()
+                            ->title(trans('Address set to default billing successfully!'))
+                            ->success()
+                            ->send();
 
                     })
                     ->disabled(fn (Address $record) => $record->is_default_billing),
@@ -200,7 +198,7 @@ class AddressesRelationManager extends RelationManager
                                 return app(DeleteAddressAction::class)->execute($record);
                             } catch (CantDeleteDefaultAddressException) {
                                 Notification::make()
-                                    ->title(trans( trans('Deleting default address not allowed.')))
+                                    ->title(trans(trans('Deleting default address not allowed.')))
                                     ->danger()
                                     ->send();
 

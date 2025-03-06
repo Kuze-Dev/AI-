@@ -11,8 +11,7 @@ readonly class GuestStatesData
     public function __construct(
         public State $shippingState,
         public State $billingState,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

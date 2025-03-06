@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Illuminate\Database\Seeder;
 use Database\Seeders\Auth\PermissionSeeder;
 use Database\Seeders\Auth\RoleSeeder;
+use Illuminate\Database\Seeder;
 use Spatie\Permission\PermissionRegistrar;
 
 class TestSeeder extends Seeder
