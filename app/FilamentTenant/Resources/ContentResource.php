@@ -158,24 +158,14 @@ class ContentResource extends Resource
                         Forms\Components\Grid::make(['sm' => 2])
                             ->schema([
                                 Forms\Components\Select::make('past_publish_date_behavior')
-                                    ->options(
-                                        collect(PublishBehavior::cases())
-                                            ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
-                                                $behaviorType->value => Str::headline($behaviorType->value),
-                                            ])
-                                            ->toArray()
-                                    )
+                                    ->options(PublishBehavior::class)
+                                    ->enum(PublishBehavior::class)
                                     ->searchable()
                                     ->columnSpan(['sm' => 1])
                                     ->required(),
                                 Forms\Components\Select::make('future_publish_date_behavior')
-                                    ->options(
-                                        collect(PublishBehavior::cases())
-                                            ->mapWithKeys(fn (PublishBehavior $behaviorType) => [
-                                                $behaviorType->value => Str::headline($behaviorType->value),
-                                            ])
-                                            ->toArray()
-                                    )
+                                    ->options(PublishBehavior::class)
+                                    ->enum(PublishBehavior::class)
                                     ->searchable()
                                     ->columnSpan(['sm' => 1])
                                     ->required(),

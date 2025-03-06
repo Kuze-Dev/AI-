@@ -56,19 +56,18 @@ class EditContent extends EditRecord
     #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateContentAction::class)
+        return app(UpdateContentAction::class)
                 ->execute($record, new ContentData(
                     name: $data['name'],
-                    taxonomies: $data['taxonomies'],
                     blueprint_id: $data['blueprint_id'],
-                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
-                    is_sortable: $data['is_sortable'],
-                    past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
-                    future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
                     prefix: $data['prefix'],
+                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
+                    taxonomies: $data['taxonomies'],
+                    past_publish_date_behavior: PublishBehavior::from($data['past_publish_date_behavior'] ?? ''),
+                    future_publish_date_behavior: PublishBehavior::from($data['future_publish_date_behavior'] ?? ''),
+                    is_sortable: $data['is_sortable'],
                     sites: $data['sites'] ?? [],
-                ))
+                )
         );
     }
 }
