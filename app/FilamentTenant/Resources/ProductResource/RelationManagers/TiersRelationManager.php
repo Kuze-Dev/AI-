@@ -73,7 +73,6 @@ class TiersRelationManager extends RelationManager
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['id', 'name'])
                     ->using(fn ($livewire, array $data): ?Model =>
-                        /** @phpstan-ignore-next-line */
                         $livewire->getRelationship()
                             ->attach(
                                 $data['recordId'],

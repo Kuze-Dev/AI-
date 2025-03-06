@@ -63,7 +63,7 @@ class ContentEntryResource extends Resource
 
             Route::name("contents.{$slug}.")
                 ->prefix('contents/{ownerRecord}')
-                ->middleware(static::getRouteMiddleware(Filament::getCurrentPanel()))
+                ->middleware(static::getRouteMiddleware(Filament::getCurrentPanel() ?? throw new \LogicException('This should not happen.')))
                 ->group(function () {
                     foreach (static::getPages() as $name => $page) {
                         /** @var array{route:string, class:string} $page*/
