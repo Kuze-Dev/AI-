@@ -204,9 +204,9 @@ class EditPage extends EditRecord
                         ->label(trans('Save As Draft'))
                         ->action('draft')
                         ->hidden(function () {
-                            
+
                             if ($this->record->draftable_id != null) {
-                            
+
                                 return true;
                             }
 
@@ -428,7 +428,7 @@ class EditPage extends EditRecord
 
         $pageDraft = $this->record;
 
-        /** @var Page */
+        /** @var Page $parentPage */
         $parentPage = $pageDraft->parentPage;
 
         $data['published_draft'] = true;
@@ -436,13 +436,12 @@ class EditPage extends EditRecord
 
         $pageData = PageData::fromArray($data);
 
-        $page = DB::transaction(
-            fn () => app(PublishedPageDraftAction::class)->execute(
+        $page =  app(PublishedPageDraftAction::class)->execute(
                 $parentPage,
                 $pageDraft,
                 $pageData
             )
-        );
+        ;
 
         return redirect(PageResource::getUrl('edit', ['record' => $page]));
     }

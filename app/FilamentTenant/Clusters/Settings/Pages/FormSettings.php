@@ -28,10 +28,7 @@ class FormSettings extends TenantBaseSettings
                     Forms\Components\TextInput::make('sender_email')
                         ->required(),
                     Forms\Components\Select::make('provider')
-                        ->options([
-                            CaptchaProvider::GOOGLE_RECAPTCHA->value => 'Google reCAPTCHA',
-                            CaptchaProvider::CLOUDFLARE_TURNSTILE->value => 'Cloudflare Turnstile',
-                        ])
+                        ->options( CaptchaProvider::class)
                         ->enum(CaptchaProvider::class)
                         ->dehydrateStateUsing(
                             fn (CaptchaProvider|string|null $state) => is_string($state)

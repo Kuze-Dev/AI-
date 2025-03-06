@@ -73,8 +73,7 @@ class EditTaxonomy extends EditRecord
     #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        // dd($data);
-        return DB::transaction(fn () => app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data)));
+        return  app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data));
     }
 
     public function createTranslation(array $data): RedirectResponse|Redirector|false

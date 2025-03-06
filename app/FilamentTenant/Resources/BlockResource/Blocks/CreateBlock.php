@@ -34,8 +34,7 @@ class CreateBlock extends CreateRecord
     #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(
-            fn () => app(CreateBlockAction::class)
+        return  app(CreateBlockAction::class)
                 ->execute(new BlockData(
                     name: $data['name'],
                     component: $data['component'],
@@ -44,7 +43,7 @@ class CreateBlock extends CreateRecord
                     is_fixed_content: $data['is_fixed_content'],
                     data: $data['data'] ?? null,
                     sites: $data['sites'] ?? [],
-                ))
+                )
         );
     }
 }

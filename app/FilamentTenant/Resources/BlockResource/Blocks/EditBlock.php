@@ -40,8 +40,7 @@ class EditBlock extends EditRecord
     #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateBlockAction::class)
+        return app(UpdateBlockAction::class)
                 ->execute(
                     $record,
                     new BlockData(
@@ -53,7 +52,7 @@ class EditBlock extends EditRecord
                         data: $data['data'] ?? null,
                         sites: $data['sites'] ?? [],
                     )
-                )
+
         );
     }
 }

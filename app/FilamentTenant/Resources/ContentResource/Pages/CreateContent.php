@@ -35,19 +35,18 @@ class CreateContent extends CreateRecord
     #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(
-            fn () => app(CreateContentAction::class)
+        return  app(CreateContentAction::class)
                 ->execute(new ContentData(
                     name: $data['name'],
-                    taxonomies: $data['taxonomies'],
                     blueprint_id: $data['blueprint_id'],
-                    is_sortable: $data['is_sortable'],
-                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
-                    past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
-                    future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
                     prefix: $data['prefix'],
+                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
+                    taxonomies: $data['taxonomies'],
+                    past_publish_date_behavior: PublishBehavior::from($data['past_publish_date_behavior'] ?? ''),
+                    future_publish_date_behavior: PublishBehavior::from($data['future_publish_date_behavior'] ?? ''),
+                    is_sortable: $data['is_sortable'],
                     sites: $data['sites'] ?? [],
-                ))
+                )
         );
     }
 }

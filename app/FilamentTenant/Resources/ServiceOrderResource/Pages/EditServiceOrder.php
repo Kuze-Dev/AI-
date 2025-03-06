@@ -484,9 +484,8 @@ class EditServiceOrder extends EditRecord
                                         ])
                                         ->successNotificationTitle(trans('Proof of payment updated successfully'))
                                         ->action(function (Forms\Components\Actions\Action $action, array $data) use ($record) {
-                                            /** @var  \Domain\Payments\Enums\PaymentRemark  $paymentRemark */
-                                            $paymentRemark = PaymentRemark::tryFrom($data['payment_remarks']);
-                                            
+                                            $paymentRemark = PaymentRemark::from($data['payment_remarks']);
+
                                             unset($data['payment_remarks']);
 
                                             /** @var \Domain\Payments\Models\Payment $payment */

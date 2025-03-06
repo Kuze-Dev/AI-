@@ -138,26 +138,26 @@ class AddressesRelationManager extends RelationManager
                     ->translateLabel()
                     ->sortable()
                     ->updateStateUsing(function (Address $record) {
-                        DB::transaction(function () use ($record) {
+
                             app(SetAddressAsDefaultShippingAction::class)->execute($record);
                             Notification::make()
                                 ->title(trans('Address set to default shipping successfully!'))
                                 ->success()
                                 ->send();
-                        });
+
                     })
                     ->disabled(fn (Address $record) => $record->is_default_shipping),
                 Tables\Columns\ToggleColumn::make('is_default_billing')
                     ->translateLabel()
                     ->sortable()
                     ->updateStateUsing(function (Address $record) {
-                        DB::transaction(function () use ($record) {
+
                             app(SetAddressAsDefaultBillingAction::class)->execute($record);
                             Notification::make()
                                 ->title( trans('Address set to default billing successfully!'))
                                 ->success()
                                 ->send();
-                        });
+
                     })
                     ->disabled(fn (Address $record) => $record->is_default_billing),
             ])

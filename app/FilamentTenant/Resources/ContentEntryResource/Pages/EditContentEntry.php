@@ -304,20 +304,19 @@ class EditContentEntry extends EditRecord
 
         $pageDraft = $this->record;
 
-        /** @var \Domain\Content\Models\ContentEntry */
+        /** @var \Domain\Content\Models\ContentEntry $parentPage */
         $parentPage = $pageDraft->parentPage;
 
         $data['published_draft'] = true;
 
         $contentEntryData = ContentEntryData::fromArray($data);
 
-        $contentEntry = DB::transaction(
-            fn () => app(PublishedContentEntryDraftAction::class)->execute(
+        $contentEntry = app(PublishedContentEntryDraftAction::class)->execute(
                 $parentPage,
                 $pageDraft,
                 $contentEntryData
             )
-        );
+        ;
 
         return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }

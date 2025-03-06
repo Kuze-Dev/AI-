@@ -66,10 +66,8 @@ class TaxZoneResource extends Resource
                             ->columnSpan(1),
                     ])->columns(2),
                     Forms\Components\Select::make('type')
-                        ->options([
-                            TaxZoneType::COUNTRY->value => trans('Limit by Countries'),
-                            TaxZoneType::STATE->value => trans('Limit by States/Provinces'),
-                        ])
+                        ->options( TaxZoneType::class)
+                        ->enum( TaxZoneType::class)
                         ->required()
                         ->enum(TaxZoneType::class)
                         ->reactive(),
