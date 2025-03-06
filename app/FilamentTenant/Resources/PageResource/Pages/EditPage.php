@@ -204,17 +204,18 @@ class EditPage extends EditRecord
                         ->label(trans('Save As Draft'))
                         ->action('draft')
                         ->hidden(function () {
-
+                            
                             if ($this->record->draftable_id != null) {
+                            
                                 return true;
                             }
 
-                            return ($this->record->draftable_id === null) ? true : false;
+                            return ($this->record->draftable_id === null && $this->record->pageDraft) ? true : false;
                         }),
 
                     Action::make('overwriteDraft')
                         ->label(trans('Save As Draft'))
-                        ->action('overwriteDraft')
+                        ->action(fn () => $this->overwriteDraft())
                         ->requiresConfirmation()
                         ->modalHeading('Draft for this page already exists')
                         ->modalDescription('You have an existing draft for this page. Do you want to overwrite the existing draft?')
@@ -223,7 +224,7 @@ class EditPage extends EditRecord
                             ->label(trans('Edit Existing Draft'))
                             ->color('gray')
                             ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft])))
-                        ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true),
+                        ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id === null) ? false : true),
                     Action::make('save')
                         ->label(trans('Save and Continue Editing'))
                         ->action('save')
