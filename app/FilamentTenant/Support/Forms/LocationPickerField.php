@@ -75,8 +75,8 @@ class LocationPickerField extends Field
                     ->autocompleteReverse(true) // reverse geocode marker location to autocomplete field
                     ->draggable() // allow dragging to move marker
                     ->defaultLocation([
-                    '14.5454321',
-                    '121.0686773',
+                        '14.5454321',
+                        '121.0686773',
                     ])
                     ->afterStateUpdated(function ($state, Get $get, Set $set) {
 

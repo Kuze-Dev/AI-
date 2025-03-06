@@ -1,49 +1,53 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Access to an undefined property Support\\\\RouteUrl\\\\Contracts\\\\HasRouteUrl\\:\\:\\$activeRouteUrl\\.$#"
+			message: '#^Match arm comparison between Domain\\Blueprint\\Enums\\ManipulationType\:\:FIT and Domain\\Blueprint\\Enums\\ManipulationType\:\:FIT is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/FilamentTenant/Resources/BlueprintResource.php
+
+		-
+			message: '#^Parameter \#2 \$callback of static method Illuminate\\Support\\Arr\:\:first\(\) expects \(callable\(Domain\\Blueprint\\DataTransferObjects\\SectionData, int\|string\)\: bool\)\|null, Closure\(Domain\\Blueprint\\DataTransferObjects\\SectionData\)\: \(Domain\\Blueprint\\DataTransferObjects\\FieldData\|null\) given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/FilamentTenant/Resources/BlueprintResource.php
+
+		-
+			message: '''
+				#^Call to method make\(\) of deprecated class Filament\\Forms\\Components\\Section\:
+				use MetaDataFormV2$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: app/FilamentTenant/Resources/ContentEntryResource.php
+
+		-
+			message: '#^Offset ''combination'' might not exist on array\|null\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/FilamentTenant/Resources/OrderResource/Pages/ViewOrderDetails.php
+
+		-
+			message: '''
+				#^Call to method make\(\) of deprecated class Filament\\Forms\\Components\\Section\:
+				use MetaDataFormV2$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: app/FilamentTenant/Resources/PageResource.php
+
+		-
+			message: '#^Access to an undefined property Support\\RouteUrl\\Contracts\\HasRouteUrl\:\:\$activeRouteUrl\.$#'
+			identifier: property.notFound
 			count: 2
 			path: app/FilamentTenant/Support/RouteUrlFieldset.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
-			count: 3
-			path: domain/Auth/Actions/AddSafeDeviceAction.php
-
-		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			message: '#^Parameter \#1 \$value of method Filament\\Support\\Components\\Component\:\:evaluate\(\) expects \(callable\(\)\: void\)\|void, Closure\(string\|Support\\RouteUrl\\Contracts\\HasRouteUrl, Filament\\Forms\\Get, Filament\\Forms\\Set, array\)\: void given\.$#'
+			identifier: argument.type
 			count: 1
-			path: domain/Auth/Actions/CheckIfOnSafeDeviceAction.php
+			path: app/FilamentTenant/Support/RouteUrlFieldset.php
 
-		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
-			count: 1
-			path: domain/Auth/Actions/FlushSafeDevicesAction.php
-
-		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\HasEmailVerificationOTP&Illuminate\\\\Contracts\\\\Auth\\\\MustVerifyEmail\\:\\:\\$emailVerificationOneTimePassword\\.$#"
-			count: 1
-			path: domain/Auth/Actions/GenerateOTPForEmailVerificationAction.php
-
-		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
-			count: 2
-			path: domain/Auth/Actions/GenerateRecoveryCodesAction.php
-
-		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
-			count: 1
-			path: domain/Auth/Actions/ValidateRecoveryCodeAction.php
-
-		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
-			count: 1
-			path: domain/Auth/Actions/ValidateTotpCodeAction.php
-
-		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\HasEmailVerificationOTP&Illuminate\\\\Contracts\\\\Auth\\\\MustVerifyEmail\\:\\:\\$emailVerificationOneTimePassword\\.$#"
-			count: 1
-			path: domain/Auth/Actions/VerifyEmailViaOTPAction.php
 		-
 			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
@@ -61,10 +65,59 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: app/HttpTenantApi/Resources/GlobalsResource.php
+
 		-
 			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: app/HttpTenantApi/Resources/TaxonomyTermResource.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
+			count: 3
+			path: domain/Auth/Actions/AddSafeDeviceAction.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
+			count: 1
+			path: domain/Auth/Actions/CheckIfOnSafeDeviceAction.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
+			count: 1
+			path: domain/Auth/Actions/FlushSafeDevicesAction.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\HasEmailVerificationOTP&Illuminate\\Contracts\\Auth\\MustVerifyEmail\:\:\$emailVerificationOneTimePassword\.$#'
+			identifier: property.notFound
+			count: 1
+			path: domain/Auth/Actions/GenerateOTPForEmailVerificationAction.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
+			count: 2
+			path: domain/Auth/Actions/GenerateRecoveryCodesAction.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
+			count: 1
+			path: domain/Auth/Actions/ValidateRecoveryCodeAction.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
+			count: 1
+			path: domain/Auth/Actions/ValidateTotpCodeAction.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\HasEmailVerificationOTP&Illuminate\\Contracts\\Auth\\MustVerifyEmail\:\:\$emailVerificationOneTimePassword\.$#'
+			identifier: property.notFound
+			count: 1
+			path: domain/Auth/Actions/VerifyEmailViaOTPAction.php
 
 

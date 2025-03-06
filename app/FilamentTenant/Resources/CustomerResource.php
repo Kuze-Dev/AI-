@@ -127,14 +127,14 @@ class CustomerResource extends Resource
                         ->translateLabel()
                         ->nullable()
                         ->before(fn () => null)
-                         /**
-                          * Important Note:
-                          *
-                          * Base the data on set timezone on config to avoid data
-                          * incosistency specially in importing process need to
-                          * set timezone on tenancy to maintain data consistency
-                          * in both application and database.
-                          */
+                        /**
+                         * Important Note:
+                         *
+                         * Base the data on set timezone on config to avoid data
+                         * incosistency specially in importing process need to
+                         * set timezone on tenancy to maintain data consistency
+                         * in both application and database.
+                         */
                         ->timezone(config()->string('app.timezone')),
                     Forms\Components\Select::make('tier_id')
                         ->translateLabel()

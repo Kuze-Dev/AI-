@@ -53,7 +53,7 @@ class UpdateProductAction
     protected function uploadMediaMaterials(Product $product, array $mediaCollection): void
     {
         collect($mediaCollection)->each(function ($media, $key) use ($product) {
-            /** @var array<int, array> $mediaMaterials */
+            /** @var array<int, \Illuminate\Http\UploadedFile|string> $mediaMaterials */
             $mediaMaterials = $media['materials'];
 
             $mediaData = collect($mediaMaterials)->map(fn ($material) =>
