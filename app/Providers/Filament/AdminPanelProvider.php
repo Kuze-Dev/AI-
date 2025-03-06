@@ -90,7 +90,7 @@ class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts(fn () => ! $this->app->isLocal())
             // ->spa()
             ->maxContentWidth(MaxWidth::Full)
-            ->databaseTransactions(!app()->runningUnitTests())
+            ->databaseTransactions()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
