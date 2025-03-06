@@ -63,8 +63,8 @@ class EditContent extends EditRecord
                     prefix: $data['prefix'],
                     visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
                     taxonomies: $data['taxonomies'],
-                    past_publish_date_behavior: PublishBehavior::from($data['past_publish_date_behavior'] ?? ''),
-                    future_publish_date_behavior: PublishBehavior::from($data['future_publish_date_behavior'] ?? ''),
+                    past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
+                    future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
                     is_sortable: $data['is_sortable'],
                     sites: $data['sites'] ?? [],
                 )
