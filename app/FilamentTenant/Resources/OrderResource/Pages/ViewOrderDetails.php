@@ -80,7 +80,7 @@ class ViewOrderDetails extends ViewRecord
                                 Infolists\Components\TextEntry::make('sub_total')
                                     ->label(trans('Amount'))
                                     ->size(Infolists\Components\TextEntry\TextEntrySize::Large)
-                                    ->prefix(fn (OrderLine $record) => $record->order->currency_symbol),
+                                    ->prefix(fn (OrderLine $record) => $record->order?->currency_symbol),
 
                                 Infolists\Components\Actions::make([])
                                     ->fullWidth()

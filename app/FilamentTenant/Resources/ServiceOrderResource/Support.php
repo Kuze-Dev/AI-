@@ -58,7 +58,6 @@ final class Support
         $subTotal = app(CalculateServiceOrderTotalPriceAction::class)
             ->execute(
                 $selling_price,
-                array_filter(
                     array_map(
                         function ($additionalCharge) {
                             if (
@@ -75,7 +74,6 @@ final class Support
                         },
                         $additionalCharges
                     )
-                )
             )
             ->getAmount();
 
