@@ -199,35 +199,33 @@ class EditContentEntry extends EditRecord
                             ->required()
                             ->options(function () {
 
-                                /** @var ContentEntry */
+                                /** @var ContentEntry $site */
                                 $site = $this->getRecord();
 
                                 return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
                             })
                             ->descriptions(function () {
 
-                                /** @var ContentEntry */
+                                /** @var ContentEntry $site */
                                 $site = $this->getRecord();
 
                                 return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
                             })
                             ->reactive()
-                            ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, $livewire) {
+                            ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, self $livewire) {
 
-                                /** @var Site */
+                                /** @var Site $site */
                                 $site = Site::find($state);
 
                                 $domain = $site->domain;
 
-                                $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
+                                $modelAction = $livewire->getAction('preview_microsite_action');
 
-                                $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
-
-                                $modelAction->modalSubmitAction(function () use ($domain) {
+                                $modelAction->modalSubmitAction(function (StaticAction $action) use ($domain) {
 
                                     $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
 
-                                    return StaticAction::makeModalAction('preview')->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
+                                    return $action->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
                                 });
 
                                 $set('domain', $domain);
