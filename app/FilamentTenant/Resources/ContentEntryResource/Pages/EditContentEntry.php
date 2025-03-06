@@ -219,6 +219,7 @@ class EditContentEntry extends EditRecord
 
                                 $domain = $site->domain;
 
+                                /** @var Action $modelAction */
                                 $modelAction = $livewire->getAction('preview_microsite_action');
 
                                 $modelAction->modalSubmitAction(function (StaticAction $action) use ($domain) {
