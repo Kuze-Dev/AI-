@@ -68,12 +68,25 @@ class PaymentMethodResource extends Resource
                             }
                             
                             if (config()->string('filament.default_filesystem_disk') === 'r2') {
-                                return $media?->getUrl();
+                                
+                                return [
+                                    'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                                    'size' => $media->getAttributeValue('size'),
+                                    'type' => $media->getAttributeValue('mime_type'),
+                                    'url' => $media->getUrl(),
+                                ];
                             }
 
                             if ($component->getVisibility() === 'private') {
                                 try {
-                                    return $media?->getTemporaryUrl(now()->addMinutes(5));
+
+                                    return [
+                                        'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                                        'size' => $media->getAttributeValue('size'),
+                                        'type' => $media->getAttributeValue('mime_type'),
+                                        'url' => $media?->getTemporaryUrl(now()->addMinutes(5)),
+                                    ];
+
                                 } catch (\Throwable) {
                                     // This driver does not support creating temporary URLs.
                                 }

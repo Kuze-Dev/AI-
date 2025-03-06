@@ -22,6 +22,7 @@ use Domain\Site\Models\Site;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
+use Filament\Actions\StaticAction;
 use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
@@ -208,7 +209,7 @@ class EditPage extends EditRecord
                                 return true;
                             }
 
-                            return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
+                            return ($this->record->draftable_id === null) ? true : false;
                         }),
 
                     Action::make('overwriteDraft')
@@ -217,7 +218,8 @@ class EditPage extends EditRecord
                         ->requiresConfirmation()
                         ->modalHeading('Draft for this page already exists')
                         ->modalDescription('You have an existing draft for this page. Do you want to overwrite the existing draft?')
-                        ->modalCancelAction(fn () => Action::makeModalAction('redirect')
+                        ->modalCancelAction(fn () => StaticAction::make('redirect')
+                            ->button()
                             ->label(trans('Edit Existing Draft'))
                             ->color('gray')
                             ->url(PageResource::getUrl('edit', ['record' => $this->record->pageDraft])))
