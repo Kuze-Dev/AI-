@@ -41,6 +41,7 @@ definitions:
               - "phpstan.neon"
               - "composer.json"
               - "bitbucket-pipelines.yml"
+              - "phpstan-stubs/"
     - step: &test
         <<: *common-step
         name: Test
