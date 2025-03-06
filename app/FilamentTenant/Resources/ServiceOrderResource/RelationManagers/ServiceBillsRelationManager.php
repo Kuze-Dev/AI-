@@ -213,7 +213,15 @@ class ServiceBillsRelationManager extends RelationManager
                         $paymentRemarks = PaymentRemark::tryFrom($data['payment_remark']);
 
                         $payment = $record->latestPayment();
+                        
+                        if (!$payment) {
 
+                            $action->failureNotificationTitle('Payment not found')
+                                ->failure();
+                                
+                            $action->halt(shouldRollBackDatabaseTransaction: true);
+                        }
+                        
                         if ($paymentRemarks === PaymentRemark::APPROVED) {
                             $payment->update([
                                 'remarks' => $paymentRemarks->value,

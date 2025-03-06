@@ -26,7 +26,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property bool $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Product\Models\Product|null $product
+ * @property-read \Domain\Product\Models\Product $product
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newQuery()
