@@ -360,7 +360,7 @@ final class Schema
                         ->inlineLabel()
                         ->prefix(fn (Order $record) => $record->currency_symbol)
                         ->columnSpanFull()
-                        ->hidden(fn (Order $record) => $record->discount_total === 0),
+                        ->hidden(fn (Order $record) => $record->discount_total === 0.0),
 
                     Infolists\Components\TextEntry::make('discount_code')
                         ->translateLabel()

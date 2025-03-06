@@ -78,7 +78,7 @@ final readonly class CustomerData
             status: Status::ACTIVE,
             tier_id: $tier?->getKey(),
             email: $validated['email'],
-            username: isset($validated['username']) && $validated['username'] !== null ? $validated['username'] : null,
+            username: $validated['username'] ?? null,
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
             shipping_address_data: isset($validated['shipping'])
@@ -106,8 +106,8 @@ final readonly class CustomerData
                 : EmailVerificationType::LINK,
             register_status: RegisterStatus::REGISTERED,
             tier_approval_status: null,
-            through_api_registration: true,
             data: $customerBlueprint ? $customderBlueprintData : null,
+            through_api_registration: true,
         );
     }
 
@@ -120,7 +120,7 @@ final readonly class CustomerData
             gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
             email: $data['email'],
-            username: isset($data['username']) && $data['username'] !== null ? $data['username'] : null,
+            username: $data['username'] ?? null,
             data: $data['data'],
         );
     }
@@ -202,7 +202,7 @@ final readonly class CustomerData
             status: isset($data['status']) ? Status::from($data['status']) : null,
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
-            username: isset($data['username']) && $data['username'] !== null ? $data['username'] : null,
+            username: $data['username'] ?? null,
             image: $data['image'],
             register_status: $registerStatus,
             tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
@@ -222,13 +222,13 @@ final readonly class CustomerData
             mobile: isset($row['mobile']) ? (string) $row['mobile'] : null,
             gender: isset($row['gender']) ? Gender::from($row['gender']) : null,
             birth_date: isset($row['birth_date']) ? now()->parse($row['birth_date']) : null,
+            status: $customerStatus === RegisterStatus::REGISTERED ? Status::ACTIVE : null,
             tier_id: $tierKey,
             email: $row['email'],
-            status: $customerStatus === RegisterStatus::REGISTERED ? Status::ACTIVE : null,
-            data: isset($row['data']) ? json_decode($row['data'], true) : null,
-            username: isset($row['username']) && $row['username'] !== null ? $row['username'] : null,
+            username: $row['username'] ?? null,
             password: $customerPassword,
             register_status: $customerStatus,
+            data: isset($row['data']) ? json_decode($row['data'], true) : null,
         );
     }
 
@@ -294,11 +294,11 @@ final readonly class CustomerData
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
             status: Status::ACTIVE,
             email: $data['email'],
-            username: isset($data['username']) && $data['username'] !== null ? $data['username'] : null,
+            username: $data['username'] ?? null,
             password: $data['password'],
             image: $data['profile_image'] ?? null,
-            tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::REGISTERED,
+            tier_approval_status: TierApprovalStatus::APPROVED,
             data: $customerBlueprint ? $customderBlueprintData : null,
         );
     }

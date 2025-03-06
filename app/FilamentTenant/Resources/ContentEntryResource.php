@@ -162,7 +162,7 @@ class ContentEntryResource extends Resource
 
                                         if (is_null($record->draftable_id) && $exist && $exist->id !== $record->id) {
                                             $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                        } elseif ($record->draftable_id !== null && $exist && $exist->id !== $record->draftable_id) {
+                                        } elseif ($record->draftable_id !== null && $exist && $exist->id !== (int) $record->draftable_id) {
                                             $fail("Content Entry {$get('name')} has a existing ({$selectedLocale}) translation.");
                                         }
                                     }

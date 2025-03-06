@@ -13,11 +13,11 @@ use Domain\Shipment\API\USPS\Enums\ServiceType;
 use Domain\Shipment\DataTransferObjects\ParcelData;
 use Illuminate\Support\Facades\Auth;
 
-class GetUSPSRateDataAction
+readonly class GetUSPSRateDataAction
 {
     public function __construct(
-        private readonly RateClient $rateClient,
-        private readonly AddressClient $addressClient
+        private RateClient $rateClient,
+        private AddressClient $addressClient
     ) {}
 
     public function execute(
@@ -25,7 +25,7 @@ class GetUSPSRateDataAction
         AddressValidateRequestData $addressValidateRequestData
     ): RateV4ResponseData {
 
-        /** @var \Domain\Customer\Models\Customer */
+        /** @var \Domain\Customer\Models\Customer|null $customer */
         $customer = Auth::user();
 
         if ($customer !== null) {
