@@ -6,11 +6,11 @@ namespace Support\Common\DataTransferObjects;
 
 use Illuminate\Http\UploadedFile;
 
-class MediaData
+readonly class MediaData
 {
     public function __construct(
-        public readonly UploadedFile|string $media,
-        public readonly array $custom_properties = [],
+        public UploadedFile|string $media,
+        public array $custom_properties = [],
     ) {
     }
 

@@ -617,7 +617,7 @@ class BlueprintResource extends Resource
                             ->keys()
                             ->mapWithKeys(
                                 fn (string $model) =>
-                                    /** @phpstan-ignore-next-line */
+                                    /** @phpstan-ignore method.notFound */
                                     [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()]
                             )
                             ->sort()
