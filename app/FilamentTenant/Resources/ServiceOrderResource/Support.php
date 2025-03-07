@@ -57,7 +57,7 @@ final class Support
             ->execute(
                 $selling_price,
                 array_map(
-                    function ($additionalCharge) {
+                    function (array $additionalCharge) {
                         if (
                             isset($additionalCharge['price']) &&
                             is_numeric($additionalCharge['price']) &&

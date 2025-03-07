@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Cart\Actions;
 
 use Domain\Cart\Events\SanitizeCartEvent;
+use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 
@@ -14,7 +15,7 @@ class SanitizeCartSummaryAction
     {
         $cartLineIdsTobeRemoved = [];
 
-        $cartLines = $cartLines->filter(function ($cartLine) use (&$cartLineIdsTobeRemoved) {
+        $cartLines = $cartLines->filter(function (CartLine $cartLine) use (&$cartLineIdsTobeRemoved) {
             if ($cartLine->purchasable instanceof Product) {
                 /** @var \Domain\Product\Models\Product $product */
                 $product = $cartLine->purchasable;

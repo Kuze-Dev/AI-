@@ -91,6 +91,12 @@ parameters:
     # The level 9 is the highest level
     level: 8
 
+    type_coverage:
+        return_type: 98.2
+        param_type: 89.4
+        property_type: 100
+        declare: 100
+
     ignoreErrors:
         #- '#Access to property \$value on an unknown class StringBackedEnum.#'
         - identifier: missingType.iterableValue

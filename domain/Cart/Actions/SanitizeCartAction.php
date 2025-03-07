@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Cart\Actions;
 
+use Domain\Cart\Models\CartLine;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 
@@ -11,7 +12,7 @@ class SanitizeCartAction
 {
     public function sanitizeGuest(mixed $model): mixed
     {
-        $model->cartLines = $model->cartLines->filter(function ($cartLine) {
+        $model->cartLines = $model->cartLines->filter(function (CartLine $cartLine) {
 
             if ($cartLine->purchasable instanceof Product) {
                 /** @var \Domain\Product\Models\Product $product */

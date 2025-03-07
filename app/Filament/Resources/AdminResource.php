@@ -142,7 +142,7 @@ class AdminResource extends Resource
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(['first_name', 'last_name'])
                     ->lineClamp(1)
-                    ->tooltip(fn ($state) => $state),
+                    ->tooltip(fn (string $state) => $state),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
                     ->getStateUsing(fn (Admin $record): bool => $record->hasVerifiedEmail())
