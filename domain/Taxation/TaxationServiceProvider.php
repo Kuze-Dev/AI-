@@ -9,7 +9,7 @@ use Illuminate\Support\ServiceProvider;
 class TaxationServiceProvider extends ServiceProvider
 {
     #[\Override]
-    public function register()
+    public function register(): void
     {
         $this->app->singleton('taxation', Taxation::class);
     }

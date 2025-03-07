@@ -10,7 +10,7 @@ use Illuminate\Support\ServiceProvider;
 class BlueprintServiceProvider extends ServiceProvider
 {
     #[\Override]
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/config/blueprint.php', 'domain.blueprint');
     }

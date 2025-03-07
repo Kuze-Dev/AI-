@@ -9,7 +9,7 @@ use Illuminate\Support\ServiceProvider;
 class RoleServiceProvider extends ServiceProvider
 {
     #[\Override]
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/config/role.php', 'domain.role');
     }

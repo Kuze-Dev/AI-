@@ -10,11 +10,11 @@ use Illuminate\Support\Str;
 /**
  * @implements Arrayable<string, mixed>
  */
-class OptionData implements Arrayable
+readonly class OptionData implements Arrayable
 {
     private function __construct(
-        public readonly string $label,
-        public readonly string $value
+        public string $label,
+        public string $value
     ) {}
 
     public static function fromArray(array $data): self
@@ -27,7 +27,7 @@ class OptionData implements Arrayable
 
     /** @return array<string, mixed> */
     #[\Override]
-    public function toArray()
+    public function toArray(): array
     {
         return (array) $this;
     }

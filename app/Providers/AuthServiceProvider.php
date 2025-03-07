@@ -62,7 +62,6 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\ServiceOrder\Models\ServiceOrder::class => \App\Policies\ServiceOrderPolicy::class,
     ];
 
-    /** Register any authentication / authorization services. */
     public function boot(): void
     {
         $this->configureNotificationUrls();

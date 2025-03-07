@@ -7,6 +7,7 @@ namespace Domain\Order\Models;
 use Domain\Review\Models\Review;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -120,14 +121,14 @@ class OrderLine extends Model implements HasMedia
         ];
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, $this> */
-    public function order()
+    /** @return BelongsTo<\Domain\Order\Models\Order, $this> */
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
     /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Review\Models\Review, $this> */
-    public function review()
+    public function review(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Review::class);
     }

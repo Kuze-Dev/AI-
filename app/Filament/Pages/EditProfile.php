@@ -69,7 +69,7 @@ class EditProfile extends \Filament\Pages\Auth\EditProfile
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Admin $admin */
-        $admin = parent::handleRecordUpdate($record, array_filter($data, fn ($value) => filled($value)));
+        $admin = parent::handleRecordUpdate($record, array_filter($data, fn (mixed $value) => filled($value)));
 
         if ($admin->wasChanged('email')) {
             $admin->forceFill(['email_verified_at' => null])

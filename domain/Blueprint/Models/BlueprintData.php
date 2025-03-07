@@ -91,8 +91,7 @@ class BlueprintData extends Model implements HasMedia
         return $this->morphTo(__FUNCTION__, 'model_type', 'model_id');
     }
 
-    /** @var bool */
-    public $registerMediaConversionsUsingModelInstance = true;
+    public bool $registerMediaConversionsUsingModelInstance = true;
 
     #[\Override]
     public function registerMediaConversions(?Media $media = null): void

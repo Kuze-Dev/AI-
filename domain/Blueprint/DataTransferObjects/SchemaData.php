@@ -9,11 +9,11 @@ use Illuminate\Contracts\Support\Arrayable;
 /**
  * @implements Arrayable<string, mixed>
  */
-class SchemaData implements Arrayable
+readonly class SchemaData implements Arrayable
 {
     /** @param  array<SectionData>  $sections */
     private function __construct(
-        public readonly array $sections
+        public array $sections
     ) {}
 
     public static function fromArray(array $data): self
@@ -28,7 +28,7 @@ class SchemaData implements Arrayable
 
     /** @return array<string, mixed> */
     #[\Override]
-    public function toArray()
+    public function toArray(): array
     {
         return (array) $this;
     }
