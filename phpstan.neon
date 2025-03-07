@@ -96,7 +96,6 @@ parameters:
         - identifier: missingType.iterableValue
         - identifier: missingType.generics
         - identifier: nullsafe.neverNull
-        - '#Class Filament\\Actions\\MountableAction has PHPDoc tag \@method for method withActivityLog\(\) parameter \#4 $properties with no value type specified in iterable type array. phpstan-stubs\/MountableAction.stub:12#'
 
     excludePaths:
         - domain/*/config/*
