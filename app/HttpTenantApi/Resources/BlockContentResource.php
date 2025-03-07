@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use TiMacDonald\JsonApi\JsonApiResource;
+use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 /**
  * @mixin \Domain\Page\Models\BlockContent
@@ -47,7 +48,7 @@ class BlockContentResource extends JsonApiResource
     }
 
     #[\Override]
-    public static function newCollection(mixed $resource)
+    public static function newCollection(mixed $resource): JsonApiResourceCollection
     {
         if ($resource instanceof Collection) {
             $resource->loadMissing('block.blueprint');

@@ -32,7 +32,7 @@ abstract class FieldData implements Arrayable
 
     /** @return array<string, mixed> */
     #[\Override]
-    public function toArray()
+    public function toArray(): array
     {
         return (array) $this;
     }

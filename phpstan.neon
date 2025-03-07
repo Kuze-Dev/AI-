@@ -92,7 +92,7 @@ parameters:
     level: 8
 
     type_coverage:
-        return_type: 98.2
+        return_type: 99.7
         param_type: 89.4
         property_type: 100
         declare: 100

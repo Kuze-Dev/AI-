@@ -18,7 +18,7 @@ use Spatie\RouteAttributes\Attributes\Middleware;
 class LocaleController
 {
     /** @return Collection<int, Locale> */
-    public function index()
+    public function index(): mixed
     {
         return Cache::rememberForever('locale', fn () => Locale::all());
     }

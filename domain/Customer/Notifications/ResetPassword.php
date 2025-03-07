@@ -14,7 +14,7 @@ class ResetPassword extends \Illuminate\Auth\Notifications\ResetPassword impleme
     use Queueable;
 
     #[\Override]
-    protected function buildMailMessage($url)
+    protected function buildMailMessage($url): MailMessage
     {
         return (new MailMessage)
             ->from(app(FormSettings::class)->sender_email ?? config('mail.from.address'))

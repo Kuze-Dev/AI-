@@ -60,7 +60,7 @@ class MediaFieldData extends FieldData
 
     /** @return array<string, mixed> */
     #[\Override]
-    public function toArray()
+    public function toArray(): array
     {
         return (array) $this;
     }

@@ -40,10 +40,6 @@ class Locale extends Model
 
     protected $table = 'locales';
 
-    /**
-     * Declare columns
-     * that are mass assignable.
-     */
     protected $fillable = [
         'code',
         'name',
@@ -51,7 +47,7 @@ class Locale extends Model
     ];
 
     #[\Override]
-    protected static function booted()
+    protected static function booted(): void
     {
         static::saving(function ($locale) {
             if ($locale->is_default) {
