@@ -53,53 +53,13 @@ class PaymentMethodResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('subtitle')
                         ->required(),
-                    SpatieMediaLibraryFileUpload::make('logo')
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('logo')
+                        ->label(trans('logo'))
+                        ->collection('logo')
+                        ->preserveFilenames()
+                        ->nullable()
                         ->image()
-                        ->beforeStateDehydrated(null)
-                        ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                        ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?array {
-                            $mediaClass = config()->string('media-library.media_model', Media::class);
-
-                            /** @var ?Media $media */
-                            $media = $mediaClass::findByUuid($file);
-
-                            if (! $media) {
-                                return null;
-                            }
-
-                            if (config()->string('filament.default_filesystem_disk') === 'r2') {
-
-                                return [
-                                    'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
-                                    'size' => $media->getAttributeValue('size'),
-                                    'type' => $media->getAttributeValue('mime_type'),
-                                    'url' => $media->getUrl(),
-                                ];
-                            }
-
-                            if ($component->getVisibility() === 'private') {
-                                try {
-
-                                    return [
-                                        'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
-                                        'size' => $media->getAttributeValue('size'),
-                                        'type' => $media->getAttributeValue('mime_type'),
-                                        'url' => $media?->getTemporaryUrl(now()->addMinutes(5)),
-                                    ];
-
-                                } catch (\Throwable) {
-                                    // This driver does not support creating temporary URLs.
-                                }
-                            }
-
-                            return [
-                                'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
-                                'size' => $media->getAttributeValue('size'),
-                                'type' => $media->getAttributeValue('mime_type'),
-                                'url' => $media->getUrl(),
-                            ];
-                            // return $media?->getUrl();
-                        }),
+                        ->columnSpanFull(),
                     Forms\Components\Toggle::make('status')
                         ->inline(false)
                         ->helperText('If enabled, message here')
@@ -164,7 +124,7 @@ class PaymentMethodResource extends Resource
                 Tables\Columns\IconColumn::make('status')
                     ->label(trans('Enabled'))
                     ->icons([
-                        'heroicon-o-check-circle' => fn ($state) => $state === true,
+                        'heroicon-o-check-circle' => fn ($state) => $state == true,
                         'heroicon-o-x-circle' => fn ($state) => $state === false,
                     ])
                     ->color(fn (bool $state) => $state ? 'success' : 'danger'),
