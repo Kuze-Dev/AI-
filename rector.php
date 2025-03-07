@@ -33,7 +33,7 @@ return Rector\Config\RectorConfig::configure()
     ->withRules([
         Spatie\Ray\Rector\RemoveRayCallRector::class,
         RectorLaravel\Rector\Class_\AddExtendsAnnotationToModelFactoriesRector::class,
-        RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector::class,
+        //        RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector::class,
         RectorLaravel\Rector\ClassMethod\AddParentBootToModelClassMethodRector::class,
         RectorLaravel\Rector\ClassMethod\AddParentRegisterToEventServiceProviderRector::class,
         //        RectorLaravel\Rector\Class_\AnonymousMigrationsRector::class,
