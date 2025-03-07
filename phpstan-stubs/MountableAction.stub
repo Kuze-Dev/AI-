@@ -6,6 +6,7 @@ use Filament\Actions\Contracts\HasLivewire;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * @phpstan-ignore missingType.iterableValue
  * @method static static withActivityLog(string $logName = 'admin', \Closure|string|null $event = null, \Closure|string|null $description = null, \Closure|array|null $properties = null, Model|int|string|null $causedBy = null)
  */
 abstract class MountableAction
