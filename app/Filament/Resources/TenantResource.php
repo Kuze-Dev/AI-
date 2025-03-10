@@ -115,13 +115,13 @@ class TenantResource extends Resource
                             ->columnSpan(['md' => 2]),
                         // ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_endpoint'))),
                         Forms\Components\TextInput::make(Tenant::internalPrefix().'bucket_url')
-                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'driver') === 's3')
+                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'bucket_driver') === 's3')
                             ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get(Tenant::internalPrefix().'bucket_driver'), ['r2'], true)))
                             ->columnSpan(['md' => 2]),
                         // ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_url'))),
                         Forms\Components\TextInput::make(Tenant::internalPrefix().'bucket_region')
                             ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get(Tenant::internalPrefix().'bucket_driver'), ['s3'], true)))
-                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'driver') === 'r2')
+                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'bucket_driver') === 'r2')
                             ->columnSpan(['md' => 2]),
                         // ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_region'))),
                         Forms\Components\Toggle::make(Tenant::internalPrefix().'bucket_style_endpoint')
