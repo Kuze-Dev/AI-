@@ -129,8 +129,8 @@ class TenantResource extends Resource
                         // ->afterStateHydrated(fn (Forms\Components\Toggle $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_style_endpoint'))),
                     ])
                     ->columns(['md' => 4]),
-                    // ->disabledOn('edit')
-                    // ->dehydrated(fn (string $context) => $context !== 'edit'),
+                // ->disabledOn('edit')
+                // ->dehydrated(fn (string $context) => $context !== 'edit'),
                 Forms\Components\Section::make(trans('Mail Settings'))
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
