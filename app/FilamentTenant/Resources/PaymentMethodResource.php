@@ -9,7 +9,6 @@ use Domain\PaymentMethod\Actions\DeletePaymentMethodAction;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Actions\GetAvailablePaymentDriverAction;
 use Filament\Forms;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -19,7 +18,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use League\Flysystem\UnableToCheckFileExistence;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class PaymentMethodResource extends Resource
@@ -124,7 +122,7 @@ class PaymentMethodResource extends Resource
                 Tables\Columns\IconColumn::make('status')
                     ->label(trans('Enabled'))
                     ->icons([
-                        'heroicon-o-check-circle' => fn ($state) => $state == true,
+                        'heroicon-o-check-circle' => fn ($state) => $state === true,
                         'heroicon-o-x-circle' => fn ($state) => $state === false,
                     ])
                     ->color(fn (bool $state) => $state ? 'success' : 'danger'),
