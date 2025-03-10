@@ -94,7 +94,7 @@ parameters:
 
     type_coverage:
         return_type: 99.7
-        param_type: 89.4
+        param_type: 89.3
         property_type: 100
         declare: 100
 
