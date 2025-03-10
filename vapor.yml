@@ -5,6 +5,7 @@ environments:
     domain:
       - staging-ecommerce.haspcms-1.com
       - staging-haspv3.haspcms-1.com
+      - filtownshipv3.haspcms-1.com
     cache: hasp-cache
     memory: 1024
     cli-memory: 512
