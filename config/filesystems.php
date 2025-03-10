@@ -60,6 +60,19 @@ return [
             'report' => false,
         ],
 
+        'r2' => [
+            'driver' => 's3',
+            'key' => null, //env('CLOUDFLARE_R2_ACCESS_KEY_ID'),
+            'secret' => null, //env('CLOUDFLARE_R2_SECRET_ACCESS_KEY'),
+            'region' => 'us-east-1', // Cloudflare R2 doesn't have specific regions, so 'us-east-1' is fine.
+            'bucket' => null, //env('CLOUDFLARE_R2_BUCKET'),
+            'url' => null, //env('CLOUDFLARE_R2_URL'),
+            'visibility' => 'private',
+            'endpoint' => null, //env('CLOUDFLARE_R2_ENDPOINT'),
+            'use_path_style_endpoint' => null, //env('CLOUDFLARE_R2_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+       ],
+
     ],
 
     /*
