@@ -83,6 +83,7 @@ parameters:
         - phpstan-stubs/PermissionRegistrar.stub
         - phpstan-stubs/Select.stub
         - phpstan-stubs/SimpleMessage.stub
+        - phpstan-stubs/TextInput.stub
 
     paths:
         - app

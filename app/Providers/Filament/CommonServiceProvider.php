@@ -7,6 +7,7 @@ namespace App\Providers\Filament;
 use App\Providers\Mixin\FilamentMountableActionMixin;
 use App\Providers\Mixin\FilamentSelectFormMixin;
 use App\Providers\Mixin\FilamentTextColumnMixin;
+use App\Providers\Mixin\FilamentTextInputMixin;
 use Exception;
 use Filament\Actions\Action as PageAction;
 use Filament\Actions as PageActions;
@@ -62,6 +63,7 @@ class CommonServiceProvider extends ServiceProvider
         MountableAction::mixin(new FilamentMountableActionMixin);
         Tables\Columns\TextColumn::mixin(new FilamentTextColumnMixin);
         Forms\Components\Select::mixin(new FilamentSelectFormMixin);
+        Forms\Components\TextInput::mixin(new FilamentTextInputMixin);
     }
 
     protected function configureComponents(): void

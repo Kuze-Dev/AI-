@@ -701,24 +701,21 @@ class BlueprintResource extends Resource
                     ->helperText(new HtmlString(<<<'HTML'
                          in kb
                         HTML))
-                    ->numeric()
-                    ->integer()
+                    ->rules('gte:0')
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_size')
                     ->helperText(new HtmlString(<<<'HTML'
                          in kb
                         HTML))
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('min_files')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_files')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
