@@ -303,21 +303,17 @@ class BlueprintResource extends Resource
                     })
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('min_size')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_size')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('min_files')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_files')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Repeater::make('hidden_option')
@@ -405,13 +401,11 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
                 Forms\Components\TextInput::make('min')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\TextInput::make('max')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Repeater::make('options')
@@ -494,20 +488,16 @@ class BlueprintResource extends Resource
             ],
             FieldType::TEXTAREA => [
                 Forms\Components\TextInput::make('min_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('rows')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('cols')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
@@ -537,12 +527,10 @@ class BlueprintResource extends Resource
             ],
             FieldType::TEXT, => [
                 Forms\Components\TextInput::make('min_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
@@ -575,26 +563,21 @@ class BlueprintResource extends Resource
             FieldType::URL,
             FieldType::PASSWORD => [
                 Forms\Components\TextInput::make('min_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             FieldType::NUMBER => [
                 Forms\Components\TextInput::make('min')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('step')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             FieldType::TOGGLE => [
@@ -626,13 +609,11 @@ class BlueprintResource extends Resource
                     ->reactive()
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('min')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\TextInput::make('max')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
                     ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Group::make()
@@ -667,12 +648,10 @@ class BlueprintResource extends Resource
             ],
             FieldType::REPEATER => [
                 Forms\Components\TextInput::make('min')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 self::getFieldsSchema()
                     ->columnSpanFull(),
@@ -701,7 +680,7 @@ class BlueprintResource extends Resource
                     ->helperText(new HtmlString(<<<'HTML'
                          in kb
                         HTML))
-                    ->rules('gte:0')
+
                     ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_size')
@@ -834,12 +813,10 @@ class BlueprintResource extends Resource
             ],
             FieldType::TINYEDITOR => [
                 Forms\Components\TextInput::make('min_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),

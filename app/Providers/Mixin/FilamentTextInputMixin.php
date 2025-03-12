@@ -34,6 +34,8 @@ class FilamentTextInputMixin
             ",
             ]);
 
+            $this->rules(['gte:0']);
+
             // $this->numeric();
             $this->integer();
 
