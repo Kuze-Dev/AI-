@@ -49,6 +49,7 @@ class MetaDataForm extends Section
                     'image/bmp',
                     'image/tiff',
                 ])
+                ->helperText(fn () => config('filament.default_filesystem_disk'))
                 // ->beforeStateDehydrated(null)
                 ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
                 ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
