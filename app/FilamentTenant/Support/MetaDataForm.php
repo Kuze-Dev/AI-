@@ -49,24 +49,39 @@ class MetaDataForm extends Section
                     'image/bmp',
                     'image/tiff',
                 ])
-                ->helperText(fn () => config('filament.default_filesystem_disk'))
                 // ->beforeStateDehydrated(null)
                 ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
+                ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): array {
                     $mediaClass = config()->string('media-library.media_model', Media::class);
 
                     /** @var ?Media $media */
                     $media = $mediaClass::findByUuid($file);
 
-                    if ($component->getVisibility() === 'private') {
-                        try {
-                            return $media?->getTemporaryUrl(now()->addMinutes(5));
-                        } catch (Throwable) {
-                            // This driver does not support creating temporary URLs.
+                    if ($media) {
+
+                        if ($component->getVisibility() === 'private') {
+                            try {
+                                return [
+                                    'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                                    'size' => $media->getAttributeValue('size'),
+                                    'type' => $media->getAttributeValue('mime_type'),
+                                    'url' => $media->getTemporaryUrl(now()->addMinutes(5)),
+                                ];
+
+                            } catch (Throwable) {
+                                // This driver does not support creating temporary URLs.
+                            }
                         }
+
+                        return [
+                            'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                            'size' => $media->getAttributeValue('size'),
+                            'type' => $media->getAttributeValue('mime_type'),
+                            'url' => $media->getUrl(),
+                        ];
                     }
 
-                    return $media?->getUrl();
+                    return [];
                 }),
             Forms\Components\TextInput::make('image_alt_text')
                 ->visible(fn (\Filament\Forms\Get $get) => filled($get('image')))
