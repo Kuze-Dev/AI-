@@ -113,14 +113,15 @@
 
     <div
         @class([
-            'ml-5 pl-5 border-l border-dashed border-gray-300',
+            '!ml-5 !pl-5 border-l border-dashed border-gray-300',
             'dark:border-gray-600' => config('forms.dark_mode'),
         ])
         x-bind:class="{ 'invisible h-0 !m-0 overflow-y-hidden': isCollapsed }"
         x-bind:aria-expanded="(! isCollapsed).toString()"
+        style="margin-left: 20px; padding-left: 20px; border-left:dotted; border-color: gray"
     >
         <div
-            class="space-y-2"
+            class="space-y-2 margin-right-[100px]"
             wire:key="{{ $statePath }}.children"
             x-init="
                 $el.sortable = new Sortable($el, {
