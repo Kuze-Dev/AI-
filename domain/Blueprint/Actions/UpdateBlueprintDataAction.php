@@ -182,9 +182,27 @@ class UpdateBlueprintDataAction
                     $currentMedia[] = $blueprintData->getMedia('blueprint_media')->last()?->uuid;
                 }
 
+                //media ordering..
+
                 $existingMedia = $blueprintData->getMedia('blueprint_media')->pluck('uuid')->toArray();
 
                 $updatedMedia = array_intersect($existingMedia, $currentMedia);
+
+                foreach ($currentMedia as $key => $media_uuid) {
+
+                    if (in_array($media_uuid, $updatedMedia)) {
+
+                        /** @var Media|null $media_item */
+                        $media_item = Media::where('uuid', $media_uuid)->first();
+
+                        if ($media_item) {
+                            $media_item->order_column = $key + 1;
+                            $media_item->save();
+                        }
+                    }
+
+                }
+
                 /**
                  *  $exceptedMedia = Media::whereIN('uuid', $updatedMedia)->get();
                  *  temporary disabled causing coversions to disappear only in production but working in local environment.
