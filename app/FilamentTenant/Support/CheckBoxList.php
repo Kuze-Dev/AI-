@@ -11,5 +11,5 @@ class CheckBoxList extends ComponentsCheckboxList
 {
     // use CanDisableOptions;
 
-    // protected string $view = 'filament.forms.components.checkbox-list';
+    protected string $view = 'filament.forms.components.checkbox-list';
 }
