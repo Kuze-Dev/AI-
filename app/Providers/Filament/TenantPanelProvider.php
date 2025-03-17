@@ -79,7 +79,7 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => trans('System')),
             ])
             ->plugins([
-                FilamentPasswordConfirmationPlugin::make(),
+                FilamentPasswordConfirmationPlugin::make()->routeMiddleware(['tenant']),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()

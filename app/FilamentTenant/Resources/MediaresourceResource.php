@@ -147,8 +147,8 @@ class MediaresourceResource extends Resource
                 Page::class => route('filament.tenant.resources.pages.edit', ['record' => $resource]),
                 Product::class => route('filament.tenant.resources.products.edit', ['record' => $resource]),
                 Service::class => route('filament.tenant.resources.services.edit', ['record' => $resource]),
-                // TaxonomyTerm::class => route('filament.tenant.resources.taxonomies.edit', ['record' => $resource->taxonomy]),
-                // Globals::class => route('filament.tenant.resources.globals.edit', ['record' => $resource]),
+                // TaxonomyTerm::class => .resources.taxonomies.edit', ['record' => $resource->taxonomy]),
+                // Globals::class => .resources.globals.edit', ['record' => $resource]),
                 default => '/admin',
             };
         }
