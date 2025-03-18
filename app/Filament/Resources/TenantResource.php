@@ -225,6 +225,22 @@ class TenantResource extends Resource
                     ])->hidden(
                         fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\GoogleMapField::class)
                     ),
+                Forms\Components\Section::make(trans('Cors Setting'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\TagsInput::make('cors_allowed_origins')
+                            ->afterStateHydrated(fn (Forms\Components\TagsInput $component, ?Tenant $record) => $component->state($record?->getInternal('cors_allowed_origins'))),
+
+                    ]),
+                // Forms\Components\Section::make(trans('Ip White List'))
+                //     ->collapsed(fn (string $context) => $context === 'edit')
+                //     ->schema([
+                // Forms\Components\Keyvalue::make('ip_white_list')
+                //     ->keyLabel('Ip Name')
+                //     ->valueLabel('Ip Address')
+                //     ->columnSpanFull()
+                //     ->afterStateHydrated(fn (Forms\Components\Keyvalue $component, ?Tenant $record) => $component->state($record?->getInternal('ip_white_list') ?? null)),
+                // ]),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->view('filament.forms.components.redbgheading-section')
                     ->collapsed(fn (string $context) => $context === 'edit')
