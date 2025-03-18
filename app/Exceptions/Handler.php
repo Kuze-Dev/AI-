@@ -6,6 +6,8 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Sentry\Laravel\Integration;
+use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -45,5 +47,16 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             Integration::captureUnhandledException($e);
         });
+    }
+
+    public function render($request, Throwable $exception): Response
+    {
+        if ($exception instanceof TenantCouldNotBeIdentifiedOnDomainException) {
+            if ($request->is('api/*')) {
+                // return response()->json(['message' => 'Unauthorized Access'], 403);
+            }
+        }
+
+        return parent::render($request, $exception);
     }
 }
