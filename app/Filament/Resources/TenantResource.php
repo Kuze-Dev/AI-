@@ -229,7 +229,7 @@ class TenantResource extends Resource
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
                         Forms\Components\TagsInput::make('cors_allowed_origins')
-                            ->afterStateHydrated(fn (Forms\Components\TagsInput $component, ?Tenant $record) => $component->state($record?->getInternal('cors_allowed_origins'))),
+                            ->afterStateHydrated(fn (Forms\Components\TagsInput $component, ?Tenant $record) => $component->state($record?->getInternal('cors_allowed_origins') ?? [])),
 
                     ]),
                 // Forms\Components\Section::make(trans('Ip White List'))
