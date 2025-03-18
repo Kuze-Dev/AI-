@@ -52,7 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'tenant.suspended' => EnsureTenantIsNotSuspended::class,
             ])
             ->throttleApi()
-            ->group('api',[
+            ->group('api', [
                 RestrictApiAccess::class,
             ])
             ->group('universal', [])
