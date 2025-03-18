@@ -35,6 +35,8 @@ class UpdateTenantAction
 
         $tenant->setInternal('mail_from_address', $tenantData->mail?->from_address);
         $tenant->setInternal('google_map_api_key', $tenantData->google_map_api_key);
+        $tenant->setInternal('cors_allowed_origins', $tenantData->cors_allowed_origins);
+        $tenant->setInternal('ip_white_list', $tenantData->ip_white_list);
         $tenant->save();
 
         $this->syncDomains($tenant, $tenantData->domains);
