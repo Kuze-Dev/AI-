@@ -245,6 +245,13 @@ class TenantResource extends Resource
                     ])->hidden(
                         fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\GoogleMapField::class)
                     ),
+                Forms\Components\Section::make(trans('Cors Setting'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\TagsInput::make(Tenant::internalPrefix().'cors_allowed_origins')
+                            ->afterStateHydrated(fn (Forms\Components\TagsInput $component, ?Tenant $record) => $component->state($record?->getInternal('cors_allowed_origins') ?? [])),
+
+                    ]),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([

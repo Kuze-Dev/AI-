@@ -39,6 +39,7 @@ return [
         App\Tenancy\Bootstrappers\ExcelBootstrapper::class,
         App\Tenancy\Bootstrappers\MailBootstrapper::class,
         App\Tenancy\Bootstrappers\GoogleMapBootstrapper::class,
+        App\Tenancy\Bootstrappers\TenantCorsBootstrapper::class,
     ],
 
     /**
