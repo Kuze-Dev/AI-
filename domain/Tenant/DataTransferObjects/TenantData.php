@@ -66,7 +66,7 @@ class TenantData
             features: isset($data['features']) ? array_filter($data['features']) : null,
             cors_allowed_origins: isset($data['cors_allowed_origins']) ? array_filter($data['cors_allowed_origins']) : null,
             ip_white_list: isset($data['ip_white_list']) ? array_filter($data['ip_white_list']) : null
-            // cors_allowed_origins: 
+            // cors_allowed_origins:
         );
     }
 

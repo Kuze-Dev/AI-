@@ -39,7 +39,7 @@ class CreateTenantAction
         $tenant->setInternal('bucket_style_endpoint', $tenantData->bucket?->style_endpoint);
         $tenant->setInternal('mail_from_address', $tenantData->mail?->from_address);
         $tenant->setInternal('cors_allowed_origins', $tenantData->cors_allowed_origins);
-        $tenant->setInternal('ip_white_list',$tenantData->ip_white_list);
+        $tenant->setInternal('ip_white_list', $tenantData->ip_white_list);
         $tenant->setInternal('cors_allowed_origins', $tenantData->cors_allowed_origins ?? ['*']);
         $tenant->setInternal('ip_white_list', $tenantData->ip_white_list);
 
