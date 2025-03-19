@@ -6,7 +6,7 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\RoleResource as BaseRoleResource;
 use App\FilamentTenant\Resources\RoleResource\Pages;
-use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
+use App\FilamentTenant\Support\Traits\RequiresPasswordConfirmation;
 
 class RoleResource extends BaseRoleResource
 {

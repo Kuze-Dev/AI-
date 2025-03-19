@@ -211,7 +211,7 @@ class MenuResource extends Resource
                                     ]),
                                 Forms\Components\Section::make([
                                     Forms\Components\Radio::make('type')
-                                        ->lazy()
+                                        ->live()
                                         ->inline()
                                         ->options(
                                             collect(NodeType::cases())

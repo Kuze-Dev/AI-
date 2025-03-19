@@ -7,10 +7,10 @@ namespace App\FilamentTenant\Clusters\Settings\Pages;
 use App\Features\Shopconfiguration\PaymentGateway\PaypalGateway;
 use App\Features\Shopconfiguration\PaymentGateway\StripeGateway;
 use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
+use App\FilamentTenant\Support\Traits\RequiresPasswordConfirmation;
 use App\Settings\PaymentSettings as SettingsPaymentSettings;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
-use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
 
 class PaymentSettings extends TenantBaseSettings
 {
