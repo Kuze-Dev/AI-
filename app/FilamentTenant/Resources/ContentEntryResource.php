@@ -211,7 +211,7 @@ class ContentEntryResource extends Resource
 
                                 $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                                return ! in_array($value, $intersect, true);
+                                return ! in_array($value, $intersect);
                             })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
                                 if (! $record) {
