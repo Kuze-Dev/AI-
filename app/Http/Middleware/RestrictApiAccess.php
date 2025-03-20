@@ -27,7 +27,7 @@ class RestrictApiAccess
 
         // If the request is an API request but the origin is not allowed, deny access
         if ($request->is('api/*') && (! in_array($origin, config('cors.allowed_origins')))) {
-            return response()->json(['message' => 'Access denied.'], 403);
+            return response()->json(['message' => 'Access denied from .'.$origin], 403);
         }
 
         return $next($request);
