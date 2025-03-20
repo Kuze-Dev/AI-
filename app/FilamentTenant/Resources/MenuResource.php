@@ -244,7 +244,7 @@ class MenuResource extends Resource
                                                                 ->sort()
                                                                 ->toArray()
                                                         )
-                                                        ->lazy(),
+                                                        ->live(),
                                                     Forms\Components\Select::make('model_id')
                                                         ->label(
                                                             fn (\Filament\Forms\Get $get) => ($modelClass = Relation::getMorphedModel($get('model_type')))

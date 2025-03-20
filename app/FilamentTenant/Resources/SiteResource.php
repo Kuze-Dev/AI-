@@ -69,8 +69,11 @@ class SiteResource extends Resource
                                 ->searchable()
                                 ->formatStateUsing(fn (?Site $record) => $record ? $record->siteManager->pluck('id')->toArray() : [])
                                 ->columns(2)
-                                ->options(fn () => \Domain\Admin\Models\Admin::permission('site.siteManager')
-                                    ->get()
+                                ->options(fn () => \Domain\Admin\Models\Admin::whereHas('roles.permissions', function ($query) {
+                                    $query->where('name', 'site.siteManager');
+                                })->orWhereHas('permissions', function ($query) {
+                                    $query->where('name', 'site.siteManager');
+                                })->get()
                                     ->pluck('site_label', 'id')
                                     ->toArray()),
                         ]),
