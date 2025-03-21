@@ -55,7 +55,9 @@ class MetaDataForm extends Section
                     $mediaClass = config()->string('media-library.media_model', Media::class);
 
                     /** @var ?Media $media */
-                    $media = $mediaClass::findByUuid($file);
+                    $media = $mediaClass::where('uuid', $file)
+                        ->orWhere('file_name', $file)
+                        ->first();
 
                     if ($media) {
 
