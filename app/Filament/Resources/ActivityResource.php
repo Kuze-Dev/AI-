@@ -193,12 +193,15 @@ class ActivityResource extends Resource
                     ->schema(function (Activity $record) {
                         $compoenents = [];
 
-                        foreach ($record->properties as $key => $property) {
+                        if ($record->properties) {
+                            foreach ($record->properties as $key => $property) {
 
-                            $compoenents[] = Infolists\Components\KeyValueEntry::make($key)
-                                ->hiddenLabel()
-                                ->inlineLabel(false)
-                                ->state(self::changes($key));
+                                $compoenents[] = Infolists\Components\KeyValueEntry::make($key)
+                                    ->hiddenLabel()
+                                    ->inlineLabel(false)
+                                    ->state(self::changes($key));
+                            }
+
                         }
 
                         return $compoenents;
