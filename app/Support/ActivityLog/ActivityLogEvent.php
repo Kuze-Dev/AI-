@@ -49,6 +49,8 @@ enum ActivityLogEvent: string implements HasLabel
     case email_link_clicked_setup_password = 'setup-password';
     case email_link_clicked_setup_password_already_confirmed = 'setup-password-already-confirmed';
 
+    case deployed_hook = 'deployed-hook';
+
     public function getLabel(): string
     {
         return Str::headline($this->value);
@@ -63,6 +65,7 @@ enum ActivityLogEvent: string implements HasLabel
         try {
             /** @var self $self */
             $self = self::tryFrom($enum);
+
         } catch (\Exception) {
             return false;
         }

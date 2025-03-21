@@ -190,15 +190,29 @@ class ActivityResource extends Resource
                                 ->isNotEmpty() ?? false
                         )
                     )
-                    ->schema([
+                    ->schema(function (Activity $record) {
+                        $compoenents = [];
 
-                        Infolists\Components\KeyValueEntry::make('properties')
-                            ->hiddenLabel()
-                            ->inlineLabel(false)
-                            ->state(fn (Activity $record): ?Collection => $record
-                                ->properties
-                                ?->except('old', 'attributes')
-                            ),
+                        foreach ($record->properties as $key => $property) {
+
+                            $compoenents[] = Infolists\Components\KeyValueEntry::make($key)
+                                ->hiddenLabel()
+                                ->inlineLabel(false)
+                                ->state(self::changes($key));
+                        }
+
+                        return $compoenents;
+                    }
+                        // [
+
+                        // Infolists\Components\KeyValueEntry::make('properties')
+                        //     ->hiddenLabel()
+                        //     ->inlineLabel(false)
+                        //     ->state(self::changes('custom'))
+                        // ->state(fn (Activity $record): ?Collection => dd($record
+                        //     ->properties
+                        //     ?->except('old', 'attributes'))
+                        // ),
 
                         //                        Infolists\Components\RepeatableEntry::make('data')
                         //                            ->hiddenLabel()
@@ -219,7 +233,8 @@ class ActivityResource extends Resource
                         //                            )
                         //                            ->contained(false),
 
-                    ]),
+                        // ]
+                    ),
 
                 Infolists\Components\Section::make()
                     ->description(trans('Changes'))
