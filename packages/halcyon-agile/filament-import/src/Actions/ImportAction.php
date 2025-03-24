@@ -61,6 +61,8 @@ class ImportAction extends Action
     {
         parent::setUp();
 
+        $this->disk = config('filament-import.temporary_files.disk');
+
         $this
             ->translateLabel()
             ->action(function (array $data) {
