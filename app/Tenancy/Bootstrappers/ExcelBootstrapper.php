@@ -27,6 +27,7 @@ class ExcelBootstrapper implements TenancyBootstrapper
 
         } else {
             $this->app->make('config')->set('excel.temporary_files.remote_disk', 's3');
+            $this->app->make('config')->set('filament-import.temporary_files.disk', 's3');
         }
 
     }
