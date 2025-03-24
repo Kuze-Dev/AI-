@@ -190,47 +190,48 @@ class GlobalsResource extends Resource
                 Tables\Columns\TextColumn::make('sites.name')
                     ->badge()
                     ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
-                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class),
+                        isToggledHiddenByDefault: fn () => TenantFeatureSupport::inactive(SitesManagement::class)),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
-                    ->multiple()
-                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
-                    ->relationship('sites', 'name', function (Builder $query) {
+                        ->multiple()
+                        ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
+                        ->relationship('sites', 'name', function (Builder $query) {
 
-                        if (filament_admin()->can('site.siteManager') &&
-                        ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
-                            return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
-                        }
+                            if (filament_admin()->can('site.siteManager') &&
+                            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
+                                return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
+                            }
 
-                        return $query;
+                            return $query;
 
-                    }),
+                        }),
                 Tables\Filters\SelectFilter::make('blueprint')
-                    ->relationship('blueprint', 'name')
-                    ->hidden((bool) ! filament_admin()->can('blueprint.viewAny'))
-                    ->searchable()
-                    ->optionsLimit(20),
+                        ->relationship('blueprint', 'name')
+                        ->hidden((bool) ! filament_admin()->can('blueprint.viewAny'))
+                        ->searchable()
+                        ->optionsLimit(20),
             ])
 
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
+                        Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('locale')
-                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
-                    ->hidden((bool) (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
-                    ->default(Locale::where('is_default', 1)->first()?->code),
+                        ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                        ->hidden((bool) (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
+                        ->default(Locale::where('is_default', 1)->first()?->code),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-                    ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
+                        ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
             ])
             ->defaultSort('updated_at', 'desc');
     }

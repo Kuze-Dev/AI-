@@ -328,7 +328,8 @@ class ContentEntryResource extends Resource
                 Tables\Columns\TextColumn::make('sites.name')
                     ->badge()
                     ->hidden((bool) ! (TenantFeatureSupport::active(SitesManagement::class)))
-                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class), isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class),
+                        isToggledHiddenByDefault: fn () => TenantFeatureSupport::inactive(SitesManagement::class)),
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime()
                     ->sortable()

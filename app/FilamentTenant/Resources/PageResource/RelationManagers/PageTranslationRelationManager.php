@@ -65,13 +65,14 @@ class PageTranslationRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sites.name')
                     ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class), isToggledHiddenByDefault: true),
+                    ->toggleable(condition: fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class),
+                        isToggledHiddenByDefault: fn () => \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class)),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
                     ->icons([
-                        'heroicon-o-check-circle' => fn ($state) => $state !== null,
-                        'heroicon-o-x-circle' => fn ($state) => $state === null,
-                    ])
+                            'heroicon-o-check-circle' => fn ($state) => $state !== null,
+                            'heroicon-o-x-circle' => fn ($state) => $state === null,
+                        ])
                     ->color(fn ($state) => $state !== null ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
