@@ -56,9 +56,9 @@ class GlobalsTranslationRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\Action::make('edit')
-                        ->url(
-                            fn (Globals $record) => GlobalsResource::getUrl('edit', ['record' => $record])
-                        ),
+                    ->url(
+                        fn (Globals $record) => GlobalsResource::getUrl('edit', ['record' => $record])
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

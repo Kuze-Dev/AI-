@@ -267,49 +267,49 @@ class ContentResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
-                        ->multiple()
-                        ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
-                        ->relationship('sites', 'name', function (Builder $query) {
+                    ->multiple()
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
+                    ->relationship('sites', 'name', function (Builder $query) {
 
-                            if (filament_admin()->can('site.siteManager') &&
-                            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
-                                return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
-                            }
+                        if (filament_admin()->can('site.siteManager') &&
+                        ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
+                            return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
+                        }
 
-                            return $query;
+                        return $query;
 
-                        }),
+                    }),
                 Tables\Filters\SelectFilter::make('blueprint')
-                        ->relationship('blueprint', 'name')
-                        ->hidden((bool) ! filament_admin()->can('blueprint.viewAny'))
-                        ->searchable()
-                        ->optionsLimit(20),
+                    ->relationship('blueprint', 'name')
+                    ->hidden((bool) ! filament_admin()->can('blueprint.viewAny'))
+                    ->searchable()
+                    ->optionsLimit(20),
             ])
 
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
 
-                        // Tables\Actions\Action::make('view-entries')
-                        //     ->icon('heroicon-s-eye')
-                        //     ->color('gray')
-                        //     ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
-                        Tables\Actions\Action::make('view-entries')
-                            ->color('gray')
-                            ->icon('heroicon-m-academic-cap')
-                            ->url(
-                                fn (Content $record): string => ContentEntryResource::getUrl('index', [
-                                    'ownerRecord' => $record,
-                                ])
-                            ),
-                        Tables\Actions\DeleteAction::make()
-                            ->using(function (Content $record) {
-                                try {
-                                    return app(DeleteContentAction::class)->execute($record);
-                                } catch (DeleteRestrictedException) {
-                                    return false;
-                                }
-                            }),
+                    // Tables\Actions\Action::make('view-entries')
+                    //     ->icon('heroicon-s-eye')
+                    //     ->color('gray')
+                    //     ->url(fn (Content $record) => ContentEntryResource::getUrl('index', [$record])),
+                    Tables\Actions\Action::make('view-entries')
+                        ->color('gray')
+                        ->icon('heroicon-m-academic-cap')
+                        ->url(
+                            fn (Content $record): string => ContentEntryResource::getUrl('index', [
+                                'ownerRecord' => $record,
+                            ])
+                        ),
+                    Tables\Actions\DeleteAction::make()
+                        ->using(function (Content $record) {
+                            try {
+                                return app(DeleteContentAction::class)->execute($record);
+                            } catch (DeleteRestrictedException) {
+                                return false;
+                            }
+                        }),
                 ]),
             ])
             ->bulkActions([

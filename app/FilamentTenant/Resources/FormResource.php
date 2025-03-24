@@ -319,28 +319,28 @@ class FormResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
-                        ->multiple()
-                        ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(SitesManagement::class)))
-                        ->relationship('sites', 'name', function (Builder $query) {
+                    ->multiple()
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(SitesManagement::class)))
+                    ->relationship('sites', 'name', function (Builder $query) {
 
-                            if (filament_admin()->can('site.siteManager') &&
-                            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
-                                return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
-                            }
+                        if (filament_admin()->can('site.siteManager') &&
+                        ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
+                            return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
+                        }
 
-                            return $query;
+                        return $query;
 
-                        }),
+                    }),
             ])
 
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                        Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-                        ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
+                    ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
             ])
             ->defaultSort('updated_at', 'desc');
     }

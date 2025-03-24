@@ -4,7 +4,7 @@ return [
 
     'temporary_files' => [
 
-        'disk' => null,
+        'disk' => env('FILESYSTEM_DISK', 's3'),
 
         'base_directory' => 'filament-import',
     ],
