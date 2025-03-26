@@ -39,6 +39,16 @@ class SyncMediaCollectionAction
 
                     $storage = Storage::disk(config('filament.default_filesystem_disk'));
 
+                    /**
+                     * @var Media|null $new_uploaded_media
+                     *
+                     *  @phpstan-ignore-next-line */
+                    $new_uploaded_media = $model->media->where('file_name', $mediaData->media)->first();
+
+                    if ($new_uploaded_media) {
+                        return $new_uploaded_media;
+                    }
+
                     if (! $storage->exists($mediaData->media)) {
                         throw new UnableToCheckExistence;
                     }

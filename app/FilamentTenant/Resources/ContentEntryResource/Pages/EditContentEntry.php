@@ -29,12 +29,18 @@ use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Exceptions\Halt;
+use Filament\Support\Facades\FilamentView;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use League\Flysystem\UnableToCheckExistence;
 use Livewire\Features\SupportRedirects\Redirector;
+use Throwable;
+
+use function Filament\Support\is_app_url;
 
 /** @method class-string<\Illuminate\Database\Eloquent\Model> getModel()
  *
@@ -445,5 +451,61 @@ class EditContentEntry extends EditRecord
 
         // Rebuild the URL and add a leading "/"
         return '/'.implode('/', $segments);
+    }
+
+    #[\Override]
+    public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
+    {
+        $this->authorizeAccess();
+
+        try {
+            $this->beginDatabaseTransaction();
+
+            $this->callHook('beforeValidate');
+
+            $data = $this->form->getState(afterValidate: function () {
+                $this->callHook('afterValidate');
+
+                $this->callHook('beforeSave');
+            });
+
+            $data = $this->mutateFormDataBeforeSave($data);
+
+            $this->handleRecordUpdate($this->record, $data);
+
+            $this->callHook('afterSave');
+
+            $this->commitDatabaseTransaction();
+        } catch (Halt $exception) {
+            $exception->shouldRollbackDatabaseTransaction() ?
+                $this->rollBackDatabaseTransaction() :
+                $this->commitDatabaseTransaction();
+
+            return;
+        } catch (UnableToCheckExistence $exception) {
+            $this->rollBackDatabaseTransaction();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('UnableToCheckExistence'))
+                ->body(trans(' Unable To Find File you where trying to upload please try to refresh the page before proceeding.'))
+                ->send();
+
+            return;
+        } catch (Throwable $exception) {
+            $this->rollBackDatabaseTransaction();
+
+            throw $exception;
+        }
+
+        $this->rememberData();
+
+        if ($shouldSendSavedNotification) {
+            $this->getSavedNotification()?->send();
+        }
+
+        if ($shouldRedirect && ($redirectUrl = $this->getRedirectUrl())) {
+            $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url($redirectUrl));
+        }
     }
 }
