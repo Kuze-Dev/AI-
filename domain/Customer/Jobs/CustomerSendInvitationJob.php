@@ -38,7 +38,6 @@ final class CustomerSendInvitationJob implements ShouldQueue
         private readonly ?Collection $records = null,
         private readonly array $registerStatuses = []
     ) {
-        /** @phpstan-ignore argument.templateType */
         $this->records?->ensure(Customer::class);
 
         $this->keyName = (new Customer)->getKeyName();

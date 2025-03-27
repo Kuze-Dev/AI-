@@ -230,9 +230,9 @@ class SchemaFormBuilder extends Component
                 ->imagePreviewHeight('256');
         }
 
-        if ($mediaFieldData->conversions) {
-            $media->image();
-        }
+        // if ($mediaFieldData->conversions) {
+        //     $media->image();
+        // }
 
         if ($mediaFieldData->reorder) {
             $media->reorderable($mediaFieldData->reorder);
@@ -271,20 +271,6 @@ class SchemaFormBuilder extends Component
                         'type' => $mediaModel->getAttributeValue('mime_type'),
                         'url' => $mediaModel->getUrl(),
                     ];
-
-                    // $media = Media::where('uuid', $file)
-                    //     ->orWhere('file_name', $file)
-                    //     ->first();
-
-                    // if ($media) {
-                    //     return $media->getUrl();
-                    // }
-
-                    //                $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
-
-                    //                if ($storage->exists($file)) {
-                    //                    return $storage->url($file);
-                    //                }
 
                 }
 
