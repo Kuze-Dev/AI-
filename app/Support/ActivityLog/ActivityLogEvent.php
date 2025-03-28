@@ -49,6 +49,8 @@ enum ActivityLogEvent: string implements HasLabel
     case email_link_clicked_setup_password = 'setup-password';
     case email_link_clicked_setup_password_already_confirmed = 'setup-password-already-confirmed';
 
+    case exported = 'exported';
+
     case deployed_hook = 'deployed-hook';
 
     public function getLabel(): string

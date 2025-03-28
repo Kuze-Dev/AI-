@@ -6,8 +6,10 @@ namespace App\FilamentTenant\Resources\ContentResource\Pages;
 
 use App\FilamentTenant\Resources\ContentResource;
 use Closure;
+use Domain\Content\Exports\ContentExporter;
 use Domain\Content\Models\Content;
 use Filament\Actions;
+use Filament\Actions\ExportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListContent extends ListRecords
@@ -33,6 +35,21 @@ class ListContent extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+            Actions\ActionGroup::make([
+                ExportAction::make()
+                    ->label(trans('Export Content'))
+                    ->exporter(ContentExporter::class)
+                    ->withActivityLog(
+                        event: 'exported',
+                        description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
+                    ),
+            ]),
+            // ->button()
+            // ->color('gray')
+            // ->icon('')
+            // ->label(trans('More Actions')),
+            // ->icon('heroicon-o-cog'),
+
         ];
     }
 }
