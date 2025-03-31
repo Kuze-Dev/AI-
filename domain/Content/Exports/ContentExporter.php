@@ -25,25 +25,36 @@ class ContentExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('name'),
-            ExportColumn::make('blueprint_id'),
-            ExportColumn::make('slug'),
-            ExportColumn::make('prefix'),
-            ExportColumn::make('visibility'),
+            ExportColumn::make('name')
+                ->label('name'),
+            ExportColumn::make('blueprint_id')
+                ->label('blueprint_id'),
+            ExportColumn::make('slug')
+                ->label('slug'),
+            ExportColumn::make('prefix')
+                ->label('prefix'),
+            ExportColumn::make('visibility')
+                ->label('visibility'),
             ExportColumn::make('past_publish_date_behavior')
+                ->label('past_publish_date_behavior')
                 ->state(fn (Content $record) => $record->past_publish_date_behavior?->value),
             ExportColumn::make('future_publish_date_behavior')
+                ->label('future_publish_date_behavior')
                 ->state(fn (Content $record) => $record->future_publish_date_behavior?->value),
-            ExportColumn::make('is_sortable'),
+            ExportColumn::make('is_sortable')
+                ->label('is_sortable'),
             ExportColumn::make('sites')
+                ->label('sites')
                 ->state(function (Content $record) {
                     return implode(',', $record->sites->pluck('domain')->toArray());
                 }),
             ExportColumn::make('taxonomies')
+                ->label('taxonomies')
                 ->state(function (Content $record) {
                     return implode(',', $record->taxonomies->pluck('slug')->toArray());
                 }),
             ExportColumn::make('created_at')
+                ->label('created_at')
                 ->state(
                     fn (Content $record) => $record->created_at
                         ?->format(Table::$defaultDateTimeDisplayFormat)

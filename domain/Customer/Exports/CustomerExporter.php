@@ -28,14 +28,27 @@ class CustomerExporter extends Exporter
             ExportColumn::make('cuid')
                 ->label('CUID'),
             ExportColumn::make('email'),
+            ExportColumn::make('username'),
             ExportColumn::make('first_name'),
             ExportColumn::make('last_name'),
             ExportColumn::make('mobile'),
-            ExportColumn::make('status'),
             ExportColumn::make('birth_date')
                 ->state(
                     fn (Customer $record) => $record->birth_date
                         ?->format(Table::$defaultDateTimeDisplayFormat)
+                ),
+            ExportColumn::make('gender')
+                ->state(
+                    fn (Customer $record) => $record->gender->getLabel()
+                ),
+            ExportColumn::make('status')
+                ->state(
+                    fn (Customer $record) => $record->status->getLabel()
+                ),
+            ExportColumn::make('birth_date')
+                ->state(
+                    fn (Customer $record) => $record->birth_date
+                        ?->format(Table::$defaultDateDisplayFormat)
                 ),
             ExportColumn::make('tier.name'),
             ExportColumn::make('created_at')

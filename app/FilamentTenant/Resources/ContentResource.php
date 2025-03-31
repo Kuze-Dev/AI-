@@ -11,6 +11,7 @@ use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Actions\DeleteContentAction;
 use Domain\Content\Enums\PublishBehavior;
+use Domain\Content\Exports\ContentExporter;
 use Domain\Content\Models\Content;
 use Domain\Page\Enums\Visibility;
 use Domain\Site\Models\Site;
@@ -314,6 +315,26 @@ class ContentResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ExportBulkAction::make()
+                    ->label(trans('Export Selected Content'))
+                    ->exporter(ContentExporter::class)
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Content $model): Content {
+                                        if ($model instanceof Content) {
+                                            return $model;
+                                        }
+
+                                        /** @phpstan-ignore return.type */
+                                        return Content::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
+                    ),
             ])
             ->defaultSort('updated_at', 'desc');
     }
