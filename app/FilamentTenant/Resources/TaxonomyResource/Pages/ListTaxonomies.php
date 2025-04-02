@@ -6,8 +6,10 @@ namespace App\FilamentTenant\Resources\TaxonomyResource\Pages;
 
 use App\FilamentTenant\Resources\TaxonomyResource;
 use Domain\Taxonomy\Exports\TaxonomiesExporter;
+use Domain\Taxonomy\Imports\TaxonomiesImporter;
 use Filament\Actions;
 use Filament\Actions\ExportAction;
+use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListTaxonomies extends ListRecords
@@ -26,6 +28,13 @@ class ListTaxonomies extends ListRecords
                     ->withActivityLog(
                         event: 'exported',
                         description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
+                    ),
+                ImportAction::make()
+                    ->label(trans('Import Taxonomies'))
+                    ->importer(TaxonomiesImporter::class)
+                    ->withActivityLog(
+                        event: 'imported',
+                        description: fn (ImportAction $action) => 'Imported '.$action->getModelLabel(),
                     ),
             ]),
         ];

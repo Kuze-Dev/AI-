@@ -18,6 +18,7 @@ class CreateTaxonomyAction
     {
         $taxonomy = Taxonomy::create([
             'name' => $taxonomyData->name,
+            'has_route' => $taxonomyData->has_route,
             'blueprint_id' => $taxonomyData->blueprint_id,
         ]);
 

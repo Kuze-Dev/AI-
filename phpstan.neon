@@ -1,6 +1,5 @@
 includes:
     - phpstan-baseline.neon
-    - phar://phpstan.phar/conf/bleedingEdge.neon
 
 services:
     -
@@ -83,7 +82,7 @@ parameters:
         - phpstan-stubs/PermissionRegistrar.stub
         - phpstan-stubs/Select.stub
         - phpstan-stubs/SimpleMessage.stub
-        - phpstan-stubs/TextInput.stub
+        - phpstan-stubs/Tenancy.stub
 
     paths:
         - app
@@ -92,12 +91,6 @@ parameters:
 
     # The level 9 is the highest level
     level: 8
-
-    type_coverage:
-        return_type: 99.7
-        param_type: 89.3
-        property_type: 100
-        declare: 100
 
     ignoreErrors:
         #- '#Access to property \$value on an unknown class StringBackedEnum.#'

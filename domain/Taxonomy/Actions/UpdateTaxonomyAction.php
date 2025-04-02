@@ -19,6 +19,7 @@ class UpdateTaxonomyAction
     {
         $taxonomy->update([
             'name' => $taxonomyData->name,
+            'has_route' => $taxonomyData->has_route,
         ]);
 
         if ($taxonomyData->has_route) {

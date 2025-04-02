@@ -26,14 +26,32 @@ class TaxonomiesExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('name'),
-            ExportColumn::make('blueprint_id'),
-            ExportColumn::make('slug'),
-            ExportColumn::make('locale'),
-            ExportColumn::make('has_route'),
+            ExportColumn::make('name')
+                ->label('name'),
+            ExportColumn::make('blueprint_id')
+                ->label('blueprint_id'),
+            ExportColumn::make('slug')
+                ->label('slug'),
+            ExportColumn::make('locale')
+                ->label('locale'),
+            ExportColumn::make('has_route')
+                ->label('has_route'),
+            ExportColumn::make('is_custom')
+                ->label('is_custom')
+                ->state(fn (Taxonomy $record) => $record->routeUrls?->is_override),
+            ExportColumn::make('url')
+                ->label('url')
+                ->state(fn (Taxonomy $record) => $record->routeUrls?->url),
+            ExportColumn::make('sites')
+                ->label('sites')
+                ->state(function (Taxonomy $record) {
+                    return implode(',', $record->sites->pluck('domain')->toArray());
+                }),
             ExportColumn::make('parent_translation')
+                ->label('parent_translation')
                 ->state(fn (Taxonomy $record) => $record->parentTranslation?->slug),
             ExportColumn::make('created_at')
+                ->label('created_at')
                 ->state(
                     fn (Taxonomy $record) => $record->created_at
                         ?->format(Table::$defaultDateTimeDisplayFormat)
