@@ -39,11 +39,11 @@ class CustomerExporter extends Exporter
                 ),
             ExportColumn::make('gender')
                 ->state(
-                    fn (Customer $record) => $record->gender->getLabel()
+                    fn (Customer $record) => $record->gender?->getLabel()
                 ),
             ExportColumn::make('status')
                 ->state(
-                    fn (Customer $record) => $record->status->getLabel()
+                    fn (Customer $record) => $record->status?->getLabel()
                 ),
             ExportColumn::make('birth_date')
                 ->state(

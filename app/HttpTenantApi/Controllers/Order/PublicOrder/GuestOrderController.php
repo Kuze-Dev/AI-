@@ -71,8 +71,8 @@ class GuestOrderController extends Controller
             ]);
 
             app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the payment credentials on your website.
-            Please ensure that your payment settings are configured correctly. using '. $validatedData['payment_method'], 'ecommerceSettings.payments');
-            
+            Please ensure that your payment settings are configured correctly. using '.$validatedData['payment_method'], 'ecommerceSettings.payments');
+
             return response()->json([
                 'payment' => 'Invalid Payment Credentials',
             ], 404);

@@ -46,12 +46,12 @@ class ListContent extends ListRecords
                         description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
                     ),
                 ImportAction::make()
-                ->label(trans('Import Content'))
-                ->importer(ContentImporter::class)
-                ->withActivityLog(
-                    event: 'imported',
-                    description: fn (ImportAction $action) => 'Imported '.$action->getModelLabel(),
-                ),
+                    ->label(trans('Import Content'))
+                    ->importer(ContentImporter::class)
+                    ->withActivityLog(
+                        event: 'imported',
+                        description: fn (ImportAction $action) => 'Imported '.$action->getModelLabel(),
+                    ),
             ]),
             // ->button()
             // ->color('gray')

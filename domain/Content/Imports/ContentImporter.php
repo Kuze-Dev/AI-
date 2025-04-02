@@ -9,10 +9,12 @@ use Domain\Content\Actions\CreateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Content;
+use Domain\Site\Models\Site;
+use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
-use Illuminate\Support\Facades\Log;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -27,43 +29,101 @@ class ContentImporter extends Importer
     public static function getColumns(): array
     {
         return [
-         
 
             ImportColumn::make('name')
-                ->requiredMapping(),
-                // ->rules(['required', 'string']),
+                ->requiredMapping()
+                ->rules(['required',
+                    function ($attribute, $value, $fail) {
+                        if (Content::where('name', $value)->exists()) {
+
+                            Notification::make()
+                                ->title(trans('Content Import Error'))
+                                ->body("Content name {$value} has already been taken.")
+                                ->danger()
+                                ->persistent()
+                                ->send();
+
+                            $fail("The name '{$value}' is already taken. Please choose another.");
+                        }
+                    },
+                ]),
 
             ImportColumn::make('slug')
                 ->requiredMapping(),
 
             ImportColumn::make('prefix')
+                ->rules([
+                    function ($attribute, $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
+
+                        $data = $validator->getData();
+
+                        if (
+                            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
+                        ) {
+
+                            $siteIDs = Site::whereIn('domain', explode(',', $data['sites']))->pluck('id');
+
+                            $content = Content::where('prefix', $value)
+                                ->whereHas(
+                                    'sites',
+                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                )->count();
+
+                        } else {
+                            $content = Content::where('prefix', $value)->count();
+                        }
+
+                        if ($content > 0) {
+
+                            Notification::make()
+                                ->title(trans('Content Import Error'))
+                                ->body("Content prefix {$data['name']} has already been taken.")
+                                ->danger()
+                                ->persistent()
+                                ->send();
+
+                            $fail("Content prefix {$data['name']} has already been taken.");
+                        }
+                    },
+                ])
                 ->requiredMapping(),
-                // ->rules(['required', 'string']),
+            // ->rules(['required', 'string']),
 
             ImportColumn::make('blueprint_id')
                 ->requiredMapping(),
-                // ->rules(['required', Rule::exists(Blueprint::class, 'id')]),
+            // ->rules(['required', Rule::exists(Blueprint::class, 'id')]),
             ImportColumn::make('visibility')
                 ->requiredMapping(),
-                // ->rules(['required']),
-                
 
-            // ImportColumn::make('past_publish_date_behavior')
-            //     ->fillRecordUsing(fn ($value) => $value ? PublishBehavior::from($value) : null)
-            //     ->requiredMapping(),
-                
+            ImportColumn::make('past_publish_date_behavior')
+                ->castStateUsing(fn (?string $state) => blank($state) ? null : PublishBehavior::from($state))
+                ->requiredMapping(),
 
-            // ImportColumn::make('future_publish_date_behavior')
-            //     ->fillRecordUsing(fn ($value) => $value ? PublishBehavior::from($value) : null)
-            //     ->requiredMapping(),
-                
+            ImportColumn::make('future_publish_date_behavior')
+                ->castStateUsing(fn (?string $state) => blank($state) ? null : PublishBehavior::from($state))
+                ->requiredMapping(),
+
+            ImportColumn::make('sites')
+                // ->relationship(resolveUsing: function (string $state): ?array {
+                //     return Site::query()
+                //         ->whereIn('domain', explode(',',$state))
+                //         ->pluck('id')
+                //         ->toArray();
+                // })
+                ->requiredMapping(),
+
+            ImportColumn::make('taxonomies')
+                // ->relationship(resolveUsing: function (string $state): ?array {
+                //     return Taxonomy::query()
+                //         ->whereIn('slug', explode(',',$state))
+                //         ->pluck('id')
+                //         ->toArray();
+                // })
+                ->requiredMapping(),
 
             ImportColumn::make('is_sortable')
                 ->requiredMapping(),
-                
-           
 
-          
         ];
     }
 
@@ -71,44 +131,56 @@ class ContentImporter extends Importer
     public function resolveRecord(): Content
     {
         if (is_null($this->data['slug'])) {
-            return new Content();
+            return new Content;
         }
 
-        return Content::where('slug',$this->data['slug'])->first() ?? new Content();
+        return Content::where('slug', $this->data['slug'])->first() ?? new Content;
     }
 
-    // /**
-    //  * @throws \Throwable
-    //  */
-    // #[\Override]
-    // public function saveRecord(): void
-    // {
-       
-    //     if ($this->record->exists) {
-    //         return;
-    //     }
+    #[\Override]
+    public function fillRecord(): void
+    {
+        /** Disabled Filament Built in Record Creation Handle the Content
+         * Creation thru Domain Level Action
+         */
+    }
 
-    //     Log::info('Creating Content');
+    /**
+     * @throws \Throwable
+     */
+    #[\Override]
+    public function saveRecord(): void
+    {
 
-    //     $contentData = new ContentData(
-    //         name: $this->data['name'],
-    //         blueprint_id: $this->data['blueprint_id'],
-    //         prefix: $this->data['prefix'],
-    //         visibility: $this->data['visibility'],
-    //         // past_publish_date_behavior: PublishBehavior::from($this->data['past_publish_date_behavior']),
-    //         // future_publish_date_behavior: PublishBehavior::from($this->data['future_publish_date_behavior']),
-    //         is_sortable: $this->data['is_sortable'],
-    //         sites: [],
-    //         taxonomies: [],
-    //     );  
+        if ($this->record->exists) {
+            return;
+        }
 
-    //     app(CreateContentAction::class)->execute($contentData);
+        /** @var array $siteIDs */
+        $siteIDs = array_key_exists('sites', $this->data) ?
+            Site::whereIn('domain', explode(',', $this->data['sites']))->pluck('id')->toArray() :
+            [];
 
-      
+        /** @var array $taxonomyIds */
+        $taxonomyIds = array_key_exists('taxonomies', $this->data) ?
+            Taxonomy::whereIn('slug', explode(',', $this->data['taxonomies']))->pluck('id')->toArray() :
+             [];
 
-    // }
+        $contentData = new ContentData(
+            name: $this->data['name'],
+            blueprint_id: $this->data['blueprint_id'],
+            prefix: $this->data['prefix'],
+            visibility: $this->data['visibility'],
+            past_publish_date_behavior: $this->data['past_publish_date_behavior'],
+            future_publish_date_behavior: $this->data['future_publish_date_behavior'],
+            is_sortable: $this->data['is_sortable'] ? true : false,
+            sites: $siteIDs,
+            taxonomies: $taxonomyIds,
+        );
 
-  
+        app(CreateContentAction::class)->execute($contentData);
+
+    }
 
     #[\Override]
     public static function getCompletedNotificationBody(Import $import): string
