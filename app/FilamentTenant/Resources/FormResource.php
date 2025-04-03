@@ -73,7 +73,7 @@ class FormResource extends Resource
                         ->unique(
                             modifyRuleUsing: function ($livewire, Unique $rule) {
 
-                                if (TenantFeatureSupport::active(SitesManagement::class)) {
+                                if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) || \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)) {
                                     return false;
                                 }
 

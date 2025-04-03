@@ -62,6 +62,7 @@ class Form extends Model
         'blueprint_id',
         'name',
         'slug',
+        'locale',
         'store_submission',
         'uses_captcha',
     ];

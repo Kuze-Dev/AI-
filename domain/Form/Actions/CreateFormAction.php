@@ -17,6 +17,7 @@ class CreateFormAction
     {
         $form = Form::create([
             'blueprint_id' => $formData->blueprint_id,
+            'locale' => $formData->locale,
             'name' => $formData->name,
             'store_submission' => $formData->store_submission,
             'uses_captcha' => $formData->uses_captcha,

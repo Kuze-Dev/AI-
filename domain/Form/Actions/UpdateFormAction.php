@@ -20,6 +20,7 @@ class UpdateFormAction
     {
         $form->update([
             'name' => $formData->name,
+            'locale' => $formData->locale,
             'store_submission' => $formData->store_submission,
             'uses_captcha' => $formData->uses_captcha,
         ]);

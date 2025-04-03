@@ -10,8 +10,9 @@ readonly class FormData
     public function __construct(
         public string $blueprint_id,
         public string $name,
-        public bool $store_submission = false,
-        public bool $uses_captcha = false,
+        public bool $store_submission,
+        public bool $uses_captcha,
+        public readonly string $locale,
         public array $form_email_notifications = [],
         public array $sites = [],
     ) {}
@@ -23,6 +24,7 @@ readonly class FormData
             name: $data['name'],
             store_submission: $data['store_submission'] ?? false,
             uses_captcha: $data['uses_captcha'] ?? false,
+            locale: $data['locale'] ?? 'en',
             form_email_notifications: array_map(
                 fn (array $formEmailNotificationData) => new FormEmailNotificationData(
                     id: $formEmailNotificationData['id'] ?? null,

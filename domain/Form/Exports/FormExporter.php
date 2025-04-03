@@ -2,20 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Domain\Menu\Exports;
+namespace Domain\Form\Exports;
 
 use App\Jobs\QueueJobPriority;
-use Domain\Menu\Models\Menu;
+use Domain\Form\Models\Form;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
-class MenuExporter extends Exporter
+class FormExporter extends Exporter
 {
-    protected static ?string $model = Menu::class;
+    protected static ?string $model = Form::class;
 
     public function getJobQueue(): ?string
     {
@@ -25,28 +24,37 @@ class MenuExporter extends Exporter
     #[\Override]
     public static function getColumns(): array
     {
+
         return [
             ExportColumn::make('name')
                 ->label('name'),
+            ExportColumn::make('blueprint_id')
+                ->label('blueprint_id'),
             ExportColumn::make('slug')
                 ->label('slug'),
             ExportColumn::make('locale')
                 ->label('locale'),
+            ExportColumn::make('store_submission')
+                ->label('store_submission'),
+            ExportColumn::make('uses_captcha')
+                ->label('uses_captcha'),
+
             ExportColumn::make('sites')
                 ->label('sites')
-                ->state(function (Menu $record) {
+                ->state(function (Form $record) {
                     return implode(',', $record->sites->pluck('domain')->toArray());
                 }),
-            ExportColumn::make('parent_translation')
-                ->label('parent_translation')
-                ->state(fn (Menu $record) => $record->parentTranslation?->slug),
-            ExportColumn::make('nodes')
-                ->label('nodes')
-                ->state(fn (Menu $record) => json_encode($record->parentNodes?->load('children')->toArray())),
+
+            ExportColumn::make('formEmailNotifications')
+                ->label('formEmailNotifications')
+                ->state(function (Form $record) {
+                    return json_encode($record->formEmailNotifications->toArray());
+                }),
+
             ExportColumn::make('created_at')
                 ->label('created_at')
                 ->state(
-                    fn (Menu $record) => $record->created_at
+                    fn (Form $record) => $record->created_at
                         ?->format(Table::$defaultDateTimeDisplayFormat)
                 ),
         ];
@@ -55,7 +63,7 @@ class MenuExporter extends Exporter
     #[\Override]
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your Taxonomy export has completed and '.number_format($export->successful_rows).
+        $body = 'Your Form export has completed and '.number_format($export->successful_rows).
             ' '.Str::of('row')->plural($export->successful_rows).' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
@@ -65,10 +73,4 @@ class MenuExporter extends Exporter
 
         return $body;
     }
-
-    // public static function modifyQuery(Builder $query): Builder
-    // {
-    //     dd($query);
-    //     return Taxonomy::query()->with('dataTranslation');
-    // }
 }
