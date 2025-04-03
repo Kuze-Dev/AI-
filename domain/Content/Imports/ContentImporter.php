@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Content\Imports;
 
-use Domain\Blueprint\Models\Blueprint;
 use Domain\Content\Actions\CreateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Enums\PublishBehavior;
@@ -15,9 +14,7 @@ use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 /**
  * @property-read Content $record
@@ -34,20 +31,20 @@ class ContentImporter extends Importer
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required',
-                        function (string $attribute, mixed $value, \Closure $fail) {
-                            if (Content::where('name', $value)->exists()) {
+                    function (string $attribute, mixed $value, \Closure $fail) {
+                        if (Content::where('name', $value)->exists()) {
 
-                                Notification::make()
-                                    ->title(trans('Content Import Error'))
-                                    ->body("Content name {$value} has already been taken.")
-                                    ->danger()
-                                    ->persistent()
-                                    ->send();
+                            Notification::make()
+                                ->title(trans('Content Import Error'))
+                                ->body("Content name {$value} has already been taken.")
+                                ->danger()
+                                ->persistent()
+                                ->send();
 
-                                $fail("The name '{$value}' is already taken. Please choose another.");
-                            }
-                        },
-                    ]),
+                            $fail("The name '{$value}' is already taken. Please choose another.");
+                        }
+                    },
+                ]),
 
             ImportColumn::make('slug')
                 ->requiredMapping(),
@@ -62,7 +59,7 @@ class ContentImporter extends Importer
                             \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
                         ) {
 
-                            $siteIDs = Site::whereIn('domain', explode(',',$data['sites']))->pluck('id');
+                            $siteIDs = Site::whereIn('domain', explode(',', $data['sites']))->pluck('id');
 
                             $content = Content::where('prefix', $value)
                                 ->whereHas(
@@ -101,7 +98,7 @@ class ContentImporter extends Importer
             ImportColumn::make('future_publish_date_behavior')
                 ->castStateUsing(fn (?string $state) => blank($state) ? null : PublishBehavior::from($state))
                 ->requiredMapping(),
-            
+
             ImportColumn::make('sites')
                 ->requiredMapping(),
 
@@ -127,7 +124,7 @@ class ContentImporter extends Importer
     #[\Override]
     public function fillRecord(): void
     {
-        /** Disabled Filament Built in Record Creation Handle the Content 
+        /** Disabled Filament Built in Record Creation Handle the Content
          * Creation thru Domain Level Action
          */
     }
@@ -145,12 +142,12 @@ class ContentImporter extends Importer
 
         /** @var array $siteIDs */
         $siteIDs = array_key_exists('sites', $this->data) ?
-            Site::whereIn('domain', explode(',',$this->data['sites']))->pluck('id')->toArray() : 
+            Site::whereIn('domain', explode(',', $this->data['sites']))->pluck('id')->toArray() :
             [];
 
         /** @var array $taxonomyIds */
-        $taxonomyIds = array_key_exists('taxonomies', $this->data) ? 
-            Taxonomy::whereIn('slug', explode(',',$this->data['taxonomies']))->pluck('id')->toArray() :
+        $taxonomyIds = array_key_exists('taxonomies', $this->data) ?
+            Taxonomy::whereIn('slug', explode(',', $this->data['taxonomies']))->pluck('id')->toArray() :
              [];
 
         $contentData = new ContentData(
@@ -164,7 +161,6 @@ class ContentImporter extends Importer
             sites: $siteIDs,
             taxonomies: $taxonomyIds,
         );
-
 
         app(CreateContentAction::class)->execute($contentData);
 

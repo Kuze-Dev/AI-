@@ -65,15 +65,42 @@ class TaxonomiesImporter extends Importer
 
             ImportColumn::make('url')
                 ->rules([
-                        function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
+                    function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
 
-                            $activeRouteUrl = RouteUrl::where('url', $value)->count();
+                        $activeRouteUrl = RouteUrl::where('url', $value)->count();
 
-                            if ($activeRouteUrl > 0) {
+                        if ($activeRouteUrl > 0) {
+
+                            Notification::make()
+                                ->title(trans('Taxonomy Import Error'))
+                                ->body("Taxonomy Url {$value} has already been taken.")
+                                ->danger()
+                                ->when(config('queue.default') === 'sync',
+                                    fn (Notification $notification) => $notification
+                                        ->persistent()
+                                        ->send(),
+                                    fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                );
+
+                            $fail("The url '{$value}' is already taken. Please choose another.");
+                        }
+                    },
+                ])
+                ->requiredMapping(),
+
+            ImportColumn::make('parent_translation')
+                ->rules([
+                    function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
+
+                        if ($value) {
+
+                            $parentTaxonomy = Taxonomy::where('slug', $value)->count();
+
+                            if ($parentTaxonomy === 0) {
 
                                 Notification::make()
                                     ->title(trans('Taxonomy Import Error'))
-                                    ->body("Taxonomy Url {$value} has already been taken.")
+                                    ->body("Taxonomy {$value} Not Found.")
                                     ->danger()
                                     ->when(config('queue.default') === 'sync',
                                         fn (Notification $notification) => $notification
@@ -82,38 +109,11 @@ class TaxonomiesImporter extends Importer
                                         fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
                                     );
 
-                                $fail("The url '{$value}' is already taken. Please choose another.");
+                                $fail("Taxonomy '{$value}' Not Found.");
                             }
-                        },
-                    ])
-                ->requiredMapping(),
+                        }
 
-            ImportColumn::make('parent_translation')
-                ->rules([
-                        function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
-
-                            if ($value) {
-
-                                $parentTaxonomy = Taxonomy::where('slug', $value)->count();
-
-                                if ($parentTaxonomy === 0) {
-
-                                    Notification::make()
-                                        ->title(trans('Taxonomy Import Error'))
-                                        ->body("Taxonomy {$value} Not Found.")
-                                        ->danger()
-                                        ->when(config('queue.default') === 'sync',
-                                            fn (Notification $notification) => $notification
-                                                ->persistent()
-                                                ->send(),
-                                            fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
-                                        );
-
-                                    $fail("Taxonomy '{$value}' Not Found.");
-                                }
-                            }
-
-                        },
+                    },
                 ])
                 ->requiredMapping(),
 
