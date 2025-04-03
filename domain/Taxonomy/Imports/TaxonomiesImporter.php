@@ -30,7 +30,7 @@ class TaxonomiesImporter extends Importer
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules([
-                    function ($attribute, $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
+                    function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
 
                         $taxo = Taxonomy::where('name', $value)->count();
 
@@ -65,7 +65,7 @@ class TaxonomiesImporter extends Importer
 
             ImportColumn::make('url')
                 ->rules([
-                        function ($attribute, $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
+                        function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
 
                             $activeRouteUrl = RouteUrl::where('url', $value)->count();
 
@@ -90,7 +90,7 @@ class TaxonomiesImporter extends Importer
 
             ImportColumn::make('parent_translation')
                 ->rules([
-                        function ($attribute, $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
+                        function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
 
                             if ($value) {
 

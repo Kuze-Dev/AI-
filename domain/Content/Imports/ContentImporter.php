@@ -15,6 +15,7 @@ use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -33,27 +34,27 @@ class ContentImporter extends Importer
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required',
-                    function ($attribute, $value, $fail) {
-                        if (Content::where('name', $value)->exists()) {
+                        function (string $attribute, mixed $value, \Closure $fail) {
+                            if (Content::where('name', $value)->exists()) {
 
-                            Notification::make()
-                                ->title(trans('Content Import Error'))
-                                ->body("Content name {$value} has already been taken.")
-                                ->danger()
-                                ->persistent()
-                                ->send();
+                                Notification::make()
+                                    ->title(trans('Content Import Error'))
+                                    ->body("Content name {$value} has already been taken.")
+                                    ->danger()
+                                    ->persistent()
+                                    ->send();
 
-                            $fail("The name '{$value}' is already taken. Please choose another.");
-                        }
-                    },
-                ]),
+                                $fail("The name '{$value}' is already taken. Please choose another.");
+                            }
+                        },
+                    ]),
 
             ImportColumn::make('slug')
                 ->requiredMapping(),
 
             ImportColumn::make('prefix')
                 ->rules([
-                    function ($attribute, $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
+                    function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
 
                         $data = $validator->getData();
 
@@ -61,7 +62,7 @@ class ContentImporter extends Importer
                             \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
                         ) {
 
-                            $siteIDs = Site::whereIn('domain', explode(',', $data['sites']))->pluck('id');
+                            $siteIDs = Site::whereIn('domain', explode(',',$data['sites']))->pluck('id');
 
                             $content = Content::where('prefix', $value)
                                 ->whereHas(
@@ -87,11 +88,9 @@ class ContentImporter extends Importer
                     },
                 ])
                 ->requiredMapping(),
-            // ->rules(['required', 'string']),
 
             ImportColumn::make('blueprint_id')
                 ->requiredMapping(),
-            // ->rules(['required', Rule::exists(Blueprint::class, 'id')]),
             ImportColumn::make('visibility')
                 ->requiredMapping(),
 
@@ -102,23 +101,11 @@ class ContentImporter extends Importer
             ImportColumn::make('future_publish_date_behavior')
                 ->castStateUsing(fn (?string $state) => blank($state) ? null : PublishBehavior::from($state))
                 ->requiredMapping(),
-
+            
             ImportColumn::make('sites')
-                // ->relationship(resolveUsing: function (string $state): ?array {
-                //     return Site::query()
-                //         ->whereIn('domain', explode(',',$state))
-                //         ->pluck('id')
-                //         ->toArray();
-                // })
                 ->requiredMapping(),
 
             ImportColumn::make('taxonomies')
-                // ->relationship(resolveUsing: function (string $state): ?array {
-                //     return Taxonomy::query()
-                //         ->whereIn('slug', explode(',',$state))
-                //         ->pluck('id')
-                //         ->toArray();
-                // })
                 ->requiredMapping(),
 
             ImportColumn::make('is_sortable')
@@ -140,7 +127,7 @@ class ContentImporter extends Importer
     #[\Override]
     public function fillRecord(): void
     {
-        /** Disabled Filament Built in Record Creation Handle the Content
+        /** Disabled Filament Built in Record Creation Handle the Content 
          * Creation thru Domain Level Action
          */
     }
@@ -158,12 +145,12 @@ class ContentImporter extends Importer
 
         /** @var array $siteIDs */
         $siteIDs = array_key_exists('sites', $this->data) ?
-            Site::whereIn('domain', explode(',', $this->data['sites']))->pluck('id')->toArray() :
+            Site::whereIn('domain', explode(',',$this->data['sites']))->pluck('id')->toArray() : 
             [];
 
         /** @var array $taxonomyIds */
-        $taxonomyIds = array_key_exists('taxonomies', $this->data) ?
-            Taxonomy::whereIn('slug', explode(',', $this->data['taxonomies']))->pluck('id')->toArray() :
+        $taxonomyIds = array_key_exists('taxonomies', $this->data) ? 
+            Taxonomy::whereIn('slug', explode(',',$this->data['taxonomies']))->pluck('id')->toArray() :
              [];
 
         $contentData = new ContentData(
@@ -177,6 +164,7 @@ class ContentImporter extends Importer
             sites: $siteIDs,
             taxonomies: $taxonomyIds,
         );
+
 
         app(CreateContentAction::class)->execute($contentData);
 

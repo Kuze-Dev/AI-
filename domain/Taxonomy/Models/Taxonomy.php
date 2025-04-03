@@ -36,6 +36,8 @@ use Support\RouteUrl\HasRouteUrl;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $routeUrls
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Content> $contents
  * @property-read int|null $contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Taxonomy\Models\TaxonomyTerm> $parentTerms
