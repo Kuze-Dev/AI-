@@ -9,9 +9,11 @@ use Domain\Page\Actions\CreateBlockAction;
 use Domain\Page\DataTransferObjects\BlockData;
 use Domain\Page\Models\Block;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 
 /**
@@ -40,6 +42,46 @@ class BlockImporter extends Importer
                 ->requiredMapping(),
 
             ImportColumn::make('sites')
+                ->rules([
+                    function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator): void {
+                        if (is_null($value) && TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
+
+                            Notification::make()
+                                ->title(trans('Block Import Error'))
+                                ->body('Sites field is required.')
+                                ->danger()
+                                ->when(config('queue.default') === 'sync',
+                                    fn (Notification $notification) => $notification
+                                        ->persistent()
+                                        ->send(),
+                                    fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                );
+
+                            $fail('Sites field is required.');
+                        }
+
+                        if (! is_null($value)) {
+                            $siteIDs = Site::whereIn('domain', explode(',', $value))->pluck('id')->toArray();
+
+                            if (count($siteIDs) !== count(explode(',', $value))) {
+
+                                Notification::make()
+                                    ->title(trans('Block Import Error'))
+                                    ->body("Item from Site list ( {$value} ) Not Found.")
+                                    ->danger()
+                                    ->when(config('queue.default') === 'sync',
+                                        fn (Notification $notification) => $notification
+                                            ->persistent()
+                                            ->send(),
+                                        fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                    );
+
+                                $fail("Site {$value} not found.");
+                            }
+                        }
+
+                    },
+                ])
                 ->requiredMapping(),
 
             ImportColumn::make('image')

@@ -61,6 +61,46 @@ class MenuImporter extends Importer
                 ->requiredMapping(),
 
             ImportColumn::make('sites')
+                ->rules([
+                    function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator): void {
+                        if (is_null($value) && TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
+
+                            Notification::make()
+                                ->title(trans('Menu Import Error'))
+                                ->body('Sites field is required.')
+                                ->danger()
+                                ->when(config('queue.default') === 'sync',
+                                    fn (Notification $notification) => $notification
+                                        ->persistent()
+                                        ->send(),
+                                    fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                );
+
+                            $fail('Sites field is required.');
+                        }
+
+                        if (! is_null($value)) {
+                            $siteIDs = Site::whereIn('domain', explode(',', $value))->pluck('id')->toArray();
+
+                            if (count($siteIDs) !== count(explode(',', $value))) {
+
+                                Notification::make()
+                                    ->title(trans('Menu Import Error'))
+                                    ->body("Item from Site list ( {$value} ) Not Found.")
+                                    ->danger()
+                                    ->when(config('queue.default') === 'sync',
+                                        fn (Notification $notification) => $notification
+                                            ->persistent()
+                                            ->send(),
+                                        fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                    );
+
+                                $fail("Site {$value} not found.");
+                            }
+                        }
+
+                    },
+                ])
                 ->requiredMapping(),
 
             ImportColumn::make('parent_translation')
