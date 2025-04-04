@@ -11,9 +11,8 @@ class CreateMenuAction
 {
     public function __construct(
         protected SyncNodeTreeAction $syncNodeAction,
-    ) {
-    }
-   
+    ) {}
+
     public function execute(MenuData $menuData): Menu
     {
         $menu = Menu::create([

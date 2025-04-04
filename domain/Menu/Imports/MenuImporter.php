@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Domain\Menu\Imports;
 
 use App\Features\CMS\Internationalization;
-use Domain\Form\Actions\CreateFormAction;
-use Domain\Form\DataTransferObjects\FormData;
 use Domain\Form\Models\Form;
 use Domain\Menu\Actions\CreateMenuAction;
 use Domain\Menu\Actions\CreateMenuTranslationAction;
@@ -40,19 +38,18 @@ class MenuImporter extends Importer
                         $data = $validator->getData();
 
                         if (TenantFeatureSupport::active(Internationalization::class)) {
-                            $exist = Menu::where('name',$value)->where('locale',$data['locale'])->count();
+                            $exist = Menu::where('name', $value)->where('locale', $data['locale'])->count();
                             if ($exist) {
                                 return $fail("Menu name {$value} has already been taken.");
                             }
-                        }else {
-                            $exist = Menu::where('name',$value)->count();
+                        } else {
+                            $exist = Menu::where('name', $value)->count();
                             if ($exist) {
                                 return $fail("Menu name {$value} has already been taken.");
                             }
                         }
 
                     },
-
 
                 ],
                 ),
@@ -63,12 +60,11 @@ class MenuImporter extends Importer
             ImportColumn::make('locale')
                 ->requiredMapping(),
 
-    
             ImportColumn::make('sites')
                 ->requiredMapping(),
 
             ImportColumn::make('parent_translation')
-            ->rules([
+                ->rules([
                     function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator) {
 
                         if ($value) {
@@ -136,7 +132,7 @@ class MenuImporter extends Importer
         $siteIDs = (array_key_exists('sites', $this->data) && ! is_null($this->data['sites'])) ?
             Site::whereIn('domain', explode(',', $this->data['sites']))->pluck('id')->toArray() :
             [];
-       
+
         $nodes = json_decode($this->data['nodes'], true);
         $nodes = $this->removeIds($nodes);
 
@@ -148,35 +144,36 @@ class MenuImporter extends Importer
         ]);
 
         if ($this->data['parent_translation']) {
-            $parentMenu = Menu::where('slug', $this->data['parent_translation'])->first();
-            
+
+            /** @var \Domain\Menu\Models\Menu $parentMenu */
+            $parentMenu = Menu::where('slug', $this->data['parent_translation'])->firstorfail();
+
             app(CreateMenuTranslationAction::class)->execute($parentMenu, $menuData);
-            # code...
-        }else {
+
+        } else {
             app(CreateMenuAction::class)->execute($menuData);
         }
     }
 
-    private function removeIds(array $items): array {
+    private function removeIds(array $items): array
+    {
         return array_map(function ($item) {
-            if (!is_array($item)) {
+            if (! is_array($item)) {
                 return $item; // Ensure it's an array before modifying
             }
             $item['parent_id'] = null; // Set 'parent_id' to null if it exists
             $item['menu_id'] = null; // Set 'menu_id' to null if it exists
             unset($item['id']); // Remove 'id' if it exists
-    
+
             foreach ($item as $key => $value) {
                 if (is_array($value)) {
                     $item[$key] = $this->removeIds($value); // Recursively process nested arrays
                 }
             }
-    
+
             return $item;
         }, $items);
     }
-    
-    
 
     #[\Override]
     public static function getCompletedNotificationBody(Import $import): string

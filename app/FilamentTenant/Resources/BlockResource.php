@@ -69,6 +69,8 @@ class BlockResource extends Resource
 
                         return [];
                     })
+                    ->openable()
+                    ->image()
                     ->getUploadedFileUsing(function ($file) {
 
                         if (! is_null($file)) {
@@ -94,8 +96,7 @@ class BlockResource extends Resource
                         }
 
                         return [];
-                    })
-                    ->image(),
+                    }),
                 // SpatieMediaLibraryFileUpload::make('image')
                 //     ->image()
                 //     ->collection('image')
