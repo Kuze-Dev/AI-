@@ -38,7 +38,7 @@ class ListBlocks extends ListRecords
                         event: 'imported',
                         description: fn (ImportAction $action) => 'Imported '.$action->getModelLabel(),
                     ),
-            ]),
+            ])->hidden(fn () => ! filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
         ];
     }
 
