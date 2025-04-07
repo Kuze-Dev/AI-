@@ -26,31 +26,34 @@ class CustomerExporter extends Exporter
     {
         return [
             ExportColumn::make('cuid')
-                ->label('CUID'),
-            ExportColumn::make('email'),
-            ExportColumn::make('username'),
-            ExportColumn::make('first_name'),
-            ExportColumn::make('last_name'),
-            ExportColumn::make('mobile'),
+                ->label('cuid'),
+            ExportColumn::make('email')
+                ->label('email'),
+            ExportColumn::make('username')
+                ->label('username'),
+            ExportColumn::make('first_name')
+                ->label('first_name'),
+            ExportColumn::make('last_name')
+                ->label('last_name'),
+            ExportColumn::make('mobile')
+                ->label('mobile'),
             ExportColumn::make('birth_date')
+                ->label('birth_date')
                 ->state(
                     fn (Customer $record) => $record->birth_date
-                        ?->format(Table::$defaultDateTimeDisplayFormat)
+                        ?->format('m/d/Y')
                 ),
             ExportColumn::make('gender')
+                ->label('gender')
                 ->state(
-                    fn (Customer $record) => $record->gender?->getLabel()
+                    fn (Customer $record) => $record->gender?->value
                 ),
             ExportColumn::make('status')
                 ->state(
-                    fn (Customer $record) => $record->status?->getLabel()
+                    fn (Customer $record) => $record->status?->value
                 ),
-            ExportColumn::make('birth_date')
-                ->state(
-                    fn (Customer $record) => $record->birth_date
-                        ?->format(Table::$defaultDateDisplayFormat)
-                ),
-            ExportColumn::make('tier.name'),
+            ExportColumn::make('tier.name')
+                ->label('tier'),
             ExportColumn::make('created_at')
                 ->state(
                     fn (Customer $record) => $record->created_at
