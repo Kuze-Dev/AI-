@@ -372,6 +372,10 @@ class SchemaFormBuilder extends Component
             ->collapsible()
             ->schema(array_map(fn (FieldData $field) => $this->generateFieldComponent($field), $repeaterFieldData->fields));
 
+        if ($repeaterFieldData->columns) {
+            $repeater->columns($repeaterFieldData->columns);
+        }
+
         if ($repeaterFieldData->min) {
             $repeater->minItems($repeaterFieldData->min);
         }

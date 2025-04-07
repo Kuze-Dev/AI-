@@ -653,6 +653,11 @@ class BlueprintResource extends Resource
                 Forms\Components\TextInput::make('max')
                     ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('columns')
+                    ->maxValue(12)
+                    ->allowedOnlyWholeNumber()
+                    ->columnSpan(2)
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 self::getFieldsSchema()
                     ->columnSpanFull(),
             ],
