@@ -13,6 +13,7 @@ use Domain\Product\Imports\ProductImporter;
 use Domain\Product\Imports\ProductVariantImporter;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Resources\Pages\ListRecords;
 
 class ListProducts extends ListRecords
@@ -44,12 +45,14 @@ class ListProducts extends ListRecords
             Actions\ExportAction::make('export_products')
                 ->exporter(ProductExporter::class)
                 ->columnMapping(false)
+                ->formats([ExportFormat::Csv, ExportFormat::Xlsx])
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('primary'),
 
             Actions\ExportAction::make('export_product_variants')
                 ->exporter(ProductVariantExporter::class)
                 ->columnMapping(false)
+                ->formats([ExportFormat::Csv, ExportFormat::Xlsx])
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('primary'),
 

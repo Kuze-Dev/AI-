@@ -30,8 +30,10 @@ class CreateDatabase implements ShouldQueue
 
     public function handle(DatabaseManager $databaseManager): ?bool
     {
+
+        $is_create_database = $this->tenant->getInternal('create_database') ? true : false;
         // Terminate execution of this job & other jobs in the pipeline
-        if ($this->tenant->getInternal('create_database') === false) {
+        if ($is_create_database === false) {
             return false;
         }
 
