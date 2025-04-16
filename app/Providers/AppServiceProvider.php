@@ -56,6 +56,7 @@ use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\Models\TenantApiCall;
 use Domain\Tenant\TenantSupport;
 use Domain\Tier\Models\Tier;
+use Filament\Actions\Exports\Downloaders\XlsxDownloader;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
@@ -219,5 +220,10 @@ class AppServiceProvider extends ServiceProvider
             clear: ClearDiscoveredSettingsCacheCommand::class,
             key: 'settings',
         );
+
+        $this->app->bind(XlsxDownloader::class, function () {
+            return new \App\Filament\Actions\Exports\Downloaders\XlsxDownloader;
+        });
+
     }
 }
