@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Csv\Reader as CsvReader;
 use League\Csv\Statement;
 use OpenSpout\Common\Entity\Row;
+use Illuminate\Support\Str;
 use OpenSpout\Writer\XLSX\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -34,7 +35,8 @@ class XlsxDownloader implements Downloader
             // }
 
             // return $response;
-
+            // Use the Storage facade to download the file
+            // and set the X-Vapor-Base64-Encode header
             return Storage::download(path: $filePath, name: null, headers: [
                 'X-Vapor-Base64-Encode' => 'True',
             ]);
@@ -63,11 +65,12 @@ class XlsxDownloader implements Downloader
             $writeRowsFromFile($directory.DIRECTORY_SEPARATOR.'headers.csv');
 
             foreach ($disk->files($directory) as $file) {
-                if (str($file)->endsWith('headers.csv')) {
+                /** phpstan doesn't allow use of global helpers */
+                if (Str::of($file)->endsWith('headers.csv')) {
                     continue;
                 }
-
-                if (! str($file)->endsWith('.csv')) {
+                /** phpstan doesn't allow use of global helpers */
+                if (! Str::of($file)->endsWith('.csv')) {
                     continue;
                 }
 
