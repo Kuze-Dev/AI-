@@ -23,6 +23,5 @@ class ServiceData
         public readonly string $svc_description,
         public readonly string $max_dimension,
         public readonly int $max_weight,
-    ) {
-    }
+    ) {}
 }

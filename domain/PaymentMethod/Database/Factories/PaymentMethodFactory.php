@@ -16,6 +16,7 @@ class PaymentMethodFactory extends Factory
     protected $model = PaymentMethod::class;
 
     /** Define values of model instance. */
+    #[\Override]
     public function definition(): array
     {
         return [

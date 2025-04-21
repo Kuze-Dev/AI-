@@ -15,6 +15,7 @@ class ShippingMethodFactory extends Factory
 {
     protected $model = ShippingMethod::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

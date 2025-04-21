@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class GoogleRecaptchaProvider extends BaseProvider
 {
+    #[\Override]
     public function verify(string $token, ?string $ip = null): bool
     {
         $response = Http::asJson()

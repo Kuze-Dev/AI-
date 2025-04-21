@@ -10,15 +10,14 @@ use Illuminate\Support\Str;
 /**
  * @implements Arrayable<string, mixed>
  */
-class SectionData implements Arrayable
+readonly class SectionData implements Arrayable
 {
-    /** @param  array<FieldData>  $fields */
+    /** @param  array<int, FieldData>  $fields */
     private function __construct(
-        public readonly string $title,
-        public readonly string $state_name,
-        public readonly array $fields
-    ) {
-    }
+        public string $title,
+        public string $state_name,
+        public array $fields
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -33,7 +32,8 @@ class SectionData implements Arrayable
     }
 
     /** @return array<string, mixed> */
-    public function toArray()
+    #[\Override]
+    public function toArray(): array
     {
         return (array) $this;
     }

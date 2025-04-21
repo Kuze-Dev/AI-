@@ -17,11 +17,13 @@ class FormSettings extends Settings
 
     public ?string $secret_key = null;
 
+    #[\Override]
     public static function group(): string
     {
         return 'form';
     }
 
+    #[\Override]
     public static function encrypted(): array
     {
         return [

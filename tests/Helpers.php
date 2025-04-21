@@ -4,33 +4,50 @@ declare(strict_types=1);
 
 use App\Features\CMS\CMSBase;
 use App\Features\ECommerce\ECommerceBase;
-use Database\Seeders\Tenant\Auth\PermissionSeeder;
-use Database\Seeders\Tenant\Auth\RoleSeeder;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
-use Domain\Tenant\Database\Factories\TenantFactory;
+use Domain\Customer\Database\Factories\CustomerFactory;
+use Domain\Customer\Models\Customer;
 use Domain\Tenant\Models\Tenant;
+use Domain\Tenant\TenantSupport;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\Repeater;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
 use Spatie\Activitylog\ActivitylogServiceProvider;
+use Spatie\Permission\Contracts\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\seed;
 
 function loginAsSuperAdmin(?Admin $admin = null): Admin
 {
-    return loginAsAdmin($admin)->assignRole(config('domain.role.super_admin'));
+    return loginAsAdmin($admin); // ->assignRole(config()->string('domain.role.super_admin'));
 }
 
 function loginAsAdmin(?Admin $admin = null): Admin
 {
-    $admin ??= AdminFactory::new()
-        ->createOne();
+    $admin ??= (
+        Admin::where(['email' => 'admin@admin.com'])->first()
+        ?? AdminFactory::new()->createOne(['email' => 'admin@admin.com'])
+    );
+
+    $role = app(Role::class)
+        ->createOrFirst(['name' => config()->string('domain.role.super_admin')]);
+
+    $admin->syncRoles($role);
 
     return tap($admin, actingAs(...));
+}
+
+function loginAsCustomer(?Customer $customer = null): Customer
+{
+    $customer ??= CustomerFactory::new()
+        ->createOne();
+
+    return tap($customer, actingAs(...));
 }
 
 function loginAsUser(?Admin $user = null): Admin
@@ -52,7 +69,7 @@ function assertActivityLogged(
     assertDatabaseHas(
         ActivitylogServiceProvider::determineActivityModel(),
         array_filter([
-            'log_name' => $logName ?? config('activitylog.default_log_name'),
+            // 'log_name' => $logName ?? config('activitylog.default_log_name'),
             'event' => $event,
             'description' => $description,
             'properties' => $properties ? json_encode($properties) : null,
@@ -64,27 +81,30 @@ function assertActivityLogged(
     );
 }
 
-function testInTenantContext(): Tenant
+function testInTenantContext(array|string|null $features = null): Tenant
 {
+    tenancy()->initialize($tenant = Tenant::first());
 
-    /** @var Tenant */
-    $tenant = TenantFactory::new()->createOne(['name' => 'testing']);
+    URL::useOrigin('http://foo.hasp.test');
 
-    $domain = 'test.'.parse_url(config('app.url'), PHP_URL_HOST);
+    Filament::setCurrentPanel(Filament::getPanels()['tenant']);
 
-    $tenant->createDomain(['domain' => $domain]);
+    /**
+     * since Livewire doesn't need to keep track of the UUIDs in a test,
+     * you can disable the UUID generation and replace them with numeric keys,
+     * using the Repeater::fake() method at the start of your test:
+     *
+     * https://filamentphp.com/docs/3.x/forms/fields/repeater#customizing-the-repeater-item-actions
+     */
+    Repeater::fake();
 
-    $tenant->features()->activate(CMSBase::class);
-    $tenant->features()->activate(ECommerceBase::class);
-
-    URL::forceRootUrl(Request::getScheme().'://'.$domain);
-
-    tenancy()->initialize($tenant);
-
-    seed([
-        PermissionSeeder::class,
-        RoleSeeder::class,
-    ]);
+    activateFeatures(
+        collect($features ?? [])
+            ->merge([
+                CMSBase::class, ECommerceBase::class,
+            ])
+            ->toArray()
+    );
 
     return $tenant;
 }
@@ -105,4 +125,63 @@ function csvFiles(callable $fakeRows, int $rowCount = 10): Illuminate\Http\Testi
             name: 'import-file.csv',
             content: $content->join("\n")
         );
+}
+
+function activateFeatures(string|array $features): void
+{
+    if (blank($features)) {
+        return;
+    }
+
+    $tenant = TenantSupport::model();
+
+    foreach (Arr::wrap($features) as $feature) {
+        $tenant->features()->activate($feature);
+    }
+
+}
+function deactivateFeatures(string|array $features): void
+{
+    if (blank($features)) {
+        return;
+    }
+
+    $tenant = TenantSupport::model();
+
+    foreach (Arr::wrap($features) as $feature) {
+        $tenant->features()->deactivate($feature);
+    }
+
+}
+
+/**
+ * @template TObject as object
+ *
+ * @param  class-string<TObject>|TObject  $object
+ * @return TObject|\Mockery\MockInterface
+ */
+function mock_expect(string|object $object, callable ...$methods): mixed
+{
+    /** @var TObject|\Mockery\MockInterface $mock */
+    $mock = mock($object);
+
+    foreach ($methods as $method => $expectation) {
+        /* @phpstan-ignore-next-line */
+        $m = $mock
+            ->shouldReceive((string) $method)
+            ->atLeast()
+            ->once();
+
+        $m->andReturnUsing($expectation);
+    }
+
+    return $mock;
+
+    //
+    //    return mock($object)
+    //        ->shouldReceive((string) $method)
+    //        ->atLeast()
+    //        ->once()
+    //        ->andReturnUsing($expectation);
+
 }

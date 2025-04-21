@@ -15,8 +15,7 @@ class EnsureLoginIsNotThrottled
 {
     public function __construct(
         protected RateLimiter $limiter
-    ) {
-    }
+    ) {}
 
     public function handle(LoginData $loginData, callable $next): LoginResult
     {

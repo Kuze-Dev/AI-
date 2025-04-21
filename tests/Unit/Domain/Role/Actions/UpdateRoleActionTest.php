@@ -27,7 +27,7 @@ it('can update role', function () {
 });
 
 it('can\' update super admin role', function () {
-    $role = Role::create(['name' => config('domain.role.super_admin')]);
+    $role = Role::create(['name' => config()->string('domain.role.super_admin')]);
 
     app(UpdateRoleAction::class)->execute($role, new RoleData(name: 'Administrator'));
 })->throws(CantModifySuperAdminRoleException::class);

@@ -11,6 +11,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\View\Components\Info;
 use Illuminate\Console\View\Components\Task;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class DropTenantDatabasesCommand extends Command
@@ -29,9 +30,10 @@ class DropTenantDatabasesCommand extends Command
 
         $tenants = Tenant::all();
 
-        $databases = collect(DB::getDoctrineSchemaManager()->listDatabases())
-            ->filter(fn (string $database) => Str::startsWith($database, config('tenancy.database.prefix')))
-            ->reject(fn (string $database) => in_array($database, $tenants->pluck('tenancy_db_name')->toArray()));
+        $databases = collect(DB::select('SHOW DATABASES'))
+            ->pluck('Database')
+            ->filter(fn (string $database) => Str::startsWith($database, config()->string('tenancy.database.prefix')))
+            ->reject(fn (string $database) => in_array($database, $tenants->pluck('tenancy_db_name')->toArray(), true));
 
         if ($databases->isEmpty()) {
             (new Info($this->output))->render('Nothing to drop.');
@@ -45,7 +47,7 @@ class DropTenantDatabasesCommand extends Command
             fn (string $database) => (new Task($this->output))
                 ->render($database, function () use ($database) {
                     try {
-                        DB::getDoctrineSchemaManager()->dropDatabase($database);
+                        Schema::dropDatabaseIfExists($database);
 
                         return true;
                     } catch (Exception $e) {

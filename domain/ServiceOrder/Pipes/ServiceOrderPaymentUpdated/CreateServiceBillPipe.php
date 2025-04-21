@@ -7,15 +7,13 @@ namespace Domain\ServiceOrder\Pipes\ServiceOrderPaymentUpdated;
 use Domain\ServiceOrder\Actions\GetServiceBillingAndDueDateAction;
 use Domain\ServiceOrder\DataTransferObjects\GetServiceBillingAndDueData;
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentUpdatedPipelineData;
-use Domain\ServiceOrder\Jobs\CreateServiceBillJob;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
 
 class CreateServiceBillPipe
 {
     public function __construct(
-        private GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
-    ) {
-    }
+        private readonly GetServiceBillingAndDueDateAction $getServiceBillingAndDueDateAction
+    ) {}
 
     public function handle(
         ServiceOrderPaymentUpdatedPipelineData $serviceOrderPaymentUpdatedPipelineData,
@@ -34,17 +32,14 @@ class CreateServiceBillPipe
             $shouldCreateNewServiceBill
         ) {
             /** @var \Illuminate\Foundation\Bus\PendingDispatch $createServiceBillJob */
-            $createServiceBillJob = CreateServiceBillJob::dispatch(
-                $serviceOrder,
-                $this->getServiceBillingAndDueDateAction
-                    ->execute(
-                        new GetServiceBillingAndDueData(
-                            service_order: $serviceOrder,
-                            service_bill: $serviceBill,
-                            service_transaction: $serviceTransaction
-                        )
+            $createServiceBillJob = dispatch(new \Domain\ServiceOrder\Jobs\CreateServiceBillJob($serviceOrder, $this->getServiceBillingAndDueDateAction
+                ->execute(
+                    new GetServiceBillingAndDueData(
+                        service_order: $serviceOrder,
+                        service_bill: $serviceBill,
+                        service_transaction: $serviceTransaction
                     )
-            );
+                )));
 
             $createServiceBillJob->chain([
                 new NotifyCustomerLatestServiceBillJob($serviceOrder),

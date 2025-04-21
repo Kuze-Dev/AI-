@@ -35,6 +35,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @property string $slug
  * @property Visibility $visibility
  * @property string|null $draftable_id
+ * @property string|null $translation_id
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -89,23 +90,27 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
         'translation_id',
     ];
 
-    /**
-     * Columns that are converted
-     * to a specific data type.
-     */
-    protected $casts = [
-        'visibility' => Visibility::class,
-        'published_at' => 'datetime',
-    ];
-
     protected $with = [
         'pageDraft',
     ];
 
     /**
+     * Columns that are converted
+     * to a specific data type.
+     */
+    protected function casts(): array
+    {
+        return [
+            'visibility' => Visibility::class,
+            'published_at' => 'datetime',
+        ];
+    }
+
+    /**
      * Define default reference
      * for meta data properties.
      */
+    #[\Override]
     public function defaultMetaData(): array
     {
         return [
@@ -113,13 +118,14 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
         ];
     }
 
-    //create a titleAttribute for name field
+    // create a titleAttribute for name field
     public function getTitleAttribute(): string
     {
         return $this->draftable_id ? $this->name.' (Draft)' : $this->name;
     }
 
     /** @return PageBuilder<self> */
+    #[\Override]
     public function newEloquentBuilder($query): PageBuilder
     {
         return new PageBuilder($query);
@@ -133,24 +139,25 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return HasMany<BlockContent> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Page\Models\BlockContent, $this> */
     public function blockContents(): HasMany
     {
         return $this->hasMany(BlockContent::class);
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Page\Models\Page, $this> */
     public function pageDraft(): HasOne
     {
         return $this->hasOne(Page::class, 'draftable_id');
     }
 
-    /** @return BelongsTo<self, Page> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Page\Models\Page, $this> */
     public function parentPage(): BelongsTo
     {
         return $this->belongsTo(Page::class, 'draftable_id');
@@ -165,24 +172,25 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
+    #[\Override]
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
         return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 
-    /** @return BelongsTo<Admin, Page> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, $this> */
     public function author(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'author_id');
     }
 
-    /** @return HasMany<Page> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Page\Models\Page, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<Page, Page> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Page\Models\Page, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

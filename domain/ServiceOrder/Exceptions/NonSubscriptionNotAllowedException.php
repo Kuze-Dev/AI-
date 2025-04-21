@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class NonSubscriptionNotAllowedException extends LogicException
-{
-}
+class NonSubscriptionNotAllowedException extends LogicException {}

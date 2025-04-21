@@ -10,9 +10,8 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceBillMilestonePipelineData;
 class UpdatePaymentPlanPipe
 {
     public function __construct(
-        private UpdatePaymentPlanAction $updatePaymentPlanAction,
-    ) {
-    }
+        private readonly UpdatePaymentPlanAction $updatePaymentPlanAction,
+    ) {}
 
     public function handle(
         ServiceBillMilestonePipelineData $serviceBillMilestonePipelineData,

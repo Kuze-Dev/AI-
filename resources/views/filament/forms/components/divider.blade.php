@@ -1,1 +1,1 @@
-<x-filament::hr />
+<hr/>

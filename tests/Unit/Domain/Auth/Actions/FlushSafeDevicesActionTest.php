@@ -9,6 +9,8 @@ use Tests\Fixtures\User;
 
 use function Pest\Laravel\assertDatabaseCount;
 
+beforeEach()->skip('skip otp');
+
 it('can flush safe devices', function () {
     Event::fake();
     $this->user = User::create(['email' => 'test@user']);

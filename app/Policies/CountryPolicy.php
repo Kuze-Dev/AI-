@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Address\Models\Country;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -16,7 +17,7 @@ class CountryPolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
+        if (TenantFeatureSupport::inactive(ECommerceBase::class)) {
             return Response::denyAsNotFound();
         }
 

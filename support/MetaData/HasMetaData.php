@@ -9,7 +9,11 @@ use Support\MetaData\Models\MetaData;
 
 trait HasMetaData
 {
-    /** @return MorphOne<MetaData> */
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Support\MetaData\Models\MetaData, $this>
+     *
+     *  @phpstan-ignore method.childReturnType, method.childReturnType, method.childReturnType, method.childReturnType
+     */
     public function metaData(): MorphOne
     {
         return $this->morphOne(MetaData::class, 'model');

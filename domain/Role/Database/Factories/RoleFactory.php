@@ -14,6 +14,7 @@ class RoleFactory extends Factory
 {
     protected $model = Role::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

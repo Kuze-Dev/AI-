@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Rules\FullyQualifiedDomainNameRule;
 use App\FilamentTenant\Resources\SiteResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Resources\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Http;
@@ -23,64 +24,64 @@ use Throwable;
 
 class SiteResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Site::class;
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(ignoreRecord: true),
                     Forms\Components\TextInput::make('domain')
                         ->required()
                         ->unique(ignoreRecord: true)
-                        ->rules([new FullyQualifiedDomainNameRule()])
+                        ->rules([new FullyQualifiedDomainNameRule])
                         ->maxLength(100)
                         ->reactive()
-                        ->formatStateUsing(function (?string $state): ?string {
-                            return $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null;
-                        })
-                        ->dehydrateStateUsing(fn ($state) => $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null)
+                        ->formatStateUsing(fn (?string $state): ?string => $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $state) : null)
+                        ->dehydrateStateUsing(fn ($state) => $state ? preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', (string) $state) : null)
                         ->label(trans('Frontend Domain')),
                     Forms\Components\TextInput::make('deploy_hook'),
                     Forms\Components\Fieldset::make('Site Managers')
                         ->schema([
                             Forms\Components\CheckboxList::make('site_manager')
-                                ->disableLabel()
+                                ->hiddenLabel()
                                 ->columnSpanFull()
                                 ->searchable()
                                 ->formatStateUsing(fn (?Site $record) => $record ? $record->siteManager->pluck('id')->toArray() : [])
                                 ->columns(2)
-                                ->options(function () {
-                                    return \Domain\Admin\Models\Admin::permission('site.siteManager')
-                                        ->get()
-                                        ->pluck('site_label', 'id')
-                                        ->toArray();
-
-                                }),
+                                ->options(fn () => \Domain\Admin\Models\Admin::whereHas('roles.permissions', function ($query) {
+                                    $query->where('name', 'site.siteManager');
+                                })->orWhereHas('permissions', function ($query) {
+                                    $query->where('name', 'site.siteManager');
+                                })->get()
+                                    ->pluck('site_label', 'id')
+                                    ->toArray()),
                         ]),
                 ]),
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -99,11 +100,8 @@ class SiteResource extends Resource
                 Tables\Actions\Action::make('deploy')
                     ->button()
                     ->icon('heroicon-o-cog')
-                    ->color('secondary')
-                    ->disabled(function (Site $record) {
-
-                        return (bool) (is_null($record->deploy_hook));
-                    })
+                    ->color('gray')
+                    ->disabled(fn (Site $record) => (bool) (is_null($record->deploy_hook)))
                     ->action(function (Site $record) {
 
                         try {
@@ -170,12 +168,14 @@ class SiteResource extends Resource
             ]);
     }
 
-    protected static function shouldRegisterNavigation(): bool
+    #[\Override]
+    public static function shouldRegisterNavigation(): bool
     {
-        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) ?: false;
+        return TenantFeatureSupport::active(SitesManagement::class);
     }
 
     /** @return Builder<Site> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -184,6 +184,7 @@ class SiteResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -191,6 +192,7 @@ class SiteResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

@@ -6,72 +6,54 @@ namespace App\Filament\Resources\TenantResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\TenantResource;
-use Domain\Tenant\Actions\UpdateTenantAction;
-use Domain\Tenant\DataTransferObjects\TenantData;
-use Domain\Tenant\Models\Tenant;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
+/**
+ * @property-read \Domain\Tenant\Models\Tenant $record
+ * @property-read array{is_suspended:bool} $data
+ */
 class EditTenant extends EditRecord
 {
     use LogsFormActivity;
+    use Support;
 
     protected static string $resource = TenantResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
-            Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
-                ->requiresConfirmation(function ($livewire) {
-                    return $livewire->data['is_suspended'] == true ? true : false;
-                })
-                ->modalCancelAction(function ($livewire) {
-
-                    return Action::makeModalAction('redirect')
-                        ->label(trans('Cancel & Revert Changes'))
-                        ->color('secondary')
-                        ->url(TenantResource::getUrl('edit', [$this->record]));
-                })
-                ->modalHeading(fn ($livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
-                ->modalSubheading(fn ($livewire) => $livewire->data['is_suspended'] ? 'The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?' : null)
-                ->action('save')
-                ->keyBindings(['mod+s']),
+            $this->getSaveFormAction(),
             Actions\DeleteAction::make(),
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),
         ];
     }
 
-    protected function getRules(): array
+    #[\Override]
+    protected function getSaveFormAction(): Action
     {
-        return tap(
-            parent::getRules(),
-            fn (&$rules) => $rules['data.domains.*.domain'] = ['distinct']
-        );
+        return Action::make('save')
+            ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+            ->requiresConfirmation(fn (self $livewire) => $livewire->data['is_suspended'] === true)
+            ->modalCancelActionLabel(trans('Cancel & Revert Changes'))
+            ->modalHeading(fn (self $livewire) => $livewire->data['is_suspended'] ? 'Warning' : null)
+            ->modalDescription(
+                fn (self $livewire) => $livewire->data['is_suspended']
+                    ? trans('The suspend option is enabled. Please proceed with caution as this action will suspend the tenant. Would you like to proceed ?')
+                    : null
+            )
+            ->action(fn () => $this->save())
+            ->keyBindings(['mod+s']);
     }
 
-    protected function afterValidate(): void
+    public function afterSave(): void
     {
-        $this->validate();
-    }
+        /** @var array{features: array} $data */
+        $data = $this->form->getRawState();
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
-    /**
-     * @param  Tenant  $record
-     *
-     * @throws Throwable
-     */
-    protected function handleRecordUpdate(Model $record, array $data): Model
-    {
-        return DB::transaction(fn () => app(UpdateTenantAction::class)->execute($record, TenantData::fromArray($data)));
+        $this->record->syncFeature(self::getNormalizedFeatureNames($data['features']));
     }
 }

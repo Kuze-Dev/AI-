@@ -18,9 +18,7 @@ use function Pest\Laravel\postJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
-    testInTenantContext();
-
-    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
+    testInTenantContext(AllowGuestOrder::class);
 
     $country = Country::create([
         'code' => 'US',
@@ -43,7 +41,7 @@ beforeEach(function () {
         ]
     );
 
-    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver());
+    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver);
 
     ProductFactory::new()
         ->times(3)

@@ -6,6 +6,4 @@ namespace Domain\Page\Exceptions;
 
 use LogicException;
 
-class CantDeleteHomePageException extends LogicException
-{
-}
+class CantDeleteHomePageException extends LogicException {}

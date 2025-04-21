@@ -14,7 +14,7 @@ class UpdateServiceBillMilestoneAction
         $serviceOrder = $serviceBillMilestonePipelineData->service_order;
         $paymentPlan = $serviceBillMilestonePipelineData->payment_plan;
 
-        if ($serviceOrder->payment_value === PaymentPlanValue::PERCENT->value) {
+        if ($serviceOrder->payment_value === PaymentPlanValue::PERCENT) {
 
             $totalAmount = $serviceOrder->total_price * ($paymentPlan['amount'] / 100);
             $taxTotal = $serviceOrder->tax_total * ($paymentPlan['amount'] / 100);

@@ -65,7 +65,7 @@ class PasswordController extends Controller
         $customer = Customer::whereEmail($request->email)->first();
 
         if (! $result->failed() && ! is_null($customer)) {
-            Notification::send($customer, new SuccessResetPasswordNotification());
+            Notification::send($customer, new SuccessResetPasswordNotification);
 
             return response()->json(['message' => $result->getMessage()], 200);
         }
@@ -97,7 +97,7 @@ class PasswordController extends Controller
             fn () => app(EditCustomerPasswordAction::class)
                 ->execute($customer, $validated['password'])
         );
-        Notification::send($customer, new SuccessUpdatePasswordNotification());
+        Notification::send($customer, new SuccessUpdatePasswordNotification);
 
         return new JsonResponse(['message' => trans('Your password has been updated!')], 200);
     }

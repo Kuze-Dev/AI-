@@ -8,8 +8,7 @@ use Domain\Service\Databases\Factories\ServiceFactory;
 use Filament\Facades\Filament;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(ServiceBase::class);
     loginAsSuperAdmin();
 });
 

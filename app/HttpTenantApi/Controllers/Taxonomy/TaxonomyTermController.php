@@ -8,6 +8,8 @@ use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\TaxonomyTermResource;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -24,7 +26,18 @@ class TaxonomyTermController
 
         return TaxonomyTermResource::collection(
             QueryBuilder::for($taxonomy->taxonomyTerms())
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters(
+                    [
+                        'name',
+                        'slug',
+                        AllowedFilter::callback('data', function (Builder $query, string $value) {
+                            $query->whereRaw('JSON_SEARCH(data, "all", ?) IS NOT NULL', [$value]);
+                        }),
+                        AllowedFilter::callback('search_data', function (Builder $query, string $value) {
+                            $query->whereRaw('CAST(data AS CHAR) LIKE ?', ['%'.$value.'%']);
+                        }),
+                    ]
+                )
                 ->allowedIncludes([
                     'children',
                     'children.children',

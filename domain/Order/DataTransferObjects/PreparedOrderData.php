@@ -12,21 +12,20 @@ use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Models\TaxZone;
 
-class PreparedOrderData
+readonly class PreparedOrderData
 {
     public function __construct(
-        public readonly Customer $customer,
-        public readonly Address $shippingAddress,
-        public readonly Address $billingAddress,
-        public readonly Currency $currency,
-        public readonly ShippingMethod $shippingMethod,
-        public readonly PaymentMethod $paymentMethod,
-        public readonly mixed $cartLine,
-        public readonly ?TaxZone $taxZone,
-        public readonly ?string $notes,
-        public readonly ?Discount $discount,
-    ) {
-    }
+        public Customer $customer,
+        public Address $shippingAddress,
+        public Address $billingAddress,
+        public Currency $currency,
+        public ShippingMethod $shippingMethod,
+        public PaymentMethod $paymentMethod,
+        public mixed $cartLine,
+        public ?TaxZone $taxZone,
+        public ?string $notes,
+        public ?Discount $discount,
+    ) {}
 
     public static function fromArray(array $data): self
     {

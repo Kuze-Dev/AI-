@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Domain\Order\DataTransferObjects;
 
-class PlaceOrderData
+readonly class PlaceOrderData
 {
     public function __construct(
-        public readonly PlaceOrderAddressData $addresses,
-        public readonly string $cart_reference,
-        public readonly string $shipping_method,
-        public readonly string $payment_method,
-        public readonly ?string $notes,
-        public readonly ?string $discountCode,
-        public readonly int|string|null $serviceId = null,
-    ) {
-    }
+        public PlaceOrderAddressData $addresses,
+        public string $cart_reference,
+        public string $shipping_method,
+        public string $payment_method,
+        public ?string $notes,
+        public ?string $discountCode,
+        public int|string|null $serviceId = null,
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -8,6 +8,7 @@ use App\Features\Customer\AddressBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Address\Models\Address;
 use Domain\Customer\Models\Customer;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -17,7 +18,7 @@ class AddressPolicy
 
     public function before(?User $user, string $ability, mixed $address = null): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(AddressBase::class)) {
+        if (TenantFeatureSupport::inactive(AddressBase::class)) {
             return Response::denyAsNotFound();
         }
 

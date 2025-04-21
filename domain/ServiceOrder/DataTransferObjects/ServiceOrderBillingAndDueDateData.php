@@ -11,6 +11,5 @@ class ServiceOrderBillingAndDueDateData
     public function __construct(
         public Carbon $bill_date,
         public Carbon $due_date,
-    ) {
-    }
+    ) {}
 }

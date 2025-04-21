@@ -6,16 +6,15 @@ namespace Domain\Page\DataTransferObjects;
 
 use Illuminate\Http\UploadedFile;
 
-class BlockData
+readonly class BlockData
 {
     public function __construct(
-        public readonly string $name,
-        public readonly string $component,
-        public readonly UploadedFile|string|null $image = null,
-        public readonly string $blueprint_id,
-        public readonly bool $is_fixed_content,
-        public readonly ?array $data = null,
-        public readonly array $sites = []
-    ) {
-    }
+        public string $name,
+        public string $component,
+        public string $blueprint_id,
+        public bool $is_fixed_content,
+        public UploadedFile|string|array|null $image = null,
+        public ?array $data = null,
+        public array $sites = []
+    ) {}
 }

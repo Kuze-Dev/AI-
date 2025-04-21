@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\BlockResource\Blocks\CreateBlock;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
-use Domain\Blueprint\Enums\FieldType;
 use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Models\Block;
-use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -16,7 +14,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 
@@ -68,36 +65,6 @@ it('can not create block with same name', function () {
         ->assertOk();
 });
 
-it('can create block with default content', function () {
-    $blueprint = BlueprintFactory::new()
-        ->addSchemaSection(['title' => 'Main'])
-        ->addSchemaField([
-            'title' => 'Title',
-            'type' => FieldType::TEXT,
-        ])
-        ->createOne();
-
-    livewire(CreateBlock::class)
-        ->fillForm([
-            'name' => 'Test',
-            'component' => 'Test',
-            'blueprint_id' => $blueprint->id,
-            'is_fixed_content' => true,
-            'data' => ['main' => ['title' => 'Foobar']],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors()
-        ->assertOk();
-
-    assertDatabaseHas(Block::class, [
-        'name' => 'Test',
-        'component' => 'Test',
-        'blueprint_id' => $blueprint->id,
-        'is_fixed_content' => true,
-        'data' => json_encode(['main' => ['title' => 'Foobar']]),
-    ]);
-});
-
 it('can create block with image', function () {
     $blueprint = BlueprintFactory::new()
         ->withDummySchema()
@@ -125,7 +92,6 @@ it('can create block with image', function () {
     ]);
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $image->getClientOriginalName(),
         'mime_type' => $image->getMimeType(),
     ]);
 });

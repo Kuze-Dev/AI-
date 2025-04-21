@@ -39,8 +39,11 @@ class Currency extends Model
         'default',
     ];
 
-    protected $casts = [
-        'enabled' => 'bool',
-        'default' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'enabled' => 'bool',
+            'default' => 'bool',
+        ];
+    }
 }

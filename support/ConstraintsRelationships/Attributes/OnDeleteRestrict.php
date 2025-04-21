@@ -11,6 +11,5 @@ class OnDeleteRestrict
 {
     public function __construct(
         public readonly array $relations
-    ) {
-    }
+    ) {}
 }

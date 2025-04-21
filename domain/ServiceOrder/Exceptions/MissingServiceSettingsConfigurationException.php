@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class MissingServiceSettingsConfigurationException extends LogicException
-{
-}
+class MissingServiceSettingsConfigurationException extends LogicException {}

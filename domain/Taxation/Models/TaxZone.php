@@ -62,12 +62,15 @@ class TaxZone extends Model
         'percentage',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'is_default' => 'boolean',
-        'price_display' => PriceDisplay::class,
-        'type' => TaxZoneType::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'is_default' => 'boolean',
+            'price_display' => PriceDisplay::class,
+            'type' => TaxZoneType::class,
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -77,13 +80,13 @@ class TaxZone extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return BelongsToMany<Country> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Address\Models\Country, $this> */
     public function countries(): BelongsToMany
     {
         return $this->belongsToMany(Country::class, 'tax_zone_country');
     }
 
-    /** @return BelongsToMany<State> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Address\Models\State, $this> */
     public function states(): BelongsToMany
     {
         return $this->belongsToMany(State::class, 'tax_zone_state');

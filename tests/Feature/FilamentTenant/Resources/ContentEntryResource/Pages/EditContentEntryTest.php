@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\Internationalization;
 use App\FilamentTenant\Resources\ContentEntryResource\Pages\EditContentEntry;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
@@ -11,7 +12,7 @@ use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
-use Filament\Facades\Filament;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -25,7 +26,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
     LocaleFactory::createDefault();
@@ -643,8 +643,8 @@ it('can published existing content entry draft', function () {
 
 it('can create content entry translation', function () {
 
-    tenancy()->tenant->features()->activate(
-        \App\Features\CMS\Internationalization::class
+    TenantFeatureSupport::activate(
+        Internationalization::class
     );
 
     LocaleFactory::createDefault();
@@ -707,9 +707,8 @@ it('can create content entry translation', function () {
 });
 
 it('can update all non translatable Field in translation relation', function () {
-
-    tenancy()->tenant->features()->activate(
-        \App\Features\CMS\Internationalization::class
+    TenantFeatureSupport::activate(
+        Internationalization::class
     );
 
     LocaleFactory::createDefault();

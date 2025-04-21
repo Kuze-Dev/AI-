@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Rules;
 
 use Closure;
+use Domain\Tenant\Models\Tenant;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Connectors\ConnectionFactory;
-use Illuminate\Support\Arr;
 use PDOException;
 
 class CheckDatabaseConnection implements DataAwareRule, ValidationRule
@@ -16,14 +16,13 @@ class CheckDatabaseConnection implements DataAwareRule, ValidationRule
     protected array $data = [];
 
     public function __construct(
-        protected string $connectionTemplate,
-        protected string $databaseArrayPath
-    ) {
-    }
+        readonly protected string $connectionTemplate,
+    ) {}
 
-    public function setData($data)
+    #[\Override]
+    public function setData($data): self
     {
-        $this->data = Arr::get($data, $this->databaseArrayPath);
+        $this->data = $data['data'];
 
         return $this;
     }
@@ -31,6 +30,7 @@ class CheckDatabaseConnection implements DataAwareRule, ValidationRule
     /**
      * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (config("database.connections.{$this->connectionTemplate}.driver") === 'sqlite') {
@@ -44,11 +44,11 @@ class CheckDatabaseConnection implements DataAwareRule, ValidationRule
                 array_merge(
                     $connectionConfig,
                     [
-                        'host' => $this->data['host'],
-                        'port' => $this->data['port'],
-                        'database' => $this->data['name'],
-                        'username' => $this->data['username'],
-                        'password' => $this->data['password'],
+                        'host' => $this->data[Tenant::internalPrefix().'db_host'],
+                        'port' => $this->data[Tenant::internalPrefix().'db_port'],
+                        'database' => $this->data[Tenant::internalPrefix().'db_name'],
+                        'username' => $this->data[Tenant::internalPrefix().'db_username'],
+                        'password' => $this->data[Tenant::internalPrefix().'db_password'],
                     ]
                 )
             )->getPdo();

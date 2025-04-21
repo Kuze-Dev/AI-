@@ -10,10 +10,8 @@ use Illuminate\Contracts\Support\Arrayable;
 
 class CustomViewField extends ViewField
 {
-    /** @phpstan-ignore-next-line */
     protected array|Arrayable|string|Closure|null $dataFilter = null;
 
-    /** @phpstan-ignore-next-line */
     public function dataFilter(array|Arrayable|string|Closure|null $dataFilter): static
     {
         $this->dataFilter = $dataFilter;
@@ -26,7 +24,7 @@ class CustomViewField extends ViewField
         $dataFilter = $this->evaluate($this->dataFilter) ?? [];
 
         if (is_string($dataFilter) && function_exists('enum_exists') && enum_exists($dataFilter)) {
-            $dataFilter = collect($dataFilter::cases())->mapWithKeys(static fn ($case) => [($case?->value ?? $case->name) => $case->name]);
+            $dataFilter = collect($dataFilter::cases())->mapWithKeys(static fn ($case) => [($case->value ?? $case->name) => $case->name]);
         }
 
         if ($dataFilter instanceof Arrayable) {
@@ -36,6 +34,7 @@ class CustomViewField extends ViewField
         return $dataFilter;
     }
 
+    #[\Override]
     public function viewData(array|Closure $data): static
     {
 

@@ -57,7 +57,10 @@ class PaymentMethod extends Model implements HasMedia
 {
     use HasFactory;
     use HasSlug;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
     use SoftDeletes;
 
@@ -71,10 +74,13 @@ class PaymentMethod extends Model implements HasMedia
         'instruction',
     ];
 
-    protected $casts = [
-        'credentials' => 'array',
-        'status' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'credentials' => 'array',
+            'status' => 'bool',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -84,6 +90,7 @@ class PaymentMethod extends Model implements HasMedia
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logo')
@@ -94,6 +101,7 @@ class PaymentMethod extends Model implements HasMedia
      * Set the column reference
      * for route keys.
      */
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

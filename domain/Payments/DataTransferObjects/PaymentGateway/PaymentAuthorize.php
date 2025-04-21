@@ -11,8 +11,7 @@ class PaymentAuthorize
         public ?string $message = null,
         public ?string $url = null,
         public ?array $data = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

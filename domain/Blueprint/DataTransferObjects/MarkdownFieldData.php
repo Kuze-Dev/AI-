@@ -22,9 +22,9 @@ class MarkdownFieldData extends FieldData
         public readonly bool $translatable = true,
         public readonly array $buttons = [],
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -44,7 +44,7 @@ class MarkdownFieldData extends FieldData
             title: $data['title'],
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             buttons: $data['buttons'] ?? [],
             helper_text: $data['helper_text'] ?? null,
         );

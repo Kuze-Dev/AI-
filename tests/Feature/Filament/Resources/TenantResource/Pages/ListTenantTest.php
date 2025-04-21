@@ -17,6 +17,7 @@ it('can render page', function () {
 
 it('can list tenants', function () {
     $tenants = TenantFactory::new()
+        ->withDomains()
         ->count(5)
         ->create();
 

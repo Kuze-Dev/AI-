@@ -12,16 +12,14 @@ use Illuminate\Support\Carbon;
 
 class EarnPointAction
 {
-    public function __construct(private RewardPointsSettings $rewardPoint)
-    {
-    }
+    public function __construct(private readonly RewardPointsSettings $rewardPoint) {}
 
     /** Execute create collection query. */
     public function execute(Customer $customer, Order $order): PointEarning
     {
         $earnedPoints = ($order->total / $this->rewardPoint->minimum_amount) * $this->rewardPoint->equivalent_point;
 
-        $pointEarning = new PointEarning();
+        $pointEarning = new PointEarning;
 
         $pointEarning->create([
             'customer_type' => $customer->getMorphClass(),

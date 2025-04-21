@@ -49,7 +49,7 @@ class UpdateTaxZoneAction
     protected function saveStateTaxZone(TaxZone $taxZone, TaxZoneData $taxZoneData): void
     {
         if (count($taxZoneData->countries) > 1) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         $taxZone->countries()->sync($taxZoneData->countries);

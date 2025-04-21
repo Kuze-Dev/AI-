@@ -12,8 +12,7 @@ class UpdateServiceOrderData
         public readonly float $total_price,
         public readonly ?array $additional_charges,
         public readonly ?array $customer_form,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

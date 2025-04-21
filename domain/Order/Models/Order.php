@@ -12,6 +12,7 @@ use Domain\Payments\Models\Traits\HasPayments;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -104,7 +105,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class Order extends Model implements HasMedia, PayableInterface
 {
     use HasPayments;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
     use Notifiable;
 
@@ -135,54 +139,59 @@ class Order extends Model implements HasMedia, PayableInterface
         'cancelled_at',
     ];
 
-    protected $casts = [
-        'tax_total' => 'float',
-        'tax_display' => PriceDisplay::class,
-        'tax_percentage' => 'float',
-        'sub_total' => 'float',
-        'discount_total' => 'float',
-        'shipping_total' => 'float',
-        'total' => 'float',
-        'is_paid' => 'boolean',
-        'status' => OrderStatuses::class,
-        'cancelled_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'tax_total' => 'float',
+            'tax_display' => PriceDisplay::class,
+            'tax_percentage' => 'float',
+            'sub_total' => 'float',
+            'discount_total' => 'float',
+            'shipping_total' => 'float',
+            'total' => 'float',
+            'is_paid' => 'boolean',
+            'status' => OrderStatuses::class,
+            'cancelled_at' => 'datetime',
+        ];
+    }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'reference';
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Order\Models\Order> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, $this> */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Order\Models\OrderLine>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Order\Models\OrderLine, $this>*/
     public function orderLines(): HasMany
     {
         return $this->hasMany(OrderLine::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress, $this> */
     public function shippingAddress(): HasOne
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::SHIPPING);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Order\Models\OrderAddress, $this> */
     public function billingAddress(): HasOne
     {
         return $this->hasOne(OrderAddress::class)->where('type', OrderAddressTypes::BILLING);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ShippingMethod\Models\ShippingMethod, \Domain\Order\Models\Order> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\ShippingMethod\Models\ShippingMethod, $this> */
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class, 'shipping_method_id');
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function () {
@@ -202,8 +211,18 @@ class Order extends Model implements HasMedia, PayableInterface
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
+    /** @return Attribute<non-falsy-string, never>.  */
     public function getReferenceNumber(): string
     {
         return $this->reference;
+    }
+
+    /** @return Attribute<non-falsy-string, never> */
+    protected function customerFullName(): Attribute
+    {
+        return Attribute::get(
+            fn (): string => "{$this->customer_first_name} {$this->customer_last_name}"
+        );
     }
 }

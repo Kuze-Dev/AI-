@@ -16,12 +16,11 @@ use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
-class GuestCreateOrderLineAction
+readonly class GuestCreateOrderLineAction
 {
     public function __construct(
-        private readonly GuestCartSummaryAction $guestCartSummaryAction,
-    ) {
-    }
+        private GuestCartSummaryAction $guestCartSummaryAction,
+    ) {}
 
     public function execute(Order $order, GuestPlaceOrderData $placeOrderData, GuestPreparedOrderData $guestPreparedOrderData): void
     {

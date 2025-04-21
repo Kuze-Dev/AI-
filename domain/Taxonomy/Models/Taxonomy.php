@@ -36,6 +36,8 @@ use Support\RouteUrl\HasRouteUrl;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Blueprint $blueprint
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $routeUrls
+ * @property-read \Support\RouteUrl\Models\RouteUrl|null $activeRouteUrl
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Content> $contents
  * @property-read int|null $contents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Taxonomy\Models\TaxonomyTerm> $parentTerms
@@ -84,19 +86,19 @@ class Taxonomy extends Model implements HasRouteUrlContract
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return BelongsTo<Blueprint, Taxonomy> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
-    /** @return HasMany<TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function parentTerms(): HasMany
     {
         return $this->taxonomyTerms()->whereNull('parent_id')->ordered();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function taxonomyTerms(): HasMany
     {
         return $this->hasMany(TaxonomyTerm::class);
@@ -106,13 +108,14 @@ class Taxonomy extends Model implements HasRouteUrlContract
      * Declare relationship of
      * current model to contents.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Content\Models\Content>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Content\Models\Content, $this>
      */
     public function contents(): BelongsToMany
     {
         return $this->belongsToMany(Content::class);
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -127,13 +130,13 @@ class Taxonomy extends Model implements HasRouteUrlContract
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return HasMany<Taxonomy> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\Taxonomy, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<Taxonomy, Taxonomy> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

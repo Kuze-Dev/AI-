@@ -9,12 +9,10 @@ use App\FilamentTenant\Resources\FormResource;
 use Domain\Form\Actions\UpdateFormAction;
 use Domain\Form\DataTransferObjects\FormData;
 use Exception;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class EditForm extends EditRecord
 {
@@ -23,29 +21,24 @@ class EditForm extends EditRecord
     protected static string $resource = FormResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Form\Models\Form  $record
-     *
-     * @throws Throwable
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateFormAction::class)->execute($record, FormData::fromArray($data)));
+        return app(UpdateFormAction::class)->execute($record, FormData::fromArray($data));
     }
 }

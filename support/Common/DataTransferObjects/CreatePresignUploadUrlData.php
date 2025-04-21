@@ -9,8 +9,7 @@ class CreatePresignUploadUrlData
     public function __construct(
         public readonly string $ext,
         public readonly string $acl,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

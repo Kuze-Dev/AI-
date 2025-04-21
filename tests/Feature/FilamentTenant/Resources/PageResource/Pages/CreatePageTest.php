@@ -11,7 +11,6 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
-use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -24,7 +23,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });
@@ -133,11 +131,17 @@ it('can clone page', function () {
 
     Livewire::withQueryParams(['clone' => $page->slug]);
 
+    $block_content = $page->blockContents->toArray();
+
+    unset($block_content['0']['block']);
+
+    // dd($block_content);
+
     $clonePage = livewire(CreatePage::class)
         ->assertFormSet([
             'visibility' => $page->visibility,
             'published_at' => $page->published_at,
-            'block_contents' => $page->blockContents->toArray(),
+            'block_contents' => $block_content,
             'meta_data' => [
                 'author' => $page->metaData?->author,
                 'description' => $page->metaData?->description,

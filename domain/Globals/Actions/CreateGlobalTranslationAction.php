@@ -20,8 +20,7 @@ class CreateGlobalTranslationAction
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create content entry query. */
     public function execute(Globals $global, GlobalsData $globalData): Globals
@@ -37,7 +36,7 @@ class CreateGlobalTranslationAction
 
         $this->createBlueprintDataAction->execute($globalTranslation);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
             $globalTranslation->sites()->sync($globalData->sites);
         }

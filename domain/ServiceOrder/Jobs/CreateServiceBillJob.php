@@ -25,8 +25,7 @@ class CreateServiceBillJob implements ShouldBeUnique, ShouldQueue
     public function __construct(
         private ServiceOrder $serviceOrder,
         private ServiceOrderBillingAndDueDateData $serviceOrderBillingAndDueDateData
-    ) {
-    }
+    ) {}
 
     public function uniqueId(): string
     {

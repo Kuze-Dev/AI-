@@ -11,10 +11,9 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderPaymentUpdatedPipelineDa
 class GenerateServiceTransactionReceiptPipe
 {
     public function __construct(
-        private GenerateServiceTransactionReceiptAction $generateServiceTransactionReceiptAction,
-        private SendToCustomerServiceTransactionReceiptEmailAction $sendToCustomerServiceTransactionReceiptEmailAction
-    ) {
-    }
+        private readonly GenerateServiceTransactionReceiptAction $generateServiceTransactionReceiptAction,
+        private readonly SendToCustomerServiceTransactionReceiptEmailAction $sendToCustomerServiceTransactionReceiptEmailAction
+    ) {}
 
     public function handle(
         ServiceOrderPaymentUpdatedPipelineData $serviceOrderPaymentUpdatedPipelineData,

@@ -22,18 +22,21 @@ class PlaceOrderRequest extends FormRequest
         return [
             'addresses.shipping' => [
                 'required',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
-                    $customerId = auth()->user()?->id;
+                Rule::exists(Address::class, (new Address)->getRouteKeyName())->where(function ($query) {
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
 
-                    $query->where('customer_id', $customerId);
+                    $query->where('customer_id', $customer->id);
                 }),
             ],
             'addresses.billing' => [
                 'required',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())->where(function ($query) {
-                    $customerId = auth()->user()?->id;
+                Rule::exists(Address::class, (new Address)->getRouteKeyName())->where(function ($query) {
 
-                    $query->where('customer_id', $customerId);
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
+
+                    $query->where('customer_id', $customer->id);
                 }),
             ],
             'cart_reference' => [
@@ -41,8 +44,11 @@ class PlaceOrderRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $reference = $value;
 
-                    $cartLines = CartLine::whereHas('cart', function ($query) {
-                        $query->whereBelongsTo(auth()->user());
+                    /** @var \Domain\Customer\Models\Customer $customer */
+                    $customer = auth()->user();
+
+                    $cartLines = CartLine::whereHas('cart', function ($query) use ($customer) {
+                        $query->whereBelongsTo($customer);
                     })
                         ->whereCheckoutReference($reference)
                         ->where('checkout_expiration', '>', now())
@@ -67,14 +73,14 @@ class PlaceOrderRequest extends FormRequest
                     /** @var int|string $userId */
                     $userId = $customer->id;
 
-                    //auth check
+                    // auth check
                     $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($cartLineIds, $userId, $type);
                     if ($checkAuth !== count($cartLineIds)) {
                         $fail('Invalid cart line IDs.');
                     }
 
                     try {
-                        //stock check
+                        // stock check
                         $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($cartLineIds, $userId, $type);
                         if ($checkStocks !== count($cartLineIds)) {
                             $fail('Invalid stocks');
@@ -100,11 +106,11 @@ class PlaceOrderRequest extends FormRequest
             ],
             'payment_method' => [
                 'required',
-                Rule::exists(PaymentMethod::class, (new PaymentMethod())->getRouteKeyName()),
+                Rule::exists(PaymentMethod::class, (new PaymentMethod)->getRouteKeyName()),
             ],
             'shipping_method' => [
                 'required',
-                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+                Rule::exists(ShippingMethod::class, (new ShippingMethod)->getRouteKeyName()),
             ],
             'service_id' => [
                 'nullable',

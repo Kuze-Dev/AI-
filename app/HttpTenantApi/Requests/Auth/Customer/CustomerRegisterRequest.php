@@ -13,20 +13,15 @@ use Domain\Address\Models\State;
 use Domain\Auth\Enums\EmailVerificationType;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Customer\Enums\Gender;
+use Domain\Tenant\TenantFeatureSupport;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class CustomerRegisterRequest extends FormRequest
 {
-    protected function prepareForValidation(): void
-    {
-        Log::debug('register', $this->all());
-    }
-
     public function rules(): array
     {
 
@@ -45,11 +40,11 @@ class CustomerRegisterRequest extends FormRequest
             'gender' => ['nullable', Rule::enum(Gender::class)],
             'tier_id' => [
                 Rule::when(
-                    (bool) tenancy()->tenant?->features()->active(TierBase::class),
+                    TenantFeatureSupport::active(TierBase::class),
                     'required',
                     'nullable'
                 ),
-                Rule::exists(Tier::class, (new Tier())->getRouteKeyName()),
+                Rule::exists(Tier::class, (new Tier)->getRouteKeyName()),
             ],
             'birth_date' => 'nullable|date',
             'password' => ['required', 'confirmed', Password::default()],
@@ -58,17 +53,17 @@ class CustomerRegisterRequest extends FormRequest
         ];
 
         // Billing and shipping rules
-        if (tenancy()->tenant?->features()->active(AddressBase::class)) {
+        if (TenantFeatureSupport::active(AddressBase::class)) {
             $rules['billing.same_as_shipping'] = 'required|bool';
 
             $shippingRules = [
                 'shipping.country_id' => [
                     'required',
-                    Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+                    Rule::exists(Country::class, (new Country)->getRouteKeyName()),
                 ],
                 'shipping.state_id' => [
                     'required',
-                    Rule::exists(State::class, (new State())->getRouteKeyName())
+                    Rule::exists(State::class, (new State)->getRouteKeyName())
                         ->where(function (Builder $query) {
 
                             $country = app(Country::class)
@@ -86,11 +81,11 @@ class CustomerRegisterRequest extends FormRequest
             $billingRules = [
                 'billing.country_id' => [
                     'required_if:billing.same_as_shipping,0',
-                    Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+                    Rule::exists(Country::class, (new Country)->getRouteKeyName()),
                 ],
                 'billing.state_id' => [
                     'required_if:billing.same_as_shipping,0',
-                    Rule::exists(State::class, (new State())->getRouteKeyName())
+                    Rule::exists(State::class, (new State)->getRouteKeyName())
                         ->where(function (Builder $query) {
 
                             $country = app(Country::class)
@@ -118,6 +113,7 @@ class CustomerRegisterRequest extends FormRequest
         return $rules;
     }
 
+    #[\Override]
     public function messages(): array
     {
         return [
@@ -157,6 +153,7 @@ class CustomerRegisterRequest extends FormRequest
         ];
     }
 
+    #[\Override]
     public function attributes(): array
     {
         return [

@@ -13,8 +13,7 @@ class TestNotification extends Notification
 
     public function __construct(
         protected readonly string $message,
-    ) {
-    }
+    ) {}
 
     /** @return non-empty-string */
     public static function databaseType(): string

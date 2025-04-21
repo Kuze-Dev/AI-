@@ -14,8 +14,7 @@ class UpdateCustomerProfileImageAction
 {
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
-    ) {
-    }
+    ) {}
 
     public function execute(Customer $customer, UploadedFile $uploadedFile): bool
     {

@@ -24,6 +24,7 @@ use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -61,6 +62,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property TierApprovalStatus|null $tier_approval_status
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Address> $addresses
@@ -113,7 +115,11 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
     use ConstraintsRelationships;
     use EmailVerificationOTP;
     use HasApiTokens;
+    use HasUuids;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
     use Notifiable;
     use SoftDeletes;
@@ -140,18 +146,28 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         'password',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-        'birth_date' => 'date',
-        'data' => 'array',
-        'status' => Status::class,
-        'gender' => Gender::class,
-        'email_verification_type' => EmailVerificationType::class,
-        'register_status' => RegisterStatus::class,
-        'email_verified_at' => 'datetime',
-        'tier_approval_status' => TierApprovalStatus::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'birth_date' => 'date',
+            'data' => 'array',
+            'status' => Status::class,
+            'gender' => Gender::class,
+            'email_verification_type' => EmailVerificationType::class,
+            'register_status' => RegisterStatus::class,
+            'email_verified_at' => 'datetime',
+            'tier_approval_status' => TierApprovalStatus::class,
+        ];
+    }
 
+    #[\Override]
+    public function uniqueIds(): array
+    {
+        return ['cuid'];
+    }
+
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'cuid';
@@ -166,7 +182,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return Attribute<string, never> */
+    /** @return Attribute<non-falsy-string, never> */
     protected function fullName(): Attribute
     {
         return Attribute::get(
@@ -174,6 +190,7 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
         );
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
@@ -185,58 +202,61 @@ class Customer extends Authenticatable implements HasEmailVerificationOTP, HasMe
             ->acceptsFile(fn () => ['application/pdf']);
     }
 
+    #[\Override]
     public function newEloquentBuilder($query): CustomerQueryBuilder
     {
         return new CustomerQueryBuilder($query);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, \Domain\Customer\Models\Customer> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Tier\Models\Tier, $this> */
     public function tier(): BelongsTo
     {
         return $this->belongsTo(Tier::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\Address> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Address\Models\Address, $this> */
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
 
+    #[\Override]
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmail());
+        $this->notify(new VerifyEmail);
     }
 
+    #[\Override]
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPassword($token));
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite, $this> */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Discount\Models\DiscountLimit, $this> */
     public function discountLimits(): HasMany
     {
         return $this->hasMany(DiscountLimit::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Shipment\Models\VerifiedAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Shipment\Models\VerifiedAddress, $this> */
     public function verifiedAddress(): HasOne
     {
         return $this->hasOne(VerifiedAddress::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrder>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrder, $this>*/
     public function serviceOrders(): HasMany
     {
         return $this->hasMany(ServiceOrder::class);
     }
 
-    /** @return MorphMany<BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Blueprint\Models\BlueprintData, $this> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class, 'model');

@@ -36,7 +36,7 @@ class UpdateBlockAction
         ]);
 
         if ($blockData->image instanceof UploadedFile && $imageString = $blockData->image->get()) {
-            $block->addMediaFromString($imageString)
+            $block->addmedia($blockData->image)
                 ->usingFileName($blockData->image->getClientOriginalName())
                 ->usingName(pathinfo($blockData->image->getClientOriginalName(), PATHINFO_FILENAME))
                 ->toMediaCollection('image');
@@ -46,7 +46,7 @@ class UpdateBlockAction
             $block->clearMediaCollection('image');
         }
 
-        // if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        // if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
         $block->sites()
             ->sync($blockData->sites);
         // }

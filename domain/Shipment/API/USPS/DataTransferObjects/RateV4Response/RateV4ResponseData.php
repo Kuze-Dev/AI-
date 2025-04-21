@@ -10,8 +10,7 @@ class RateV4ResponseData implements RateResponse
 {
     public function __construct(
         public readonly PackageData $package,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -33,11 +32,13 @@ class RateV4ResponseData implements RateResponse
         );
     }
 
+    #[\Override]
     public function getRateResponseAPI(): array
     {
         return ['is_united_state_domestic' => true] + get_object_vars($this);
     }
 
+    #[\Override]
     public function getRate(int|string|null $serviceID = null): float
     {
         return $this->package->postage->rate;

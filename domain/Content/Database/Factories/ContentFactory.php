@@ -19,6 +19,7 @@ class ContentFactory extends Factory
     protected $model = Content::class;
 
     /** Define values of model instance. */
+    #[\Override]
     public function definition(): array
     {
         $name = $this->faker->unique()->word();

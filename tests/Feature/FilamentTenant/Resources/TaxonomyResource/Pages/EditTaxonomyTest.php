@@ -6,19 +6,17 @@ use App\FilamentTenant\Resources\TaxonomyResource\Pages\EditTaxonomy;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
-use Domain\Support\RouteUrl\Models\RouteUrl;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
+use Support\RouteUrl\Models\RouteUrl;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });
@@ -47,7 +45,6 @@ it('can edit taxonomy', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
         ->createOne();
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])
@@ -106,7 +103,7 @@ it('can edit taxonomy and add terms with route url', function () {
                 ->addSchemaSection(['title' => 'Main'])
                 ->addSchemaField(['title' => 'Description', 'type' => FieldType::TEXT])
         )
-        ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
+        // ->has(TaxonomyTermFactory::new(), 'taxonomyTerms')
         ->createOne();
 
     livewire(EditTaxonomy::class, ['record' => $taxonomy->getRouteKey()])

@@ -41,9 +41,12 @@ class FormSubmission extends Model
         'data',
     ];
 
-    protected $casts = [
-        'data' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -53,7 +56,7 @@ class FormSubmission extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Form\Models\Form, \Domain\Form\Models\FormSubmission> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Form\Models\Form, $this> */
     public function form(): BelongsTo
     {
         return $this->belongsTo(Form::class);

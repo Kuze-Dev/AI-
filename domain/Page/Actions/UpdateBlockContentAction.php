@@ -17,8 +17,7 @@ class UpdateBlockContentAction
 
     public function __construct(
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     public function execute(BlockContent $blockContent, BlockContentData $blockContentData): BlockContent
     {
@@ -29,14 +28,14 @@ class UpdateBlockContentAction
 
         $blockContent->update([
             'block_id' => $blockContentData->block_id,
-            'data' => $sanitizeData ? $sanitizeData : null,
+            'data' => $sanitizeData ?: null,
         ]);
 
         /** @var Page */
         $page = $blockContent->page;
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
             is_null($page->draftable_id)
         ) {
 

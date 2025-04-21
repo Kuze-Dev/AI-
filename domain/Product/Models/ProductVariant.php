@@ -7,7 +7,7 @@ namespace Domain\Product\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Image\Manipulations;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Support\ConstraintsRelationships\ConstraintsRelationships;
@@ -25,7 +25,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property bool $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Product\Models\Product|null $product
+ * @property-read \Domain\Product\Models\Product $product
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductVariant newQuery()
@@ -46,6 +46,8 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
 class ProductVariant extends Model implements HasMedia
 {
     use ConstraintsRelationships;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     protected $fillable = [
@@ -62,10 +64,13 @@ class ProductVariant extends Model implements HasMedia
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [
-        'combination' => 'array',
-        'status' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'combination' => 'array',
+            'status' => 'boolean',
+        ];
+    }
 
     /**
      * Get the stringify combination (array)
@@ -94,20 +99,21 @@ class ProductVariant extends Model implements HasMedia
      * Declare relationship of
      * current model to product.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Product\Models\ProductVariant>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, $this>
      */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')
-                    ->fit(Manipulations::FIT_CROP, 300, 300);
+                    ->fit(Fit::Crop, 300, 300);
             });
 
         $this->addMediaCollection('video')

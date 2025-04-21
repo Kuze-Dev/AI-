@@ -77,7 +77,7 @@ class GuestCartSummaryController extends Controller
                     $request->getShippingMethod()
                 ),
                 $discount,
-                $serviceId ? $serviceId : null
+                $serviceId ?: null
             );
 
             $responseArray = [

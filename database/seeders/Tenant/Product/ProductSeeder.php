@@ -31,9 +31,9 @@ class ProductSeeder extends Seeder
 
         $taxonomyTermIds = TaxonomyTerm::whereIn('slug', ['brand-one', 'clothing'])->pluck('id');
 
-        $bar = $this->command->getOutput()->createProgressBar(count($this->data()['products']));
+        $bar = $this->command->getOutput()->createProgressBar(count(static::data()['products']));
 
-        foreach ($this->data()['products'] as $product) {
+        foreach (static::data()['products'] as $product) {
             unset($product['image_url']);
 
             $product = ProductFactory::new($product)
@@ -70,12 +70,12 @@ class ProductSeeder extends Seeder
 
     public function seedBrandAndCategories(): void
     {
-        $taxonomies = $this->data()['taxonomies'];
+        $taxonomies = static::data()['taxonomies'];
         $blueprintId = null;
-        $blueprintId = Blueprint::whereName($this->data()['blueprint_for_taxonomy']['name'])->value('id');
+        $blueprintId = Blueprint::whereName(static::data()['blueprint_for_taxonomy']['name'])->value('id');
 
         if (! $blueprintId) {
-            $blueprintId = BlueprintFactory::new($this->data()['blueprint_for_taxonomy'])->create()->id ?? null;
+            $blueprintId = BlueprintFactory::new(static::data()['blueprint_for_taxonomy'])->create()->id ?? null;
         }
 
         // Seed Brand and Category in Taxonomy

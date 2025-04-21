@@ -13,19 +13,5 @@ class OrderPlacedEvent
 {
     use SerializesModels;
 
-    public Order $order;
-
-    public PreparedOrderData $preparedOrderData;
-
-    public PlaceOrderData $placeOrderData;
-
-    public function __construct(
-        Order $order,
-        PreparedOrderData $preparedOrderData,
-        PlaceOrderData $placeOrderData
-    ) {
-        $this->order = $order;
-        $this->preparedOrderData = $preparedOrderData;
-        $this->placeOrderData = $placeOrderData;
-    }
+    public function __construct(public Order $order, public PreparedOrderData $preparedOrderData, public PlaceOrderData $placeOrderData) {}
 }

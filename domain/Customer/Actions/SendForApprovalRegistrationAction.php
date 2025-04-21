@@ -16,7 +16,7 @@ class SendForApprovalRegistrationAction
             return false;
         }
 
-        $customer->notify(new ForApprovalRegistrationNotification());
+        $customer->notify(new ForApprovalRegistrationNotification);
 
         return true;
     }

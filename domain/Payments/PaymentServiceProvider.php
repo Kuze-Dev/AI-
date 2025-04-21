@@ -10,13 +10,15 @@ use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
 use Domain\Payments\Providers\StripeProvider;
 use Domain\Payments\Providers\VisionPayProvider;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
 
 class PaymentServiceProvider extends ServiceProvider implements DeferrableProvider
 {
-    public function register()
+    #[\Override]
+    public function register(): void
     {
         $this->app->singleton(
             PaymentManagerInterface::class,
@@ -28,21 +30,19 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
 
     public function boot(): void
     {
-        if (tenancy()->initialized) {
+        if (TenantSupport::initialized()) {
 
             $paymentMethods = PaymentMethod::all();
 
             if ($paymentMethods->count() > 0) {
                 foreach ($paymentMethods as $paymentType) {
-                    app(PaymentManagerInterface::class)->extend($paymentType->slug, function () use ($paymentType) {
-                        return match ($paymentType->gateway) {
-                            'paypal' => new PaypalProvider(),
-                            'manual' => new OfflinePayment(),
-                            'stripe' => new StripeProvider(),
-                            'bank-transfer' => new OfflinePayment(),
-                            'vision-pay' => new VisionPayProvider(),
-                            default => throw new InvalidArgumentException(),
-                        };
+                    app(PaymentManagerInterface::class)->extend($paymentType->slug, fn () => match ($paymentType->gateway) {
+                        'paypal' => new PaypalProvider,
+                        'manual' => new OfflinePayment,
+                        'stripe' => new StripeProvider,
+                        'bank-transfer' => new OfflinePayment,
+                        'vision-pay' => new VisionPayProvider,
+                        default => throw new InvalidArgumentException,
                     });
                 }
             }
@@ -50,7 +50,8 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
 
     }
 
-    public function provides()
+    #[\Override]
+    public function provides(): array
     {
 
         return [

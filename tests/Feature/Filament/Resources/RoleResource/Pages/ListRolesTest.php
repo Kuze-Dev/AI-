@@ -5,15 +5,20 @@ declare(strict_types=1);
 use App\Filament\Resources\RoleResource\Pages\ListRoles;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Role\Database\Factories\RoleFactory;
-use Filament\Pages\Actions\DeleteAction;
+use Filament\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Spatie\Permission\Models\Permission;
+use Tests\TestSeeder;
 
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\assertModelMissing;
+use function Pest\Laravel\seed;
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsSuperAdmin());
+beforeEach(function () {
+    seed(TestSeeder::class);
+    loginAsSuperAdmin();
+});
 
 it('can list', function () {
     $roles = RoleFactory::new()->count(9)->create();
@@ -53,5 +58,7 @@ it('can not delete role with existing user', function () {
 
     livewire(ListRoles::class)
         ->callTableAction(DeleteAction::class, $role)
-        ->assertNotified();
+        ->assertNotified(trans(
+            'Cannot Delete this Record',
+        ));
 });

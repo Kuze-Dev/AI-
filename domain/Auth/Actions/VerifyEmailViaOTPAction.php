@@ -8,12 +8,11 @@ use Domain\Auth\Contracts\HasEmailVerificationOTP;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Hash;
 
-class VerifyEmailViaOTPAction
+readonly class VerifyEmailViaOTPAction
 {
     public function __construct(
-        private readonly VerifyEmailAction $verifyEmail
-    ) {
-    }
+        private VerifyEmailAction $verifyEmail
+    ) {}
 
     public function execute(HasEmailVerificationOTP&MustVerifyEmail $user, string $otp): ?bool
     {

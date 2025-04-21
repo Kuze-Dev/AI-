@@ -16,6 +16,5 @@ class PackageData
         public readonly string $areas_served,
         public readonly string $additional_restriction,
         public readonly array $services,
-    ) {
-    }
+    ) {}
 }

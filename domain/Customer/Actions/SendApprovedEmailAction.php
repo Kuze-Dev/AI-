@@ -11,7 +11,7 @@ class SendApprovedEmailAction
 {
     public function execute(Customer $customer): bool
     {
-        $customer->notify(new ApprovedRegistrationNotification());
+        $customer->notify(new ApprovedRegistrationNotification);
 
         return true;
     }

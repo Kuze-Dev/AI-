@@ -7,7 +7,6 @@ namespace Domain\Blueprint\Actions;
 use App\Settings\CustomerSettings;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Blueprint\Enums\FieldType;
-use Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
@@ -24,8 +23,7 @@ class UpdateBlueprintDataAction
     public function __construct(
         protected ExtractDataAction $extractDataAction,
         protected CreateBlueprintDataAction $createBlueprintData,
-    ) {
-    }
+    ) {}
 
     public function execute(Model $model): void
     {
@@ -92,7 +90,7 @@ class UpdateBlueprintDataAction
             $statePath = $decopuledData->state_path;
             $newValue = $decopuledData->value;
 
-            if ($decopuledData->type == FieldType::MEDIA->value) {
+            if ($decopuledData->type === FieldType::MEDIA->value) {
 
                 $newValue = $decopuledData->getMedia('blueprint_media')->pluck('uuid')->toArray();
             }
@@ -132,10 +130,10 @@ class UpdateBlueprintDataAction
 
             $this->createBlueprintData->execute($model);
 
-            return $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first() ?: new BlueprintData();
+            return $blueprintData = BlueprintData::where('model_id', $blueprintDataData->model_id)->where('state_path', $blueprintDataData->state_path)->first() ?: new BlueprintData;
         }
 
-        if ($blueprintData->type == FieldType::MEDIA->value) {
+        if ($blueprintData->type === FieldType::MEDIA->value) {
 
             if (! $blueprintDataData->value) {
 
@@ -153,7 +151,7 @@ class UpdateBlueprintDataAction
                 $toUpload = $blueprintDataData->value;
                 $currentUploaded = $blueprintDataData->value;
 
-                //filter array with value that has filename extension
+                // filter array with value that has filename extension
 
                 $filtered = array_filter($toUpload, function ($value) {
                     $pathInfo = pathinfo($value);
@@ -182,27 +180,9 @@ class UpdateBlueprintDataAction
                     $currentMedia[] = $blueprintData->getMedia('blueprint_media')->last()?->uuid;
                 }
 
-                //media ordering..
-
                 $existingMedia = $blueprintData->getMedia('blueprint_media')->pluck('uuid')->toArray();
 
                 $updatedMedia = array_intersect($existingMedia, $currentMedia);
-
-                foreach ($currentMedia as $key => $media_uuid) {
-
-                    if (in_array($media_uuid, $updatedMedia)) {
-
-                        /** @var Media|null $media_item */
-                        $media_item = Media::where('uuid', $media_uuid)->first();
-
-                        if ($media_item) {
-                            $media_item->order_column = $key + 1;
-                            $media_item->save();
-                        }
-                    }
-
-                }
-
                 /**
                  *  $exceptedMedia = Media::whereIN('uuid', $updatedMedia)->get();
                  *  temporary disabled causing coversions to disappear only in production but working in local environment.
@@ -239,12 +219,12 @@ class UpdateBlueprintDataAction
 
         $statepaths = array_column($flattenData, 'statepath');
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore method.notFound */
         $removeBlueprintData = $model->blueprintData()->whereNotIn('state_path', $statepaths)->get();
 
         foreach ($flattenData as $item) {
 
-            /** @phpstan-ignore-next-line */
+            /** @phpstan-ignore method.notFound */
             $blueprint_data_entity = $model->BlueprintData()->where('state_path', $item['statepath'])->get();
 
             if ($blueprint_data_entity->count() > 1) {
@@ -252,7 +232,7 @@ class UpdateBlueprintDataAction
 
                 $minValue = min($blueprint_entity_id);
 
-                $key = array_search($minValue, $blueprint_entity_id);
+                $key = array_search($minValue, $blueprint_entity_id, true);
 
                 unset($blueprint_entity_id[$key]);
 
@@ -281,9 +261,9 @@ class UpdateBlueprintDataAction
 
             }
 
-            DeleteS3FilesFromDeletedBlueprintDataJob::dispatch(array_unique($toRemove));
+            dispatch(new \Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob(array_unique($toRemove)));
 
-            /** @phpstan-ignore-next-line */
+            /** @phpstan-ignore method.notFound */
             $model->blueprintData()->whereNotIn('state_path', $statepaths)->delete();
 
         }

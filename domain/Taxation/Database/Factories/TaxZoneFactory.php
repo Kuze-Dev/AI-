@@ -17,6 +17,7 @@ class TaxZoneFactory extends Factory
 {
     protected $model = TaxZone::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

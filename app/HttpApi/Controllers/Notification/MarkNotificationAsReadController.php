@@ -23,7 +23,7 @@ class MarkNotificationAsReadController
     public function __invoke(DatabaseNotification $databaseNotification): JsonResponse
     {
         app(MarkAsReadNotificationAction::class)
-            /** @phpstan-ignore-next-line  */
+            /** @phpstan-ignore argument.type  */
             ->execute(Auth::user(), $databaseNotification);
 
         return response()

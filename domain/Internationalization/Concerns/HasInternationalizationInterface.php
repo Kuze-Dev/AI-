@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 interface HasInternationalizationInterface
 {
-    /** @phpstan-ignore-next-line */
+    /** @phpstan-ignore missingType.generics */
     public function dataTranslation(): HasMany;
 }

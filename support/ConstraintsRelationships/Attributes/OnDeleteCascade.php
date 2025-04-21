@@ -11,6 +11,5 @@ class OnDeleteCascade
 {
     public function __construct(
         public readonly array $relations
-    ) {
-    }
+    ) {}
 }

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
+use App\Features\CMS\SitesManagement;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Models\Content;
+use Domain\Tenant\TenantFeatureSupport;
 
 class UpdateContentAction
 {
@@ -27,7 +29,8 @@ class UpdateContentAction
         $content->taxonomies()
             ->sync($contentData->taxonomies);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
+            filament_admin()->hasRole(config('domain.role.super_admin'))
         ) {
 
             $content->sites()

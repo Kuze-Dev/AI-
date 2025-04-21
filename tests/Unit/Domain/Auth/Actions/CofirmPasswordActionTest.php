@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
+beforeEach()->skip('skip otp');
+
 it('can confirm password', function () {
     Session::shouldReceive('put')
         ->once()

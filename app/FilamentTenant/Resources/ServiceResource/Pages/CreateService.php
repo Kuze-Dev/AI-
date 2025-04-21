@@ -6,14 +6,9 @@ namespace App\FilamentTenant\Resources\ServiceResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ServiceResource;
-use Domain\Service\Actions\CreateServiceAction;
-use Domain\Service\DataTransferObjects\ServiceData;
 use Exception;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class CreateService extends CreateRecord
 {
@@ -21,26 +16,24 @@ class CreateService extends CreateRecord
 
     protected static string $resource = ServiceResource::class;
 
-    /** @throws Throwable */
-    public function handleRecordCreation(array $data): Model
-    {
-        return DB::transaction(fn () => app(CreateServiceAction::class)->execute(ServiceData::fromArray($data)));
-    }
-
     /** @throws Exception */
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
             $this->getCreateAnotherFormAction(),
         ];
     }
 
-    protected function getFormActions(): array
+    #[\Override]
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        return $this->getCachedActions();
+        $data['pay_upfront'] ??= false;
+
+        return parent::mutateFormDataBeforeCreate($data);
     }
 }

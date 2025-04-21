@@ -10,13 +10,12 @@ use Illuminate\Contracts\Support\Arrayable;
 /**
  * @implements Arrayable<string, mixed>
  */
-class ManipulationData implements Arrayable
+readonly class ManipulationData implements Arrayable
 {
     public function __construct(
-        public readonly ManipulationType $type,
-        public readonly array $params = [],
-    ) {
-    }
+        public ManipulationType $type,
+        public array $params = [],
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -27,7 +26,8 @@ class ManipulationData implements Arrayable
     }
 
     /** @return array<string, mixed> */
-    public function toArray()
+    #[\Override]
+    public function toArray(): array
     {
         return (array) $this;
     }

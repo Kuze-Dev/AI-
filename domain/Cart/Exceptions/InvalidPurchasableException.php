@@ -6,6 +6,4 @@ namespace Domain\Cart\Exceptions;
 
 use LogicException;
 
-class InvalidPurchasableException extends LogicException
-{
-}
+class InvalidPurchasableException extends LogicException {}

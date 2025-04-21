@@ -11,11 +11,13 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
  */
 class MoneyCast implements CastsAttributes
 {
+    #[\Override]
     public function get($model, string $key, $value, array $attributes): float
     {
         return round(floatval($value) / 100, precision: 2);
     }
 
+    #[\Override]
     public function set($model, string $key, $value, array $attributes): float
     {
         return round(floatval($value) * 100);

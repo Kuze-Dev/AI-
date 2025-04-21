@@ -6,6 +6,7 @@ namespace App\HttpTenantApi\Controllers\Order\PrivateOrder;
 
 use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\OrderResource;
+use Domain\Customer\Models\Customer;
 use Domain\Order\Actions\PlaceOrderAction;
 use Domain\Order\Actions\UpdateOrderAction;
 use Domain\Order\DataTransferObjects\PlaceOrderData;
@@ -21,6 +22,7 @@ use Domain\Payments\Exceptions\PaymentException;
 use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
 use Exception;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -31,15 +33,13 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 
 #[
-    Resource('orders', apiResource: true, except: 'destroy', names: 'guest.orders'),
+    Resource('orders', apiResource: true, except: 'destroy', names: 'customer.orders'),
     Middleware(['auth:sanctum'])
 ]
 class OrderController extends Controller
 {
-    public function index(): mixed
+    public function index(#[CurrentUser('sanctum')] Customer $customer): mixed
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         return OrderResource::collection(
             QueryBuilder::for(Order::with([
@@ -64,7 +64,7 @@ class OrderController extends Controller
                 $order = app(PlaceOrderAction::class)
                     ->execute(PlaceOrderData::fromArray($validatedData));
 
-                if (is_array($order) && $order['order'] instanceof Order) {
+                if ($order['order'] instanceof Order) {
 
                     return [
                         'message' => 'Order placed successfully',
@@ -83,8 +83,13 @@ class OrderController extends Controller
                 'service_id' => 'Shipping method service id is required',
             ], 404);
         } catch (PaymentException) {
+
+            Log::error('payment error', [
+                'message' => json_encode($validatedData),
+            ]);
+
             app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the payment credentials on your website.
-            Please ensure that your payment settings are configured correctly.', 'ecommerceSettings.payments');
+            Please ensure that your payment settings are configured correctly. using '.$validatedData['payment_method'], 'ecommerceSettings.payments');
 
             return response()->json([
                 'payment' => 'Invalid Payment Credentials',
@@ -119,10 +124,8 @@ class OrderController extends Controller
         }
     }
 
-    public function show(Order $order): OrderResource
+    public function show(Order $order, #[CurrentUser('sanctum')] Customer $customer): OrderResource
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         $model = QueryBuilder::for(
             $order->with([

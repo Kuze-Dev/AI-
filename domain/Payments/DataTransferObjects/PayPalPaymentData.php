@@ -10,6 +10,5 @@ class PayPalPaymentData
         public readonly string $redirect_urls,
         public readonly TransactionData $transactions,
         public readonly string $intent = 'sale',
-    ) {
-    }
+    ) {}
 }

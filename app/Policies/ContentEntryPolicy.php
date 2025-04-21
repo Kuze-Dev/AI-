@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\CMS\CMSBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Content\Models\ContentEntry;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -16,7 +17,7 @@ class ContentEntryPolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (TenantFeatureSupport::inactive(CMSBase::class)) {
             return Response::denyAsNotFound();
         }
 
@@ -44,7 +45,7 @@ class ContentEntryPolicy
         /** @var \Domain\Admin\Models\Admin */
         $admin = $user;
 
-        if ($admin->hasRole(config('domain.role.super_admin'))) {
+        if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
 
             return true;
         }

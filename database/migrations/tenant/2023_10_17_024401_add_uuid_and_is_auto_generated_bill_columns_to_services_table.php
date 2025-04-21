@@ -18,11 +18,11 @@ return new class extends Migration
             $table->boolean('is_auto_generated_bill')->default(false)->after('needs_approval');
         });
 
-        DB::table((new Service())->getTable())
+        DB::table((new Service)->getTable())
             ->orderBy('id')
             ->lazy()
             ->each(
-                fn ($row) => DB::table((new Service())->getTable())
+                fn ($row) => DB::table((new Service)->getTable())
                     ->where('id', $row->id)
                     ->update([
                         'uuid' => (string) \Illuminate\Support\Str::uuid(),

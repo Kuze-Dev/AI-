@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Filament\Resources\AdminResource\Pages\EditAdmin;
 use Domain\Admin\Database\Factories\AdminFactory;
 use Domain\Admin\Models\Admin;
+use Spatie\Permission\Contracts\Permission;
+use Spatie\Permission\Contracts\Role;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -16,8 +18,13 @@ it('can show edit', function () {
         ->active()
         ->createOne();
 
-    $admin->assignRole(1);
-    $admin->givePermissionTo(2);
+    $role = app(Role::class)
+        ->create(['name' => fake()->name]);
+    $permission = app(Permission::class)
+        ->create(['name' => fake()->name]);
+
+    $admin->assignRole($role);
+    $admin->givePermissionTo($permission);
 
     livewire(EditAdmin::class, ['record' => $admin->getKey()])
         ->assertFormSet([
@@ -25,8 +32,8 @@ it('can show edit', function () {
             'last_name' => $admin->last_name,
             'email' => $admin->email,
             'active' => $admin->active,
-            'roles' => [1],
-            'permissions' => [2],
+            'roles' => [$role->getKey()],
+            'permissions' => [$permission->getKey()],
         ]);
 });
 

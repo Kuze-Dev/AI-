@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
+use App\Features\CMS\SitesManagement;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Models\Content;
+use Domain\Tenant\TenantFeatureSupport;
 
 class CreateContentAction
 {
     /** Execute create content query. */
     public function execute(ContentData $contentData): Content
     {
+
         $content = Content::create([
             'name' => $contentData->name,
             'prefix' => $contentData->prefix,
@@ -25,8 +28,8 @@ class CreateContentAction
         $content->taxonomies()
             ->attach($contentData->taxonomies);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
-
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
+            filament_admin()->hasRole(config('domain.role.super_admin'))
         ) {
 
             $content->sites()

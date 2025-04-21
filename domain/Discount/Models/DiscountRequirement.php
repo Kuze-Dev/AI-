@@ -47,12 +47,15 @@ class DiscountRequirement extends Model
         'minimum_amount',
     ];
 
-    protected $casts = [
-        'requirement_type' => DiscountRequirementType::class,
-        'minimum_amount' => 'float',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'requirement_type' => DiscountRequirementType::class,
+            'minimum_amount' => 'float',
+        ];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, \Domain\Discount\Models\DiscountRequirement> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, $this> */
     public function discount(): BelongsTo
     {
         return $this->belongsTo(Discount::class);

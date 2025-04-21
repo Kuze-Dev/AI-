@@ -62,11 +62,14 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             ->dontSubmitEmptyLogs();
     }
 
-    protected $fillable = [
-        'name',
-        'is_suspended',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_suspended' => 'boolean',
+        ];
+    }
 
+    #[\Override]
     public static function getCustomColumns(): array
     {
         return [
@@ -80,7 +83,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return (string) $this->apiCalls()->sum('count');
     }
 
-    /** @return HasMany<TenantApiCall> */
+    /** @return HasMany<TenantApiCall, $this> */
     public function apiCalls(): HasMany
     {
         return $this->hasmany(TenantApiCall::class);
@@ -89,5 +92,12 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function domainFirstUrl(): string
     {
         return RequestFacade::getScheme().'://'.$this->domains[0]?->domain;
+    }
+
+    public function syncFeature(array $features): void
+    {
+        $feature = $this->features();
+        $feature->deactivate(collect($feature->all())->keys()->toArray());
+        $feature->activate($features);
     }
 }

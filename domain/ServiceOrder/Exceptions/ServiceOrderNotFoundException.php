@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class ServiceOrderNotFoundException extends LogicException
-{
-}
+class ServiceOrderNotFoundException extends LogicException {}

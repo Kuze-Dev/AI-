@@ -14,12 +14,11 @@ use Log;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Throwable;
 
-class UpdateOrderAction
+readonly class UpdateOrderAction
 {
     public function __construct(
-        private readonly UpdateOrderPaymentAction $updateOrderPaymentAction,
-    ) {
-    }
+        private UpdateOrderPaymentAction $updateOrderPaymentAction,
+    ) {}
 
     public function execute(
         Order $order,
@@ -50,7 +49,7 @@ class UpdateOrderAction
                 }
 
                 if (
-                    $updateOrderData->type == 'bank-transfer' &&
+                    $updateOrderData->type === 'bank-transfer' &&
                     $updateOrderData->proof_of_payment !== null
                 ) {
                     try {
@@ -63,7 +62,7 @@ class UpdateOrderAction
                         return $e->getMessage();
                     }
                 } else {
-                    if ($updateOrderData->type != 'status') {
+                    if ($updateOrderData->type !== 'status') {
                         try {
                             return $this->updateOrderPaymentAction->withGateway(
                                 $orderWithPayment,

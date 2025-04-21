@@ -48,9 +48,10 @@ class BucketBootstrapper implements TenancyBootstrapper
 
     }
 
+    #[\Override]
     public function bootstrap(Tenant $tenant): void
     {
-        if ($tenant->getInternal('bucket_driver') == 'r2') {
+        if ($tenant->getInternal('bucket_driver') === 'r2') {
 
             $this->app->make('config')->set('media-library.disk_name', $tenant->getInternal('bucket_driver'));
             $this->app->make('config')->set('filesystems.default', $tenant->getInternal('bucket_driver'));
@@ -63,7 +64,7 @@ class BucketBootstrapper implements TenancyBootstrapper
             $this->app->make('config')->set('filesystems.disks.r2.url', $tenant->getInternal('bucket_url'));
             $this->app->make('config')->set('filesystems.disks.r2.use_path_style_endpoint', $tenant->getInternal('bucket_style_endpoint'));
         } elseif (
-            $tenant->getInternal('bucket_driver') == 's3' &&
+            $tenant->getInternal('bucket_driver') === 's3' &&
             ! is_null($tenant->getInternal('bucket_access_key')) &&
             ! is_null($tenant->getInternal('bucket_secret_key'))
         ) {
@@ -80,6 +81,7 @@ class BucketBootstrapper implements TenancyBootstrapper
         $this->app->make('config')->set('filament-import.temporary_files.disk', $tenant->getInternal('bucket_driver'));
     }
 
+    #[\Override]
     public function revert(): void
     {
         $this->app->make('config')->set('filesystems.disks.s3.bucket', $this->orignalBucket);

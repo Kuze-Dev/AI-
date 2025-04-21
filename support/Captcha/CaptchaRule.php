@@ -12,14 +12,14 @@ class CaptchaRule implements ValidationRule
 {
     public function __construct(
         protected ?string $ip = null
-    ) {
-    }
+    ) {}
 
     /**
      * Run the validation rule.
      *
      * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! Captcha::verify($value, $this->ip)) {

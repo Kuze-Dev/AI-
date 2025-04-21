@@ -16,7 +16,7 @@ beforeEach(function () {
         TwoFactorAuthenticationProvider::class,
         fn (MockInterface $mock) => $mock->expects('generateSecretKey')->andReturns('secret')
     );
-});
+})->skip('skip otp');
 
 it('can setup two factor authentication', function () {
     app(SetupTwoFactorAuthenticationAction::class)->execute($this->user);

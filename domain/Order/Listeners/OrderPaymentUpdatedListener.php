@@ -54,7 +54,7 @@ class OrderPaymentUpdatedListener
 
             Notification::send($customer, new OrderCancelledNotification($order));
 
-            //comment when the env and mail is not set
+            // comment when the env and mail is not set
             $customer->notify(new AdminOrderStatusUpdatedMail(
                 $order,
                 'cancelled',

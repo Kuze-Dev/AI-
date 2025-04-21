@@ -18,24 +18,9 @@ class DeleteS3FilesFromDeletedBlueprintDataJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    protected array $files;
+    public function __construct(protected array $files) {}
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct(array $files)
-    {
-        $this->files = $files;
-    }
-
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
-    public function handle()
+    public function handle(): void
     {
         foreach ($this->files as $filePath) {
             if (Storage::disk(config('filament.default_filesystem_disk'))->exists($filePath)) {

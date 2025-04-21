@@ -53,18 +53,19 @@ class Cart extends Model
         'coupon_code',
     ];
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'uuid';
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Cart\Models\CartLine, $this> */
     public function cartLines(): HasMany
     {
-        return $this->hasMany(CartLine::class)->whereNull('checked_out_at')->orderBy('created_at', 'desc');
+        return $this->hasMany(CartLine::class)->whereNull('checked_out_at')->latest();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Cart\Models\Cart> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, $this> */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

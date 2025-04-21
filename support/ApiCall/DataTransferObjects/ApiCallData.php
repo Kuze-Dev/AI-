@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Support\ApiCall\DataTransferObjects;
 
-class ApiCallData
+readonly class ApiCallData
 {
     public function __construct(
-        public readonly string $requestType,
-        public readonly string $requestUrl,
-        public readonly array $requestResponse,
-    ) {
-    }
+        public string $requestType,
+        public string $requestUrl,
+        public array $requestResponse,
+    ) {}
 
     public function toArray(): array
     {

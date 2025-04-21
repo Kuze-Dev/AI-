@@ -6,6 +6,4 @@ namespace Domain\Order\Exceptions;
 
 use Exception;
 
-class OrderEmailSiteSettingsException extends Exception
-{
-}
+class OrderEmailSiteSettingsException extends Exception {}

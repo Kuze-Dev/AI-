@@ -10,7 +10,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Auth;
 
 class ChangeByAdminNotification extends Notification implements ShouldQueue
 {
@@ -24,18 +23,15 @@ class ChangeByAdminNotification extends Notification implements ShouldQueue
 
     private string $reference;
 
-    private string $status;
-
     private string $from;
 
     /** Create a new notification instance. */
-    public function __construct(ServiceOrder $serviceOrder, string $status)
+    public function __construct(ServiceOrder $serviceOrder, private string $status)
     {
         $this->cc = app(ServiceSettings::class)->admin_cc;
         $this->bcc = app(ServiceSettings::class)->admin_bcc;
         $this->url = url("/admin/service-orders/$serviceOrder->reference");
         $this->reference = $serviceOrder->reference;
-        $this->status = $status;
         $this->from = app(ServiceSettings::class)->email_sender_name;
     }
 
@@ -52,9 +48,9 @@ class ChangeByAdminNotification extends Notification implements ShouldQueue
     /** Get the mail representation of the notification. */
     public function toMail(object $notifiable): MailMessage
     {
-        $user = Auth::user();
+        $user = filament_admin();
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->greeting('Hi Admin,')
             ->from($this->from)
             ->subject("Service order #$this->reference")

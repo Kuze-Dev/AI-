@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Auth\DataTransferObjects;
 
-class ResetPasswordData
+readonly class ResetPasswordData
 {
     public function __construct(
-        public readonly string $email,
-        public readonly string $password,
-        public readonly string $token,
-    ) {
-    }
+        public string $email,
+        public string $password,
+        public string $token,
+    ) {}
 }

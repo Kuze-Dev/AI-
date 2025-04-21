@@ -17,7 +17,7 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 class SearchController
 {
-    private const SEARCHABLE_MODELS = ['page', 'contentEntry'];
+    private const array SEARCHABLE_MODELS = ['page', 'contentEntry'];
 
     #[Get('/search')]
     public function index(Request $request): JsonResponse
@@ -29,7 +29,7 @@ class SearchController
 
         $results = array_reduce(
             ($validated['filter']['models'] ?? null)
-                ? explode(',', $validated['filter']['models'])
+                ? explode(',', (string) $validated['filter']['models'])
                 : self::SEARCHABLE_MODELS,
             function (array $results, string $model) use ($request, $validated) {
 
@@ -65,12 +65,7 @@ class SearchController
                 ->whereNotNull('published_at')
                 ->when(
                     $filter['sites.id'] ?? null,
-                    function ($query, $siteIds) {
-
-                        return $query->wherehas('sites', function ($q) use ($siteIds) {
-                            return $q->whereIn('site_id', explode(',', $siteIds));
-                        });
-                    }
+                    fn ($query, $siteIds) => $query->wherehas('sites', fn ($q) => $q->whereIn('site_id', explode(',', (string) $siteIds)))
                 )
                 ->limit(20)
                 ->get()
@@ -87,16 +82,11 @@ class SearchController
                 ->whereRelation('content', 'visibility', '!=', Visibility::AUTHENTICATED->value)
                 ->when(
                     $filter['content_ids'] ?? null,
-                    fn ($query, $contentIds) => $query->whereIn('content_id', explode(',', $contentIds))
+                    fn ($query, $contentIds) => $query->whereIn('content_id', explode(',', (string) $contentIds))
                 )
                 ->when(
                     $filter['sites.id'] ?? null,
-                    function ($query, $siteIds) {
-
-                        return $query->wherehas('sites', function ($q) use ($siteIds) {
-                            return $q->whereIn('site_id', explode(',', $siteIds));
-                        });
-                    }
+                    fn ($query, $siteIds) => $query->wherehas('sites', fn ($q) => $q->whereIn('site_id', explode(',', (string) $siteIds)))
                 )
                 ->limit(20)
                 ->get()

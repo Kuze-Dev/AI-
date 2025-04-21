@@ -13,9 +13,11 @@ trait Sites
      * current model to site.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
-     */
+     *
+     * @phpstan-ignore generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes */
     public function sites()
     {
+        /** @phpstan-ignore return.type, return.type, return.type, return.type, return.type, return.type, return.type, return.type */
         return $this->morphToMany(Site::class, 'model_sites');
     }
 }

@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\ECommerce\ECommerceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Admin\Models\Admin;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 
 class ReportPolicy
@@ -15,7 +16,7 @@ class ReportPolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(ECommerceBase::class)) {
+        if (TenantFeatureSupport::inactive(ECommerceBase::class)) {
             return Response::denyAsNotFound();
         }
 

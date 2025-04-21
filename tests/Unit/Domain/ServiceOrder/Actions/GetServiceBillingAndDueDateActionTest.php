@@ -86,7 +86,7 @@ it(
         Carbon $nextBillDate,
         Carbon $nextDueDate
     ) {
-        //set the current the curret date the day/s after the date ordered.
+        // set the current the curret date the day/s after the date ordered.
         now()->setTestNow(now()->parse($createdAt)->addDay());
 
         $serviceOrder = ServiceOrderFactory::new()
@@ -135,7 +135,7 @@ it(
         Carbon $nextBillDate,
         Carbon $nextDueDate
     ) {
-        //set current date before the bill's due date.
+        // set current date before the bill's due date.
         now()->setTestNow(now()->parse($dueDate)->subDay());
 
         $serviceOrder = ServiceOrderFactory::new()
@@ -190,7 +190,7 @@ it(
         Carbon $nextBillDate,
         Carbon $nextDueDate
     ) {
-        //set current date after the bill's due date.
+        // set current date after the bill's due date.
         now()->setTestNow(now()->parse($dueDate)->addDay());
 
         $serviceOrder = ServiceOrderFactory::new()

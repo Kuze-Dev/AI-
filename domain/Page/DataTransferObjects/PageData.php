@@ -9,21 +9,20 @@ use Illuminate\Support\Carbon;
 use Support\MetaData\DataTransferObjects\MetaDataData;
 use Support\RouteUrl\DataTransferObjects\RouteUrlData;
 
-class PageData
+readonly class PageData
 {
     public function __construct(
-        public readonly string $name,
-        public readonly ?string $locale,
-        public readonly RouteUrlData $route_url_data,
-        public readonly MetaDataData $meta_data,
-        public readonly ?int $author_id = null,
-        public readonly Visibility $visibility = Visibility::PUBLIC,
-        public readonly ?Carbon $published_at = null,
-        public readonly bool $published_draft = false,
-        public readonly array $block_contents = [],
-        public readonly array $sites = []
-    ) {
-    }
+        public string $name,
+        public ?string $locale,
+        public RouteUrlData $route_url_data,
+        public MetaDataData $meta_data,
+        public ?int $author_id = null,
+        public Visibility $visibility = Visibility::PUBLIC,
+        public ?Carbon $published_at = null,
+        public bool $published_draft = false,
+        public array $block_contents = [],
+        public array $sites = []
+    ) {}
 
     public static function fromArray(array $data): self
     {

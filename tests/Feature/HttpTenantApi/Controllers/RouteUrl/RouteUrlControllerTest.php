@@ -83,7 +83,7 @@ it('responds 404 when route url doesn\'t exist', function () {
 it('can get route url but return InvalidArgumentException with error message', function () {
     DB::connection()
         ->getSchemaBuilder()
-        ->create((new TestModelForRouteUrl())->getTable(), function (Blueprint $table) {
+        ->create((new TestModelForRouteUrl)->getTable(), function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('draftable_id')->nullable();

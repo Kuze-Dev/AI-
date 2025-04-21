@@ -13,8 +13,7 @@ class GetAuspostRateDataAction
 {
     public function __construct(
         private readonly AusPostRateClient $rateClient,
-    ) {
-    }
+    ) {}
 
     public function execute(
         ParcelData $parcelData,

@@ -7,7 +7,6 @@ namespace Support\ConstraintsRelationships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use ReflectionClass;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
 use Support\ConstraintsRelationships\Attributes\OnDeleteRestrict;
@@ -19,6 +18,8 @@ trait ConstraintsRelationships
     protected static function bootConstraintsRelationships(): void
     {
         static::deleting(function (self $model) {
+
+            /** @phpstan-ignore function.alreadyNarrowedType (Call to function method_exists() with Domain\Customer\Models\Customer and 'trashed' will always evaluate to true.) */
             if (method_exists($model, 'trashed') && ! $model->trashed()) {
                 return;
             }
@@ -35,12 +36,12 @@ trait ConstraintsRelationships
 
     protected function onDeleteRestrictRelations(): array
     {
-        return $this->getClassAttribute(OnDeleteRestrict::class)?->relations ?? [];
+        return $this->getClassAttribute(OnDeleteRestrict::class)->relations ?? [];
     }
 
     protected function onDeleteCascadeRelations(): array
     {
-        return $this->getClassAttribute(OnDeleteCascade::class)?->relations ?? [];
+        return $this->getClassAttribute(OnDeleteCascade::class)->relations ?? [];
     }
 
     /**
@@ -49,7 +50,7 @@ trait ConstraintsRelationships
      * @param  class-string<T>  $attributeClass
      * @return ?T
      *
-     * @phpstan-ignore-next-line Model property accessors should not be used.
+     * @phpstan-ignore larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor, larastanStrictRules.noPropertyAccessor (Model property accessors should not be used.)
      */
     protected function getClassAttribute(string $attributeClass): ?object
     {
@@ -69,7 +70,7 @@ trait ConstraintsRelationships
 
     protected function cascadeDelete(string $relationName): void
     {
-        /** @var Relation<Model> $relation */
+
         $relation = $this->{$relationName}();
 
         if ($relation instanceof BelongsToMany) {

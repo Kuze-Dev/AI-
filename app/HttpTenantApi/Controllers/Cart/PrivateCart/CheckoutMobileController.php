@@ -10,8 +10,10 @@ use Domain\Cart\Actions\CartSummaryAction;
 use Domain\Cart\DataTransferObjects\CartSummaryShippingData;
 use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Requests\CartMobileSummaryRequest;
+use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Throwable;
@@ -22,14 +24,11 @@ use Throwable;
 class CheckoutMobileController extends Controller
 {
     #[Get('/v2/carts/summary', name: 'v2.carts.summary')]
-    public function summary(CartMobileSummaryRequest $request): mixed
+    public function summary(CartMobileSummaryRequest $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
         $reference = $validated['reference'];
-
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         $cartLines = $request->getCartLines();
 
@@ -55,7 +54,7 @@ class CheckoutMobileController extends Controller
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
-                $serviceId ? $serviceId : null
+                $serviceId ?: null
             );
 
             $responseArray = [

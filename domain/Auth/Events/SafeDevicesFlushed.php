@@ -10,6 +10,5 @@ class SafeDevicesFlushed
 {
     public function __construct(
         public TwoFactorAuthenticatable $user
-    ) {
-    }
+    ) {}
 }

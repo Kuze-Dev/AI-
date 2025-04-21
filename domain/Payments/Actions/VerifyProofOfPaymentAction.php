@@ -13,8 +13,7 @@ class VerifyProofOfPaymentAction
 {
     public function __construct(
         protected SyncMediaCollectionAction $syncMediaCollectionAction
-    ) {
-    }
+    ) {}
 
     /** Execute create collection query. */
     public function execute(Payment $model, VerifyProofOfPaymentData $verifyProofOfPaymentData): Payment

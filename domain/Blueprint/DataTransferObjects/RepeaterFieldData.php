@@ -21,10 +21,11 @@ class RepeaterFieldData extends FieldData
         public readonly array $rules = [],
         public readonly ?int $min = null,
         public readonly ?int $max = null,
+        public readonly ?int $columns = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -36,6 +37,7 @@ class RepeaterFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             type: $data['type'],
             rules: $data['rules'] ?? [],
+            columns: $data['columns'] ?? null,
             fields: array_map(
                 fn (array $field) => FieldData::fromArray($field),
                 $data['fields']

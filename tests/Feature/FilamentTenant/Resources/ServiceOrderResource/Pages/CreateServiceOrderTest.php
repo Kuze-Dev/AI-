@@ -7,14 +7,11 @@ use App\FilamentTenant\Resources\ServiceOrderResource\Pages\CreateServiceOrder;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Customer\Database\Factories\CustomerFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
-use Filament\Facades\Filament;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
-
-    Filament::setContext('filament-tenant');
+    testInTenantContext(ServiceBase::class);
 
     CurrencyFactory::new()->createOne([
         'code' => 'USD',
@@ -47,7 +44,7 @@ it('can create product', function () {
             'last_name' => $customer->last_name,
             'email' => $customer->email,
             'mobile' => $customer->mobile,
-            'service_address_id' => $customer->addresses
+            'service_address' => $customer->addresses
                 ->first()
                 ->id,
             'service_id' => $service->id,

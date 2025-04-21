@@ -9,10 +9,12 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Cart\Helpers\PrivateCart\CartLineQuery;
 use Domain\Cart\Models\CartLine;
+use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,12 +27,8 @@ class CartMobileSummaryRequest extends FormRequest
 
     private array $cartLineIds;
 
-    public function rules(): array
+    public function rules(#[CurrentUser('sanctum')] Customer $customer): array
     {
-
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
-
         return [
             'reference' => [
                 'required',
@@ -43,7 +41,7 @@ class CartMobileSummaryRequest extends FormRequest
                         ]);
                     }, 'media'])
                         ->whereHas('cart', function ($query) {
-                            $query->whereBelongsTo(auth()->user());
+                            $query->whereBelongsTo(customer_logged_in());
                         })
                         ->whereCheckoutReference($value);
 
@@ -64,16 +62,16 @@ class CartMobileSummaryRequest extends FormRequest
             ],
             'billing_address_id' => [
                 'nullable',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())
+                Rule::exists(Address::class, (new Address)->getRouteKeyName())
                     ->where('customer_id', $customer->id),
             ],
             'shipping_method_id' => [
                 'nullable',
-                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+                Rule::exists(ShippingMethod::class, (new ShippingMethod)->getRouteKeyName()),
             ],
             'shipping_address_id' => [
                 'nullable',
-                Rule::exists(Address::class, (new Address())->getRouteKeyName())
+                Rule::exists(Address::class, (new Address)->getRouteKeyName())
                     ->where('customer_id', $customer->id),
             ],
             'service_id' => [
@@ -104,7 +102,7 @@ class CartMobileSummaryRequest extends FormRequest
         if ($id = $this->validated('billing_address_id')) {
             /** @var \Domain\Address\Models\Address $billingAddress */
             $billingAddress = Address::with('state.country')
-                ->where((new Address())->getRouteKeyName(), $id)->first();
+                ->where((new Address)->getRouteKeyName(), $id)->first();
 
             /** @var \Domain\Address\Models\State $state */
             $state = $billingAddress->state;
@@ -121,7 +119,7 @@ class CartMobileSummaryRequest extends FormRequest
     public function getShippingMethod(): ?ShippingMethod
     {
         if ($id = $this->validated('shipping_method_id')) {
-            return app(ShippingMethod::class)->where((new ShippingMethod())->getRouteKeyName(), $id)->first();
+            return app(ShippingMethod::class)->where((new ShippingMethod)->getRouteKeyName(), $id)->first();
         }
 
         return null;
@@ -130,7 +128,7 @@ class CartMobileSummaryRequest extends FormRequest
     public function getShippingAddress(): ?Address
     {
         if ($id = $this->validated('shipping_address_id')) {
-            return app(Address::class)->where((new Address())->getRouteKeyName(), $id)->first();
+            return app(Address::class)->where((new Address)->getRouteKeyName(), $id)->first();
         }
 
         return null;
@@ -141,7 +139,7 @@ class CartMobileSummaryRequest extends FormRequest
         if ($id = $this->validated('billing_address_id')) {
             /** @var \Domain\Address\Models\Address $billingAddress */
             $billingAddress = Address::with('state')
-                ->where((new Address())->getRouteKeyName(), $id)->first();
+                ->where((new Address)->getRouteKeyName(), $id)->first();
 
             /** @var \Domain\Address\Models\State $state */
             $state = $billingAddress->state;

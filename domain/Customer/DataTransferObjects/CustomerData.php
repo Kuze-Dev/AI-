@@ -13,6 +13,7 @@ use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Domain\Tenant\TenantFeatureSupport;
 use Domain\Tier\Enums\TierApprovalStatus;
 use Domain\Tier\Models\Tier;
 use Illuminate\Http\UploadedFile;
@@ -39,8 +40,7 @@ final readonly class CustomerData
         public ?TierApprovalStatus $tier_approval_status = null,
         public readonly ?array $data = [],
         public bool $through_api_registration = false,
-    ) {
-    }
+    ) {}
 
     public static function fromRegistrationRequest(
         CustomerRegisterRequest $request,
@@ -53,7 +53,7 @@ final readonly class CustomerData
         $sameAsShipping = $request->boolean('billing.same_as_shipping');
         unset($request);
 
-        if (! tenancy()->tenant?->features()->active(TierBase::class) || $defaultTier->is($customerTier)) {
+        if (TenantFeatureSupport::inactive(TierBase::class) || $defaultTier->is($customerTier)) {
             $tier = $defaultTier;
         }
 
@@ -72,13 +72,13 @@ final readonly class CustomerData
         return new self(
             first_name: $validated['first_name'],
             last_name: $validated['last_name'],
-            mobile: isset($validated['mobile']) ? $validated['mobile'] : null,
+            mobile: $validated['mobile'] ?? null,
             gender: isset($validated['gender']) ? Gender::from($validated['gender']) : null,
             birth_date: isset($validated['birth_date']) ? now()->parse($validated['birth_date']) : null,
             status: Status::ACTIVE,
             tier_id: $tier?->getKey(),
             email: $validated['email'],
-            username: isset($validated['username']) && $validated['username'] != null ? $validated['username'] : null,
+            username: $validated['username'] ?? null,
             password: $validated['password'],
             image: $validated['profile_image'] ?? null,
             shipping_address_data: isset($validated['shipping'])
@@ -106,8 +106,8 @@ final readonly class CustomerData
                 : EmailVerificationType::LINK,
             register_status: RegisterStatus::REGISTERED,
             tier_approval_status: null,
-            through_api_registration: true,
             data: $customerBlueprint ? $customderBlueprintData : null,
+            through_api_registration: true,
         );
     }
 
@@ -120,31 +120,71 @@ final readonly class CustomerData
             gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
             email: $data['email'],
-            username: isset($data['username']) && $data['username'] != null ? $data['username'] : null,
+            username: $data['username'] ?? null,
             data: $data['data'],
         );
     }
 
-    public static function fromArrayCreateByAdmin(array $data): self
-    {
+    //        public static function fromArrayCreateByAdmin(array $data): self
+    //        {
+    //
+    //            return new self(
+    //                first_name: $data['first_name'],
+    //                last_name: $data['last_name'],
+    //                mobile: $data['mobile'] ?? null,
+    //                gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+    //                birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+    //                status: Status::INACTIVE,
+    //                tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
+    //                email: $data['email'],
+    //                password: $data['password'] ?? null,
+    //                image: $data['image'] ?? null,
+    //                register_status: RegisterStatus::UNREGISTERED,
+    //                tier_approval_status: TierApprovalStatus::APPROVED,
+    //            );
+    //        }
 
-        return new self(
-            first_name: $data['first_name'],
-            last_name: $data['last_name'],
-            mobile: $data['mobile'] ?? null,
-            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
-            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
-            status: Status::INACTIVE,
-            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
-            email: $data['email'],
-            username: isset($data['username']) && $data['username'] != null ? $data['username'] : null,
-            password: $data['password'] ?? null,
-            image: $data['image'] ?? null,
-            register_status: RegisterStatus::UNREGISTERED,
-            tier_approval_status: TierApprovalStatus::APPROVED,
-            data: $data['data'] ?? null,
-        );
-    }
+    //    public static function fromArrayEditByAdmin(Customer $customer, array $data, ?Tier $tier = null): self
+    //    {
+    //
+    //        $tierApprovalStatus = ! isset($data['tier_approval_status'])
+    //            ? null
+    //            : TierApprovalStatus::from($data['tier_approval_status']);
+    //
+    //        $registerStatus = self::getStatus($tier, $tierApprovalStatus, $customer);
+    //
+    //        return new self(
+    //            first_name: $data['first_name'],
+    //            last_name: $data['last_name'],
+    //            mobile: $data['mobile'] ?? null,
+    //            gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+    //            birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+    //            status: isset($data['status']) ? Status::from($data['status']) : null,
+    //            tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
+    //            email: $data['email'],
+    //            image: $data['image'],
+    //            register_status: $registerStatus,
+    //            tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
+    //        );
+    //    }
+
+    //     return new self(
+    //         first_name: $data['first_name'],
+    //         last_name: $data['last_name'],
+    //         mobile: $data['mobile'] ?? null,
+    //         gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
+    //         birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
+    //         status: Status::INACTIVE,
+    //         tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
+    //         email: $data['email'],
+    //         username: isset($data['username']) && $data['username'] != null ? $data['username'] : null,
+    //         password: $data['password'] ?? null,
+    //         image: $data['image'] ?? null,
+    //         register_status: RegisterStatus::UNREGISTERED,
+    //         tier_approval_status: TierApprovalStatus::APPROVED,
+    //         data: $data['data'] ?? null,
+    //     );
+    // }
 
     public static function fromArrayEditByAdmin(Customer $customer, array $data, ?Tier $tier = null): self
     {
@@ -162,7 +202,7 @@ final readonly class CustomerData
             status: isset($data['status']) ? Status::from($data['status']) : null,
             tier_id: isset($data['tier_id']) ? ((int) $data['tier_id']) : null,
             email: $data['email'],
-            username: isset($data['username']) && $data['username'] != null ? $data['username'] : null,
+            username: $data['username'] ?? null,
             image: $data['image'],
             register_status: $registerStatus,
             tier_approval_status: isset($data['tier_approval_status']) ? TierApprovalStatus::from($data['tier_approval_status']) : null,
@@ -182,23 +222,23 @@ final readonly class CustomerData
             mobile: isset($row['mobile']) ? (string) $row['mobile'] : null,
             gender: isset($row['gender']) ? Gender::from($row['gender']) : null,
             birth_date: isset($row['birth_date']) ? now()->parse($row['birth_date']) : null,
+            status: $customerStatus === RegisterStatus::REGISTERED ? Status::ACTIVE : null,
             tier_id: $tierKey,
             email: $row['email'],
-            status: $customerStatus === RegisterStatus::REGISTERED ? Status::ACTIVE : null,
-            data: isset($row['data']) ? json_decode($row['data'], true) : null,
-            username: isset($row['username']) && $row['username'] != null ? $row['username'] : null,
+            username: $row['username'] ?? null,
             password: $customerPassword,
             register_status: $customerStatus,
+            data: isset($row['data']) ? json_decode($row['data'], true) : null,
         );
     }
 
-    private static function getStatus(
+    public static function getStatus(
         ?Tier $tier = null,
         ?TierApprovalStatus $tierApprovalStatus = null,
         ?Customer $customer = null
     ): RegisterStatus {
 
-        if (! tenancy()->tenant?->features()->active(TierBase::class)) {
+        if (TenantFeatureSupport::inactive(TierBase::class)) {
             return RegisterStatus::REGISTERED;
         }
 
@@ -206,7 +246,7 @@ final readonly class CustomerData
             if (
                 $tier?->has_approval &&
                 $tierApprovalStatus === TierApprovalStatus::APPROVED &&
-                $customer?->register_status == RegisterStatus::UNREGISTERED
+                $customer?->register_status === RegisterStatus::UNREGISTERED
 
             ) {
                 return RegisterStatus::REGISTERED;
@@ -220,8 +260,8 @@ final readonly class CustomerData
 
         if (
             $tier?->has_approval &&
-            $customer?->tier_approval_status == TierApprovalStatus::APPROVED &&
-            $customer?->register_status == RegisterStatus::INVITED
+            $customer?->tier_approval_status === TierApprovalStatus::APPROVED &&
+            $customer?->register_status === RegisterStatus::INVITED
         ) {
             return RegisterStatus::REGISTERED;
         }
@@ -249,16 +289,16 @@ final readonly class CustomerData
         return new self(
             first_name: $data['first_name'],
             last_name: $data['last_name'],
-            mobile: isset($data['mobile']) ? $data['mobile'] : null,
+            mobile: $data['mobile'] ?? null,
             gender: isset($data['gender']) ? Gender::from($data['gender']) : null,
             birth_date: isset($data['birth_date']) ? now()->parse($data['birth_date']) : null,
             status: Status::ACTIVE,
             email: $data['email'],
-            username: isset($data['username']) && $data['username'] != null ? $data['username'] : null,
+            username: $data['username'] ?? null,
             password: $data['password'],
             image: $data['profile_image'] ?? null,
-            tier_approval_status: TierApprovalStatus::APPROVED,
             register_status: RegisterStatus::REGISTERED,
+            tier_approval_status: TierApprovalStatus::APPROVED,
             data: $customerBlueprint ? $customderBlueprintData : null,
         );
     }

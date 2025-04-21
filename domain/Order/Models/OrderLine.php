@@ -7,6 +7,8 @@ namespace Domain\Order\Models;
 use Domain\Review\Models\Review;
 use Domain\Taxation\Enums\PriceDisplay;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -75,7 +77,9 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class OrderLine extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
 
     protected $fillable = [
@@ -100,32 +104,36 @@ class OrderLine extends Model implements HasMedia
         'reviewed_at',
     ];
 
-    protected $casts = [
-        'unit_price' => 'float',
-        'quantity' => 'integer',
-        'tax_total' => 'float',
-        'tax_display' => PriceDisplay::class,
-        'tax_percentage' => 'float',
-        'sub_total' => 'float',
-        'discount_total' => 'float',
-        'total' => 'float',
-        'remarks_data' => 'array',
-        'purchasable_data' => 'array',
-        'reviewed_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'unit_price' => 'float',
+            'quantity' => 'integer',
+            'tax_total' => 'float',
+            'tax_display' => PriceDisplay::class,
+            'tax_percentage' => 'float',
+            'sub_total' => 'float',
+            'discount_total' => 'float',
+            'total' => 'float',
+            'remarks_data' => 'array',
+            'purchasable_data' => 'array',
+            'reviewed_at' => 'datetime',
+        ];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderLine> */
-    public function order()
+    /** @return BelongsTo<\Domain\Order\Models\Order, $this> */
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Review\Models\Review> */
-    public function review()
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\Review\Models\Review, $this> */
+    public function review(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Review::class);
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function (Media $media) {
@@ -133,6 +141,7 @@ class OrderLine extends Model implements HasMedia
         };
 
         $this->addMediaCollection('order_line_images')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
             ->onlyKeepLatest(5)
             ->registerMediaConversions($registerMediaConversions);
 
@@ -147,5 +156,11 @@ class OrderLine extends Model implements HasMedia
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    /** @return MorphTo<Model, $this> */
+    public function purchasable(): MorphTo
+    {
+        return $this->morphTo();
     }
 }

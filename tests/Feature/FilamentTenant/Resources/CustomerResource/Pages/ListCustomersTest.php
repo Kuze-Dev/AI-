@@ -7,10 +7,10 @@ use App\Features\Customer\CustomerBase;
 use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use Domain\Customer\Database\Factories\CustomerFactory;
-use Filament\Facades\Filament;
-use Filament\Pages\Actions\DeleteAction;
-use Filament\Pages\Actions\ForceDeleteAction;
-use Filament\Pages\Actions\RestoreAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;
@@ -21,11 +21,11 @@ use function PHPUnit\Framework\assertCount;
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(TierBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: [
+        CustomerBase::class,
+        AddressBase::class,
+        TierBase::class,
+    ]);
     loginAsSuperAdmin();
 });
 
@@ -61,6 +61,7 @@ it('can restore customer', function () {
         ->createOne();
 
     livewire(ListCustomers::class)
+        ->filterTable(TrashedFilter::class)
         ->callTableAction(RestoreAction::class, $customer)
         ->assertOk();
 
@@ -78,6 +79,7 @@ it('can force delete customer', function () {
     assertCount(1, $customer->addresses);
 
     livewire(ListCustomers::class)
+        ->filterTable(TrashedFilter::class)
         ->callTableAction(ForceDeleteAction::class, $customer)
         ->assertOk();
 

@@ -24,13 +24,12 @@ use Illuminate\Support\Facades\Auth;
 class CreateServiceOrderAction
 {
     public function __construct(
-        private GenerateReferenceNumberAction $generateReferenceNumberAction,
-        private CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
-        private GetTaxableInfoAction $getTaxableInfoAction,
-        private ServiceOrderCreatedPipelineAction $serviceOrderCreatedPipelineAction,
-        private ServiceOrderMilestoneCreatedPipelineAction $serviceOrderMilestoneCreatedPipelineAction
-    ) {
-    }
+        private readonly GenerateReferenceNumberAction $generateReferenceNumberAction,
+        private readonly CalculateServiceOrderTotalPriceAction $calculateServiceOrderTotalPriceAction,
+        private readonly GetTaxableInfoAction $getTaxableInfoAction,
+        private readonly ServiceOrderCreatedPipelineAction $serviceOrderCreatedPipelineAction,
+        private readonly ServiceOrderMilestoneCreatedPipelineAction $serviceOrderMilestoneCreatedPipelineAction
+    ) {}
 
     public function execute(ServiceOrderData $serviceOrderData): ServiceOrder
     {
@@ -41,7 +40,7 @@ class CreateServiceOrderAction
         $currency = Currency::whereEnabled(true)->firstOrFail();
 
         if (! $service->status) {
-            throw new ServiceStatusMustBeActive();
+            throw new ServiceStatusMustBeActive;
         }
 
         $subTotalPrice = $this->getSubTotalPrice(
@@ -75,7 +74,7 @@ class CreateServiceOrderAction
             'service_id' => $serviceOrderData->service_id,
             'customer_id' => $serviceOrderData->customer_id,
             'reference' => $this->generateReferenceNumberAction
-                ->execute(new ServiceOrder()),
+                ->execute(ServiceOrder::class),
             'customer_first_name' => $customer->first_name,
             'customer_last_name' => $customer->last_name,
             'customer_email' => $customer->email,
@@ -182,6 +181,8 @@ class CreateServiceOrderAction
                                     (int) $additionalCharge['quantity']
                                 );
                             }
+
+                            return null;
                         },
                         $additionalCharges
                     )

@@ -10,6 +10,7 @@ use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -68,6 +69,12 @@ class ContentEntryV2Controller
                             }
                         }
                     ),
+                    AllowedFilter::callback('data', function (Builder $query, string $value) {
+                        $query->whereRaw('JSON_SEARCH(data, "all", ?) IS NOT NULL', [$value]);
+                    }),
+                    AllowedFilter::callback('search_data', function (Builder $query, string $value) {
+                        $query->whereRaw('CAST(data AS CHAR) LIKE ?', ['%'.$value.'%']);
+                    }),
                     AllowedFilter::exact('sites.id'),
                 ])
                 ->allowedSorts([

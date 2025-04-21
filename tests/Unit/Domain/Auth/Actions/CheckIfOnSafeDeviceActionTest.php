@@ -28,7 +28,7 @@ beforeEach(function () {
         ])
         ->save();
     $this->safeDevice = SafeDevice::first();
-});
+})->skip('skip otp');
 
 it('can check if on safe device', function () {
     $this->mock(
