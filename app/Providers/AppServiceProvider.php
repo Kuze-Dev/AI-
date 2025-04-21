@@ -99,7 +99,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             Admin::class,
             config('permission.models.role'),
-            config('tenancy.tenant_model'),
+            'Domain\Tenant\Models\Tenant' => config('tenancy.tenant_model'),
             Blueprint::class,
             Page::class,
             Block::class,
