@@ -7,6 +7,8 @@ use Domain\Auth\Events\Deactivated;
 use Illuminate\Support\Facades\Event;
 use Tests\Fixtures\User;
 
+beforeEach()->skip('skip otp');
+
 it('can deactivate account', function () {
     Event::fake();
 

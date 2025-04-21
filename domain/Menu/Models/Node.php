@@ -81,24 +81,27 @@ class Node extends Model implements HasInternationalizationInterface, Sortable
         'model',
     ];
 
-    protected $casts = [
-        'target' => Target::class,
-        'type' => NodeType::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'target' => Target::class,
+            'type' => NodeType::class,
+        ];
+    }
 
-    /** @return BelongsTo<Menu, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Menu\Models\Menu, $this> */
     public function menu(): BelongsTo
     {
         return $this->belongsTo(Menu::class);
     }
 
-    /** @return HasMany<self> */
+    /** @return HasMany<self, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->ordered()->with('children');
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function model(): MorphTo
     {
         return $this->morphTo();
@@ -107,16 +110,20 @@ class Node extends Model implements HasInternationalizationInterface, Sortable
     /** @return Builder<self> */
     public function buildSortQuery(): Builder
     {
+        /**
+         * Method Node::buildSortQuery() should return Illuminate\Database\Eloquent\Builder<Node> ...
+         *
+         * @phpstan-ignore return.type */
         return static::query()->whereMenuId($this->menu_id)->whereParentId($this->parent_id);
     }
 
-    /** @return HasMany<Node> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Menu\Models\Node, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<Node, Node> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Menu\Models\Node, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

@@ -16,6 +16,7 @@ class BlockFactory extends Factory
 {
     protected $model = Block::class;
 
+    #[\Override]
     public function definition(): array
     {
         /** @var string $name */

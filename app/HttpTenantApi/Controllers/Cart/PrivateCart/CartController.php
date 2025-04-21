@@ -8,9 +8,11 @@ use App\Http\Controllers\Controller;
 use App\HttpTenantApi\Resources\CartResource;
 use Domain\Cart\Actions\DestroyCartAction;
 use Domain\Cart\Models\Cart;
+use Domain\Customer\Models\Customer;
 use Domain\Product\Models\Product;
 use Domain\Product\Models\ProductVariant;
 use Domain\Tier\Models\Tier;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -23,13 +25,11 @@ use Spatie\RouteAttributes\Attributes\Resource;
 ]
 class CartController extends Controller
 {
-    public function index(): mixed
+    public function index(#[CurrentUser('sanctum')] Customer $customer): mixed
     {
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         /** @var \Domain\Tier\Models\Tier $tier */
-        $tier = $customer->tier ?? Tier::query()->where('name', config('domain.tier.default'))->first();
+        $tier = $customer->tier ?? Tier::query()->where('name', config()->string('domain.tier.default'))->first();
 
         $model = QueryBuilder::for(
             Cart::with([
@@ -56,9 +56,7 @@ class CartController extends Controller
             ->first();
 
         if ($model && isset($model->cartLines)) {
-            $model->cartLines = $model->cartLines->filter(function ($cartLine) {
-                return $cartLine->purchasable !== null;
-            });
+            $model->cartLines = $model->cartLines->filter(fn ($cartLine) => $cartLine->purchasable !== null);
         }
 
         if ($model) {

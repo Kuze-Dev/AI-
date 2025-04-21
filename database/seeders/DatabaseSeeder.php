@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
     {
         Artisan::call('app:horizon:clear');
 
-        Artisan::call(DropTenantDatabasesCommand::class);
+        if (! app()->runningUnitTests()) {
+            Artisan::call(DropTenantDatabasesCommand::class);
+        }
 
         Storage::disk(config('media-library.disk_name'))
             ->deleteDirectory(config('media-library.prefix'));

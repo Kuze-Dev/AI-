@@ -9,6 +9,5 @@ class PostageData
     public function __construct(
         public readonly string $mail_service,
         public readonly float $rate
-    ) {
-    }
+    ) {}
 }

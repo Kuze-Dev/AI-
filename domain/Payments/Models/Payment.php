@@ -65,6 +65,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  */
 class Payment extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     /**
@@ -92,28 +93,32 @@ class Payment extends Model implements HasMedia
         'media',
     ];
 
-    protected $casts = [
-        'payment_details' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'payment_details' => 'array',
+        ];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\PaymentMethod\Models\PaymentMethod, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\PaymentMethod\Models\PaymentMethod, $this> */
     public function paymentMethod(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Payments\Models\PaymentRefund>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Payments\Models\PaymentRefund, $this>*/
     public function refunds(): HasMany
     {
         return $this->hasMany(PaymentRefund::class);
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function payable(): MorphTo
     {
         return $this->morphTo();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')

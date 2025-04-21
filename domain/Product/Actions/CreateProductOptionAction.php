@@ -75,12 +75,12 @@ class CreateProductOptionAction
             /** @var array<int, \Domain\Product\DataTransferObjects\VariantCombinationData> $variantCombination */
             $variantCombination = $variant->combination;
             $newCombinations = collect($variantCombination)->map(function ($combination) use ($needle, $newValue, $field) {
-                if ($combination->{$field} == $needle) {
-                    if ($field == 'option_id') {
+                if ($combination->{$field} === $needle) {
+                    if ($field === 'option_id') {
                         return $combination->withOptionId($newValue, $combination);
                     }
 
-                    if ($field == 'option_value_id') {
+                    if ($field === 'option_value_id') {
                         return $combination->withOptionValueId($newValue, $combination);
                     }
                 }

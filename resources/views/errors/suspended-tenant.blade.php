@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Halcyon Laravel | Tall Boilerplate</title>
+    <title>{{ app(\App\Settings\SiteSettings::class)->name }} | {{ $title }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,8 +23,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         </div>
-        <h1 class="my-10 text-5xl">{{$title}}</h1>
-        <p class="text-2xl">{{$message}}</p>
+        <h1 class="my-10 text-5xl">{{ $title }}</h1>
+        <p class="text-2xl">{{ $message }}</p>
       </div>
     </div>
 </body>

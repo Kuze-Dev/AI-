@@ -8,6 +8,7 @@ use App\Features\CMS\Internationalization;
 use App\Features\CMS\SitesManagement;
 use Closure;
 use Domain\Internationalization\Models\Locale;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
 use Filament\Forms\Components\Group;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,7 @@ class RouteUrlFieldset extends Group
 {
     protected ?Closure $generateModelForRouteUrlUsing = null;
 
+    #[\Override]
     public function setUp(): void
     {
         parent::setUp();
@@ -30,7 +32,7 @@ class RouteUrlFieldset extends Group
         $this->registerListeners([
             'route_url::update' => [
                 function (self $component, ...$eventParameters): void {
-                    $component->evaluate(function (HasRouteUrl|string $model, Closure $get, Closure $set, array $state) use ($eventParameters) {
+                    $component->evaluate(function (HasRouteUrl|string $model, \Filament\Forms\Get $get, \Filament\Forms\Set $set, array $state) use ($eventParameters) {
                         if ((bool) $get('is_override')) {
                             return;
                         }
@@ -45,7 +47,7 @@ class RouteUrlFieldset extends Group
                                 Str::contains($inputUrl, "/$locale/") ? Str::replace("/$locale/", '/', $inputUrl) : $inputUrl
                                 : '/'.$inputUrl;
 
-                            $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ?
+                            $newUrl = $locale !== $defaultLocale && TenantFeatureSupport::active(Internationalization::class) ?
                                 "/$locale$inputUrl" : $inputUrl;
 
                             $set('route_url.url', $newUrl);
@@ -54,7 +56,7 @@ class RouteUrlFieldset extends Group
                         }
 
                         $newUrl = $model::generateRouteUrl($this->getModelForRouteUrl(), $get('data', true));
-                        $newUrl = $locale !== $defaultLocale && tenancy()->tenant?->features()->active(Internationalization::class) ? "/$locale$newUrl" : $newUrl;
+                        $newUrl = $locale !== $defaultLocale && TenantFeatureSupport::active(Internationalization::class) ? "/$locale$newUrl" : $newUrl;
 
                         $set('route_url.url', $newUrl);
                     });
@@ -72,7 +74,8 @@ class RouteUrlFieldset extends Group
                 ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update')),
             Forms\Components\TextInput::make('url')
                 ->label(trans('URL'))
-                ->disabled(fn (Closure $get) => ! (bool) $get('is_override'))
+                ->readOnly(fn (\Filament\Forms\Get $get) => ! (bool) $get('is_override'))
+                // ->disabled(fn (\Filament\Forms\Get $get) => ! (bool) $get('is_override'))
                 ->formatStateUsing(fn (?HasRouteUrl $record) => $record?->activeRouteUrl?->url)
                 ->lazy()
                 ->required()
@@ -80,16 +83,14 @@ class RouteUrlFieldset extends Group
                 ->maxLength(255)
                 ->startsWith('/')
                 ->rule(
-                    fn (?HasRouteUrl $record) => tenancy()->tenant?->features()->inactive(SitesManagement::class) ?
+                    fn (?HasRouteUrl $record) => TenantFeatureSupport::inactive(SitesManagement::class) ?
                         new UniqueActiveRouteUrlRule($record) : null
                     // new MicroSiteUniqueRouteUrlRule($record, $get('sites'))
                 )
                 ->afterStateUpdated(fn () => $this->dispatchEvent('route_url::update', 'input')),
         ]);
 
-        $this->generateModelForRouteUrlUsing(function (HasRouteUrl|string $model) {
-            return $model instanceof Model ? $model : new $model();
-        });
+        $this->generateModelForRouteUrlUsing(fn (HasRouteUrl|string $model) => $model instanceof Model ? $model : new $model);
     }
 
     public function getModelForRouteUrl(): Model

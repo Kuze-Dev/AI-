@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\PageResource\Pages\ListPages;
 use Domain\Page\Database\Factories\BlockFactory;
 use Domain\Page\Database\Factories\PageFactory;
-use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 use Support\MetaData\Database\Factories\MetaDataFactory;
 use Support\RouteUrl\Database\Factories\RouteUrlFactory;
@@ -15,7 +14,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 

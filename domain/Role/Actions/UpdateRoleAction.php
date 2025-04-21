@@ -13,7 +13,7 @@ class UpdateRoleAction
     public function execute(Role $role, RoleData $roleData): Role
     {
         if ($role->name === config('domain.role.super_admin')) {
-            throw new CantModifySuperAdminRoleException();
+            throw new CantModifySuperAdminRoleException;
         }
 
         $role->update(array_filter([

@@ -12,14 +12,8 @@ class OrderFulfilledNotification extends Notification
 {
     use Queueable;
 
-    private Order $order;
-
     /** Create a new notification instance. */
-    public function __construct(Order $order)
-    {
-
-        $this->order = $order;
-    }
+    public function __construct(private Order $order) {}
 
     /**
      * Get the notification's delivery channels.

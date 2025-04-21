@@ -19,11 +19,13 @@ class TestSecondModelForRouteUrl extends Model implements HasRouteUrlContract
 
     protected $fillable = ['name'];
 
+    #[\Override]
     public function getTable(): string
     {
         return 'test_model_second_for_route_url';
     }
 
+    #[\Override]
     public static function generateRouteUrl(Model $model, array $attributes): string
     {
         return $model->name;

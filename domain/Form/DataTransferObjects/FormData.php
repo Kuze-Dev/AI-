@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Domain\Form\DataTransferObjects;
 
-class FormData
+readonly class FormData
 {
     /** @param  \Domain\Form\DataTransferObjects\FormEmailNotificationData[]  $form_email_notifications */
     public function __construct(
-        public readonly string $blueprint_id,
-        public readonly string $name,
-        public readonly bool $store_submission = false,
-        public readonly bool $uses_captcha = false,
-        public readonly array $form_email_notifications = [],
-        public readonly array $sites = [],
-    ) {
-    }
+        public string $blueprint_id,
+        public string $name,
+        public bool $store_submission,
+        public bool $uses_captcha,
+        public readonly string $locale,
+        public array $form_email_notifications = [],
+        public array $sites = [],
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -24,6 +24,7 @@ class FormData
             name: $data['name'],
             store_submission: $data['store_submission'] ?? false,
             uses_captcha: $data['uses_captcha'] ?? false,
+            locale: $data['locale'] ?? 'en',
             form_email_notifications: array_map(
                 fn (array $formEmailNotificationData) => new FormEmailNotificationData(
                     id: $formEmailNotificationData['id'] ?? null,

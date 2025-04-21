@@ -23,9 +23,9 @@ class TextFieldData extends FieldData
         public readonly ?int $max = null,
         public readonly ?float $step = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -38,7 +38,7 @@ class TextFieldData extends FieldData
             type: $data['type'],
             rules: $data['rules'] ?? [],
             hidden_option: $data['hidden_option'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             min_length: $data['min_length'] ?? null,
             max_length: $data['max_length'] ?? null,
             min: $data['min'] ?? null,

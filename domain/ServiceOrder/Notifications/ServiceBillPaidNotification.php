@@ -18,19 +18,11 @@ class ServiceBillPaidNotification extends Notification implements ShouldQueue
 
     private ServiceSettings $serviceSettings;
 
-    private ServiceOrder $serviceOrder;
-
-    private Media $pdf;
-
     public function __construct(
-        ServiceOrder $serviceOrder,
-        Media $pdf
+        private ServiceOrder $serviceOrder,
+        private Media $pdf
     ) {
         $this->serviceSettings = app(ServiceSettings::class);
-
-        $this->serviceOrder = $serviceOrder;
-
-        $this->pdf = $pdf;
     }
 
     /** @return array<int, string> */
@@ -41,7 +33,7 @@ class ServiceBillPaidNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service Bill Paid')
             ->replyTo($this->serviceSettings->email_reply_to ?? [])
             ->from($this->serviceSettings->email_sender_name)

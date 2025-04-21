@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Review;
 
 use App\HttpTenantApi\Resources\ReviewResource;
+use Domain\Customer\Models\Customer;
 use Domain\Review\Actions\CreateReviewAction;
 use Domain\Review\Actions\DestroyReviewAction;
 use Domain\Review\DataTransferObjects\CreateReviewData;
 use Domain\Review\Models\Review;
 use Domain\Review\Requests\ReviewStoreRequest;
+use Illuminate\Container\Attributes\CurrentUser;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -22,13 +24,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 ]
 class ReviewController
 {
-    public function store(ReviewStoreRequest $request, CreateReviewAction $createReviewAction): JsonResponse
+    public function store(ReviewStoreRequest $request, CreateReviewAction $createReviewAction, #[CurrentUser('sanctum')] Customer $customer): JsonResponse
     {
 
         $validatedData = $request->validated();
-
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         $createReviewAction->execute(CreateReviewData::fromArray($validatedData), $customer);
 

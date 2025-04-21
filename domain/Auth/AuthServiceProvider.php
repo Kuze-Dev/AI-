@@ -25,6 +25,7 @@ class AuthServiceProvider extends EventServiceProvider
         ],
     ];
 
+    #[\Override]
     public function register(): void
     {
         parent::register();
@@ -33,12 +34,10 @@ class AuthServiceProvider extends EventServiceProvider
 
         $this->app->singleton(
             TwoFactorAuthenticationProviderContract::class,
-            function ($app) {
-                return new TwoFactorAuthenticationProvider(
-                    $app->make(Google2FA::class),
-                    $app->make(Repository::class)
-                );
-            }
+            fn ($app) => new TwoFactorAuthenticationProvider(
+                $app->make(Google2FA::class),
+                $app->make(Repository::class)
+            )
         );
     }
 }

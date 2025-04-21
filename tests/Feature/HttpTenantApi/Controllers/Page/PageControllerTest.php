@@ -108,8 +108,7 @@ it('can show an unpublished page with valid signature', function () {
 
     $queryString = Str::after(URL::temporarySignedRoute('tenant.api.pages.show', now()->addMinutes(15), [$page->getRouteKey()], false), '?');
 
-    getJson("api/pages/{$page->getRouteKey()}?{$queryString}")
-        ->assertStatus(200)
+    getJson("api/pages/{$page->getRouteKey()}?{$queryString}")->assertOk()
         ->assertJson(function (AssertableJson $json) use ($page) {
             $json
                 ->where('data.type', 'pages')

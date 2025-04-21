@@ -9,7 +9,6 @@ use Filament\Notifications\Notification;
 use Filament\Widgets\Widget;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Http;
-use Livewire\Redirector;
 use Spatie\Activitylog\ActivityLogger;
 
 class DeployStaticSite extends Widget
@@ -21,10 +20,10 @@ class DeployStaticSite extends Widget
         return app(CMSSettings::class)->deploy_hook;
     }
 
-    public function deploy(): RedirectResponse|Redirector|bool
+    public function deploy(): RedirectResponse|bool
     {
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
             return redirect()->away(route('filament-tenant.resources.sites.index'));
         }

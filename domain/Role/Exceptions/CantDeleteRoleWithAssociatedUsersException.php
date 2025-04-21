@@ -6,6 +6,4 @@ namespace Domain\Role\Exceptions;
 
 use LogicException;
 
-class CantDeleteRoleWithAssociatedUsersException extends LogicException
-{
-}
+class CantDeleteRoleWithAssociatedUsersException extends LogicException {}

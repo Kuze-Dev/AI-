@@ -7,7 +7,7 @@ namespace Domain\Product\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Image\Manipulations;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Sluggable\HasSlug;
@@ -21,7 +21,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $name
  * @property string $slug
  * @property int $product_option_id
- * @property-read \Domain\Product\Models\ProductOption|null $productOption
+ * @property-read \Domain\Product\Models\ProductOption $productOption
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductOptionValue newQuery()
@@ -37,6 +37,8 @@ class ProductOptionValue extends Model implements HasMedia
 {
     use ConstraintsRelationships;
     use HasSlug;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     public $timestamps = false;
@@ -52,29 +54,17 @@ class ProductOptionValue extends Model implements HasMedia
         'productOption',
     ];
 
-    /**
-     * Columns that are converted
-     * to a specific data type.
-     */
-    protected $casts = [
-        'data' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+        ];
+    }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
-    }
-
-    /**
-     * Get the product option name
-     *
-     * @return Attribute<string, static>
-     */
-    protected function productOptionName(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->productOption ? $this->productOption->name : '',
-        );
     }
 
     /**
@@ -86,11 +76,13 @@ class ProductOptionValue extends Model implements HasMedia
     {
         return Attribute::make(
             get: function ($value) {
-                if (is_null($this->data) || $this->data['icon_type'] == 'text') {
+                /** @phpstan-ignore offsetAccess.notFound */
+                if (is_null($this->data) || $this->data['icon_type'] === 'text') {
                     return 'Type: Text | Value: N/A';
                 } else {
-                    $iconTypeTransformed = ucwords(str_replace('_', ' ', $this->data['icon_type']));
+                    $iconTypeTransformed = ucwords(str_replace('_', ' ', (string) $this->data['icon_type']));
 
+                    /** @phpstan-ignore offsetAccess.notFound */
                     return "Type: {$iconTypeTransformed} | Value: {$this->data['icon_value']}";
                 }
             }
@@ -110,20 +102,21 @@ class ProductOptionValue extends Model implements HasMedia
      * Declare relationship of
      * current model to product option.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\ProductOption, \Domain\Product\Models\ProductOptionValue>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\ProductOption, $this>
      */
     public function productOption(): BelongsTo
     {
         return $this->belongsTo(ProductOption::class)->without('productOptionValues');
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('media')
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')
-                    ->fit(Manipulations::FIT_CROP, 300, 300);
+                    ->fit(Fit::Crop, 300, 300);
             });
     }
 }

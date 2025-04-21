@@ -8,18 +8,17 @@ use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Domain\Tenant\Models\Tenant;
 use Illuminate\Support\Arr;
-use Livewire\FileUploadConfiguration;
+use Livewire\Features\SupportFileUploads\FileUploadConfiguration;
 
-class BucketManager
+readonly class BucketManager
 {
     public function __construct(
-        protected readonly Tenant $tenant
-    ) {
-    }
+        protected Tenant $tenant
+    ) {}
 
     public function makeS3Client(): S3Client
     {
-        return new S3Client($this->formatS3Config(config('filesystems.disks.s3')));
+        return new S3Client($this->formatS3Config(config()->array('filesystems.disks.s3')));
     }
 
     public function formatS3Config(array $config): array
@@ -39,7 +38,7 @@ class BucketManager
 
         $buckets = Arr::pluck($result['Buckets'], 'Name');
 
-        return in_array($this->tenant->getInternal('bucket'), $buckets);
+        return in_array($this->tenant->getInternal('bucket'), $buckets, true);
     }
 
     public function createBucket(): void

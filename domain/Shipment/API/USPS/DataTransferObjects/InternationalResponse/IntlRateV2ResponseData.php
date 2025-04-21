@@ -11,8 +11,7 @@ class IntlRateV2ResponseData implements RateResponse
 {
     public function __construct(
         public readonly PackageData $package
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -65,19 +64,21 @@ class IntlRateV2ResponseData implements RateResponse
         );
     }
 
+    #[\Override]
     public function getRateResponseAPI(): array
     {
         return ['is_united_state_domestic' => false] + get_object_vars($this);
     }
 
+    #[\Override]
     public function getRate(int|string|null $serviceID = null): float
     {
         foreach ($this->package->services as $service) {
-            if ($service->id == $serviceID) {
+            if ($service->id === $serviceID) {
                 return $service->postage;
             }
         }
 
-        throw new USPSServiceNotFoundException();
+        throw new USPSServiceNotFoundException;
     }
 }

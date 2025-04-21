@@ -22,7 +22,7 @@ class SendRegisterInvitationAction
             return false;
         }
 
-        $customer->notify(new RegisterInvitationNotification());
+        $customer->notify(new RegisterInvitationNotification);
 
         if ($customer->register_status !== RegisterStatus::INVITED) {
             $customer->update([

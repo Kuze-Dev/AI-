@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Domain\Order\DataTransferObjects;
 
-class UpdateOrderData
+readonly class UpdateOrderData
 {
     public function __construct(
-        public readonly string $type,
-        public readonly ?string $status,
-        public readonly ?string $notes,
-        public readonly ?string $proof_of_payment,
-    ) {
-    }
+        public string $type,
+        public ?string $status,
+        public ?string $notes,
+        public ?string $proof_of_payment,
+    ) {}
 
     public static function fromArray(array $data): self
     {

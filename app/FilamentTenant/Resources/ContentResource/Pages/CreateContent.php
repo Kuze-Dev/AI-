@@ -10,10 +10,9 @@ use Domain\Content\Actions\CreateContentAction;
 use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Page\Enums\Visibility;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateContent extends CreateRecord
 {
@@ -21,40 +20,32 @@ class CreateContent extends CreateRecord
 
     protected static string $resource = ContentResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                // ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
-    /**
-     * Execute database transaction
-     * for creating contents.
-     */
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(
-            fn () => app(CreateContentAction::class)
-                ->execute(new ContentData(
-                    name: $data['name'],
-                    taxonomies: $data['taxonomies'],
-                    blueprint_id: $data['blueprint_id'],
-                    is_sortable: $data['is_sortable'],
-                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
-                    past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
-                    future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
-                    prefix: $data['prefix'],
-                    sites: $data['sites'] ?? [],
-                ))
-        );
+        return app(CreateContentAction::class)
+            ->execute(new ContentData(
+                name: $data['name'],
+                blueprint_id: $data['blueprint_id'],
+                prefix: $data['prefix'],
+                visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
+                taxonomies: $data['taxonomies'],
+                past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
+                future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
+                is_sortable: $data['is_sortable'],
+                sites: $data['sites'] ?? [],
+            )
+            );
     }
 }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\MenuResource\Pages\CreateMenu;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
 use Domain\Menu\Database\Factories\MenuFactory;
@@ -9,14 +10,12 @@ use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
 use Domain\Menu\Models\Menu;
 use Domain\Site\Database\Factories\SiteFactory;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 
     LocaleFactory::createDefault();
@@ -59,7 +58,7 @@ it('can create menu', function () {
 
 it('can create menu with sites', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $site = SiteFactory::new()->createOne();
 
@@ -83,7 +82,7 @@ it('can create menu with sites', function () {
 
 it('can create menu with same name on different sites', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $site = SiteFactory::new()->count(2)->create();
 
@@ -109,7 +108,7 @@ it('can create menu with same name on different sites', function () {
 
 it('cannot create menu with same name on same sites', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     $site = SiteFactory::new()->create();
 

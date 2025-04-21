@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\FilamentTenant\Pages\Settings\PaymentSettings;
+use App\FilamentTenant\Clusters\Settings\Pages\PaymentSettings;
 use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Contracts\PaymentManagerInterface;
@@ -27,7 +27,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Stripe']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new StripeProvider());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new StripeProvider);
 });
 
 it('Stripe payment Gateway must be instance of StripeProvider  ', function () {

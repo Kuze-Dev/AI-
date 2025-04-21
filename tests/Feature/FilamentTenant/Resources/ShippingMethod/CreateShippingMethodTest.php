@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
-use App\FilamentTenant\Resources\ShippingmethodResource\Pages\CreateShippingmethod;
+use App\FilamentTenant\Resources\ShippingmethodResource\Pages\CreateShippingMethod;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: [
+        ECommerceBase::class,
+        ShippingStorePickup::class,
+    ]);
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(ECommerceBase::class);
-    tenancy()->tenant->features()->activate(ShippingStorePickup::class);
 });
 
 it('can render shipping method', function () {
-    livewire(CreateShippingmethod::class)
+    livewire(CreateShippingMethod::class)
         ->assertFormExists()
         ->assertSuccessful();
 });
@@ -31,7 +29,7 @@ it('can create shipping method', function () {
 
     StateFactory::new()->createOne();
 
-    livewire(CreateShippingmethod::class)
+    livewire(CreateShippingMethod::class)
         ->fillForm([
             'title' => 'Store Pickup',
             'subtitle' => 'InStore Pickup',

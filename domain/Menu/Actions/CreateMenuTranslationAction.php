@@ -11,8 +11,7 @@ class CreateMenuTranslationAction
 {
     public function __construct(
         protected SyncNodeTreeAction $syncNodeAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Menu $menu, MenuData $menuData): Menu
     {
@@ -22,7 +21,7 @@ class CreateMenuTranslationAction
             'locale' => $menuData->locale,
         ]);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
         ) {
             $menuTranslation->sites()
                 ->attach($menuData->sites);

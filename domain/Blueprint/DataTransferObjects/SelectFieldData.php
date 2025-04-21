@@ -26,9 +26,9 @@ class SelectFieldData extends FieldData
         public readonly ?int $min = null,
         public readonly ?int $max = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -47,7 +47,7 @@ class SelectFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
             hidden_option: $data['hidden_option'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             options: $data['options'] ?? [],
             multiple: $data['multiple'] ?? false,
             min: $data['min'] ?? null,

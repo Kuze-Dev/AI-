@@ -31,8 +31,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         protected readonly array $data,
         protected readonly ?array $form_attachments = [],
         protected readonly ?int $form_submission_id = null,
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {
@@ -56,6 +55,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         return $string;
     }
 
+    #[\Override]
     protected function buildView(): array
     {
         return [
@@ -73,7 +73,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
         $contents = Blade::render($compiledTemplate, $this->getMailVariables());
 
-        return new HtmlString((new CssToInlineStyles())->convert(
+        return new HtmlString((new CssToInlineStyles)->convert(
             $contents,
             View::make($this->getTheme(), $this->getMailVariables())->render()
         ));
@@ -108,7 +108,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
             return $customTheme;
         }
 
-        if (str_contains($this->theme, '::')) {
+        if (str_contains((string) $this->theme, '::')) {
             return $this->theme;
         }
 
@@ -141,7 +141,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
             foreach ($this->form_attachments as $value) {
                 $attach[] = Attachment::fromStorageDisk('s3', $value)
-                    ->as(basename($value));
+                    ->as(basename((string) $value));
             }
         }
 

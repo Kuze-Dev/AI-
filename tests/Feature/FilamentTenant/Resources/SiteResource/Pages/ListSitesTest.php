@@ -5,15 +5,12 @@ declare(strict_types=1);
 use App\FilamentTenant\Resources\SiteResource\Pages\ListSites;
 use Domain\Site\Database\Factories\SiteFactory;
 use Domain\Site\Models\Site;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
-    Filament::setContext('filament-tenant');
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    testInTenantContext(App\Features\CMS\SitesManagement::class);
     loginAsSuperAdmin();
 });
 

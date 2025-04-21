@@ -17,8 +17,7 @@ class ShippingAddressData
         public readonly string $code,
         public readonly State $state,
         public readonly Country $country,
-    ) {
-    }
+    ) {}
 
     public static function fromAddressModel(Address $address): self
     {

@@ -10,9 +10,7 @@ use Filament\Facades\Filament;
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: CustomerBase::class);
     loginAsSuperAdmin();
 });
 

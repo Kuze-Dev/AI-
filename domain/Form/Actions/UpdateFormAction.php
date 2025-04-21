@@ -14,13 +14,13 @@ class UpdateFormAction
         protected CreateFormEmailNotificationAction $createFormEmailNotification,
         protected UpdateFormEmailNotificationAction $updateFormEmailNotification,
         protected DeleteFormEmailNotificationAction $deleteFormEmailNotification
-    ) {
-    }
+    ) {}
 
     public function execute(Form $form, FormData $formData): Form
     {
         $form->update([
             'name' => $formData->name,
+            'locale' => $formData->locale,
             'store_submission' => $formData->store_submission,
             'uses_captcha' => $formData->uses_captcha,
         ]);

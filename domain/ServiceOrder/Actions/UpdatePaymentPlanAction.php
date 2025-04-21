@@ -19,7 +19,7 @@ class UpdatePaymentPlanAction
             throw new InvalidPaymentPlan('No payment plan');
         }
 
-        $key = array_search($paymentPlan['description'], array_column($data, 'description'));
+        $key = array_search($paymentPlan['description'], array_column($data, 'description'), true);
 
         if ($key !== false) {
             $data[$key]['is_generated'] = true;

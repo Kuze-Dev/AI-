@@ -30,32 +30,29 @@ class RouteUrlV2Controller
     ]
     public function __invoke(string $url = ''): JsonApiResource
     {
-        /** @var array */
         $notDraftableModels = [
             app(Taxonomy::class)->getMorphClass(),
             app(TaxonomyTerm::class)->getMorphClass(),
         ];
 
-        /** @var \Illuminate\Database\Eloquent\Builder<RouteUrl> */
+        /** @var \Illuminate\Database\Eloquent\Builder<RouteUrl> $queryRouteUrl */
         $queryRouteUrl = RouteUrl::whereUrl(Str::start($url, '/'))
             ->with('model');
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) &&
             request('site')
         ) {
 
             $siteId = request('site');
 
-            $queryRouteUrl->whereHas('model', function ($query) use ($siteId) {
-                return $query->whereHas('sites', fn ($q) => $q->where('site_id', $siteId));
-            });
+            $queryRouteUrl->whereHas('model', fn ($query) => $query->whereHas('sites', fn ($q) => $q->where('site_id', $siteId)));
 
         }
 
         $queryRouteUrl->whereHas('model', function ($query) use ($notDraftableModels) {
 
-            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels)) {
+            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels, true)) {
                 return $query->where('draftable_id', null);
             }
 
@@ -75,7 +72,7 @@ class RouteUrlV2Controller
 
     private function handleContentEntryResource(ContentEntry $contentEntry): ContentEntryResource
     {
-        abort_if($contentEntry->status == false, 404);
+        abort_if($contentEntry->status === false, 404);
 
         return ContentEntryResource::make($contentEntry);
     }

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\Content\Actions;
 
+use App\Features\CMS\SitesManagement;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Actions\HandleUpdateDataTranslation;
 use Domain\Internationalization\Models\Locale;
+use Domain\Tenant\TenantFeatureSupport;
 use Support\MetaData\Actions\CreateMetaDataAction;
 use Support\MetaData\Actions\UpdateMetaDataAction;
 use Support\RouteUrl\Actions\CreateOrUpdateRouteUrlAction;
@@ -20,8 +22,7 @@ class PublishedContentEntryDraftAction
         protected UpdateMetaDataAction $updateMetaData,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected DeleteContentEntryAction $deleteContentEntry,
-    ) {
-    }
+    ) {}
 
     /** Execute create content entry query. */
     public function execute(ContentEntry $contentEntry, ContentEntry $draft_content_entry, ContentEntryData $contentEntryData): ContentEntry
@@ -44,13 +45,13 @@ class PublishedContentEntryDraftAction
 
         $this->createOrUpdateRouteUrl->execute($contentEntry, $contentEntryData->route_url_data);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (TenantFeatureSupport::active(SitesManagement::class)) {
 
             $contentEntry->sites()->sync($contentEntryData->sites);
         }
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
             is_null($contentEntry->draftable_id)
         ) {
 

@@ -11,7 +11,8 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use function Pest\Laravel\getJson;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
+    testInTenantContext(ServiceBase::class);
+    // testInTenantContext(ServiceBase::class);
 });
 
 it('can list services', function () {
@@ -124,6 +125,5 @@ it("can't show an inactive service", function () {
         ->isActive(false)
         ->createOne();
 
-    getJson("api/services/{$service->getRouteKey()}")
-        ->assertStatus(404);
+    getJson("api/services/{$service->getRouteKey()}")->assertNotFound();
 });

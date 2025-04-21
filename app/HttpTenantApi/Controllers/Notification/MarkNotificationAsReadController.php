@@ -23,7 +23,7 @@ class MarkNotificationAsReadController
     public function update(DatabaseNotification $databaseNotification): JsonResponse
     {
         app(MarkAsReadNotificationAction::class)
-            /** @phpstan-ignore-next-line  */
+            /** @phpstan-ignore argument.type  */
             ->execute(Auth::user(), $databaseNotification);
 
         return response()
@@ -36,7 +36,7 @@ class MarkNotificationAsReadController
     public function markAllAsRead(): JsonResponse
     {
         app(MarkAsReadNotificationAction::class)
-            /** @phpstan-ignore-next-line  */
+            /** @phpstan-ignore argument.type  */
             ->markAllAsRead(Auth::user());
 
         return response()

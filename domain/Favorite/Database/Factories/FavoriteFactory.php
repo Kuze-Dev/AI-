@@ -14,6 +14,7 @@ class FavoriteFactory extends Factory
 {
     protected $model = Favorite::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

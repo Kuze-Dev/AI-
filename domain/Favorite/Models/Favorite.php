@@ -7,6 +7,7 @@ namespace Domain\Favorite\Models;
 use Domain\Customer\Models\Customer;
 use Domain\Product\Models\Product;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Domain\Favorite\Models\Favorite
@@ -34,14 +35,14 @@ class Favorite extends Model
 {
     protected $fillable = ['customer_id', 'product_id'];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Favorite\Models\Favorite> */
-    public function customer()
+    /** @return BelongsTo<\Domain\Customer\Models\Customer, $this> */
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Favorite\Models\Favorite> */
-    public function product()
+    /** @return BelongsTo<\Domain\Product\Models\Product, $this> */
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }

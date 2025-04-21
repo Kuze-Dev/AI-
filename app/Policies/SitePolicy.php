@@ -6,6 +6,7 @@ namespace App\Policies;
 
 use App\Features\CMS\SitesManagement;
 use App\Policies\Concerns\ChecksWildcardPermissions;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -15,7 +16,7 @@ class SitePolicy
 
     public function before(): ?Response
     {
-        if (tenancy()->tenant?->features()->inactive(SitesManagement::class)) {
+        if (TenantFeatureSupport::inactive(SitesManagement::class)) {
             return Response::denyAsNotFound();
         }
 

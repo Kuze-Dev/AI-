@@ -14,6 +14,8 @@ use Domain\Payments\Models\Payment;
 use Domain\Payments\Models\Traits\HasPayments;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Enums\PaymentPlanType;
+use Domain\ServiceOrder\Enums\PaymentPlanValue;
 use Domain\ServiceOrder\Enums\ServiceBillStatus;
 use Domain\ServiceOrder\Enums\ServiceOrderAddressType;
 use Domain\ServiceOrder\Enums\ServiceOrderStatus;
@@ -64,8 +66,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $tax_percentage
  * @property float $tax_total
  * @property float $total_price
- * @property string|null $payment_type
- * @property string|null $payment_value
+ * @property PaymentPlanType $payment_type
+ * @property PaymentPlanValue $payment_value
  * @property array|null $payment_plan
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -73,7 +75,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property-read int|null $activities_count
  * @property-read Admin|null $admin
  * @property-read Customer|null $customer
- * @property-read Service|null $service
+ * @property-read Service $service
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceBill> $serviceBills
  * @property-read int|null $service_bills_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\ServiceOrder\Models\ServiceOrderAddress> $serviceOrderAddress
@@ -175,87 +177,95 @@ class ServiceOrder extends Model implements PayableInterface
         'payment_type',
     ];
 
-    protected $casts = [
-        'schema' => 'json',
-        'customer_form' => 'json',
-        'service_price' => MoneyCast::class,
-        'additional_charges' => 'json',
-        'billing_cycle' => BillingCycleEnum::class,
-        'pay_upfront' => 'boolean',
-        'is_subscription' => 'boolean',
-        'needs_approval' => 'boolean',
-        'is_auto_generated_bill' => 'boolean',
-        'is_partial_payment' => 'boolean',
-        'schedule' => 'datetime',
-        'sub_total' => MoneyCast::class,
-        'tax_display' => PriceDisplay::class,
-        'tax_percentage' => 'float',
-        'tax_total' => MoneyCast::class,
-        'total_price' => MoneyCast::class,
-        'status' => ServiceOrderStatus::class,
-        'payment_plan' => 'json',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'schema' => 'json',
+            'customer_form' => 'json',
+            'service_price' => MoneyCast::class,
+            'additional_charges' => 'array',
+            'billing_cycle' => BillingCycleEnum::class,
+            'pay_upfront' => 'boolean',
+            'is_subscription' => 'boolean',
+            'needs_approval' => 'boolean',
+            'is_auto_generated_bill' => 'boolean',
+            'is_partial_payment' => 'boolean',
+            'schedule' => 'datetime',
+            'sub_total' => MoneyCast::class,
+            'tax_display' => PriceDisplay::class,
+            'tax_percentage' => 'float',
+            'tax_total' => MoneyCast::class,
+            'total_price' => MoneyCast::class,
+            'status' => ServiceOrderStatus::class,
+            'payment_plan' => 'json',
+            'payment_type' => PaymentPlanType::class,
+            'payment_value' => PaymentPlanValue::class,
+        ];
+    }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'reference';
     }
 
+    #[\Override]
     public function getReferenceNumber(): string
     {
         return $this->reference;
     }
 
+    #[\Override]
     public function newEloquentBuilder($query): ServiceOrderQueryBuilder
     {
         return new ServiceOrderQueryBuilder($query);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\ServiceOrder\Models\ServiceOrder> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, $this> */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Service\Models\Service, \Domain\ServiceOrder\Models\ServiceOrder> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Service\Models\Service, $this> */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceTransaction>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceTransaction, $this>*/
     public function serviceTransactions(): HasMany
     {
         return $this->hasMany(ServiceTransaction::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, \Domain\ServiceOrder\Models\ServiceOrder> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Admin\Models\Admin, $this> */
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceOrderAddress, $this>*/
     public function serviceOrderAddress(): HasMany
     {
         return $this->hasMany(ServiceOrderAddress::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress, $this>*/
     public function serviceOrderServiceAddress(): HasOne
     {
         return $this->hasOne(ServiceOrderAddress::class)
             ->whereType(ServiceOrderAddressType::SERVICE_ADDRESS);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasOne<\Domain\ServiceOrder\Models\ServiceOrderAddress, $this>*/
     public function serviceOrderBillingAddress(): HasOne
     {
         return $this->hasOne(ServiceOrderAddress::class)
             ->whereType(ServiceOrderAddressType::BILLING_ADDRESS);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceBill>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\ServiceOrder\Models\ServiceBill, $this>*/
     public function serviceBills(): HasMany
     {
         return $this->hasMany(ServiceBill::class);
@@ -270,9 +280,12 @@ class ServiceOrder extends Model implements PayableInterface
 
     public function totalBalance(): Money
     {
-        return money($this->serviceBills()
-            ->where('status', 'pending')
-            ->sum('total_balance'));
+        return money(
+            $this->serviceBills()
+                ->where('status', 'pending')
+                ->sum('total_balance'),
+            $this->currency_code,
+        );
     }
 
     public function totalUnpaidBills(): int

@@ -71,7 +71,7 @@ beforeEach(function () {
 
     $shippingMethod = ShippingMethodFactory::new()->createOne(['title' => 'Store Pickup']);
 
-    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver());
+    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver);
 
     $shippingMethod->update([
         'shipper_country_id' => $country->id,
@@ -80,7 +80,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Cod']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment);
 
     Sanctum::actingAs($customer);
 

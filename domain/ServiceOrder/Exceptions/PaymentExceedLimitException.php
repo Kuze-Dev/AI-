@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class PaymentExceedLimitException extends LogicException
-{
-}
+class PaymentExceedLimitException extends LogicException {}

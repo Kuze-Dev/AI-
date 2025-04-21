@@ -54,19 +54,19 @@ class BlockContent extends Model implements Sortable
         'block',
     ];
 
-    /** @return BelongsTo<Block, self> */
+    /** @return BelongsTo<Block, $this> */
     public function block(): BelongsTo
     {
-        return $this->belongsTo(Block::class)->with(['blueprint']);
+        return $this->belongsTo(Block::class);
     }
 
-    /** @return BelongsTo<Page, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Page\Models\Page, $this> */
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class);
     }
 
-    /** @return MorphMany<BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Blueprint\Models\BlueprintData, $this> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class, 'model');
@@ -75,6 +75,7 @@ class BlockContent extends Model implements Sortable
     /** @return Builder<BlockContent> */
     public function buildSortQuery(): Builder
     {
+        /** @phpstan-ignore return.type */
         return static::query()->where('page_id', $this->page_id);
     }
 

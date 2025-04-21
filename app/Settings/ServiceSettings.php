@@ -8,9 +8,9 @@ use Spatie\LaravelSettings\Settings;
 
 class ServiceSettings extends Settings
 {
-    public ?int $service_category;
+    public ?int $service_category = null;
 
-    public ?string $domain_path_segment;
+    public ?string $domain_path_segment = null;
 
     // admin email notif
     public bool $admin_should_receive = false;
@@ -21,7 +21,7 @@ class ServiceSettings extends Settings
 
     public ?array $admin_bcc = [];
 
-    //customer email notif
+    // customer email notif
     public string $email_sender_name = '';
 
     public ?array $email_reply_to = [];
@@ -30,6 +30,7 @@ class ServiceSettings extends Settings
 
     public ?int $days_before_due_date_notification = 1;
 
+    #[\Override]
     public static function group(): string
     {
         return 'service';

@@ -16,6 +16,7 @@ class SchemaDataCast implements CastsAttributes
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string|array  $value
      */
+    #[\Override]
     public function get($model, string $key, $value, array $attributes): SchemaData
     {
         if (is_string($value)) {
@@ -29,6 +30,7 @@ class SchemaDataCast implements CastsAttributes
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  ?array  $value
      */
+    #[\Override]
     public function set($model, string $key, $value, array $attributes): string
     {
         if (is_array($value)) {

@@ -14,6 +14,7 @@ class PaymentManager extends Manager
     /**
      * Get the default driver name.
      */
+    #[\Override]
     public function getDefaultDriver(): string
     {
         return config('payment-gateway.default');

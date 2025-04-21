@@ -14,6 +14,7 @@ class RouteUrlFactory extends Factory
 {
     protected $model = RouteUrl::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

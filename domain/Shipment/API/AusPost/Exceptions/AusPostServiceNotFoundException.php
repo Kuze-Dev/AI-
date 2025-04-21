@@ -6,6 +6,4 @@ namespace Domain\Shipment\API\AusPost\Exceptions;
 
 use LogicException;
 
-class AusPostServiceNotFoundException extends LogicException
-{
-}
+class AusPostServiceNotFoundException extends LogicException {}

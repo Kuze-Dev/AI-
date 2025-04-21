@@ -16,8 +16,7 @@ class ItemsData
         public readonly ?string $tax = null,
         public readonly ?string $url = null,
         public readonly ?string $category = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

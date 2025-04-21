@@ -7,14 +7,14 @@ namespace App\FilamentTenant\Resources\FormResource\RelationManagers;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Domain\Form\Models\FormSubmission;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+// use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class FormSubmissionsRelationManager extends RelationManager
 {
@@ -22,7 +22,8 @@ class FormSubmissionsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'id';
 
-    public static function form(Form $form): Form
+    #[\Override]
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -33,17 +34,17 @@ class FormSubmissionsRelationManager extends RelationManager
             ]);
     }
 
-    public static function table(Table $table): Table
+    #[\Override]
+    public function table(Table $table): Table
     {
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = Auth::user();
+        $admin = filament_admin();
 
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id'),
                 Tables\Columns\TextColumn::make('data.main.name'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->actions([
@@ -57,17 +58,15 @@ class FormSubmissionsRelationManager extends RelationManager
                         Forms\Components\DatePicker::make('created_until')
                             ->label(trans('Submitted until')),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-                            );
-                    })
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['created_from'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['created_until'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                        ))
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
 
@@ -105,7 +104,7 @@ class FormSubmissionsRelationManager extends RelationManager
                             }
 
                             $data['main.submission_date'] = $record->created_at?->timezone(
-                                $admin->timezone ?: config('domain.admin.default_timezone')
+                                $admin->timezone ?: config()->string('domain.admin.default_timezone')
                             )->format('Y-m-d H:i a');
 
                             return $data;

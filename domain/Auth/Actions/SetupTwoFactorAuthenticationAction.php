@@ -11,8 +11,7 @@ class SetupTwoFactorAuthenticationAction
 {
     public function __construct(
         protected TwoFactorAuthenticationProvider $twoFactorAuthenticationProvider
-    ) {
-    }
+    ) {}
 
     public function execute(TwoFactorAuthenticatable $authenticatable): TwoFactorAuthenticatable
     {

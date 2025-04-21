@@ -130,6 +130,5 @@ it('cant show an inactive product', function () {
     $product = ProductFactory::new(['name' => 'Foo', 'status' => 0])
         ->createOne();
 
-    getJson("api/products/{$product->getRouteKey()}")
-        ->assertStatus(404);
+    getJson("api/products/{$product->getRouteKey()}")->assertNotFound();
 });

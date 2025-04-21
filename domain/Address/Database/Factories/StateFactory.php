@@ -14,6 +14,7 @@ class StateFactory extends Factory
 {
     protected $model = State::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

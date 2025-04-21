@@ -11,8 +11,7 @@ class CheckIfOnSafeDeviceAction
 {
     public function __construct(
         protected Request $request
-    ) {
-    }
+    ) {}
 
     public function execute(TwoFactorAuthenticatable $authenticatable): bool
     {

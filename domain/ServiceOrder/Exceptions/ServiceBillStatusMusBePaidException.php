@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class ServiceBillStatusMusBePaidException extends LogicException
-{
-}
+class ServiceBillStatusMusBePaidException extends LogicException {}

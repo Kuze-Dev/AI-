@@ -5,17 +5,13 @@ declare(strict_types=1);
 use App\Features\Shopconfiguration\PaymentGateway\OfflineGateway;
 use App\FilamentTenant\Resources\PaymentMethodResource\Pages\CreatePaymentMethod;
 use Domain\PaymentMethod\Models\PaymentMethod;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext();
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: OfflineGateway::class);
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(OfflineGateway::class);
 });
 
 it('can render payment method', function () {

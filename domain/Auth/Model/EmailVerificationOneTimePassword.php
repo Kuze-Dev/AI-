@@ -37,12 +37,15 @@ class EmailVerificationOneTimePassword extends Model
         'expired_at',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-        'expired_at' => 'datetime',
-    ];
-
     protected $hidden = [
         'password',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'expired_at' => 'datetime',
+        ];
+    }
 }

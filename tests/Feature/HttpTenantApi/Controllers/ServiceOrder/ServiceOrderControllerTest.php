@@ -15,7 +15,7 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
+    testInTenantContext(ServiceBase::class);
 
     $this->customer = CustomerFactory::new()
         ->hasAddress()

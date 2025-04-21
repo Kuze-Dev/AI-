@@ -13,13 +13,13 @@ class UpdateTaxonomyAction
     public function __construct(
         protected SyncTermTreeAction $syncTermAction,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
-    ) {
-    }
+    ) {}
 
     public function execute(Taxonomy $taxonomy, TaxonomyData $taxonomyData): Taxonomy
     {
         $taxonomy->update([
             'name' => $taxonomyData->name,
+            'has_route' => $taxonomyData->has_route,
         ]);
 
         if ($taxonomyData->has_route) {

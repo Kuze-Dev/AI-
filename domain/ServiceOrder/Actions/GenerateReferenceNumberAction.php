@@ -9,12 +9,15 @@ use Illuminate\Support\Str;
 
 class GenerateReferenceNumberAction
 {
-    public function execute(Model $model): string
+    /**
+     * @param  class-string<Model>  $model
+     */
+    public function execute(string $model): string
     {
-        /** @var array|false $words */
+        /** @var list<string>|false $words */
         $words = preg_split(
             '/(?=[A-Z])/',
-            Str::of(get_class($model))
+            Str::of($model)
                 ->classBasename()
                 ->value(),
             -1,
@@ -23,7 +26,7 @@ class GenerateReferenceNumberAction
 
         /** @var string $prefix */
         $prefix = is_array($words)
-            ? implode(array_map(fn ($word) => substr($word, 0, 1), $words))
+            ? implode('', array_map(fn ($word) => substr((string) $word, 0, 1), $words))
             : '';
 
         $referenceNumber = $prefix.now()->format('ymd');

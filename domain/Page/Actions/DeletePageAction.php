@@ -11,13 +11,12 @@ class DeletePageAction
 {
     public function __construct(
         protected DeleteBlockContentAction $deleteBlockContentAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Page $page): ?bool
     {
         if ($page->isHomePage()) {
-            throw new CantDeleteHomePageException();
+            throw new CantDeleteHomePageException;
         }
 
         $blockContent = $page->blockContents->first();

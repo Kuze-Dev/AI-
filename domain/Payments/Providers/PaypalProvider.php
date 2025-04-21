@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Domain\Payments\Providers;
 
 use App\Settings\PaymentSettings;
-use Doctrine\Common\Cache\Psr6\InvalidArgument;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentAuthorize;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
@@ -19,7 +18,7 @@ class PaypalProvider extends Provider
 {
     protected string $name = 'paypal';
 
-    private PayPalClient $payPalclient;
+    private readonly PayPalClient $payPalclient;
 
     public function __construct()
     {
@@ -39,7 +38,7 @@ class PaypalProvider extends Provider
             ],
             'payment_action' => 'Sale',
             'currency' => 'USD',
-            'notify_url' => '', //?
+            'notify_url' => '', // ?
             'locale' => 'en_US',
             'validate_ssl' => true,
         ];
@@ -49,6 +48,7 @@ class PaypalProvider extends Provider
         $this->payPalclient->getAccessToken();
     }
 
+    #[\Override]
     public function authorize(): PaymentAuthorize
     {
 
@@ -118,12 +118,13 @@ class PaypalProvider extends Provider
         }
     }
 
+    #[\Override]
     public function capture(ModelsPayment $paymentModel, array $data): PaymentCapture
     {
         return match ($data['status']) {
             'success' => $this->processTransaction($paymentModel, $data),
             'cancelled' => $this->cancelTransaction($paymentModel),
-            default => throw new InvalidArgument(),
+            default => throw new \InvalidArgumentException,
         };
     }
 
@@ -156,6 +157,7 @@ class PaypalProvider extends Provider
         );
     }
 
+    #[\Override]
     public function refund(ModelsPayment $paymentModel, int $amount): PaymentRefund
     {
         return new PaymentRefund(success: false);

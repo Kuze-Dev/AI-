@@ -17,12 +17,13 @@ class TotalOrder extends Widget
 
     public array $status = ['pending', 'cancelled', 'packed', 'delivered', 'shipped', 'refunded',  'fulfilled'];
 
+    #[\Override]
     protected function getViewData(): array
     {
         $statusCounts = [];
 
         foreach ($this->status as $s) {
-            $statusCounts[strtolower($s)] = $this->getOrderByStatus($s);
+            $statusCounts[strtolower((string) $s)] = $this->getOrderByStatus($s);
         }
 
         return [

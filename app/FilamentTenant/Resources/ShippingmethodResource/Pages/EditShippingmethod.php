@@ -5,58 +5,57 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\ShippingmethodResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
-use App\FilamentTenant\Resources\ShippingmethodResource;
+use App\FilamentTenant\Resources\ShippingMethodResource;
 use Domain\ShippingMethod\Actions\GetAvailableShippingDriverAction;
-use Domain\ShippingMethod\Actions\UpdateShippingMethodAction;
-use Domain\ShippingMethod\DataTransferObjects\ShippingMethodData;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
-class EditShippingmethod extends EditRecord
+/**
+ * @property-read \Domain\ShippingMethod\Models\ShippingMethod $record
+ */
+class EditShippingMethod extends EditRecord
 {
     use LogsFormActivity;
 
-    protected static string $resource = ShippingmethodResource::class;
+    protected static string $resource = ShippingMethodResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    public function mount(int|string $record): void
     {
+        parent::mount($record);
 
-        $drivers = app(GetAvailableShippingDriverAction::class)->execute();
-
-        /** @var \Domain\ShippingMethod\Models\ShippingMethod */
-        $model = $this->record;
-
-        if (array_key_exists($model->driver->value, $drivers)) {
-            return [
-                Action::make('save')
-                    ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
-                    ->action('save')
-                    ->keyBindings(['mod+s']),
-                Actions\DeleteAction::make(),
-            ];
+        if (! $this->hasValidShippingDriver()) {
+            Notification::make()
+                ->warning()
+                ->body(trans('Shipping Method [:driver] is currently Disabled please inform your service provider if you wish to Re Enabled this feature', [
+                    'driver' => $this->record->driver->value,
+                ]))
+                ->send();
         }
-
-        $this->notify('warning', 'Shipping Method ['.$model->driver->value.'] is currently Disabled please inform your service provider if you wish to Re Enabled this feature');
-
-        return [];
     }
 
-    /**
-     * @param  \Domain\ShippingMethod\Models\ShippingMethod  $record
-     *
-     * @throws Throwable
-     */
-    protected function handleRecordUpdate(Model $record, array $data): Model
+    #[\Override]
+    protected function getHeaderActions(): array
     {
-        return DB::transaction(fn () => app(UpdateShippingMethodAction::class)->execute($record, ShippingMethodData::fromArray($data)));
+        return [
+            Action::make('save')
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
+                ->action('save')
+                ->keyBindings(['mod+s'])
+                ->visible($this->hasValidShippingDriver()),
+            Actions\DeleteAction::make()
+                ->visible($this->hasValidShippingDriver()),
+        ];
     }
 
-    protected function getFormActions(): array
+    private function hasValidShippingDriver(): bool
     {
-        return $this->getCachedActions();
+        return once(function () {
+            $drivers = app(GetAvailableShippingDriverAction::class)->execute();
+
+            return array_key_exists($this->record->driver->value, $drivers);
+        });
     }
 }

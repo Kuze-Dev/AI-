@@ -19,8 +19,7 @@ class ParcelData
         public readonly ?string $height = null,
         public readonly ?string $width = null,
         public readonly ?string $length = null,
-    ) {
-    }
+    ) {}
 
     public function toArray(): array
     {

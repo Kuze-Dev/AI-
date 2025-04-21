@@ -20,6 +20,7 @@ class AdminFactory extends Factory
 {
     protected $model = Admin::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [
@@ -28,7 +29,7 @@ class AdminFactory extends Factory
             'email' => function (array $attributes) {
                 $firstName = Str::of($attributes['first_name'])->camel();
                 $lastName = Str::of($attributes['last_name'])->camel();
-                $domain = parse_url(config('app.url'), PHP_URL_HOST);
+                $domain = parse_url((string) config('app.url'), PHP_URL_HOST);
 
                 return "{$firstName}.{$lastName}@{$domain}";
             },
@@ -48,9 +49,7 @@ class AdminFactory extends Factory
     public function passwordPrompt(Command $command): self
     {
         return $this->state([
-            'password' => function (array $attributes) use ($command) {
-                return $command->secret("Enter a password for {$attributes['email']} (Keep this somewhere safe, you wont be able to see this again)");
-            },
+            'password' => fn (array $attributes) => $command->secret("Enter a password for {$attributes['email']} (Keep this somewhere safe, you wont be able to see this again)"),
         ]);
     }
 

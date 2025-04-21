@@ -19,12 +19,11 @@ class ComputeServiceBillingCycleAction
         Carbon $startDate
     ): ServiceOrderBillingAndDueDateData {
 
-        /** @var \Illuminate\Support\Carbon $billDate */
         $billDate = match ($serviceOrder->billing_cycle) {
             BillingCycleEnum::DAILY => $startDate->addDay(),
             BillingCycleEnum::MONTHLY => $startDate->addMonthNoOverflow(),
             BillingCycleEnum::YEARLY => $startDate->addYearNoOverflow(),
-            default => throw new InvalidServiceBillingCycleException()
+            default => throw new InvalidServiceBillingCycleException,
         };
 
         return new ServiceOrderBillingAndDueDateData(

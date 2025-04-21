@@ -28,9 +28,7 @@ class UpdateCartLineRequest extends FormRequest
             'quantity' => [
                 'nullable',
                 'integer',
-                Rule::requiredIf(function () {
-                    return $this->input('type') === 'quantity';
-                }),
+                Rule::requiredIf(fn () => $this->input('type') === 'quantity'),
                 'min:1',
                 function ($attribute, $value, $fail) use ($cartLine) {
 

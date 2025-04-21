@@ -12,6 +12,5 @@ class ServiceOrderPaymentData
     public function __construct(
         public readonly ServiceTransactionStatus $service_transaction_status,
         public readonly ServiceBillStatus $service_bill_status,
-    ) {
-    }
+    ) {}
 }

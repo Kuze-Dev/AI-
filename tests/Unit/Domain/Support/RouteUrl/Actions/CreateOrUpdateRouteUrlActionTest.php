@@ -20,7 +20,7 @@ beforeEach(function () {
 
     DB::connection()
         ->getSchemaBuilder()
-        ->create((new TestModelForRouteUrl())->getTable(), function (Blueprint $table) {
+        ->create((new TestModelForRouteUrl)->getTable(), function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->timestamps();

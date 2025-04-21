@@ -21,6 +21,7 @@ class PageFactory extends Factory
 {
     protected $model = Page::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [
@@ -44,6 +45,7 @@ class PageFactory extends Factory
         return $this->has(BlockContentFactory::new($attributes)->for($block));
     }
 
+    #[\Override]
     public function configure(): self
     {
         return $this->afterCreating(function (Page $model) {

@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Lloricode\SpatieImageOptimizerHealthCheck\ImageOptimizerCheck;
+use Lloricode\SpatieImageOptimizerHealthCheck\Optimizer;
 use Spatie\Health\Checks\Checks\CacheCheck;
 use Spatie\Health\Checks\Checks\DatabaseCheck;
 use Spatie\Health\Checks\Checks\DatabaseConnectionCountCheck;
@@ -34,7 +35,7 @@ class HealthCheckServiceProvider extends ServiceProvider
             EnvironmentCheck::new(),
             ScheduleCheck::new(),
             SslCertificationExpiredCheck::new()
-                ->url(config('app.url'))
+                ->url(config()->string('app.url'))
                 ->warnWhenSslCertificationExpiringDay(24)
                 ->failWhenSslCertificationExpiringDay(14),
             UsedDiskSpaceCheck::new(),
@@ -43,9 +44,11 @@ class HealthCheckServiceProvider extends ServiceProvider
             QueueCheck::new(),
             // https://github.com/spatie/image-optimizer#optimization-tools
             ImageOptimizerCheck::new()
-                ->checkJPEGOPTIM()
-                ->checkOPTIPNG()
-                ->checkPNGQUANT(),
+                ->addChecks([
+                    Optimizer::JPEGOPTIM,
+                    Optimizer::OPTIPNG,
+                    Optimizer::PNGQUANT,
+                ]),
         ]);
     }
 }

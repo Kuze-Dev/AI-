@@ -8,18 +8,18 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\DB;
 
-class UniqueDomainRule implements ValidationRule
+readonly class UniqueDomainRule implements ValidationRule
 {
     public function __construct(
-        protected readonly string $table,
-        protected readonly string $column = 'domain',
-    ) {
-    }
+        protected string $table,
+        protected string $column = 'domain',
+    ) {}
 
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         // Remove http:// or https:// and www. if they're present
-        $value = preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', $value);
+        $value = preg_replace('/^(http:\/\/|https:\/\/|www\.)/i', '', (string) $value);
 
         // Check if the domain exists in the database
         $passed = DB::table($this->table)

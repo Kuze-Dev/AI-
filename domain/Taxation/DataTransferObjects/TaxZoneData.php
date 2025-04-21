@@ -18,8 +18,7 @@ class TaxZoneData
         public readonly float $percentage,
         public readonly array $countries = [],
         public readonly array $states = [],
-    ) {
-    }
+    ) {}
 
     public static function formArray(array $data): self
     {

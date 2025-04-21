@@ -16,6 +16,5 @@ class ServiceOrderPaymentUpdatedPipelineData
         public readonly ServiceTransaction $service_transaction,
         public readonly bool $is_payment_paid,
         public readonly bool $is_service_order_status_closed
-    ) {
-    }
+    ) {}
 }

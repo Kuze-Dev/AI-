@@ -10,6 +10,5 @@ class Deactivated
 {
     public function __construct(
         public HasActiveState $user
-    ) {
-    }
+    ) {}
 }

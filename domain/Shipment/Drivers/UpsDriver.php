@@ -21,8 +21,7 @@ class UpsDriver
 
         return app(GetUPSRateDataAction::class)->execute(
             $parcelData,
-            $address,
-            $shippingMethod
+            $address
         );
     }
 

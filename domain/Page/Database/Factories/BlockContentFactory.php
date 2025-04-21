@@ -14,6 +14,7 @@ class BlockContentFactory extends Factory
 {
     protected $model = BlockContent::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace App\Features\ECommerce;
 
+use App\Features\FeatureContract;
 use Domain\Tenant\Models\Tenant;
 
-class ColorPallete
+class ColorPallete implements FeatureContract
 {
     public string $name = 'ecommerce.color-pallete';
-
-    public string $label = 'Color Pallete';
 
     public function resolve(Tenant $scope): mixed
     {
         return false;
+    }
+
+    #[\Override]
+    public function getLabel(): string
+    {
+        return trans('Color Pallete');
     }
 }

@@ -12,8 +12,7 @@ readonly class ImportBlueprintAction
 {
     public function __construct(
         private CreateBlueprintAction $createBlueprintAction,
-    ) {
-    }
+    ) {}
 
     public function execute(array $row): Blueprint
     {
@@ -31,7 +30,7 @@ readonly class ImportBlueprintAction
         }
 
         $data = $row;
-        $data['schema'] = json_decode($row['schema'], true);
+        $data['schema'] = json_decode((string) $row['schema'], true);
 
         unset($row);
 

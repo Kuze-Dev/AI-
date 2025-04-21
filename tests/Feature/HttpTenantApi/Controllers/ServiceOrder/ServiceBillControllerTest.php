@@ -13,7 +13,7 @@ use Laravel\Sanctum\Sanctum;
 use function Pest\Laravel\getJson;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
+    testInTenantContext(ServiceBase::class);
 
     $this->customer = CustomerFactory::new()->createOne();
 

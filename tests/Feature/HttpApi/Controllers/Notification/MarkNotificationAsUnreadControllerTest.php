@@ -11,7 +11,7 @@ use function Pest\Laravel\patchJson;
 use function PHPUnit\Framework\assertTrue;
 
 it('mark as un-read', function () {
-    Event::fake();
+    Event::fake(NotificationUnread::class);
 
     $user = loginAsUser();
     $user->notify(new TestNotification(fake()->sentence()));

@@ -9,7 +9,11 @@ use Domain\ServiceOrder\Models\ServiceOrder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-/** @extends \Illuminate\Database\Eloquent\Builder<\Domain\ServiceOrder\Models\ServiceBill> */
+/**
+ * @template TServiceBill of \Domain\ServiceOrder\Models\ServiceBill
+ *
+ * @extends \Illuminate\Database\Eloquent\Builder<TServiceBill>
+ * */
 class ServiceBillQueryBuilder extends Builder
 {
     public function wherePendingStatus(): self

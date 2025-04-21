@@ -10,8 +10,7 @@ class UpdateServiceOrderStatusData
 {
     public function __construct(
         public readonly ?ServiceOrderStatus $status,
-    ) {
-    }
+    ) {}
 
     public static function fromRequest(ServiceOrderStatus $status): self
     {

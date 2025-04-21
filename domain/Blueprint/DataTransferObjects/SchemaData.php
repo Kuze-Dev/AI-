@@ -9,13 +9,12 @@ use Illuminate\Contracts\Support\Arrayable;
 /**
  * @implements Arrayable<string, mixed>
  */
-class SchemaData implements Arrayable
+readonly class SchemaData implements Arrayable
 {
     /** @param  array<SectionData>  $sections */
     private function __construct(
-        public readonly array $sections
-    ) {
-    }
+        public array $sections
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -28,7 +27,8 @@ class SchemaData implements Arrayable
     }
 
     /** @return array<string, mixed> */
-    public function toArray()
+    #[\Override]
+    public function toArray(): array
     {
         return (array) $this;
     }
@@ -44,7 +44,7 @@ class SchemaData implements Arrayable
 
                     $repeaterRule = $field->rules;
 
-                    if (! in_array('array', $repeaterRule)) {
+                    if (! in_array('array', $repeaterRule, true)) {
                         $repeaterRule[] = 'array';
                     }
 

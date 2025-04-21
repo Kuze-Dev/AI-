@@ -24,8 +24,7 @@ class NotifyCustomerServiceBillDueDateJob implements ShouldBeUnique, ShouldQueue
     public function __construct(
         private ServiceOrder $serviceOrder,
         private ServiceBill $serviceBill
-    ) {
-    }
+    ) {}
 
     public function uniqueId(): string
     {

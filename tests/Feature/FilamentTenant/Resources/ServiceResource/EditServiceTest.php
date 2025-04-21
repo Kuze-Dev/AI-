@@ -9,22 +9,20 @@ use App\FilamentTenant\Resources\ServiceResource\Pages\EditService;
 use Domain\Currency\Database\Factories\CurrencyFactory;
 use Domain\Service\Databases\Factories\ServiceFactory;
 use Domain\Service\Models\Service;
-use Domain\Support\MetaData\Models\MetaData;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Support\MetaData\Database\Factories\MetaDataFactory;
+use Support\MetaData\Models\MetaData;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(ServiceBase::class);
     loginAsSuperAdmin();
 
     CurrencyFactory::new()->createOne([
@@ -108,10 +106,10 @@ it('can edit service', function () {
             'is_auto_generated_bill' => ! $service->is_auto_generated_bill,
             'is_partial_payment' => ! $service->is_partial_payment,
             //            'is_installment' => ! $service->is_installment,
-            'taxonomy_term_id' => $taxonomyTerm->id,
+            'taxonomyTerms' => [$taxonomyTerm->id],
             'media.0' => $image,
-            'meta_data' => $metaData,
-            'meta_data.image.0' => $path,
+            'metaData' => $metaData,
+            'metaData.image.0' => $path,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -129,13 +127,11 @@ it('can edit service', function () {
 
     assertDatabaseHas(
         MetaData::class,
-        array_merge(
-            $metaData,
-            [
-                'model_type' => $service->getMorphClass(),
-                'model_id' => $service->getKey(),
-            ]
-        )
+        [
+            'model_type' => $service->getMorphClass(),
+            'model_id' => $service->getKey(),
+            ...$metaData,
+        ]
     );
 
     assertDatabaseHas(Media::class, [

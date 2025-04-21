@@ -13,9 +13,7 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
-    testInTenantContext();
-
-    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
+    testInTenantContext(AllowGuestOrder::class);
 
     ProductFactory::new()
         ->createOne([
@@ -46,9 +44,6 @@ it('can show cart', function () {
                     'id' => $this->cart->uuid,
                     'coupon_code' => null,
                 ],
-            ],
-            'jsonapi' => [
-                'version' => '1.0',
             ],
         ])
         ->assertOk();

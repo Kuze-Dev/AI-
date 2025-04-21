@@ -1,0 +1,14 @@
+<?php
+
+namespace Filament\Forms\Components;
+
+use Filament\Actions\Contracts\HasLivewire;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * @method static static optionsFromModel(string|\Closure $model, string|\Closure $titleColumnName, ?\Closure $callback = null)
+ */
+class Select
+{
+
+}

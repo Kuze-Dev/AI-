@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Http;
 
 final class Client
 {
-    public const PRODUCTION_URL = 'https://apigateway.visionpay.com.au';
+    public const string PRODUCTION_URL = 'https://apigateway.visionpay.com.au';
 
-    public const SANDBOX_URL = 'https://apigatewaystaging.visionpay.com.au';
+    public const string SANDBOX_URL = 'https://apigatewaystaging.visionpay.com.au';
 
-    private PendingRequest $client;
+    private readonly PendingRequest $client;
 
     private ?string $jwtToken = null;
 
@@ -39,17 +39,20 @@ final class Client
      */
     public function authenticate(): string
     {
-        if ($this->jwtToken) {
-            return $this->jwtToken;
+        $token = $this->jwtToken;
+
+        if ($token) {
+            return $token;
         }
 
-        $this->jwtToken = Cache::remember('vision_pay_token', 60, function () {
-            return $this->generateToken();
-        });
+        /** @var string $token */
+        $token = Cache::remember('vision_pay_token', 60, fn () => $this->generateToken());
+
+        $this->jwtToken = $token;
 
         $this->client->withToken($this->jwtToken); // Set the token for subsequent requests
 
-        return $this->jwtToken;
+        return $token;
     }
 
     /**

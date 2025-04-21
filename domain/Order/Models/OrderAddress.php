@@ -59,12 +59,15 @@ class OrderAddress extends Model
         'city',
     ];
 
-    protected $casts = [
-        'label_as' => AddressLabelAs::class,
-        'type' => OrderAddressTypes::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'label_as' => AddressLabelAs::class,
+            'type' => OrderAddressTypes::class,
+        ];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Order\Models\OrderAddress> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, $this> */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);

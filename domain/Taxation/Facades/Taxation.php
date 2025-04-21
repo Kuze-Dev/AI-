@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Facade;
 
 class Taxation extends Facade
 {
-    protected static function getFacadeAccessor()
+    #[\Override]
+    protected static function getFacadeAccessor(): string
     {
         return 'taxation';
     }
