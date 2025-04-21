@@ -56,7 +56,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class CartLine extends Model implements HasMedia
 {
     use HasFactory;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
 
     protected $fillable = [
@@ -70,29 +73,34 @@ class CartLine extends Model implements HasMedia
         'checked_out_at',
     ];
 
-    protected $casts = [
-        'remarks' => 'array',
-        'checkout_expiration' => 'datetime',
-        'checked_out_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'remarks' => 'array',
+            'checkout_expiration' => 'datetime',
+            'checked_out_at' => 'datetime',
+        ];
+    }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'uuid';
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Cart\Models\Cart, \Domain\Cart\Models\CartLine> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Cart\Models\Cart, $this> */
     public function cart(): BelongsTo
     {
         return $this->belongsTo(Cart::class);
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function purchasable(): MorphTo
     {
         return $this->morphTo();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function (Media $media) {

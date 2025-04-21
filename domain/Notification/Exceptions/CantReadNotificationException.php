@@ -6,6 +6,4 @@ namespace Domain\Notification\Exceptions;
 
 use LogicException;
 
-class CantReadNotificationException extends LogicException
-{
-}
+class CantReadNotificationException extends LogicException {}

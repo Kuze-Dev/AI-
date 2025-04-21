@@ -55,12 +55,7 @@ class ServiceOrderCheckoutController
                 ['message' => trans('Unable to proceed, service order\'s status is still on pending')],
                 Response::HTTP_NOT_FOUND
             );
-        } catch (PaymentException $p) {
-            return response(
-                ['message' => trans($p->getMessage())],
-                Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-        } catch (PaymentExceedLimitException $p) {
+        } catch (PaymentException|PaymentExceedLimitException $p) {
             return response(
                 ['message' => trans($p->getMessage())],
                 Response::HTTP_INTERNAL_SERVER_ERROR

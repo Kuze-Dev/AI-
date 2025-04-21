@@ -10,7 +10,7 @@ use Domain\ServiceOrder\Database\Factories\ServiceOrderFactory;
 use function Pest\Laravel\postJson;
 
 beforeEach(function () {
-    testInTenantContext()->features()->activate(ServiceBase::class);
+    testInTenantContext(ServiceBase::class);
     $this->customer = CustomerFactory::new()->createOne();
     CurrencyFactory::new()->createOne([
         'code' => 'USD',

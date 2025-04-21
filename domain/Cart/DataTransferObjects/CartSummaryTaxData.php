@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
-class CartSummaryTaxData
+readonly class CartSummaryTaxData
 {
     public function __construct(
-        public readonly ?int $countryId,
-        public readonly ?int $stateId,
-    ) {
-    }
+        public ?int $countryId,
+        public ?int $stateId,
+    ) {}
 
     public static function fromArray(array $data): self
     {

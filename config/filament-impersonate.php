@@ -1,5 +1,4 @@
 <?php
-
 return [
     // This is the guard used when logging in as the impersonated user.
     'guard' => env('FILAMENT_IMPERSONATE_GUARD', 'web'),
@@ -15,6 +14,9 @@ return [
     ],
 
     'banner' => [
+        // Available hooks: https://filamentphp.com/docs/3.x/support/render-hooks#available-render-hooks
+        'render_hook' => env('FILAMENT_IMPERSONATE_BANNER_RENDER_HOOK', 'panels::body.start'),
+
         // Currently supports 'dark', 'light' and 'auto'.
         'style' => env('FILAMENT_IMPERSONATE_BANNER_STYLE', 'auto'),
 

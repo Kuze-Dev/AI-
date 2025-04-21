@@ -12,7 +12,7 @@ class DeleteAddressAction
     public function execute(Address $address): ?bool
     {
         if ($address->is_default_shipping || $address->is_default_billing) {
-            throw new CantDeleteDefaultAddressException();
+            throw new CantDeleteDefaultAddressException;
         }
 
         return $address->delete();

@@ -8,14 +8,13 @@ use Domain\Shipment\DataTransferObjects\ReceiverData;
 use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
-class GuestCartSummaryShippingData
+readonly class GuestCartSummaryShippingData
 {
     public function __construct(
-        public readonly ?ReceiverData $receiverData,
-        public readonly ?ShippingAddressData $shippingAddress,
-        public readonly ?ShippingMethod $shippingMethod,
-    ) {
-    }
+        public ?ReceiverData $receiverData,
+        public ?ShippingAddressData $shippingAddress,
+        public ?ShippingMethod $shippingMethod,
+    ) {}
 
     public static function fromArray(array $data): self
     {

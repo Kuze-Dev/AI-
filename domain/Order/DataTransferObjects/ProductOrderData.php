@@ -7,27 +7,26 @@ namespace Domain\Order\DataTransferObjects;
 use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Product\Models\Product;
 
-class ProductOrderData
+readonly class ProductOrderData
 {
     public function __construct(
-        public readonly int $id,
-        public readonly string $name,
-        public readonly string $slug,
-        public readonly string $sku,
-        public readonly float|string $retail_price,
-        public readonly float|string $selling_price,
-        public readonly bool $status,
-        public readonly bool $is_digital_product,
-        public readonly bool $is_featured,
-        public readonly bool $is_special_offer,
-        public readonly bool $allow_customer_remarks,
-        public readonly ?string $description,
-        public readonly ?int $stock,
-        public readonly ?bool $allow_stocks,
-        public readonly ?int $minimum_order_quantity,
-        public readonly ?bool $allow_guest_purchase,
-    ) {
-    }
+        public int $id,
+        public string $name,
+        public string $slug,
+        public string $sku,
+        public float|string $retail_price,
+        public float|string $selling_price,
+        public bool $status,
+        public bool $is_digital_product,
+        public bool $is_featured,
+        public bool $is_special_offer,
+        public bool $allow_customer_remarks,
+        public ?string $description,
+        public ?int $stock,
+        public ?bool $allow_stocks,
+        public ?int $minimum_order_quantity,
+        public ?bool $allow_guest_purchase,
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -45,15 +44,15 @@ class ProductOrderData
             allow_customer_remarks: $data['allow_customer_remarks'],
             description: $data['description'] ?? null,
             stock: $data['stock'] ?? null,
-            allow_stocks: isset($data['allow_stocks']) ? $data['allow_stocks'] : null,
-            minimum_order_quantity: isset($data['minimum_order_quantity']) ? $data['minimum_order_quantity'] : null,
-            allow_guest_purchase: isset($data['allow_guest_purchase']) ? $data['allow_guest_purchase'] : null,
+            allow_stocks: $data['allow_stocks'] ?? null,
+            minimum_order_quantity: $data['minimum_order_quantity'] ?? null,
+            allow_guest_purchase: $data['allow_guest_purchase'] ?? null,
         );
     }
 
     public static function fromProduct(Product $product): self
     {
-        //product tiering discount
+        // product tiering discount
         $selling_price = $product->selling_price;
 
         if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
@@ -74,9 +73,9 @@ class ProductOrderData
             allow_customer_remarks: (bool) $product->allow_customer_remarks,
             description: $product->description ?? null,
             stock: $product->stock ?? null,
-            allow_stocks: isset($product->allow_stocks) ? $product->allow_stocks : null,
-            minimum_order_quantity: isset($product->minimum_order_quantity) ? $product->minimum_order_quantity : null,
-            allow_guest_purchase: isset($product->allow_guest_purchase) ? $product->allow_guest_purchase : null,
+            allow_stocks: $product->allow_stocks ?? null,
+            minimum_order_quantity: $product->minimum_order_quantity ?? null,
+            allow_guest_purchase: $product->allow_guest_purchase ?? null,
         );
     }
 }

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('product_tier', function (Blueprint $table) {
             $table->id();
-            $table->unsignedDecimal('discount', 6, 3)->default(0);
+            $table->decimal('discount', 6, 3)->unsigned()->default(0);
             $table->foreignIdFor(Product::class)->index();
             $table->foreignIdFor(Tier::class)->index();
         });

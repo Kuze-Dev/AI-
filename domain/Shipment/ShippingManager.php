@@ -9,6 +9,7 @@ use Illuminate\Support\Manager;
 
 class ShippingManager extends Manager implements ShippingManagerInterface
 {
+    #[\Override]
     public function getDefaultDriver(): string
     {
         return config('domain.shipment.default');

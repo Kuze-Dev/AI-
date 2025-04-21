@@ -15,6 +15,7 @@ class TenantFactory extends Factory
 {
     protected $model = Tenant::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [
@@ -38,5 +39,16 @@ class TenantFactory extends Factory
                 $tenant->createDomain($domain);
             }
         });
+    }
+
+    public function withDatabase(): self
+    {
+        return $this->state([
+            Tenant::internalPrefix().'db_host' => 'test',
+            Tenant::internalPrefix().'db_port' => '3306 ',
+            Tenant::internalPrefix().'db_name' => 'test',
+            Tenant::internalPrefix().'db_username' => 'test',
+            Tenant::internalPrefix().'db_password' => 'test',
+        ]);
     }
 }

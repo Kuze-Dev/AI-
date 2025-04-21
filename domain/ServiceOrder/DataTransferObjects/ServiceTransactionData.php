@@ -16,8 +16,7 @@ class ServiceTransactionData
         public readonly string $currency,
         public readonly ?float $total_amount,
         public readonly ServiceTransactionStatus $status,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

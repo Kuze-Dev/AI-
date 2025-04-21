@@ -6,10 +6,11 @@ namespace App\Policies;
 
 use App\Features\CMS\CMSBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
+use Domain\Admin\Models\Admin;
 use Domain\Page\Models\Page;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\Auth;
 
 class PagePolicy
 {
@@ -17,7 +18,7 @@ class PagePolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (TenantFeatureSupport::inactive(CMSBase::class)) {
             return Response::denyAsNotFound();
         }
 
@@ -39,20 +40,17 @@ class PagePolicy
         return $this->checkWildcardPermissions($user);
     }
 
-    public function update(User $user, Page $page): bool
+    public function update(Admin $user, Page $page): bool
     {
-        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if ($user->hasRole(config()->string('domain.role.super_admin'))) {
 
             return true;
         }
 
         if ($user->can('site.siteManager')) {
 
-            /** @var \Domain\Admin\Models\Admin */
-            $admin = $user;
-
             $pageSites = $page->sites->pluck('id')->toArray();
-            $userSites = $admin->userSite->pluck('id')->toArray();
+            $userSites = $user->userSite->pluck('id')->toArray();
 
             $intersection = array_intersect($pageSites, $userSites);
 

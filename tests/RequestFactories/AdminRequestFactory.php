@@ -9,6 +9,7 @@ use Worksome\RequestFactories\RequestFactory;
 
 class AdminRequestFactory extends RequestFactory
 {
+    #[\Override]
     public function definition(): array
     {
         return [

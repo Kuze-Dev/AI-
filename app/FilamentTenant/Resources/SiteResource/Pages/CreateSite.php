@@ -7,36 +7,30 @@ namespace App\FilamentTenant\Resources\SiteResource\Pages;
 use App\FilamentTenant\Resources\SiteResource;
 use Domain\Site\Actions\CreateSiteAction;
 use Domain\Site\DataTransferObjects\SiteData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class CreateSite extends CreateRecord
 {
     protected static string $resource = SiteResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('Create Site'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
     }
 
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
 
-        return DB::transaction(
-            fn () => app(CreateSiteAction::class)
-                ->execute(SiteData::fromArray($data))
-        );
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
+        return app(CreateSiteAction::class)
+            ->execute(SiteData::fromArray($data));
     }
 }

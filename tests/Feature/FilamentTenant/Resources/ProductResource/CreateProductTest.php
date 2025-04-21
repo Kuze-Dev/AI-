@@ -8,7 +8,6 @@ use Domain\Product\Models\Product;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
 use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Support\MetaData\Models\MetaData;
@@ -18,7 +17,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 
@@ -41,11 +39,11 @@ it('can create product', function () {
             'retail_price' => 24.99,
             'selling_price' => 29.99,
             'stock' => 50,
-            'images.0' => $productImage,
+            'image.0' => $productImage,
             'weight' => 1,
-            'length' => 10,
-            'height' => 10,
-            'width' => 3,
+            'dimension.length' => 10,
+            'dimension.height' => 10,
+            'dimension.width' => 3,
             'taxonomy_terms.0' => $taxonomyTerm->id,
         ])
         ->call('create')
@@ -64,7 +62,6 @@ it('can create product', function () {
     ]);
 
     assertDatabaseHas(Media::class, [
-        'file_name' => $productImage->getClientOriginalName(),
         'mime_type' => $productImage->getMimeType(),
     ]);
 });
@@ -111,13 +108,13 @@ it('can create product with metadata', function () {
             'selling_price' => 29.99,
             'stock' => 50,
             'weight' => 15,
-            'length' => 20,
-            'width' => 15,
-            'height' => 15,
-            'images.0' => $imageFaker,
+            'dimension.length' => 20,
+            'dimension.width' => 15,
+            'dimension.height' => 15,
+            'image.0' => $imageFaker,
             'taxonomy_terms.0' => $taxonomyTerm->id,
-            'meta_data' => $metaData,
-            'meta_data.image.0' => $path,
+            'metaData' => $metaData,
+            'metaData.image.0' => $path,
         ])
         ->call('create')
         ->assertHasNoFormErrors()

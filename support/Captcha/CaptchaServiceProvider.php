@@ -8,7 +8,8 @@ use Illuminate\Support\ServiceProvider;
 
 class CaptchaServiceProvider extends ServiceProvider
 {
-    public function register()
+    #[\Override]
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/config/captcha.php', 'captcha');
     }

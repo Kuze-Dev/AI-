@@ -57,7 +57,7 @@ beforeEach(function () {
         ]
     );
 
-    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver());
+    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver);
 
     ProductFactory::new()
         ->times(3)

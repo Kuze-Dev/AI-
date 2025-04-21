@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\GlobalsResource\Pages;
 
-use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Actions\CreateGlobalTranslationAction;
@@ -12,16 +11,19 @@ use Domain\Globals\Actions\UpdateGlobalsAction;
 use Domain\Globals\DataTransferObjects\GlobalsData;
 use Domain\Globals\Models\Globals;
 use Domain\Internationalization\Models\Locale;
+use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Notifications\Notification;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+// use Filament\Pages\Actions;
+// use Filament\Pages\Actions\Action;
+// use Filament\Resources\Pages\EditRecord;
+// use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
-use Livewire\Redirector;
-use Throwable;
+use Livewire\Features\SupportRedirects\Redirector;
 
 class EditGlobals extends EditRecord
 {
@@ -29,53 +31,47 @@ class EditGlobals extends EditRecord
 
     protected static string $resource = GlobalsResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
 
-            'other_page_actions' => CustomPageActionGroup::make([
+            ActionGroup::make([
 
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    ->action('createTranslation')
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->action(fn (Action $action) => $this->createTranslation($action->getFormData()))
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
-                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->required(),
                     ]),
             ])
-                ->view('filament.pages.actions.custom-action-group.index')
-                ->setName('other_page_actions')
-                ->color('secondary')
+                ->button()
+                ->icon('')
                 ->label(trans('More Actions')),
             Actions\DeleteAction::make(),
 
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Globals\Models\Globals  $record
-     *
-     * @throws Throwable
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(fn () => app(UpdateGlobalsAction::class)->execute($record, GlobalsData::fromArray($data)));
+        return app(UpdateGlobalsAction::class)->execute($record, GlobalsData::fromArray($data));
     }
 
     public function createTranslation(array $data): RedirectResponse|Redirector|false
@@ -96,8 +92,7 @@ class EditGlobals extends EditRecord
         /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();
 
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = auth()->user();
+        $admin = filament_admin();
 
         if ($exist) {
 

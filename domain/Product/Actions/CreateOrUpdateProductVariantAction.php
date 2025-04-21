@@ -75,13 +75,11 @@ class CreateOrUpdateProductVariantAction
                 'LIKE',
                 '%"option_value_id": '.$productVariant->combination[0]->option_value_id.'%'
             )
-                ->when(isset($productVariant->combination[1]), function ($query) use ($productVariant) {
-                    return $query->where(
-                        'combination',
-                        'LIKE',
-                        '%"option_value_id": '.$productVariant->combination[1]->option_value_id.'%'
-                    );
-                })
+                ->when(isset($productVariant->combination[1]), fn ($query) => $query->where(
+                    'combination',
+                    'LIKE',
+                    '%"option_value_id": '.$productVariant->combination[1]->option_value_id.'%'
+                ))
                 ->where('product_id', $productId)
                 ->first();
 

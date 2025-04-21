@@ -13,8 +13,7 @@ class GetUPSInternationalRateDataAction
 {
     public function __construct(
         private readonly UPSRateClient $rateClient,
-    ) {
-    }
+    ) {}
 
     public function execute(
         ParcelData $parcelData,

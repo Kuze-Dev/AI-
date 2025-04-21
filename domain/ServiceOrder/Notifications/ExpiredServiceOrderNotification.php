@@ -18,8 +18,6 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
 {
     use Queueable;
 
-    private ServiceBill $serviceBill;
-
     private ?ServiceOrder $serviceOrder;
 
     private string $logo;
@@ -34,30 +32,31 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
 
     private array $replyTo;
 
-    private string $payment_method = 'bank-transfer';
+    private string $payment_method;
 
     private ?string $footer = null;
 
     /** Create a new notification instance. */
-    public function __construct(ServiceBill $serviceBill)
+    public function __construct(private ServiceBill $serviceBill)
     {
-        $this->serviceBill = $serviceBill;
-        $this->serviceOrder = $serviceBill->serviceOrder;
-        $this->payment_method = $serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
+        $this->serviceOrder = $this->serviceBill->serviceOrder;
+        $this->payment_method = $this->serviceBill->serviceOrder?->latestPaymentMethod()?->slug ?? 'bank-transfer';
 
-        $this->logo = app(SiteSettings::class)->getLogoUrl();
-        $this->title = app(SiteSettings::class)->name;
-        $this->description = app(SiteSettings::class)->description;
-        $this->description = app(SiteSettings::class)->description;
-        $this->url = 'http://'.app(SiteSettings::class)->front_end_domain.'/'.app(ServiceSettings::class)->domain_path_segment.
-                    '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$serviceBill->reference.
+        $siteSettings = app(SiteSettings::class);
+        $serviceSettings = app(ServiceSettings::class);
+
+        $this->logo = $siteSettings->getLogoUrl();
+        $this->title = $siteSettings->name;
+        $this->description = $siteSettings->description;
+        $this->url = 'http://'.$siteSettings->front_end_domain.'/'.$serviceSettings->domain_path_segment.
+                    '?ServiceOrder='.$this->serviceOrder?->reference.'&ServiceBill='.$this->serviceBill->reference.
                     '&payment_method='.$this->payment_method;
-        $this->from = app(ServiceSettings::class)->email_sender_name;
+        $this->from = $serviceSettings->email_sender_name;
 
-        $sanitizedReplyToEmails = $this->sanitizeEmailArray(app(ServiceSettings::class)->email_reply_to ?? []);
+        $sanitizedReplyToEmails = $this->sanitizeEmailArray($serviceSettings->email_reply_to ?? []);
         $this->replyTo = $sanitizedReplyToEmails;
 
-        $this->footer = app(ServiceSettings::class)->email_footer;
+        $this->footer = $serviceSettings->email_footer;
     }
 
     /**
@@ -75,7 +74,7 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
     {
         $admin = Admin::first();
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service Expired')
             ->replyTo($this->replyTo)
             ->from($this->from)
@@ -105,7 +104,7 @@ class ExpiredServiceOrderNotification extends Notification implements ShouldQueu
         $sanitizedEmails = [];
 
         foreach ($emailArray as $email) {
-            $email = trim($email);
+            $email = trim((string) $email);
 
             if (! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;

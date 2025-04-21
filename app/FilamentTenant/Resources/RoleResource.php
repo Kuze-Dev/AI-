@@ -6,14 +6,13 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\RoleResource as BaseRoleResource;
 use App\FilamentTenant\Resources\RoleResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
+use App\FilamentTenant\Support\Traits\RequiresPasswordConfirmation;
 
 class RoleResource extends BaseRoleResource
 {
-    use ContextualResource;
+    use RequiresPasswordConfirmation;
 
-    protected static string|array $middlewares = ['password.confirm:filament-tenant.auth.password.confirm'];
-
+    #[\Override]
     public static function getPages(): array
     {
         return [

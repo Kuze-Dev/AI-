@@ -6,27 +6,25 @@ namespace App\Filament\Resources\AdminResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\AdminResource;
-use Domain\Admin\Actions\UpdateAdminAction;
-use Domain\Admin\DataTransferObjects\AdminData;
-use Domain\Admin\Models\Admin;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
+/**
+ * @property-read \Domain\Admin\Models\Admin&\Illuminate\Contracts\Auth\Authenticatable $record
+ */
 class EditAdmin extends EditRecord
 {
     use LogsFormActivity;
 
     protected static string $resource = AdminResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
@@ -35,16 +33,13 @@ class EditAdmin extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
+    public function afterSave(): void
     {
-        return $this->getCachedActions();
-    }
+        if ($this->record->wasChanged('email')) {
+            $this->record->forceFill(['email_verified_at' => null])
+                ->save();
 
-    /** @param  Admin  $record
-     * @throws Throwable
-     */
-    protected function handleRecordUpdate(Model $record, array $data): Model
-    {
-        return DB::transaction(fn () => app(UpdateAdminAction::class)->execute($record, new AdminData(...$data)));
+            $this->record->sendEmailVerificationNotification();
+        }
     }
 }

@@ -9,8 +9,7 @@ class MediaCollectionData
     public function __construct(
         public readonly string $collection,
         public readonly array $media = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -21,10 +21,12 @@ use Domain\Service\Models\Service;
 use Domain\ShippingMethod\Models\ShippingMethod;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
-use Filament\Resources\Form;
+// use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+// use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -32,7 +34,7 @@ use Support\MetaData\Models\MetaData;
 
 class MediaresourceResource extends Resource
 {
-    use ContextualResource;
+    // use ContextualResource;
 
     protected static ?string $model = Media::class;
 
@@ -40,11 +42,13 @@ class MediaresourceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -60,6 +64,7 @@ class MediaresourceResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -71,39 +76,33 @@ class MediaresourceResource extends Resource
             ->columns([
                 Tables\Columns\Layout\Stack::make([
                     Tables\Columns\ImageColumn::make('original_url')
-                        ->getStateUsing(function ($record) {
-                            return match ($record->getTypeFromMime()) {
-                                'image' => $record->original_url,
-                                default => 'https://dummyimage.com/600x400/000/fff&text='.$record->getTypeFromMime(),
-                            };
+                        ->getStateUsing(fn ($record) => match ($record->getTypeFromMime()) {
+                            'image' => $record->original_url,
+                            default => 'https://dummyimage.com/600x400/000/fff&text='.$record->getTypeFromMime(),
                         })
                         ->height(200)
                         ->width('100%')
                         ->extraAttributes(['class' => 'rounded-lg w-full overflow-hidden bg-neutral-800'])
                         ->extraImgAttributes(['class' => 'aspect-[5/3] object-contain']),
                     Tables\Columns\TextColumn::make('model_type')
-                        ->formatStateUsing(function ($record) {
-                            return match ($record->model_type) {
-                                app(MetaData::class)->getMorphClass() => 'MetaData',
-                                app(Block::class)->getMorphClass() => 'Blocks',
-                                app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.BlueprintData::select(['id', 'model_type'])->where('id', $record->model_id)->first()?->model_type.')',
-                                default => Str::upper($record->model_type),
-                            };
+                        ->formatStateUsing(fn ($record) => match ($record->model_type) {
+                            app(MetaData::class)->getMorphClass() => 'MetaData',
+                            app(Block::class)->getMorphClass() => 'Blocks',
+                            app(BlueprintData::class)->getMorphClass() => 'BlueprintData('.BlueprintData::select(['id', 'model_type'])->where('id', $record->model_id)->first()?->model_type.')',
+                            default => Str::upper($record->model_type),
                         })
                         ->searchable(),
                     Tables\Columns\TextColumn::make('name')
-                        ->url(function (Media $record) {
-                            return match ($record->model_type) {
-                                app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
-                                app(Block::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.blocks.edit', Block::find($record->model_id)),
-                                app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
-                                app(Service::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.services.edit', Service::find($record->model_id)),
-                                app(Customer::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.customers.edit', Customer::find($record->model_id)),
-                                app(PaymentMethod::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.payment-methods.edit', PaymentMethod::find($record->model_id)),
-                                app(Product::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.products.edit', Product::find($record->model_id)),
-                                app(ShippingMethod::class)->getMorphClass() => self::resolveModelUrl('filament-tenant.resources.shipping-methods.edit', ShippingMethod::find($record->model_id)),
-                                default => '/admin',
-                            };
+                        ->url(fn (Media $record) => match ($record->model_type) {
+                            app(MetaData::class)->getMorphClass() => self::getMetaDataResourceModel($record),
+                            app(Block::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.blocks.edit', Block::find($record->model_id)),
+                            app(BlueprintData::class)->getMorphClass() => self::getBlueprintDataResourceUrl($record),
+                            app(Service::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.services.edit', Service::find($record->model_id)),
+                            app(Customer::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.customers.edit', Customer::find($record->model_id)),
+                            app(PaymentMethod::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.payment-methods.edit', PaymentMethod::find($record->model_id)),
+                            app(Product::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.products.edit', Product::find($record->model_id)),
+                            app(ShippingMethod::class)->getMorphClass() => self::resolveModelUrl('filament.tenant.resources.shipping-methods.edit', ShippingMethod::find($record->model_id)),
+                            default => '/admin',
                         })
                         ->openUrlInNewTab()
                         ->extraAttributes(['class' => ' rounded-lg w-full overflow-hidden'])
@@ -141,15 +140,15 @@ class MediaresourceResource extends Resource
         $resource = $metaData?->resourceModel;
         if ($resource) {
             return match ($resource::class) {
-                ContentEntry::class => route('filament-tenant.resources.contents.entries.edit', [
+                ContentEntry::class => route('filament.tenant.resources.contents.entries.edit', [
                     'ownerRecord' => $resource->content,
                     'record' => $resource,
                 ]),
-                Page::class => route('filament-tenant.resources.pages.edit', ['record' => $resource]),
-                Product::class => route('filament-tenant.resources.products.edit', ['record' => $resource]),
-                Service::class => route('filament-tenant.resources.services.edit', ['record' => $resource]),
-                // TaxonomyTerm::class => route('filament-tenant.resources.taxonomies.edit', ['record' => $resource->taxonomy]),
-                // Globals::class => route('filament-tenant.resources.globals.edit', ['record' => $resource]),
+                Page::class => route('filament.tenant.resources.pages.edit', ['record' => $resource]),
+                Product::class => route('filament.tenant.resources.products.edit', ['record' => $resource]),
+                Service::class => route('filament.tenant.resources.services.edit', ['record' => $resource]),
+                // TaxonomyTerm::class => .resources.taxonomies.edit', ['record' => $resource->taxonomy]),
+                // Globals::class => .resources.globals.edit', ['record' => $resource]),
                 default => '/admin',
             };
         }
@@ -172,14 +171,14 @@ class MediaresourceResource extends Resource
         $resource = $blueprintData?->resourceModel;
         if ($resource) {
             return match ($resource::class) {
-                ContentEntry::class => route('filament-tenant.resources.contents.entries.edit', [
+                ContentEntry::class => route('filament.tenant.resources.contents.entries.edit', [
                     'ownerRecord' => $resource->content,
                     'record' => $resource,
                 ]),
-                BlockContent::class => self::resolveModelUrl('filament-tenant.resources.pages.edit', $resource->page),
-                TaxonomyTerm::class => self::resolveModelUrl('filament-tenant.resources.taxonomies.edit', $resource->taxonomy),
-                Globals::class => self::resolveModelUrl('filament-tenant.resources.globals.edit', $resource),
-                Customer::class => self::resolveModelUrl('filament-tenant.resources.customers.edit', $resource),
+                BlockContent::class => self::resolveModelUrl('filament.tenant.resources.pages.edit', $resource->page),
+                TaxonomyTerm::class => self::resolveModelUrl('filament.tenant.resources.taxonomies.edit', $resource->taxonomy),
+                Globals::class => self::resolveModelUrl('filament.tenant.resources.globals.edit', $resource),
+                Customer::class => self::resolveModelUrl('filament.tenant.resources.customers.edit', $resource),
                 default => '/admin',
             };
         }
@@ -188,6 +187,7 @@ class MediaresourceResource extends Resource
 
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -195,11 +195,12 @@ class MediaresourceResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListMediaresources::route('/'),
-            'edit' => Pages\EditMediaresource::route('/{record}/edit'),
+            'edit' => Pages\EditMediaResource::route('/{record}/edit'),
         ];
     }
 }

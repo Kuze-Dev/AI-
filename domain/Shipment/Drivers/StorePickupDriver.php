@@ -17,13 +17,13 @@ class StorePickupDriver
         ShippingAddressData $address,
         ShippingMethod $shippingMethod
     ): RateResponse {
-        return new StorePickupResponseData();
+        return new StorePickupResponseData;
     }
 
     public function getInternationalRate(
         ParcelData $parcelData,
         ShippingAddressData $address,
     ): RateResponse {
-        return new StorePickupResponseData();
+        return new StorePickupResponseData;
     }
 }

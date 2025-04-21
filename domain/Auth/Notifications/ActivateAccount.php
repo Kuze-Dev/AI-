@@ -37,7 +37,7 @@ class ActivateAccount extends Notification implements ShouldQueue
 
     protected function buildMailMessage(string $url): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(trans('Activate Account'))
             ->line(trans('Please click the button below to activate your account.'))
             ->action(trans('Activate Account'), $url)

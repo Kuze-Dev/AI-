@@ -12,11 +12,12 @@ use Domain\Content\DataTransferObjects\ContentData;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Content;
 use Domain\Page\Enums\Visibility;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
+// use Filament\Pages\Actions;
+// use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class EditContent extends EditRecord
 {
@@ -28,25 +29,21 @@ class EditContent extends EditRecord
      * Declare action buttons that
      * are available on the page.
      */
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('Save Changes'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
             Actions\Action::make('view-entries')
-                ->color('secondary')
+                ->color('gray')
                 ->record($this->getRecord())
                 ->authorize(ContentEntryResource::canViewAny())
                 ->url(ContentEntryResource::getUrl('index', [$this->getRecord()])),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     /**
@@ -55,21 +52,21 @@ class EditContent extends EditRecord
      *
      * @param  Content  $record
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateContentAction::class)
-                ->execute($record, new ContentData(
-                    name: $data['name'],
-                    taxonomies: $data['taxonomies'],
-                    blueprint_id: $data['blueprint_id'],
-                    visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
-                    is_sortable: $data['is_sortable'],
-                    past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
-                    future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
-                    prefix: $data['prefix'],
-                    sites: $data['sites'] ?? [],
-                ))
-        );
+        return app(UpdateContentAction::class)
+            ->execute($record, new ContentData(
+                name: $data['name'],
+                blueprint_id: $data['blueprint_id'],
+                prefix: $data['prefix'],
+                visibility: $data['visibility'] ?? Visibility::PUBLIC->value,
+                taxonomies: $data['taxonomies'],
+                past_publish_date_behavior: PublishBehavior::tryFrom($data['past_publish_date_behavior'] ?? ''),
+                future_publish_date_behavior: PublishBehavior::tryFrom($data['future_publish_date_behavior'] ?? ''),
+                is_sortable: $data['is_sortable'],
+                sites: $data['sites'] ?? [],
+            )
+            );
     }
 }

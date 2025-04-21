@@ -13,12 +13,11 @@ use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 use Illuminate\Support\Str;
 
-class GuestCreateOrderAction
+readonly class GuestCreateOrderAction
 {
     public function __construct(
-        private readonly GuestCartSummaryAction $guestCartSummaryAction,
-    ) {
-    }
+        private GuestCartSummaryAction $guestCartSummaryAction,
+    ) {}
 
     public function execute(GuestPlaceOrderData $guestPlaceOrderData, GuestPreparedOrderData $guestPreparedOrderData): Order
     {
@@ -39,7 +38,7 @@ class GuestCreateOrderAction
             $guestPlaceOrderData->serviceId
         );
 
-        $paymentMethod = $guestPreparedOrderData->paymentMethod->gateway == 'manual'
+        $paymentMethod = $guestPreparedOrderData->paymentMethod->gateway === 'manual'
             ? OrderStatuses::PENDING : OrderStatuses::FORPAYMENT;
 
         $order = Order::create([

@@ -21,18 +21,18 @@ class CreateCartLineRequest extends FormRequest
         return [
             'purchasable_id' => [
                 'required',
-                Rule::exists(Product::class, (new Product())->getRouteKeyName()),
+                Rule::exists(Product::class, (new Product)->getRouteKeyName()),
             ],
             'variant_id' => [
                 'nullable',
-                Rule::exists(ProductVariant::class, (new ProductVariant())->getRouteKeyName()),
+                Rule::exists(ProductVariant::class, (new ProductVariant)->getRouteKeyName()),
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
                     $purchasableType = $this->input('purchasable_type');
 
                     if ($purchasableType === 'Product') {
                         ProductVariant::whereHas('product', function ($subQuery) use ($purchasableId) {
-                            $subQuery->where((new Product())->getRouteKeyName(), $purchasableId);
+                            $subQuery->where((new Product)->getRouteKeyName(), $purchasableId);
                         });
                     }
                 },
@@ -53,9 +53,9 @@ class CreateCartLineRequest extends FormRequest
                         $fail('Invalid product.');
                     }
 
-                    $type = auth()->user() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
+                    $type = guest_customer_logged_in() ? CartUserType::AUTHENTICATED : CartUserType::GUEST;
                     /** @var int|string $userId */
-                    $userId = auth()->user() ? auth()->user()->id : $this->bearerToken();
+                    $userId = guest_customer_logged_in() ? customer_logged_in()->id : $this->bearerToken();
 
                     if (is_null($variantId)) {
                         try {
@@ -88,7 +88,7 @@ class CreateCartLineRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $purchasableId = $this->input('purchasable_id');
 
-                    $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
+                    $product = Product::where((new Product)->getRouteKeyName(), $purchasableId)->first();
 
                     if (! $product) {
                         $fail('Invalid product.');
@@ -114,7 +114,7 @@ class CreateCartLineRequest extends FormRequest
 
                     $purchasableId = $this->input('purchasable_id');
 
-                    $product = Product::where((new Product())->getRouteKeyName(), $purchasableId)->first();
+                    $product = Product::where((new Product)->getRouteKeyName(), $purchasableId)->first();
 
                     if (! $product) {
                         $fail('Invalid product.');

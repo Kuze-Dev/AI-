@@ -9,6 +9,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
 
 class ProductTierDiscountResource extends JsonApiResource
 {
+    #[\Override]
     public function toId(Request $request): string
     {
         if (! isset($this->pivot)) {
@@ -18,11 +19,13 @@ class ProductTierDiscountResource extends JsonApiResource
         return (string) $this->pivot->id;
     }
 
+    #[\Override]
     public function toType(Request $request): string
     {
         return 'productTier';
     }
 
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         if (! isset($this->pivot)) {
@@ -37,6 +40,7 @@ class ProductTierDiscountResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [];

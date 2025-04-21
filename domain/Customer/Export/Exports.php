@@ -6,7 +6,7 @@ namespace Domain\Customer\Export;
 
 use App\Settings\CustomerSettings;
 use Domain\Customer\Models\Customer;
-use Filament\Support\Actions\Action;
+use Filament\Actions\Action;
 use HalcyonAgile\FilamentExport\Actions\ExportAction;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,9 +14,7 @@ use Laravel\SerializableClosure\Exceptions\PhpVersionNotSupportedException;
 
 final class Exports
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * @param  array<int, \Domain\Customer\Enums\RegisterStatus>  $registerStatues
@@ -49,7 +47,7 @@ final class Exports
                     $customer->gender?->value,
                     $customer->status?->value,
                     $customer->birth_date?->format(
-                        ($date_format == 'default' || $date_format == null) ?
+                        ($date_format === 'default' || $date_format === null) ?
                         config('tables.date_format') :
                             $date_format
                     ),
@@ -76,6 +74,7 @@ final class Exports
     {
         $date_format = app(CustomerSettings::class)->date_format;
 
+        /** @phpstan-ignore return.type */
         return ExportBulkAction::make()
             ->queue()
             ->query(
@@ -95,7 +94,7 @@ final class Exports
                     $customer->mobile,
                     $customer->status?->value,
                     $customer->birth_date?->format(
-                        ($date_format == 'default' || $date_format == null) ?
+                        ($date_format === 'default' || $date_format === null) ?
                         config('tables.date_format') :
                             $date_format
                     ),
@@ -110,6 +109,7 @@ final class Exports
             ->withActivityLog(
                 event: 'bulk-exported',
                 description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                /** @phpstan-ignore method.notFound  */
                 properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
             );
     }

@@ -13,8 +13,7 @@ class PermissionGroup
     public function __construct(
         public Permission $main,
         public Collection $abilities
-    ) {
-    }
+    ) {}
 
     /** @param  Collection<int, Permission>  $permissions */
     public static function make(Collection $permissions): self

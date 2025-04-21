@@ -16,7 +16,7 @@ use Domain\Order\Models\Order;
 
 final class DiscountHelperFunctions
 {
-    public function deductableAmount(Discount $discount, float $subTotal, float $shippingTotal): ?float
+    public function deductableAmount(Discount $discount, float $subTotal, float $shippingTotal): float
     {
         $deductable = 0;
 
@@ -63,7 +63,7 @@ final class DiscountHelperFunctions
                 'message' => 'This discount code is invalid.',
             ],
             'max_uses' => [
-                'condition' => $discount->max_uses == 0 || $discount->max_uses == null,
+                'condition' => $discount->max_uses === 0 || $discount->max_uses === null,
                 'message' => 'This discount code max usage limit has been reached.',
             ],
             'grandTotal' => [
@@ -89,7 +89,7 @@ final class DiscountHelperFunctions
 
     public function resetDiscountUsage(Order $order): void
     {
-        if ($order->discount_code != null) {
+        if ($order->discount_code !== null) {
             DiscountLimit::whereOrderId($order->id)->delete();
 
             /** @var \Domain\Discount\Models\Discount $discount */

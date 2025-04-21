@@ -14,7 +14,10 @@ class ApiCall extends Model
         'request_response',
     ];
 
-    protected $casts = [
-        'request_response' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'request_response' => 'array',
+        ];
+    }
 }

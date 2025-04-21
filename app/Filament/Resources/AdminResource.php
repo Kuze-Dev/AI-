@@ -6,39 +6,43 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\AdminResource\Pages;
-use App\Filament\Resources\AdminResource\RelationManagers\CauserRelationManager;
+use App\Filament\Resources\AdminResource\RelationManagers\ActionsRelationManager;
+use Domain\Admin\Exports\AdminExporter;
 use Domain\Admin\Models\Admin;
 use Domain\Auth\Actions\ForgotPasswordAction;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
-use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
+use Filament\Tables\Actions\ExportBulkAction;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use JulioMotol\FilamentPasswordConfirmation\RequiresPasswordConfirmation;
+use Lloricode\Timezone\Timezone;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class AdminResource extends Resource
 {
+    use RequiresPasswordConfirmation;
+
     protected static ?string $model = Admin::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
 
-    protected static string|array $middlewares = ['password.confirm:filament.auth.password.confirm'];
-
     protected static ?string $recordTitleAttribute = 'full_name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Access');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return [
@@ -48,82 +52,78 @@ class AdminResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('first_name')
+                        ->translateLabel()
                         ->required(),
                     Forms\Components\TextInput::make('last_name')
                         ->required(),
                     Forms\Components\TextInput::make('email')
+                        ->translateLabel()
                         ->email()
-                        ->rules(Rule::email())
+                        ->rules(fn () => Rule::email())
                         ->unique(ignoreRecord: true)
                         ->required()
-                        ->helperText(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
-                        ->disabled(fn (?Admin $record) => ! empty($record) && ! config('domain.admin.can_change_email')),
+                        ->helperText(fn (?Admin $record) => ! empty($record) && ! config()->boolean('domain.admin.can_change_email') ? 'Email update is currently disabled.' : '')
+                        ->disabled(fn (?Admin $record) => ! empty($record) && ! config()->boolean('domain.admin.can_change_email')),
                     Forms\Components\TextInput::make('password')
+                        ->translateLabel()
                         ->password()
+                        ->revealable()
                         ->required()
                         ->rule(Password::default())
                         ->helperText(
-                            app()->environment('local', 'testing')
-                                ? trans('Password must be at least 4 characters.')
-                                : trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
+                            trans('Password must be at least 8 characters, have 1 special character, 1 number, 1 upper case and 1 lower case.')
                         )
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\TextInput::make('password_confirmation')
+                        ->translateLabel()
                         ->required()
                         ->password()
                         ->same('password')
+                        ->revealable()
                         ->dehydrated(false)
                         ->rule(Password::default())
                         ->visible(fn (?Admin $record) => $record === null || ! $record->exists),
                     Forms\Components\Select::make('timezone')
-                        ->options(
-                            collect(timezone_identifiers_list())
-                                ->mapWithKeys(fn (string $timezone) => [$timezone => $timezone])
-                                ->toArray()
-                        )
+                        ->options(Timezone::generateList())
+                        ->rule('timezone')
                         ->searchable()
-                        ->default(config('domain.admin.default_timezone')),
+                        ->default(config()->string('domain.admin.default_timezone')),
                 ])
                     ->columnSpan(['lg' => 2]),
                 Forms\Components\Group::make([
                     Forms\Components\Section::make(trans('Status'))
                         ->schema([
                             Forms\Components\Toggle::make('active')
+                                ->translateLabel()
                                 ->default(true),
                         ]),
                     Forms\Components\Section::make(trans('Access'))
                         ->schema([
                             Forms\Components\Select::make('roles')
+                                ->translateLabel()
+                                ->relationship(
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
+                                )
                                 ->multiple()
                                 ->preload()
-                                ->optionsFromModel(
-                                    config('permission.models.role'),
-                                    'name',
-                                    function (Builder $query) {
-
-                                        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
-                                            return $query->where('guard_name', 'admin');
-                                        }
-
-                                        return $query->where('guard_name', 'admin')->where('name', '!=', config('domain.role.super_admin'));
-                                    }
-                                )
-                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->roles->pluck('id')->toArray() : []),
+                                ->searchable(),
                             Forms\Components\Select::make('permissions')
+                                ->translateLabel()
+                                ->relationship(
+                                    titleAttribute: 'name',
+                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
+                                )
                                 ->multiple()
                                 ->preload()
-                                ->optionsFromModel(
-                                    config('permission.models.permission'),
-                                    'name',
-                                    fn (Builder $query) => $query->where('guard_name', 'admin')
-                                )
-                                ->formatStateUsing(fn (?Admin $record) => $record ? $record->permissions->pluck('id')->toArray() : []),
+                                ->searchable(),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
@@ -132,30 +132,45 @@ class AdminResource extends Resource
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('full_name')
+                    ->translateLabel()
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(['first_name', 'last_name'])
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->tooltip(fn (string $state) => $state),
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label(trans('Verified'))
                     ->getStateUsing(fn (Admin $record): bool => $record->hasVerifiedEmail())
                     ->boolean(),
                 Tables\Columns\IconColumn::make('active')
+                    ->translateLabel()
                     ->boolean(),
-                Tables\Columns\TagsColumn::make('roles.name'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->translateLabel()
+                    ->badge(),
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->translateLabel()
+                    ->dateTime()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->dateTime(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('role')
+                    ->translateLabel()
                     ->options(
-                        app(config('permission.models.role'))
+                        app(config()->string('permission.models.role'))
                             ->pluck('name', 'id')
                             ->put('no-roles', 'No Roles')
                     )
@@ -206,6 +221,7 @@ class AdminResource extends Resource
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\Action::make('resend-verification')
                         ->requiresConfirmation()
+                        ->icon('heroicon-o-envelope')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             try {
                                 $record->sendEmailVerificationNotification();
@@ -223,7 +239,7 @@ class AdminResource extends Resource
                         ->icon('heroicon-o-lock-open')
                         ->action(function (Admin $record, Tables\Actions\Action $action): void {
                             $result = app(ForgotPasswordAction::class)
-                                ->execute($record->email, 'admin');
+                                ->execute($record->email, Filament::getAuthPasswordBroker());
 
                             if ($result->failed()) {
                                 $action->failureNotificationTitle($result->getMessage())
@@ -242,43 +258,42 @@ class AdminResource extends Resource
                             description: fn (Admin $record) => $record->full_name.' password reset sent'
                         ),
                     Impersonate::make()
-                        ->guard('admin')
+                        ->translateLabel()
+                        ->grouped()
+                        ->guard(Filament::getAuthGuard())
                         ->redirectTo(Filament::getUrl() ?? '/')
                         ->authorize('impersonate')
                         ->withActivityLog(
                             event: 'impersonated',
                             description: fn (Admin $record) => $record->full_name.' impersonated',
-                            causedBy: Auth::user()
+                            causedBy: filament_admin()
                         ),
                 ]),
             ])
             ->bulkActions([
                 ExportBulkAction::make()
-                    ->queue()
-                    ->query(fn (Builder $query) => $query->with('roles')->whereKeyNot(1)->latest())
-                    ->mapUsing(
-                        ['Email', 'First Name',  'Last Name', 'Active', 'Roles', 'Created At'],
-                        fn (Admin $admin): array => [
-                            $admin->email,
-                            $admin->first_name,
-                            $admin->last_name,
-                            $admin->active ? 'Yes' : 'No',
-                            $admin->getRoleNames()->implode(', '),
-                            $admin->created_at?->format(config('tables.date_time_format')),
-                        ]
-                    )
-                    ->tags([
-                        'tenant:'.(tenant('id') ?? 'central'),
-                    ])
+                    ->exporter(AdminExporter::class)
                     ->withActivityLog(
                         event: 'bulk-exported',
                         description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
-                        properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
+                        properties: fn (ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Admin $model): Admin {
+                                        if ($model instanceof Admin) {
+                                            return $model;
+                                        }
+
+                                        return Admin::whereKey($model)->sole();
+                                    }
+                                ),
+                        ]
                     ),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('updated_at', 'desc');
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -289,6 +304,7 @@ class AdminResource extends Resource
     }
 
     /** @return Builder<Admin> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -297,11 +313,12 @@ class AdminResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
             ActivitiesRelationManager::class,
-            CauserRelationManager::class,
+            ActionsRelationManager::class,
         ];
     }
 }

@@ -14,6 +14,5 @@ class ServiceOrderTaxData
         public readonly int|float $tax_percentage,
         public readonly int|float $tax_total,
         public readonly int|float $total_price
-    ) {
-    }
+    ) {}
 }

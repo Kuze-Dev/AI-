@@ -12,13 +12,12 @@ use Domain\Order\DataTransferObjects\PreparedOrderData;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
 
-class CreateOrderAction
+readonly class CreateOrderAction
 {
     public function __construct(
-        private readonly CartSummaryAction $cartSummaryAction,
-        private readonly CreateOrderReference $createOrderReference
-    ) {
-    }
+        private CartSummaryAction $cartSummaryAction,
+        private CreateOrderReference $createOrderReference
+    ) {}
 
     public function execute(PlaceOrderData $placeOrderData, PreparedOrderData $preparedOrderData): Order
     {
@@ -45,7 +44,7 @@ class CreateOrderAction
             $placeOrderData->serviceId
         );
 
-        $paymentMethod = $preparedOrderData->paymentMethod->gateway == 'manual'
+        $paymentMethod = $preparedOrderData->paymentMethod->gateway === 'manual'
             ? OrderStatuses::PENDING : OrderStatuses::FORPAYMENT;
 
         $order = Order::create([

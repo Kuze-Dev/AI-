@@ -26,7 +26,7 @@ class AdminServiceBillBankPaymentListener
         $customer = $serviceOrder?->customer;
 
         if (! $serviceOrder || ! $serviceTransaction) {
-            throw new ModelNotFoundException();
+            throw new ModelNotFoundException;
         }
 
         if ($serviceOrder->is_subscription) {

@@ -16,6 +16,7 @@ return new class extends Migration
         });
 
         Schema::table('contents', function (Blueprint $table) {
+            $table->dropUnique(['route_url']);
             $table->dropColumn('route_url');
         });
     }

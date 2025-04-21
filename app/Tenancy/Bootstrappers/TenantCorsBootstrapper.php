@@ -26,7 +26,7 @@ class TenantCorsBootstrapper implements TenancyBootstrapper
 
             $origins = array_values($allowed_origins);
 
-            if (count($origins) != 0) {
+            if (count($origins) !== 0) {
 
                 $this->app->make('config')->set('cors.allowed_origins', $allowed_origins);
             }

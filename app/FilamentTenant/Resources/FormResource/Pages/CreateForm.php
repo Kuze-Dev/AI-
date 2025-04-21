@@ -8,11 +8,9 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\FormResource;
 use Domain\Form\Actions\CreateFormAction;
 use Domain\Form\DataTransferObjects\FormData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class CreateForm extends CreateRecord
 {
@@ -20,24 +18,20 @@ class CreateForm extends CreateRecord
 
     protected static string $resource = FormResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
-    /** @throws Throwable */
+    #[\Override]
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(fn () => app(CreateFormAction::class)->execute(FormData::fromArray($data)));
+        return app(CreateFormAction::class)->execute(FormData::fromArray($data));
     }
 }

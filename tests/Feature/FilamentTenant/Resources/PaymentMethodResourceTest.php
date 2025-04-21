@@ -8,11 +8,8 @@ use Domain\PaymentMethod\Database\Factories\PaymentMethodFactory;
 use Filament\Facades\Filament;
 
 beforeEach(function () {
-    testInTenantContext();
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: PaypalGateway::class);
     loginAsSuperAdmin();
-
-    tenancy()->tenant->features()->activate(PaypalGateway::class);
 });
 
 it('can globally search', function () {

@@ -5,7 +5,7 @@
     :label-sr-only="$isLabelHidden()"
     :helper-text="$getHelperText()"
     :hint="$getHint()"
-    :hint-action="$getHintAction()"
+    {{-- :hint-action="$getHintActions()" --}}
     :hint-color="$getHintColor()"
     :hint-icon="$getHintIcon()"
     :required="$isRequired()"
@@ -44,13 +44,13 @@
             @endforeach
         </div>
         <div class="relative">
-            <x-forms::button
+            <x-filament::button
                 :wire:click="'dispatchFormEvent(\'tree::createItem\', \'' . $getStatePath() . '\')'"
                 size="sm"
                 type="button"
             >
                 @lang('Add to :label', ['label' => lcfirst($getLabel())])
-            </x-forms::button>
+            </x-filament::button>
         </div>
     </div>
 </x-dynamic-component>

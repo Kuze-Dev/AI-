@@ -16,6 +16,7 @@ class CartLineFactory extends Factory
 {
     protected $model = CartLine::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

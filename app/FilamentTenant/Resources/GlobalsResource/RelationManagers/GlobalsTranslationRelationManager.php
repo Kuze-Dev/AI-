@@ -7,11 +7,11 @@ namespace App\FilamentTenant\Resources\GlobalsResource\RelationManagers;
 use App\FilamentTenant\Resources\GlobalsResource;
 use Domain\Globals\Models\Globals;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+// use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 
 class GlobalsTranslationRelationManager extends RelationManager
 {
@@ -19,33 +19,33 @@ class GlobalsTranslationRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @phpstan-ignore-next-line */
+    /** @phpstan-ignore missingType.generics, missingType.generics */
     public function getRelationship(): Relation|Builder
     {
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound */
         if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0 || is_null($this->getOwnerRecord()->translation_id)) {
             return $this->getOwnerRecord()->{static::getRelationshipName()}();
         }
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound, property.notFound, property.notFound */
         return $this->getOwnerRecord()->{static::getRelationshipName()}()->orwhere('id', $this->ownerRecord->translation_id)->orwhere('translation_id', $this->ownerRecord->translation_id)->where('id', '!=', $this->ownerRecord->id);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-                Tables\Columns\TagsColumn::make('sites.name')
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
-                    }, isToggledHiddenByDefault: fn () => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class)),
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
+                    ->toggleable(condition: fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class),
+                        isToggledHiddenByDefault: fn () => \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class)),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([

@@ -27,13 +27,11 @@ class FormSubmissionController extends Controller
         try {
 
             DB::transaction(
-                function () use ($request, $form) {
-                    return app(CreateFormSubmissionAction::class)
-                        ->execute(
-                            form: $form,
-                            data: Arr::except($request->validated(), 'captcha_token'),
-                        );
-                }
+                fn () => app(CreateFormSubmissionAction::class)
+                    ->execute(
+                        form: $form,
+                        data: Arr::except($request->validated(), 'captcha_token'),
+                    )
             );
 
             return response()

@@ -8,10 +8,14 @@ use App\Tenancy\Jobs\CreateDatabase;
 use App\Tenancy\Jobs\CreateS3Bucket;
 use App\Tenancy\Jobs\DeleteS3Bucket;
 use Domain\Tenant\Models\Tenant;
+use Filament\Actions\Exports\Http\Controllers\DownloadExport;
+use Filament\Actions\Imports\Http\Controllers\DownloadImportFailureCsv;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Controllers\TenantAssetsController;
 use Stancl\Tenancy\DatabaseConfig;
@@ -58,9 +62,7 @@ class TenancyServiceProvider extends ServiceProvider
                 JobPipeline::make([
                     Jobs\DeleteDatabase::class,
                     DeleteS3Bucket::class,
-                ])->send(function (Events\TenantDeleted $event) {
-                    return $event->tenant;
-                })->shouldBeQueued($this->app->isProduction()),
+                ])->send(fn (Events\TenantDeleted $event) => $event->tenant)->shouldBeQueued($this->app->isProduction()),
             ],
 
             // Domain events
@@ -115,9 +117,8 @@ class TenancyServiceProvider extends ServiceProvider
         ];
     }
 
-    public function register(): void
-    {
-    }
+    #[\Override]
+    public function register(): void {}
 
     public function boot(): void
     {
@@ -132,9 +133,13 @@ class TenancyServiceProvider extends ServiceProvider
             ],
         ];
 
-        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config('tenancy.database.prefix').Str::of($tenant->name)->lower()->snake().config('tenancy.database.suffix'));
+        DatabaseConfig::generateDatabaseNamesUsing(fn (Tenant $tenant) => config()->string('tenancy.database.prefix').Str::of($tenant->name)->lower()->snake().config()->string('tenancy.database.suffix'));
 
         TenantAssetsController::$tenancyMiddleware = 'tenant';
+
+        $this->prepareLivewire();
+        $this->prepareFilamentExport();
+
     }
 
     protected function bootEvents(): void
@@ -166,5 +171,42 @@ class TenancyServiceProvider extends ServiceProvider
         foreach (array_reverse($tenancyMiddleware) as $middleware) {
             $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);
         }
+    }
+
+    private function prepareLivewire(): void
+    {
+        // https://github.dev/savannabits/filament-tenancy-starter
+        // https://livewire.laravel.com/docs/security#applying-global-livewire-middleware
+        Livewire::setUpdateRoute(
+            fn (mixed $handle) => Route::post('/livewire/update', $handle)
+                ->middleware([
+                    'web',
+                    'universal',
+                    Middleware\InitializeTenancyByDomain::class,
+                ])
+                ->name('livewire.update')
+        );
+    }
+
+    public function prepareFilamentExport(): void
+    {
+
+        Route::get('/filament/exports/{export}/download', DownloadExport::class)
+            ->name('filament.exports.download')
+            ->middleware([
+                'web',
+                'universal',
+                Middleware\InitializeTenancyByDomain::class,
+                'auth',
+            ]);
+
+        Route::get('/filament/imports/{import}/failed-rows/download', DownloadImportFailureCsv::class)
+            ->name('filament.imports.failed-rows.download')
+            ->middleware([
+                'web',
+                'universal',
+                Middleware\InitializeTenancyByDomain::class,
+                'auth',
+            ]);
     }
 }

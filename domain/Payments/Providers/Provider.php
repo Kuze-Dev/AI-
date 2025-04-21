@@ -30,6 +30,7 @@ abstract class Provider implements PaymentInterface
     }
 
     /** {@inheritDoc} */
+    #[\Override]
     public function setConfig(array $config): self
     {
         $this->config = $config;

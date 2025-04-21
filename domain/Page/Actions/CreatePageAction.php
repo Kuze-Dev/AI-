@@ -18,8 +18,7 @@ class CreatePageAction
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateBlueprintDataAction $createBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     public function execute(PageData $pageData): Page
     {

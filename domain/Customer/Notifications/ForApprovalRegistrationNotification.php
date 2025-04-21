@@ -22,7 +22,7 @@ class ForApprovalRegistrationNotification extends Notification implements Should
 
     public function toMail(Customer $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(trans('For Approval Registration'))
             ->line(trans('Your request for the wholesaler tier is now being reviewed!'))
             ->line(trans('Please wait for our team to process your application.'))

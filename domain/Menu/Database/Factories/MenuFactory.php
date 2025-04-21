@@ -14,6 +14,7 @@ class MenuFactory extends Factory
 {
     protected $model = Menu::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

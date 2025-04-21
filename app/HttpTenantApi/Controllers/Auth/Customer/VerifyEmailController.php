@@ -13,6 +13,7 @@ use Domain\Auth\Actions\VerifyEmailViaOTPAction;
 use Domain\Customer\Actions\CustomerResendEmailVerificationAction;
 use Domain\Customer\Models\Customer;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,7 @@ class VerifyEmailController extends Controller
         /** @var string $hash */
         $hash = $request->route('hash') ?? '';
         if (! hash_equals($hash, sha1($customer->getEmailForVerification()))) {
-            throw new AuthorizationException();
+            throw new AuthorizationException;
         }
 
         $params = http_build_query([
@@ -50,14 +51,11 @@ class VerifyEmailController extends Controller
     }
 
     #[Post('otp', name: 'customer.verification.verify.otp', middleware: 'auth:sanctum')]
-    public function verifyViaOTP(Request $request): mixed
+    public function verifyViaOTP(Request $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $otp = $this->validate($request, [
             'otp' => 'required|string',
         ])['otp'];
-
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         if (app(VerifyEmailViaOTPAction::class)->execute($customer, $otp)) {
             return response(['message' => trans('Email verified!')]);

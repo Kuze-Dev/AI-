@@ -11,9 +11,8 @@ use Domain\ServiceOrder\DataTransferObjects\ServiceOrderCreatedPipelineData;
 class CreateServiceBillPipe
 {
     public function __construct(
-        private CreateServiceBillAction $createServiceBillAction
-    ) {
-    }
+        private readonly CreateServiceBillAction $createServiceBillAction
+    ) {}
 
     public function handle(
         ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData,

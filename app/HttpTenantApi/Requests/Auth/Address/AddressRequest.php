@@ -21,11 +21,11 @@ class AddressRequest extends FormRequest
         return [
             'country_id' => [
                 'required',
-                Rule::exists(Country::class, (new Country())->getRouteKeyName()),
+                Rule::exists(Country::class, (new Country)->getRouteKeyName()),
             ],
             'state_id' => [
                 'required',
-                Rule::exists(State::class, (new State())->getRouteKeyName())
+                Rule::exists(State::class, (new State)->getRouteKeyName())
                     ->where(function (Builder $query) {
 
                         $country = app(Country::class)

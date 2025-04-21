@@ -18,12 +18,6 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private Order $order;
-
-    private string $status;
-
-    private ?string $remarks;
-
     private string $logo;
 
     private string $title;
@@ -37,12 +31,8 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     private ?string $footer = null;
 
     /** Create a new notification instance. */
-    public function __construct(Order $order, string $status, ?string $remarks)
+    public function __construct(private Order $order, private string $status, private ?string $remarks)
     {
-        $this->order = $order;
-        $this->status = $status;
-        $this->remarks = $remarks;
-
         $this->logo = app(SiteSettings::class)->getLogoUrl();
         $this->title = app(SiteSettings::class)->name;
         $this->description = app(SiteSettings::class)->description;
@@ -70,7 +60,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
     {
         $customer = $this->getCustomer($notifiable);
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Order '.$this->order->reference.' has been '.$this->status)
             ->replyTo($this->replyTo)
             ->from($this->from)
@@ -115,7 +105,7 @@ class AdminOrderStatusUpdatedMail extends Notification implements ShouldQueue
         $sanitizedEmails = [];
 
         foreach ($emailArray as $email) {
-            $email = trim($email);
+            $email = trim((string) $email);
 
             if (! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $sanitizedEmails[] = $email;

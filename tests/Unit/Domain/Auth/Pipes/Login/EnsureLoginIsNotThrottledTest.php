@@ -27,7 +27,7 @@ it('proceeds when not throttled', function () {
 });
 
 it('throttles on multiple invalid attempts', function () {
-    Event::fake();
+    Event::fake(Lockout::class);
     $this->mock(
         RateLimiter::class,
         function (MockInterface $mock) {

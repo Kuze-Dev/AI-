@@ -21,7 +21,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Domain\Product\Models\Product|null $product
+ * @property-read \Domain\Product\Models\Product $product
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Domain\Product\Models\ProductOptionValue> $productOptionValues
  * @property-read int|null $product_option_values_count
  *
@@ -57,10 +57,14 @@ class ProductOption extends Model
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [
-        'is_custom' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_custom' => 'boolean',
+        ];
+    }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -75,7 +79,7 @@ class ProductOption extends Model
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOptionValue> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOptionValue, $this> */
     public function productOptionValues(): HasMany
     {
         return $this->hasMany(ProductOptionValue::class);
@@ -85,7 +89,7 @@ class ProductOption extends Model
      * Declare relationship of
      * current model to product.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Product\Models\ProductOption>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, $this>
      */
     public function product(): BelongsTo
     {

@@ -6,51 +6,35 @@ namespace App\Filament\Resources\TenantResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\Filament\Resources\TenantResource;
-use Domain\Tenant\Actions\CreateTenantAction;
-use Domain\Tenant\DataTransferObjects\TenantData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
+/**
+ * @property-read \Domain\Tenant\Models\Tenant $record
+ */
 class CreateTenant extends CreateRecord
 {
     use LogsFormActivity;
+    use Support;
 
     protected static string $resource = TenantResource::class;
 
-    protected function getRules(): array
-    {
-        return tap(
-            parent::getRules(),
-            fn (&$rules) => $rules['data.domains.*.domain'] = ['distinct']
-        );
-    }
-
-    protected function afterValidate(): void
-    {
-        $this->validate();
-    }
-
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
     }
 
-    protected function getFormActions(): array
+    public function afterCreate(): void
     {
-        return $this->getCachedActions();
-    }
+        /** @var array{features: array} $data */
+        $data = $this->form->getRawState();
 
-    /** @throws Throwable */
-    public function handleRecordCreation(array $data): Model
-    {
-        return DB::transaction(fn () => app(CreateTenantAction::class)->execute(TenantData::fromArray($data)));
+        $this->record->syncFeature(self::getNormalizedFeatureNames($data['features']));
     }
 }

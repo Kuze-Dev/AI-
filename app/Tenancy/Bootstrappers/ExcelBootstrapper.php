@@ -20,13 +20,14 @@ class ExcelBootstrapper implements TenancyBootstrapper
 
     public function bootstrap(Tenant $tenant): void
     {
-        if ($tenant->getInternal('bucket_driver') == 'r2') {
+        if ($tenant->getInternal('bucket_driver') === 'r2') {
             $this->app->make('config')->set('excel.temporary_files.remote_disk', $tenant->getInternal('bucket_driver'));
             $this->app->make('config')->set('filament-export.temporary_files.disk', $tenant->getInternal('bucket_driver'));
             $this->app->make('config')->set('filament-import.temporary_files.disk', $tenant->getInternal('bucket_driver'));
 
         } else {
             $this->app->make('config')->set('excel.temporary_files.remote_disk', 's3');
+            $this->app->make('config')->set('filament-import.temporary_files.disk', 's3');
         }
 
     }

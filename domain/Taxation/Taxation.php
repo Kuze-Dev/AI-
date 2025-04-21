@@ -11,9 +11,7 @@ use Domain\Taxation\Models\TaxZone;
 
 class Taxation
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function getTaxZone(Country|int $country, State|int|null $state = null): ?TaxZone
     {

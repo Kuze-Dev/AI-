@@ -15,6 +15,7 @@ class FormFactory extends Factory
 {
     protected $model = Form::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

@@ -79,7 +79,7 @@ class CountrySeeder extends Seeder
         $response = file_get_contents('https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates.json');
 
         if (! $response) {
-            throw new Exception();
+            throw new Exception;
         }
 
         return json_decode($response, true);

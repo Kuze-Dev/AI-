@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Domain\Product\Models;
 
 use Domain\Favorite\Models\Favorite;
+use Domain\Product\Enums\Taxonomy as EnumsTaxonomy;
 use Domain\Product\Models\Builders\ProductBuilder;
 use Domain\Review\Models\Review;
+use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tier\Models\Tier;
 use Illuminate\Database\Eloquent\Model;
@@ -16,9 +18,10 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Image\Manipulations;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\File;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -33,10 +36,10 @@ use Support\MetaData\HasMetaData;
  * @property string $name
  * @property string $slug
  * @property string $sku
- * @property string $retail_price
- * @property string $selling_price
+ * @property float $retail_price
+ * @property float $selling_price
  * @property array|null $dimension
- * @property string|null $weight
+ * @property float|null $weight
  * @property int|null $stock
  * @property string|null $description
  * @property bool $status
@@ -98,7 +101,10 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     use ConstraintsRelationships;
     use HasMetaData;
     use HasSlug;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
 
     protected $fillable = [
@@ -124,21 +130,30 @@ class Product extends Model implements HasMedia, HasMetaDataContract
      * Columns that are converted
      * to a specific data type.
      */
-    protected $casts = [
-        'dimension' => 'array',
-        'status' => 'boolean',
-        'is_digital_product' => 'boolean',
-        'is_featured' => 'boolean',
-        'is_special_offer' => 'boolean',
-        'allow_customer_remarks' => 'boolean',
-        'allow_stocks' => 'boolean',
-        'allow_guest_purchase' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'dimension' => 'array',
+            'status' => 'boolean',
+            'is_digital_product' => 'boolean',
+            'is_featured' => 'boolean',
+            'is_special_offer' => 'boolean',
+            'allow_customer_remarks' => 'boolean',
+            'allow_stocks' => 'boolean',
+            'allow_guest_purchase' => 'boolean',
+            'retail_price' => 'float',
+            'selling_price' => 'float',
+            'weight' => 'float',
+            'minimum_order_quantity' => 'int',
+            'stock' => 'int',
+        ];
+    }
 
     /**
      * Define default reference
      * for meta data properties.
      */
+    #[\Override]
     public function defaultMetaData(): array
     {
         return [
@@ -147,6 +162,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     }
 
     /** @return ProductBuilder<self> */
+    #[\Override]
     public function newEloquentBuilder($query): ProductBuilder
     {
         return new ProductBuilder($query);
@@ -160,6 +176,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
             ->dontSubmitEmptyLogs();
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -169,7 +186,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
      * Declare relationship of
      * current model to taxonomy terms.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
      */
     public function taxonomyTerms(): BelongsToMany
     {
@@ -177,10 +194,36 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
+     */
+    public function taxonomyTermsBranch(): BelongsToMany
+    {
+        return $this->taxonomyTerms()
+            ->where(
+                'taxonomy_id',
+                Taxonomy::whereSlug(EnumsTaxonomy::BRAND->value)
+                    ->value('id')
+            );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this>
+     */
+    public function taxonomyTermsCategory(): BelongsToMany
+    {
+        return $this->taxonomyTerms()
+            ->where(
+                'taxonomy_id',
+                Taxonomy::whereSlug(EnumsTaxonomy::CATEGORIES->value)
+                    ->value('id')
+            );
+    }
+
+    /**
      * Declare relationship of
      * current model to tiers.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier, $this>
      */
     public function tiers(): BelongsToMany
     {
@@ -190,7 +233,7 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     /**
      * Get the product tier relationship.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Tier\Models\Tier, $this>
      */
     public function productTier(): BelongsToMany
     {
@@ -198,13 +241,13 @@ class Product extends Model implements HasMedia, HasMetaDataContract
             ->withPivot(['id', 'tier_id', 'discount', 'discount_amount_type']);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductVariant> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductVariant, $this> */
     public function productVariants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOption> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Product\Models\ProductOption, $this> */
     public function productOptions(): HasMany
     {
         return $this->hasMany(ProductOption::class);
@@ -213,20 +256,20 @@ class Product extends Model implements HasMedia, HasMetaDataContract
     /**
      * Get all of the option values of product option.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Domain\Product\Models\ProductOptionValue>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\Domain\Product\Models\ProductOptionValue, \Domain\Product\Models\ProductOption, $this>
      */
     public function productOptionValues(): HasManyThrough
     {
         return $this->hasManyThrough(ProductOptionValue::class, ProductOption::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Favorite\Models\Favorite, $this> */
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\Review> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\Review, $this> */
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
@@ -234,17 +277,13 @@ class Product extends Model implements HasMedia, HasMetaDataContract
 
     public function isFavorite(): bool
     {
-        if (! auth()->check()) {
+        $customer = guest_customer_logged_in();
+
+        if ($customer === null) {
             return false;
         }
 
-        $customer = auth()->user();
-
-        if ($customer) {
-            return $this->favorites()->where('customer_id', $customer->id)->exists();
-        }
-
-        return false;
+        return $this->favorites()->where('customer_id', $customer->id)->exists();
     }
 
     public function getSlugOptions(): SlugOptions
@@ -261,16 +300,29 @@ class Product extends Model implements HasMedia, HasMetaDataContract
         return Str::of($attributes['name'])->slug()->start('/')->toString();
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+            ->acceptsFile(
+                fn (File $file): bool => Str::of($file->mimeType)
+                    ->before('/')
+                    ->value() === 'image'
+            )
             ->registerMediaConversions(function () {
                 $this->addMediaConversion('original');
                 $this->addMediaConversion('preview')
-                    ->fit(Manipulations::FIT_CROP, 300, 300);
+                    ->fit(Fit::Crop, 300, 300);
             });
 
         $this->addMediaCollection('video')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+            ->acceptsFile(
+                fn (File $file): bool => Str::of($file->mimeType)
+                    ->before('/')
+                    ->value() === 'video'
+            )
             ->registerMediaConversions(fn () => $this->addMediaConversion('original'));
     }
 }

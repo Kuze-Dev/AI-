@@ -53,9 +53,12 @@ class Tier extends Model
         'has_approval',
     ];
 
-    protected $casts = [
-        'has_approval' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'has_approval' => 'boolean',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -65,7 +68,7 @@ class Tier extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Customer\Models\Customer> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Customer\Models\Customer, $this> */
     public function customers(): HasMany
     {
         return $this->hasMany(Customer::class);
@@ -75,7 +78,7 @@ class Tier extends Model
      * Declare relationship of
      * current model to products.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product, $this>
      */
     public function products(): BelongsToMany
     {

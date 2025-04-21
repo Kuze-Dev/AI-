@@ -30,7 +30,7 @@ class AdminServiceOrderBankPaymentListener
         $customer = $serviceOrder->customer;
 
         if (! $serviceTransaction) {
-            throw new ModelNotFoundException();
+            throw new ModelNotFoundException;
         }
 
         $serviceTransaction->update(['status' => ServiceTransactionStatus::PAID]);
@@ -50,7 +50,7 @@ class AdminServiceOrderBankPaymentListener
                     service_bill: $serviceBill,
                     service_transaction: $serviceTransaction,
                     is_payment_paid: $serviceBill->is_paid && $serviceTransaction->is_paid,
-                    is_service_order_status_closed: $serviceOrder->status == ServiceOrderStatus::CLOSED
+                    is_service_order_status_closed: $serviceOrder->status === ServiceOrderStatus::CLOSED
                 )
             );
 

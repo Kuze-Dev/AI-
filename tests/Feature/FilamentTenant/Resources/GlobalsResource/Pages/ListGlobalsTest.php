@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\GlobalsResource\Pages\ListGlobals;
 use Domain\Globals\Database\Factories\GlobalsFactory;
-use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
 use function Pest\Laravel\assertModelMissing;
@@ -12,7 +11,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 

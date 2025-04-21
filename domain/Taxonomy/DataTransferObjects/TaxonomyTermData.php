@@ -16,8 +16,7 @@ class TaxonomyTermData extends TranslationDTO
         public readonly ?string $translation_id = null,
         public readonly ?int $id = null,
         public readonly ?array $children = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -12,17 +12,16 @@ use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Jobs\CustomerSendInvitationJob;
 use Domain\Tier\Database\Factories\TierFactory;
 use Domain\Tier\Models\Tier;
-use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Queue;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(TierBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(features: [
+        CustomerBase::class,
+        AddressBase::class,
+        TierBase::class,
+    ]);
     if (Tier::whereName(config('domain.tier.default'))->doesntExist()) {
         TierFactory::createDefault();
     }
@@ -70,7 +69,7 @@ it('can dispatch all send-register-invitation job', function () {
     Queue::fake();
 
     livewire(ListInviteCustomers::class)
-        ->callPageAction(
+        ->callAction(
             'send-register-invitation',
             data: [
                 'register_status' => collect(RegisterStatus::allowedResendInviteCases())

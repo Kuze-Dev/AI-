@@ -23,6 +23,7 @@ class OrderFactory extends Factory
 {
     protected $model = Order::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [
@@ -48,7 +49,7 @@ class OrderFactory extends Factory
 
             'discount_total' => $this->faker->randomFloat(2, 0, 10),
             'discount_id' => $this->faker->unique()->numberBetween(1, 5),
-            'discount_code' => new AutoGenerateCode(),
+            'discount_code' => new AutoGenerateCode,
 
             'shipping_total' => $this->faker->randomFloat(2, 0, 10),
             'shipping_method_id' => 1,
@@ -61,6 +62,7 @@ class OrderFactory extends Factory
         ];
     }
 
+    #[\Override]
     public function configure()
     {
         return $this->afterCreating(function (Order $order) {

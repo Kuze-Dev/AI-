@@ -11,6 +11,4 @@ use Spatie\RouteAttributes\Attributes\Middleware;
     ApiResource('auth/services', only: ['index', 'show'], names: 'auth.services'),
     Middleware(['auth:sanctum'])
 ]
-class ServiceAuthController extends ServiceController
-{
-}
+class ServiceAuthController extends ServiceController {}

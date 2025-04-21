@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 use App\FilamentTenant\Resources\OrderResource\Pages\ListOrders;
 use Domain\Order\Database\Factories\OrderFactory;
-use Filament\Facades\Filament;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 

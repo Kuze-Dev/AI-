@@ -10,8 +10,7 @@ class AmountData
         public readonly PaymentDetailsData $details,
         public readonly string $currency,
         public readonly int|float $total,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

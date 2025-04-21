@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Cart\DataTransferObjects;
 
-class CheckoutData
+readonly class CheckoutData
 {
     public function __construct(
-        public readonly array $cart_line_ids
-    ) {
-    }
+        public array $cart_line_ids
+    ) {}
 
     public static function fromArray(array $data): self
     {

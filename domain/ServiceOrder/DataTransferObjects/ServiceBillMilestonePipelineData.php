@@ -11,6 +11,5 @@ class ServiceBillMilestonePipelineData
     public function __construct(
         public readonly ServiceOrder $service_order,
         public readonly array $payment_plan,
-    ) {
-    }
+    ) {}
 }

@@ -38,6 +38,7 @@ class ServiceBillGuestStoreRequest extends FormRequest
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException
      */
+    #[\Override]
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([

@@ -6,6 +6,4 @@ namespace Domain\Role\Exceptions;
 
 use LogicException;
 
-class CantDeleteSuperAdminRoleException extends LogicException
-{
-}
+class CantDeleteSuperAdminRoleException extends LogicException {}

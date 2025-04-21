@@ -25,10 +25,8 @@ class CreateCustomerAction
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
         private readonly CreateAddressAction $createAddress,
-        private readonly GenerateCustomerIDAction $generateCustomerID,
-        protected CreateBlueprintDataAction $createBlueprintDataAction
-    ) {
-    }
+        protected CreateBlueprintDataAction $createBlueprintDataAction,
+    ) {}
 
     public function execute(CustomerData $customerData): Customer
     {
@@ -85,7 +83,6 @@ class CreateCustomerAction
 
         return Customer::create([
             'tier_id' => $customerData->tier_id,
-            'cuid' => $this->generateCustomerID->execute(),
             'email' => $customerData->email,
             'username' => $customerData->username,
             'first_name' => $customerData->first_name,
@@ -125,9 +122,7 @@ class CreateCustomerAction
 
         if (! empty(app(CustomerSettings::class)->customer_email_notifications)) {
 
-            $importedNotification = array_filter(app(CustomerSettings::class)->customer_email_notifications, function ($mail_notification) {
-                return $mail_notification['events'] == CustomerEvent::REGISTERED->value;
-            });
+            $importedNotification = array_filter(app(CustomerSettings::class)->customer_email_notifications, fn ($mail_notification) => $mail_notification['events'] === CustomerEvent::REGISTERED->value);
 
             if (! empty($importedNotification)) {
                 foreach ($importedNotification as $notification) {

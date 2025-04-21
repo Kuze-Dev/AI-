@@ -71,7 +71,7 @@ beforeEach(function () {
 
     $shippingMethod = ShippingMethodFactory::new()->createOne(['title' => 'Store Pickup']);
 
-    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver());
+    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver);
 
     $shippingMethod->update([
         'shipper_country_id' => $country->id,
@@ -80,7 +80,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Cod']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment);
 
     Sanctum::actingAs($customer);
 
@@ -137,9 +137,7 @@ it('can send order email notification to admin', function () {
 
     Notification::assertSentOnDemand(
         AdminOrderPlacedMail::class,
-        function ($notification, $channels, $notifiable) use ($orderSettings) {
-            return $notifiable->routes['mail'] === $orderSettings->admin_main_receiver;
-        }
+        fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === $orderSettings->admin_main_receiver
     );
 });
 
@@ -155,11 +153,9 @@ it('cannot send order email notification to admin', function () {
     event($event);
 
     Notification::assertNotSentTo(
-        new AnonymousNotifiable(),
+        new AnonymousNotifiable,
         AdminOrderPlacedMail::class,
-        function ($notification, $channels, $notifiable) use ($orderSettings) {
-            return $notifiable->routes['mail'] === $orderSettings->admin_main_receiver;
-        }
+        fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === $orderSettings->admin_main_receiver
     );
 });
 

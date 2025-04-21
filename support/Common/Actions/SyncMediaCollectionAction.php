@@ -19,7 +19,9 @@ use Support\Common\DataTransferObjects\MediaData;
 
 class SyncMediaCollectionAction
 {
-    /** @return MediaCollection<int, Media>|null  */
+    /**
+     * @return MediaCollection<int, Media>|null
+     */
     public function execute(Model&HasMedia $model, MediaCollectionData $mediaCollectionData): ?MediaCollection
     {
 
@@ -37,14 +39,24 @@ class SyncMediaCollectionAction
 
                     $storage = Storage::disk(config('filament.default_filesystem_disk'));
 
+                    /**
+                     * @var Media|null $new_uploaded_media
+                     *
+                     *  @phpstan-ignore-next-line */
+                    $new_uploaded_media = $model->media->where('file_name', $mediaData->media)->first();
+
+                    if ($new_uploaded_media) {
+                        return $new_uploaded_media;
+                    }
+
                     if (! $storage->exists($mediaData->media)) {
-                        throw new UnableToCheckExistence();
+                        throw new UnableToCheckExistence;
                     }
 
                     /**
                      * Ignore unknown addMediaFromDisk error for \Spatie\MediaLibrary\HasMedia interface
                      *
-                     *  @phpstan-ignore-next-line
+                     * @phpstan-ignore method.notFound
                      * */
                     return $model->addMediaFromDisk($mediaData->media, config('filament.default_filesystem_disk'))
                         ->withCustomProperties($mediaData->custom_properties)
@@ -52,7 +64,7 @@ class SyncMediaCollectionAction
                 }
 
                 if (! Str::isUuid($mediaData->media)) {
-                    throw new InvalidArgumentException();
+                    throw new InvalidArgumentException;
                 }
 
                 if ($media = $model->getMedia($mediaCollectionData->collection)->firstWhere('uuid', $mediaData->media)) {
@@ -83,11 +95,11 @@ class SyncMediaCollectionAction
     protected function addMedia(Model&HasMedia $model, string $collection, UploadedFile $media, array $customProperties = []): Media
     {
         if (! $imageString = $media->get()) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         if (! method_exists($model, 'addMediaFromString')) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         return $model->addMediaFromString($imageString)
@@ -100,7 +112,7 @@ class SyncMediaCollectionAction
     protected function addMediaFromUrl(Model&HasMedia $model, string $collection, string $media): Media
     {
         if (! method_exists($model, 'addMediaFromUrl')) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         return $model

@@ -9,8 +9,7 @@ class PresignUrlData
     public function __construct(
         public readonly string $presigned_url,
         public readonly string $object_key,
-    ) {
-    }
+    ) {}
 
     public function toArray(): array
     {

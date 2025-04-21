@@ -17,8 +17,7 @@ class ConversionData implements Arrayable
     private function __construct(
         public readonly string $name,
         public readonly array $manipulations = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -46,7 +45,8 @@ class ConversionData implements Arrayable
     }
 
     /** @return array<string, mixed> */
-    public function toArray()
+    #[\Override]
+    public function toArray(): array
     {
         return (array) $this;
     }

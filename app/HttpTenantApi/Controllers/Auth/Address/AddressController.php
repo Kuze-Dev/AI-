@@ -19,6 +19,7 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
+use Domain\Tenant\TenantFeatureSupport;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -77,7 +78,7 @@ class AddressController extends Controller
             $stateName = $state->name;
 
             // Check the condition only once
-            if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
+            if (TenantFeatureSupport::active(ShippingUsps::class) && $country->code === 'US') {
 
                 $USaddress = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
 
@@ -124,7 +125,7 @@ class AddressController extends Controller
             $stateName = $state->name;
 
             // Check the condition only once
-            if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code === 'US') {
+            if (TenantFeatureSupport::active(ShippingUsps::class) && $country->code === 'US') {
 
                 $USaddress = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
                 $newAddressDto = new AddressData(

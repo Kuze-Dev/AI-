@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Filament\Livewire\Auth\AccountDeactivatedNotice;
+use App\Filament\Pages\AccountDeactivatedNotice;
 use Domain\Admin\Database\Factories\AdminFactory;
 
 use function Pest\Livewire\livewire;
@@ -28,10 +28,4 @@ it('will redirect if user is active', function () {
 
     livewire(AccountDeactivatedNotice::class)
         ->assertRedirect();
-});
-
-it('can log out authenticated user', function () {
-    livewire(AccountDeactivatedNotice::class)->call('logout');
-
-    expect(Auth::check())->toBeFalse();
 });

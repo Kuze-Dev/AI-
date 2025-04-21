@@ -1,5 +1,5 @@
 image:
-  name: bitnami/laravel:9.5.2 # https://bitnami.com/stack/laravel w- 9.5.2 - 10.3.3
+  name: bitnami/laravel:11.3.3 # https://bitnami.com/stack/laravel w- 9.5.2 - 10.3.3
   run-as-user: 1000
 
 definitions:
@@ -7,7 +7,7 @@ definitions:
     phpstan: build/phpstan
   setup-script: &setup-script |
     composer install --prefer-dist --no-interaction
-    cp .env.example .env
+    cp .env.testing .env
     php artisan key:generate
     php artisan about --only=environment
   steps:
@@ -38,15 +38,17 @@ definitions:
           changesets:
             includePaths:
               - "**.php"
-              - "phpstan.neon.dist"
+              - "phpstan.neon"
+              - "composer.json"
+              - "bitbucket-pipelines.yml"
+              - "phpstan-stubs/"
     - step: &test
         <<: *common-step
         name: Test
         size: 4x
         script:
           - *setup-script
-          # TODO: remove test-no-timeout when using stancl/tenancy v4
-          - composer test-no-timeout -- --ci --passthru-php="-d memory_limit=-1"
+          - composer test-ci
 
 pipelines:
   branches:

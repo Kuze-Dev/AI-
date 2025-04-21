@@ -8,6 +8,7 @@ use Domain\Role\Database\Seeders\PermissionSeeder as BasePermissionSeeder;
 
 class PermissionSeeder extends BasePermissionSeeder
 {
+    #[\Override]
     protected function permissionsByGuard(): array
     {
         return [

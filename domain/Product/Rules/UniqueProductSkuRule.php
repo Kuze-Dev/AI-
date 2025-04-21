@@ -2,51 +2,54 @@
 
 declare(strict_types=1);
 
-namespace Domain\Product\Rules;
+// declare(strict_types=1);
 
-use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+// namespace Domain\Product\Rules;
 
-class UniqueProductSkuRule implements ValidationRule
-{
-    public function __construct(
-        protected readonly EditProduct $livewire
-    ) {
-    }
+// use App\FilamentTenant\Resources\ProductResource\Pages\EditProduct;
+// use Closure;
+// use Illuminate\Contracts\Validation\ValidationRule;
 
-    /** @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail */
-    public function validate(string $attribute, mixed $value, Closure $fail): void
-    {
-        $filteredProducts = [];
-        if (is_null($this->livewire->activeProductVariantItemStatePath)) {
-            return;
-        }
+// class UniqueProductSkuRule implements ValidationRule
+// {
+//     public function __construct(
+//         protected readonly EditProduct $livewire
+//     ) {
+//     }
 
-        $toArrayVariantStatePath = explode('.', $this->livewire->activeProductVariantItemStatePath);
+//     /** @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail */
+//     #[\Override]
+//     public function validate(string $attribute, mixed $value, Closure $fail): void
+//     {
+//         $filteredProducts = [];
+//         if (is_null($this->livewire->activeProductVariantItemStatePath)) {
+//             return;
+//         }
 
-        /** @var array */
-        $productVariants = $this->livewire->data['product_variants'];
+//         $toArrayVariantStatePath = explode('.', (string) $this->livewire->activeProductVariantItemStatePath);
 
-        if (
-            isset($productVariants[end($toArrayVariantStatePath)])
-            && $productVariants[end($toArrayVariantStatePath)]['sku'] === $value
-        ) {
-            return;
-        }
+//         /** @var array */
+//         $productVariants = $this->livewire->data['product_variants'];
 
-        foreach ($productVariants as $variant) {
-            if (
-                isset($variant['sku'])
-                && ($this->livewire->data['sku'] === $value
-                    || $variant['sku'] === $value)
-            ) {
-                $filteredProducts[] = $variant;
-            }
-        }
+//         if (
+//             isset($productVariants[end($toArrayVariantStatePath)])
+//             && $productVariants[end($toArrayVariantStatePath)]['sku'] === $value
+//         ) {
+//             return;
+//         }
 
-        if (count($filteredProducts)) {
-            $fail('SKU is already existing.');
-        }
-    }
-}
+//         foreach ($productVariants as $variant) {
+//             if (
+//                 isset($variant['sku'])
+//                 && ($this->livewire->data['sku'] === $value
+//                     || $variant['sku'] === $value)
+//             ) {
+//                 $filteredProducts[] = $variant;
+//             }
+//         }
+
+//         if (count($filteredProducts)) {
+//             $fail('SKU is already existing.');
+//         }
+//     }
+// }

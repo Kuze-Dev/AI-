@@ -14,8 +14,7 @@ class ResetPasswordAction
 {
     public function __construct(
         protected UpdatePasswordAction $updatePassword
-    ) {
-    }
+    ) {}
 
     public function execute(ResetPasswordData $resetPasswordData, ?string $broker = null): PasswordResetResult
     {
