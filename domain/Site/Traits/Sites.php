@@ -17,7 +17,6 @@ trait Sites
      * @phpstan-ignore-next-line  ignore type */
     public function sites()
     {
-
         /** @phpstan-ignore-next-line  ignore type */
         return $this->morphToMany(Site::class, 'model_sites');
     }
