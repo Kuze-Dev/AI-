@@ -16,6 +16,7 @@ class GlobalsResource extends JsonApiResource
 {
     use TransformsSchemaPayload;
 
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [
@@ -26,6 +27,7 @@ class GlobalsResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [

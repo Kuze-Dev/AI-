@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\CMS\Internationalization;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Internationalization\Models\Locale;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -16,7 +17,7 @@ class LocalePolicy
 
     public function before(): ?Response
     {
-        if (tenancy()->tenant?->features()->inactive(Internationalization::class)) {
+        if (TenantFeatureSupport::inactive(Internationalization::class)) {
             return Response::denyAsNotFound();
         }
 

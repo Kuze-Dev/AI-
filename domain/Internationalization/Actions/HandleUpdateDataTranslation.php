@@ -30,8 +30,7 @@ class HandleUpdateDataTranslation
     public function __construct(
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create content query. */
     public function execute(
@@ -74,9 +73,7 @@ class HandleUpdateDataTranslation
 
         $flattenData = app(ExtractDataAction::class)->flattenArray($data);
 
-        $filtered = array_filter($flattenData, function ($item) {
-            return isset($item['translatable']) && $item['translatable'] === false;
-        });
+        $filtered = array_filter($flattenData, fn ($item) => isset($item['translatable']) && $item['translatable'] === false);
 
         if (
             count($filtered) > 0
@@ -94,7 +91,7 @@ class HandleUpdateDataTranslation
                 );
 
                 if (
-                    tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+                    \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) &&
                     property_exists($modelDTO, 'sites')
                 ) {
 
@@ -130,8 +127,8 @@ class HandleUpdateDataTranslation
             $statePath = $update['statepath'];
             $newValue = $update['value'];
 
-            if ($item->id != $source->id &&
-                $update['type'] == \Domain\Blueprint\Enums\FieldType::MEDIA &&
+            if ($item->id !== $source->id &&
+                $update['type'] === \Domain\Blueprint\Enums\FieldType::MEDIA &&
                 ! is_null($update['value'])
             ) {
                 $newValue = [];
@@ -140,7 +137,7 @@ class HandleUpdateDataTranslation
 
                 foreach ($update['value'] as $media_item) {
 
-                    $pathInfo = pathinfo($media_item);
+                    $pathInfo = pathinfo((string) $media_item);
 
                     if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
 
@@ -187,7 +184,7 @@ class HandleUpdateDataTranslation
 
             }
 
-            $keys = explode('.', $statePath);
+            $keys = explode('.', (string) $statePath);
 
             $temp = &$arrayData;
 
@@ -241,10 +238,9 @@ class HandleUpdateDataTranslation
     }
 
     /**
-     * @param  ContentEntry|BlockContent|Customer|TaxonomyTerm|Globals  $model,
+     * @param  ContentEntry|BlockContent|Customer|TaxonomyTerm|Globals  $model
      * @param  mixed  $modelDTO
      */
-    /** @phpstan-ignore-next-line */
     protected function getTranslatableModelCollection($model, $modelDTO): Collection
     {
 
@@ -274,15 +270,21 @@ class HandleUpdateDataTranslation
                 ->where('order', $model->order)
                 ->get();
         }
-
+        /**
+         * TODO::
+         *
+         * Revisit Transalation Generation for other models
+         */
+        /** @phpstan-ignore property.notFound  */
         if ($model->translation_id) {
-
+            /** @phpstan-ignore method.notFound */
             $translation_collection = $model->dataTranslation()
                 ->orwhere('id', $model->translation_id)
                 ->orwhere('translation_id', $model->translation_id)
                 ->get();
 
         } else {
+            /** @phpstan-ignore method.notFound  */
             $translation_collection = $model->dataTranslation()
                 ->orwhere('id', $model->id)
                 ->get();

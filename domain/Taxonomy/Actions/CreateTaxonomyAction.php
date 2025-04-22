@@ -12,13 +12,13 @@ class CreateTaxonomyAction
 {
     public function __construct(
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
-    ) {
-    }
+    ) {}
 
     public function execute(TaxonomyData $taxonomyData): Taxonomy
     {
         $taxonomy = Taxonomy::create([
             'name' => $taxonomyData->name,
+            'has_route' => $taxonomyData->has_route,
             'blueprint_id' => $taxonomyData->blueprint_id,
         ]);
 

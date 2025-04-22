@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class ServiceOrderStatusStillPendingException extends LogicException
-{
-}
+class ServiceOrderStatusStillPendingException extends LogicException {}

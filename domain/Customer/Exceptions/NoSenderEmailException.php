@@ -6,6 +6,4 @@ namespace Domain\Customer\Exceptions;
 
 use Exception;
 
-class NoSenderEmailException extends Exception
-{
-}
+class NoSenderEmailException extends Exception {}

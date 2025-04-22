@@ -37,7 +37,7 @@ beforeEach(function () {
 
     $shippingMethod = ShippingMethodFactory::new()->createOne();
 
-    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver());
+    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver);
 
     $shippingMethod->update([
         'shipper_country_id' => $country->id,

@@ -45,9 +45,12 @@ class Blueprint extends Model
         'schema',
     ];
 
-    protected $casts = [
-        'schema' => SchemaDataCast::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'schema' => SchemaDataCast::class,
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

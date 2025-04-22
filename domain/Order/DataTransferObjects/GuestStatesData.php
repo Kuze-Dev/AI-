@@ -6,13 +6,12 @@ namespace Domain\Order\DataTransferObjects;
 
 use Domain\Address\Models\State;
 
-class GuestStatesData
+readonly class GuestStatesData
 {
     public function __construct(
-        public readonly State $shippingState,
-        public readonly State $billingState,
-    ) {
-    }
+        public State $shippingState,
+        public State $billingState,
+    ) {}
 
     public static function fromArray(array $data): self
     {

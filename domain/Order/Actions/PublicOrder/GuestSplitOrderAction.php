@@ -18,15 +18,14 @@ use Domain\Payments\DataTransferObjects\TransactionData;
 use Domain\Payments\Exceptions\PaymentException;
 use Exception;
 
-class GuestSplitOrderAction
+readonly class GuestSplitOrderAction
 {
     public function __construct(
-        private readonly GuestCreateOrderAction $guestCreateOrderAction,
-        private readonly GuestCreateOrderLineAction $guestCreateOrderLineAction,
-        private readonly GuestCreateOrderAddressAction $guestCreateOrderAddressAction,
-        private readonly CreatePaymentAction $createPaymentAction,
-    ) {
-    }
+        private GuestCreateOrderAction $guestCreateOrderAction,
+        private GuestCreateOrderLineAction $guestCreateOrderLineAction,
+        private GuestCreateOrderAddressAction $guestCreateOrderAddressAction,
+        private CreatePaymentAction $createPaymentAction,
+    ) {}
 
     public function execute(GuestPreparedOrderData $guestPreparedOrderData, GuestPlaceOrderData $guestPlaceOrderData): array|Exception
     {
@@ -84,6 +83,6 @@ class GuestSplitOrderAction
             return $result;
         }
 
-        throw new PaymentException();
+        throw new PaymentException;
     }
 }

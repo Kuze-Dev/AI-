@@ -14,8 +14,7 @@ class ReceiverData
         public readonly ?string $first_name = null,
         public readonly ?string $email = null,
         public readonly ?string $mobile = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

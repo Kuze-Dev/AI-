@@ -40,17 +40,14 @@ class Locale extends Model
 
     protected $table = 'locales';
 
-    /**
-     * Declare columns
-     * that are mass assignable.
-     */
     protected $fillable = [
         'code',
         'name',
         'is_default',
     ];
 
-    protected static function booted()
+    #[\Override]
+    protected static function booted(): void
     {
         static::saving(function ($locale) {
             if ($locale->is_default) {
@@ -79,6 +76,7 @@ class Locale extends Model
      * Set the column reference
      * for route keys.
      */
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'code';

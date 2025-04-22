@@ -19,6 +19,7 @@ class ServiceOrderFactory extends Factory
 {
     protected $model = ServiceOrder::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

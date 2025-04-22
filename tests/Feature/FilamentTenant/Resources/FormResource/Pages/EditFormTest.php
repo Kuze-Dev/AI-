@@ -8,14 +8,12 @@ use Domain\Form\Database\Factories\FormFactory;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormEmailNotification;
 use Domain\Internationalization\Database\Factories\LocaleFactory;
-use Filament\Facades\Filament;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });

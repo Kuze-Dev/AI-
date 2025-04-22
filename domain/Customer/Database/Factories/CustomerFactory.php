@@ -22,6 +22,7 @@ class CustomerFactory extends Factory
 {
     protected $model = Customer::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

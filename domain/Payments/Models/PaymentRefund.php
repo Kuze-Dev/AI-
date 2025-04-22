@@ -47,6 +47,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  */
 class PaymentRefund extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     /**
@@ -69,16 +70,20 @@ class PaymentRefund extends Model implements HasMedia
         'media',
     ];
 
-    protected $casts = [
-        'refund_details' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'refund_details' => 'array',
+        ];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Payments\Models\Payment, self> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Payments\Models\Payment, $this> */
     public function payment(): BelongsTo
     {
         return $this->belongsTo(Payment::class);
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')

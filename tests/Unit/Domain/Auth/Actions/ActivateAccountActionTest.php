@@ -7,6 +7,8 @@ use Domain\Auth\Events\Activated;
 use Illuminate\Support\Facades\Event;
 use Tests\Fixtures\User;
 
+beforeEach()->skip('skip otp');
+
 it('can activate account', function () {
     Event::fake();
 

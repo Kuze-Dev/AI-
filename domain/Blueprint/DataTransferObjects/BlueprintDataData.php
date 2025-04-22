@@ -23,8 +23,7 @@ class BlueprintDataData
         public readonly string $state_path,
         public readonly null|string|array|bool $value,
         public readonly FieldType $type,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(Model $model, array $data): self
     {
@@ -41,7 +40,7 @@ class BlueprintDataData
         } elseif ($model instanceof Customer) {
             $blueprintId = app(CustomerSettings::class)->blueprint_id;
         } else {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException;
         }
 
         return new self(

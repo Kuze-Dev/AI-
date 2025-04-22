@@ -20,6 +20,7 @@ class ServiceFactory extends Factory
 {
     protected $model = Service::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

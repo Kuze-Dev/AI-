@@ -13,8 +13,7 @@ class EnableTwoFactorAuthenticationAction
 {
     public function __construct(
         protected ValidateTotpCodeAction $validator
-    ) {
-    }
+    ) {}
 
     public function execute(User&TwoFactorAuthenticatable $authenticatable, string $code): ?bool
     {

@@ -7,15 +7,14 @@ namespace Domain\Auth\DataTransferObjects;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 
-class LoginData
+readonly class LoginData
 {
     public function __construct(
-        public readonly string $email,
-        public readonly string $password,
-        public readonly bool $remember = false,
-        public readonly ?string $guard = null,
-    ) {
-    }
+        public string $email,
+        public string $password,
+        public bool $remember = false,
+        public ?string $guard = null,
+    ) {}
 
     public function throttleKey(): string
     {

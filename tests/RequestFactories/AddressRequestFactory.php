@@ -11,6 +11,7 @@ use Worksome\RequestFactories\RequestFactory;
 
 class AddressRequestFactory extends RequestFactory
 {
+    #[\Override]
     public function definition(): array
     {
         return [

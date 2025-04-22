@@ -64,13 +64,16 @@ class FormEmailNotification extends Model
         'has_attachments',
     ];
 
-    protected $casts = [
-        'to' => DelimitedCast::class,
-        'cc' => DelimitedCast::class,
-        'bcc' => DelimitedCast::class,
-        'reply_to' => DelimitedCast::class,
-        'has_attachments' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'to' => DelimitedCast::class,
+            'cc' => DelimitedCast::class,
+            'bcc' => DelimitedCast::class,
+            'reply_to' => DelimitedCast::class,
+            'has_attachments' => 'bool',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -80,7 +83,7 @@ class FormEmailNotification extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Form\Models\Form, \Domain\Form\Models\FormEmailNotification> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Form\Models\Form, $this> */
     public function form(): BelongsTo
     {
         return $this->belongsTo(Form::class);

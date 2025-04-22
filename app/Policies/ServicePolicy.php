@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\Service\ServiceBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Service\Models\Service;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -16,7 +17,7 @@ class ServicePolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(ServiceBase::class)) {
+        if (TenantFeatureSupport::inactive(ServiceBase::class)) {
             return Response::denyAsNotFound();
         }
 

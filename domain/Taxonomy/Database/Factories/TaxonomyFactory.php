@@ -15,6 +15,7 @@ class TaxonomyFactory extends Factory
 {
     protected $model = Taxonomy::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

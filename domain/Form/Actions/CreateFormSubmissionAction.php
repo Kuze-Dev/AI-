@@ -21,7 +21,7 @@ class CreateFormSubmissionAction
 
         foreach ($schema['sections'] as $section) {
             foreach ($section->fields as $field) {
-                if ($field->type == FieldType::FILE) {
+                if ($field->type === FieldType::FILE) {
                     $filesFields[] = $field->state_name;
                 }
             }
@@ -40,7 +40,7 @@ class CreateFormSubmissionAction
                             abort(422, 'File '.$value.' Not Found');
                         } else {
 
-                            $objectkey = 'uploads/forms/'.$form->id.'/'.basename($value);
+                            $objectkey = 'uploads/forms/'.$form->id.'/'.basename((string) $value);
 
                             Storage::disk(config('filament.default_filesystem_disk'))->move($value, $objectkey);
 

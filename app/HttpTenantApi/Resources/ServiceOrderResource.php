@@ -13,6 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class ServiceOrderResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [
@@ -50,11 +51,12 @@ class ServiceOrderResource extends JsonApiResource
     /**
      * @return array<string, callable>
      */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [
             'serviceBills' => fn () => ServiceBillResource::collection($this->serviceBills),
-            is_null($this->service) ? '' : 'service' => fn () => new ServiceResource($this->service),
+            'service' => fn () => new ServiceResource($this->service),
         ];
     }
 }

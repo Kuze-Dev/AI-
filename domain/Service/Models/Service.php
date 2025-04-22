@@ -7,6 +7,7 @@ namespace Domain\Service\Models;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Service\Enums\BillingCycleEnum;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -39,9 +40,9 @@ use Support\MetaData\Models\MetaData;
  * @property int|null $due_date_every
  * @property int $is_featured
  * @property int $is_special_offer
- * @property int $pay_upfront
- * @property int $is_subscription
- * @property int $status
+ * @property bool $pay_upfront
+ * @property bool $is_subscription
+ * @property bool $status
  * @property int $needs_approval
  * @property int $is_auto_generated_bill
  * @property int $is_partial_payment
@@ -92,7 +93,11 @@ class Service extends Model implements HasMedia, HasMetaDataContract
 {
     use ConstraintsRelationships;
     use HasMetaData;
+    use HasUuids;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
     use SoftDeletes;
 
@@ -116,35 +121,46 @@ class Service extends Model implements HasMedia, HasMetaDataContract
         //        'is_installment',
     ];
 
-    protected $casts = [
-        'billing_cycle' => BillingCycleEnum::class,
-        'is_featured' => 'bool',
-        'is_special_offer' => 'bool',
-        'pay_upfront' => 'bool',
-        'is_subscription' => 'bool',
-        'status' => 'bool',
-        'needs_approval' => 'bool',
-        'is_auto_generated_bill' => 'bool',
-        'is_partial_payment' => 'bool',
-        'is_installment' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'billing_cycle' => BillingCycleEnum::class,
+            'is_featured' => 'bool',
+            'is_special_offer' => 'bool',
+            'pay_upfront' => 'bool',
+            'is_subscription' => 'bool',
+            'status' => 'bool',
+            'needs_approval' => 'bool',
+            'is_auto_generated_bill' => 'bool',
+            'is_partial_payment' => 'bool',
+            'is_installment' => 'bool',
+            'retail_price' => 'float',
+            'selling_price' => 'float',
+        ];
+    }
 
-    protected $with = [
-        'taxonomyTerms',
-    ];
+    #[\Override]
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm> */
+    //    protected $with = [
+    //        'taxonomyTerms',
+    //    ];
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function taxonomyTerms(): BelongsToMany
     {
         return $this->belongsToMany(TaxonomyTerm::class, 'service_taxonomy_terms');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Service\Models\Service> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
+    #[\Override]
     public function defaultMetaData(): array
     {
         return [
@@ -152,6 +168,7 @@ class Service extends Model implements HasMedia, HasMetaDataContract
         ];
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'uuid';
@@ -163,5 +180,16 @@ class Service extends Model implements HasMedia, HasMetaDataContract
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    #[\Override]
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('media')
+            ->useFallbackUrl('https://via.placeholder.com/500x300/333333/fff?text=No+preview+available')
+            ->acceptsFile(fn () => [
+                'video/*',
+                'image/*',
+            ]);
     }
 }

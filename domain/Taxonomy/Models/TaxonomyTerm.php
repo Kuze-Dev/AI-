@@ -35,6 +35,7 @@ use Support\RouteUrl\HasRouteUrl;
  * @property string $slug
  * @property array $data
  * @property int $order
+ * @property string|null $translation_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $children
@@ -85,22 +86,25 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
         'order',
     ];
 
-    protected $casts = ['data' => 'array'];
-
     protected $appends = ['url'];
+
+    protected function casts(): array
+    {
+        return ['data' => 'array'];
+    }
 
     public function getUrlAttribute(): ?string
     {
         return $this->activeRouteUrl?->url ?: null;
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, \Domain\Taxonomy\Models\TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\Taxonomy, $this> */
     public function taxonomy(): BelongsTo
     {
         return $this->belongsTo(Taxonomy::class);
     }
 
-    /** @return HasMany<TaxonomyTerm> */
+    /** @return  \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->ordered()->with('children');
@@ -110,7 +114,7 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
      * Declare relationship of
      * current model to content entries.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Content\Models\ContentEntry>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Content\Models\ContentEntry, $this>
      */
     public function contentEntries(): BelongsToMany
     {
@@ -121,25 +125,26 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
      * Declare relationship of
      * current model to products.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Product\Models\Product, $this>
      */
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class);
     }
 
-    /** @return BelongsToMany<\Domain\Service\Models\Service> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Service\Models\Service, $this> */
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'service_taxonomy_terms');
     }
 
-    /** @return MorphMany<BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Blueprint\Models\BlueprintData, $this> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class, 'model');
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -154,9 +159,13 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return Builder<TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Builder<\Domain\Taxonomy\Models\TaxonomyTerm> */
     public function buildSortQuery(): Builder
     {
+        /**
+         * Method Domain\Taxonomy\Models\TaxonomyTerm::buildSortQuery() should return Illuminate\Database\Eloquent\Builder<Domain\Taxonomy\Models\TaxonomyTerm> but returns Illuminate\Database\Eloquent\Builder<static(Domain\Taxonomy\Models\TaxonomyTerm)>domain/Taxonomy/Models/TaxonomyTerm.php
+         *
+         *  @phpstan-ignore return.type */
         return static::query()->whereTaxonomyId($this->taxonomy_id)->whereParentId($this->parent_id);
     }
 
@@ -168,13 +177,13 @@ class TaxonomyTerm extends Model implements HasRouteUrlContract, Sortable
         return $taxonomy->taxonomy->activeRouteUrl?->url.'/'.Str::of($attributes['name'])->slug()->toString();
     }
 
-    /** @return HasMany<TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<TaxonomyTerm, TaxonomyTerm> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Taxonomy\Models\TaxonomyTerm, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

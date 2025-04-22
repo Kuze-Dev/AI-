@@ -12,8 +12,7 @@ class CreateGlobalsAction
 {
     public function __construct(
         protected CreateBlueprintDataAction $createBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create collection query. */
     public function execute(GlobalsData $globalData): Globals
@@ -28,7 +27,7 @@ class CreateGlobalsAction
 
         $this->createBlueprintDataAction->execute($globals);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
             $globals->sites()
                 ->attach($globalData->sites);

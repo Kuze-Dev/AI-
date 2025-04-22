@@ -17,6 +17,7 @@ class GlobalsFactory extends Factory
     protected $model = Globals::class;
 
     /** Define values of model instance. */
+    #[\Override]
     public function definition(): array
     {
         return [

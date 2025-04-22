@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Concerns;
 
-use App\Filament\Pages\Settings\BaseSettings;
+use App\Filament\Clusters\Settings\Pages\BaseSettings;
 use Carbon\CarbonInterval;
 use DateInterval;
 use Filament\Forms\ComponentContainer;
@@ -25,8 +25,9 @@ trait LogsFormActivity
     public function afterFill(): void
     {
         $state = $this->form->getRawState();
-
+        /** @phpstan-ignore argument.type */
         $this->form->dehydrateState($state);
+        /** @phpstan-ignore argument.type */
         $this->form->mutateDehydratedState($state);
 
         $this->initialFormState = ($statePath = $this->form->getStatePath())
@@ -97,7 +98,7 @@ trait LogsFormActivity
 
     protected function shouldLogInitialState(): bool
     {
-        /** @phpstan-ignore-next-line See https://github.com/phpstan/phpstan/issues/3632 */
+        /** @phpstan-ignore instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysFalse (See https://github.com/phpstan/phpstan/issues/3632) */
         return $this instanceof EditRecord || $this instanceof BaseSettings;
     }
 
@@ -133,9 +134,11 @@ trait LogsFormActivity
 
     protected function getDescriptionForEvent(string $event): string
     {
+        /** @phpstan-ignore function.alreadyNarrowedType, notIdentical.alwaysTrue */
         if (method_exists($this, 'getResource')) {
-            if (method_exists($this, 'getRecord')) {
-                return $this->getRecord()->getAttribute($this->getResource()::getRecordTitleAttribute());
+            /** @phpstan-ignore function.alreadyNarrowedType, notIdentical.alwaysTrue */
+            if (method_exists($this, 'getRecord') && ($record = $this->getRecord()) !== null) {
+                return $record->getAttribute($this->getResource()::getRecordTitleAttribute());
             }
 
             return Str::headline($this->getResource()::getModelLabel()).' '.$event;

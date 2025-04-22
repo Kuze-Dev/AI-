@@ -14,6 +14,7 @@ class LocaleFactory extends Factory
 {
     protected $model = Locale::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

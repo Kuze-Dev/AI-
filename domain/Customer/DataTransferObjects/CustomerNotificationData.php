@@ -11,8 +11,7 @@ class CustomerNotificationData
         public string $subject,
         public string $template,
         public array $reply_to = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

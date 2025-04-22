@@ -27,11 +27,13 @@ class ShippingSettings extends Settings
     /** auspost */
     public ?string $auspost_api_key = null;
 
+    #[\Override]
     public static function group(): string
     {
         return 'shipping';
     }
 
+    #[\Override]
     public static function encrypted(): array
     {
         return [

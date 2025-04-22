@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-final class InvalidServiceBillingCycleException extends LogicException
-{
-}
+final class InvalidServiceBillingCycleException extends LogicException {}

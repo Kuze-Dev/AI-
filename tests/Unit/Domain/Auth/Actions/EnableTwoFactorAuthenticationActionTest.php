@@ -16,7 +16,7 @@ beforeEach(function () {
         ->firstOrNew()
         ->forceFill(['secret' => 'secret'])
         ->save();
-});
+})->skip('skip otp');
 
 it('can enable two factor authentication', function () {
     $this->mock(

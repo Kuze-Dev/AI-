@@ -18,8 +18,7 @@ class EditCustomerAction
     public function __construct(
         private readonly SyncMediaCollectionAction $syncMediaCollection,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Customer $customer, CustomerData $customerData): mixed
     {
@@ -61,7 +60,7 @@ class EditCustomerAction
             $customer->sendEmailVerificationNotification();
         }
 
-        if ($customer->tier_approval_status == TierApprovalStatus::APPROVED) {
+        if ($customer->tier_approval_status === TierApprovalStatus::APPROVED) {
             app(SendApprovedEmailAction::class)->execute($customer);
             $customer->sendEmailVerificationNotification();
         }

@@ -21,13 +21,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class UpdateOrderPaymentAction
+readonly class UpdateOrderPaymentAction
 {
     public function __construct(
-        private readonly UploadProofofPaymentAction $uploadProofofPaymentAction,
-        private readonly CreatePaymentLink $createPaymentLink,
-    ) {
-    }
+        private UploadProofofPaymentAction $uploadProofofPaymentAction,
+        private CreatePaymentLink $createPaymentLink,
+    ) {}
 
     public function status(Order $order, string|OrderStatuses $status, ?string $notes = null): Order
     {
@@ -35,7 +34,7 @@ class UpdateOrderPaymentAction
             'status' => $status,
         ];
 
-        if ($status == OrderStatuses::CANCELLED->value) {
+        if ($status === OrderStatuses::CANCELLED->value) {
             $orderData['cancelled_reason'] = $notes;
             $orderData['cancelled_at'] = now();
 
@@ -63,13 +62,13 @@ class UpdateOrderPaymentAction
         $payment = $order->payments->first();
 
         if (
-            $payment->gateway != 'bank-transfer'
+            $payment->gateway !== 'bank-transfer'
         ) {
             throw new BadRequestHttpException('You cant upload a proof of payment in this gateway');
         }
 
         if (
-            $order->status != OrderStatuses::FORPAYMENT
+            $order->status !== OrderStatuses::FORPAYMENT
         ) {
             throw new BadRequestHttpException('Invalid action');
         }

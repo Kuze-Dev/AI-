@@ -14,9 +14,7 @@ use Domain\ShippingMethod\Models\ShippingMethod;
 
 class GetShippingRateAction
 {
-    public function __construct(private readonly ShippingManagerInterface $shippingManager)
-    {
-    }
+    public function __construct(private readonly ShippingManagerInterface $shippingManager) {}
 
     public function execute(
         ParcelData $parcelData,
@@ -26,7 +24,7 @@ class GetShippingRateAction
 
         $shippingDriver = $this->shippingManager->driver($shippingMethod->driver->value);
 
-        if ($shippingMethod->driver == Driver::AUSPOST && $this->isDomesticShipping($address, 'AU')) {
+        if ($shippingMethod->driver === Driver::AUSPOST && $this->isDomesticShipping($address, 'AU')) {
 
             return $shippingDriver->getRate(
                 $parcelData,
@@ -36,7 +34,7 @@ class GetShippingRateAction
         }
 
         if ($this->isDomesticInUnitedStates($address) &&
-            in_array($shippingMethod->driver, [Driver::USPS, Driver::UPS])
+            in_array($shippingMethod->driver, [Driver::USPS, Driver::UPS], true)
         ) {
 
             return $shippingDriver->getRate(
@@ -54,11 +52,11 @@ class GetShippingRateAction
 
     protected function isDomesticInUnitedStates(ShippingAddressData $address): bool
     {
-        return $address->country->code == 'US';
+        return $address->country->code === 'US';
     }
 
     protected function isDomesticShipping(ShippingAddressData $address, string $countryCode): bool
     {
-        return $address->country->code == $countryCode;
+        return $address->country->code === $countryCode;
     }
 }

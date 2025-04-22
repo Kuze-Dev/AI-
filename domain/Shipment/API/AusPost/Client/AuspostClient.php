@@ -7,14 +7,14 @@ namespace Domain\Shipment\API\AusPost\Client;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
-final class AuspostClient
+final readonly class AuspostClient
 {
-    public const API_URL = 'https://digitalapi.auspost.com.au';
+    public const string API_URL = 'https://digitalapi.auspost.com.au';
 
     private PendingRequest $client;
 
     public function __construct(
-        public readonly string $auspost_api_key,
+        public string $auspost_api_key,
     ) {
         $this->client = Http::baseUrl(self::API_URL);
     }

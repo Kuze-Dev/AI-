@@ -9,8 +9,7 @@ class PaymentCapture
     public function __construct(
         public bool $success = false,
         public ?string $message = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

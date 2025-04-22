@@ -9,6 +9,8 @@ use Domain\Order\Models\Order;
 use Domain\Order\Models\OrderLine;
 use Domain\Product\Models\Product;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -59,6 +61,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class Review extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     protected $fillable = [
@@ -74,11 +77,15 @@ class Review extends Model implements HasMedia
         'product_id',
     ];
 
-    protected $casts = [
-        'data' => 'array',
-        'is_anonymous' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+            'is_anonymous' => 'bool',
+        ];
+    }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $registerMediaConversions = function (Media $media) {
@@ -89,32 +96,32 @@ class Review extends Model implements HasMedia
             ->registerMediaConversions($registerMediaConversions);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Product\Models\Product, \Domain\Review\Models\Review> */
-    public function product()
+    /** @return BelongsTo<\Domain\Product\Models\Product, $this> */
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Review\Models\Review>*/
-    public function customer()
+    /** @return BelongsTo<\Domain\Customer\Models\Customer, $this>*/
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\Order, \Domain\Review\Models\Review> */
-    public function order()
+    /** @return BelongsTo<\Domain\Order\Models\Order, $this> */
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Order\Models\OrderLine, \Domain\Review\Models\Review> */
-    public function order_line()
+    /** @return BelongsTo<\Domain\Order\Models\OrderLine, $this> */
+    public function order_line(): BelongsTo
     {
         return $this->belongsTo(OrderLine::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Review\Models\ReviewLike> */
-    public function review_likes()
+    /** @return HasMany<\Domain\Review\Models\ReviewLike, $this> */
+    public function review_likes(): HasMany
     {
         return $this->hasMany(ReviewLike::class);
     }

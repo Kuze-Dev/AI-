@@ -17,8 +17,7 @@ class RateV4RequestData
         public readonly string $Ounces,
         public readonly Container $Container = Container::VARIABLE,
         public readonly bool $Machinable = true,
-    ) {
-    }
+    ) {}
 
     public function toArray(): array
     {

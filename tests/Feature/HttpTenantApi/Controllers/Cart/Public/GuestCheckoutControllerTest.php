@@ -16,9 +16,7 @@ use function Pest\Laravel\postJson;
 use function Pest\Laravel\withHeader;
 
 beforeEach(function () {
-    testInTenantContext();
-
-    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
+    testInTenantContext(AllowGuestOrder::class);
 
     ProductFactory::new()
         ->times(3)
@@ -72,7 +70,7 @@ it('cant checkout when product inactive', function () {
 
     postJson('api/guest/carts/checkouts', [
         'cart_line_ids' => [$cartLine->uuid],
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it('cant checkout when product didnt meet the minimum order quantity', function () {
@@ -87,7 +85,7 @@ it('cant checkout when product didnt meet the minimum order quantity', function 
 
     postJson('api/guest/carts/checkouts', [
         'cart_line_ids' => [$cartLine->uuid],
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it('cant checkout when product cant purchase as a guest', function () {
@@ -105,7 +103,7 @@ it('cant checkout when product cant purchase as a guest', function () {
 
     postJson('api/guest/carts/checkouts', [
         'cart_line_ids' => [$cartLine->uuid],
-    ])->assertStatus(422);
+    ])->assertUnprocessable();
 });
 
 it('can show checkout items', function () {

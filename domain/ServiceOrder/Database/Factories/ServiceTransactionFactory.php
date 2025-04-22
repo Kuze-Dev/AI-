@@ -17,6 +17,7 @@ class ServiceTransactionFactory extends Factory
 {
     protected $model = ServiceTransaction::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

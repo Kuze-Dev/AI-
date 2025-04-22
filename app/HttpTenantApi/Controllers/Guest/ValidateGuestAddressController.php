@@ -12,6 +12,7 @@ use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Domain\Shipment\API\USPS\Clients\AddressClient;
 use Domain\Shipment\API\USPS\DataTransferObjects\AddressValidateRequestData;
+use Domain\Tenant\TenantFeatureSupport;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -38,7 +39,7 @@ class ValidateGuestAddressController extends Controller
 
             $stateName = $state->name;
 
-            if (tenancy()->tenant?->features()->active(ShippingUsps::class) && $country->code == 'US') {
+            if (TenantFeatureSupport::active(ShippingUsps::class) && $country->code === 'US') {
 
                 $address = app(AddressClient::class)->verify(AddressValidateRequestData::fromAddressRequest($addressDto, $stateName));
 

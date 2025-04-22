@@ -6,8 +6,6 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\BlueprintResource\Pages;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Closure;
 use Domain\Blueprint\Actions\DeleteBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\SectionData;
@@ -20,59 +18,61 @@ use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Enums\TiptapTools;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Tenant\TenantFeatureSupport;
 use ErrorException;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class BlueprintResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Blueprint::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-table';
+    protected static ?string $navigationIcon = 'heroicon-o-table-cells';
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->string()
                         ->maxLength(255),
                 ]),
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->statePath('schema')
                     ->schema([
                         Forms\Components\Repeater::make('sections')
-                            ->orderable()
+                            ->orderColumn()
                             ->itemLabel(fn (array $state) => $state['title'] ?? null)
                             ->minItems(1)
                             ->collapsible()
@@ -83,7 +83,7 @@ class BlueprintResource extends Resource
                                     ->string()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('state_name')
-                                    ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
+                                    ->readOnly(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
                                         $record->schema->sections,
                                         fn (SectionData $section) => $section->state_name === $state
                                     ))),
@@ -93,6 +93,7 @@ class BlueprintResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -102,7 +103,7 @@ class BlueprintResource extends Resource
                     ->searchable(),
                 // ->truncate('max-w-xs xl:max-w-md 2xl:max-w-2xl', true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
 
@@ -139,12 +140,19 @@ class BlueprintResource extends Resource
                     ->withActivityLog(
                         event: 'bulk-exported',
                         description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
-                        properties: fn (ExportBulkAction $action) => ['selected_record_ids' => $action->getRecords()?->modelKeys()]
+                        properties: function (ExportBulkAction $action) {
+
+                            /** @var EloquentCollection $records */
+                            $records = $action->getRecords();
+
+                            return ['selected_record_ids' => $records->modelKeys()];
+                        }
                     ),
             ])
             ->defaultSort('created_at', 'desc');
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -154,6 +162,7 @@ class BlueprintResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -164,7 +173,7 @@ class BlueprintResource extends Resource
     protected static function getFieldsSchema(): Forms\Components\Repeater
     {
         return Forms\Components\Repeater::make('fields')
-            ->orderable()
+            ->orderColumn()
             ->itemLabel(function (array $state) {
                 if (blank($state['title'])) {
                     return null;
@@ -172,7 +181,7 @@ class BlueprintResource extends Resource
 
                 $label = $state['title'];
 
-                if (filled($state['type'])) {
+                if (array_key_exists('type', $state) && filled($state['type'])) {
                     $type = $state['type'] instanceof FieldType
                         ? $state['type']->value
                         : $state['type'];
@@ -194,7 +203,7 @@ class BlueprintResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('state_name')
                     ->columnSpan(['sm' => 2])
-                    ->disabled(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
+                    ->readOnly(fn (?Blueprint $record, ?string $state) => (bool) ($record && Arr::first(
                         $record->schema->sections,
                         fn (SectionData $section) => Arr::first(
                             $section->fields,
@@ -206,7 +215,7 @@ class BlueprintResource extends Resource
                     ->options(
                         collect(FieldType::cases())
                             ->reject(fn (FieldType $fieldType) => (
-                                tenancy()->tenant?->features()->inactive(\App\Features\CMS\GoogleMapField::class) &&
+                                TenantFeatureSupport::inactive(\App\Features\CMS\GoogleMapField::class) &&
                                 $fieldType === FieldType::LOCATION_PICKER
                             ))
                             ->mapWithKeys(fn (FieldType $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
@@ -214,7 +223,7 @@ class BlueprintResource extends Resource
                             ->toArray()
                     )
                     ->required()
-                    ->disabled(fn (?Blueprint $record, Closure $get) => (bool) ($record && Arr::first(
+                    ->disableOptionWhen(fn (?Blueprint $record, \Filament\Forms\Get $get) => (bool) ($record && Arr::first(
                         $record->schema->sections,
                         fn (SectionData $section) => Arr::first(
                             $section->fields,
@@ -229,16 +238,14 @@ class BlueprintResource extends Resource
                     ),
                 Forms\Components\TextInput::make('rules')
                     ->columnSpanFull()
-                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('rules', implode('|', $state ?? []));
                     })
-                    ->dehydrateStateUsing(function (?string $state): array {
-                        return $state !== null
-                            ? Str::of($state)->split('/\|/')
-                                ->map(fn (string $rule) => trim($rule))
-                                ->toArray()
-                            : [];
-                    })
+                    ->dehydrateStateUsing(fn (?string $state): array => $state !== null
+                        ? Str::of($state)->split('/\|/')
+                            ->map(fn (string $rule) => trim($rule))
+                            ->toArray()
+                        : [])
                     ->helperText(new HtmlString(<<<'HTML'
                             Rules should be separated with "|". Available rules can be found on <a href="https://laravel.com/docs/validation#available-validation-rules" class="text-primary-500" target="_blank" rel="noopener noreferrer">Laravel's Documentation</a>.
                         HTML)),
@@ -247,13 +254,20 @@ class BlueprintResource extends Resource
                 Forms\Components\Section::make('Field Options')
                     ->id('field-options')
                     ->collapsible()
-                    ->when(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
+                    // ->hidden(fn (Forms\Components\Section $component, array $state) => (filled($state['type'] ?? null) && count($component->getChildComponents()) > 0))
                     ->columns(['sm' => 2])
-                    ->schema(fn (array $state) => self::getFieldOptionSchema(
-                        $state['type'] instanceof FieldType
-                            ? $state['type']
-                            : FieldType::tryFrom($state['type'] ?? '')
-                    )),
+                    ->schema(function (array $state) {
+
+                        if (! array_key_exists('type', $state)) {
+                            return [];
+                        }
+
+                        return self::getFieldOptionSchema(
+                            $state['type'] instanceof FieldType
+                                ? $state['type']
+                                : FieldType::tryFrom($state['type'] ?? ''));
+                    }),
+
             ]);
     }
 
@@ -261,10 +275,8 @@ class BlueprintResource extends Resource
     {
         return match ($fieldType) {
             FieldType::DATETIME => [
-                Forms\Components\DateTimePicker::make('min')
-                    ->timezone(Auth::user()?->timezone),
-                Forms\Components\DateTimePicker::make('max')
-                    ->timezone(Auth::user()?->timezone),
+                Forms\Components\DateTimePicker::make('min'),
+                Forms\Components\DateTimePicker::make('max'),
                 Forms\Components\TextInput::make('format')
                     ->helperText(new HtmlString(<<<'HTML'
                             See <a href="https://www.php.net/manual/en/datetime.format.php" class="text-primary-500" target="_blank" rel="noopener noreferrer">PHP's Date/Time Format</a> for available options.
@@ -280,7 +292,7 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
                 Forms\Components\TextInput::make('accept')
-                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
                     })
                     ->dehydrateStateUsing(function (?string $state): array {
@@ -296,22 +308,18 @@ class BlueprintResource extends Resource
                     })
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('min_size')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_size')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('min_files')
-                    ->numeric()
-                    ->integer()
-                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->allowedOnlyWholeNumber()
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_files')
-                    ->numeric()
-                    ->integer()
-                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->allowedOnlyWholeNumber()
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Repeater::make('hidden_option')
                     ->collapsible()
@@ -398,18 +406,16 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
                 Forms\Components\TextInput::make('min')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (Closure $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\TextInput::make('max')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (Closure $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
-                    ->orderable()
+                    ->orderColumn()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
                     ->columnSpanFull()
                     ->columns(2)
@@ -450,7 +456,7 @@ class BlueprintResource extends Resource
                     ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
-                    ->orderable()
+                    ->orderColumn()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
                     ->columnSpanFull()
                     ->columns(2)
@@ -487,20 +493,16 @@ class BlueprintResource extends Resource
             ],
             FieldType::TEXTAREA => [
                 Forms\Components\TextInput::make('min_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('rows')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('cols')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
@@ -530,12 +532,10 @@ class BlueprintResource extends Resource
             ],
             FieldType::TEXT, => [
                 Forms\Components\TextInput::make('min_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
@@ -568,26 +568,21 @@ class BlueprintResource extends Resource
             FieldType::URL,
             FieldType::PASSWORD => [
                 Forms\Components\TextInput::make('min_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             FieldType::NUMBER => [
                 Forms\Components\TextInput::make('min')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('step')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
             ],
             FieldType::TOGGLE => [
@@ -600,17 +595,16 @@ class BlueprintResource extends Resource
                 Forms\Components\Select::make('resource')
                     ->columnSpanFull()
                     ->lazy()
-                    ->afterStateUpdated(function (Closure $set) {
+                    ->afterStateUpdated(function (\Filament\Forms\Set $set) {
                         $set('relation_scopes', []);
                     })
                     ->options(
-                        (new Collection(config('domain.blueprint.related_resources', [])))
+                        (new Collection(config()->array('domain.blueprint.related_resources', [])))
                             ->keys()
                             ->mapWithKeys(
-                                function (string $model) {
-                                    /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
-                                    return [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()];
-                                }
+                                fn (string $model) =>
+                                    /** @phpstan-ignore method.notFound */
+                                    [(new $model)->getMorphClass() => Str::of($model)->classBasename()->headline()]
                             )
                             ->sort()
                             ->toArray()
@@ -620,24 +614,22 @@ class BlueprintResource extends Resource
                     ->reactive()
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('min')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (Closure $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\TextInput::make('max')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                    ->when(fn (Closure $get) => $get('multiple') === true),
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === false),
                 Forms\Components\Group::make()
                     ->columnSpanFull()
-                    ->hidden(function (Closure $get) {
+                    ->hidden(function (\Filament\Forms\Get $get) {
                         $modelClass = Relation::getMorphedModel($get('resource'));
                         $relationScopes = config("domain.blueprint.related_resources.{$modelClass}.relation_scopes", []);
 
                         return count($relationScopes) <= 0;
                     })
-                    ->schema(function (Closure $get) {
+                    ->schema(function (\Filament\Forms\Get $get) {
                         $modelClass = Relation::getMorphedModel($get('resource'));
                         $relationScopes = config("domain.blueprint.related_resources.{$modelClass}.relation_scopes", []);
 
@@ -645,7 +637,7 @@ class BlueprintResource extends Resource
 
                         foreach ($relationScopes as $relationName => $options) {
                             /** @var \Illuminate\Database\Eloquent\Model $related */
-                            $related = (new $modelClass())->{$relationName}()->getRelated();
+                            $related = (new $modelClass)->{$relationName}()->getRelated();
 
                             $schema[] = Forms\Components\Select::make("relation_scopes.$relationName")
                                 ->label(Str::headline($relationName))
@@ -661,12 +653,15 @@ class BlueprintResource extends Resource
             ],
             FieldType::REPEATER => [
                 Forms\Components\TextInput::make('min')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
+                    ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\TextInput::make('columns')
+                    ->maxValue(12)
+                    ->allowedOnlyWholeNumber()
+                    ->columnSpan(2)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 self::getFieldsSchema()
                     ->columnSpanFull(),
@@ -676,7 +671,7 @@ class BlueprintResource extends Resource
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
                 Forms\Components\TextInput::make('accept')
-                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
                     })
                     ->dehydrateStateUsing(function (?string $state): array {
@@ -695,25 +690,22 @@ class BlueprintResource extends Resource
                     ->helperText(new HtmlString(<<<'HTML'
                          in kb
                         HTML))
-                    ->numeric()
-                    ->integer()
+
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_size')
                     ->helperText(new HtmlString(<<<'HTML'
                          in kb
                         HTML))
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('min_files')
-                    ->numeric()
-                    ->integer()
-                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->allowedOnlyWholeNumber()
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_files')
-                    ->numeric()
-                    ->integer()
-                    ->when(fn (Closure $get) => $get('multiple') === true)
+                    ->allowedOnlyWholeNumber()
+                    ->hidden(fn (\Filament\Forms\Get $get) => $get('multiple') === true)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
@@ -767,7 +759,6 @@ class BlueprintResource extends Resource
                                                     ->hintColor('primary')
                                                     ->hintIcon('heroicon-s-question-mark-circle'),
                                             ]),
-                                            /** @phpstan-ignore-next-line */
                                             default => throw new ErrorException(
                                                 ManipulationType::class.'::'.Str::upper($manipulationType->value).' field not setup for conversion manipulation.'
                                             )
@@ -786,7 +777,7 @@ class BlueprintResource extends Resource
                     ->default(true),
                 Forms\Components\Repeater::make('options')
                     ->collapsible()
-                    ->orderable()
+                    ->orderColumn()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
                     ->columnSpanFull()
                     ->columns(2)
@@ -798,7 +789,7 @@ class BlueprintResource extends Resource
                     ]),
                 Forms\Components\Repeater::make('descriptions')
                     ->collapsible()
-                    ->orderable()
+                    ->orderColumn()
                     ->itemLabel(fn (array $state) => $state['title'] ?? null)
                     ->columnSpanFull()
                     ->columns(2)
@@ -832,12 +823,10 @@ class BlueprintResource extends Resource
             ],
             FieldType::TINYEDITOR => [
                 Forms\Components\TextInput::make('min_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\TextInput::make('max_length')
-                    ->numeric()
-                    ->integer()
+                    ->allowedOnlyWholeNumber()
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
@@ -868,7 +857,7 @@ class BlueprintResource extends Resource
 
             FieldType::TIPTAPEDITOR => [
                 Forms\Components\TextInput::make('accept')
-                    ->afterStateHydrated(function (Closure $set, ?array $state): void {
+                    ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
                     })
                     ->dehydrateStateUsing(function (?string $state): array {

@@ -10,20 +10,20 @@ use Illuminate\Support\Str;
 
 class TreeFormAction extends Action
 {
+    #[\Override]
     public static function getDefaultName(): ?string
     {
         return 'tree-form';
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->modalHeading(function ($component, self $action) {
-            return ($activeTreeState = $action->getActiveTreeState())
-                ? trans('Edit :label', ['label' => $component->getItemLabel($activeTreeState)])
-                : trans('Add :name', ['name' => (string) Str::of($component->getName())->headline()->singular()]);
-        });
+        $this->modalHeading(fn ($component, self $action) => ($activeTreeState = $action->getActiveTreeState())
+            ? trans('Edit :label', ['label' => $component->getItemLabel($activeTreeState)])
+            : trans('Add :name', ['name' => (string) Str::of($component->getName())->headline()->singular()]));
 
         $this->slideOver(true);
 
@@ -33,9 +33,7 @@ class TreeFormAction extends Action
             $form->fill($action->getActiveTreeState());
         });
 
-        $this->form(function ($component) {
-            return $component->getChildComponents();
-        });
+        $this->form(fn ($component) => $component->getChildComponents());
 
         $this->action(function ($livewire, self $action, array $data) {
             data_set(
@@ -48,8 +46,8 @@ class TreeFormAction extends Action
 
     protected function getActiveTreeStatePath(): string
     {
-        /** @phpstan-ignore-next-line */
-        return $this->getLivewire()->mountedFormComponentActionArguments['activeTreeStatePath'];
+        /** @phpstan-ignore property.notFound */
+        return $this->getLivewire()->mountedFormComponentActionsArguments[0]['activeTreeStatePath'];
     }
 
     protected function getActiveTreeState(): array

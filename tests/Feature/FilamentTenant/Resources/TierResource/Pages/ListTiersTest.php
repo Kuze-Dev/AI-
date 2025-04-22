@@ -5,10 +5,10 @@ declare(strict_types=1);
 use App\Features\Customer\TierBase;
 use App\FilamentTenant\Resources\TierResource\Pages\ListTiers;
 use Domain\Tier\Database\Factories\TierFactory;
-use Filament\Facades\Filament;
-use Filament\Pages\Actions\DeleteAction;
-use Filament\Pages\Actions\ForceDeleteAction;
-use Filament\Pages\Actions\RestoreAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Tables\Filters\TrashedFilter;
 
 use function Pest\Laravel\assertModelMissing;
 use function Pest\Laravel\assertNotSoftDeleted;
@@ -18,9 +18,7 @@ use function Pest\Livewire\livewire;
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(TierBase::class);
-    Filament::setContext('filament-tenant');
+    testInTenantContext(TierBase::class);
     loginAsSuperAdmin();
 });
 
@@ -56,6 +54,7 @@ it('can restore tier', function () {
         ->createOne();
 
     livewire(ListTiers::class)
+        ->filterTable(TrashedFilter::class)
         ->callTableAction(RestoreAction::class, $tier)
         ->assertOk();
 
@@ -68,6 +67,7 @@ it('can force delete tier', function () {
         ->createOne();
 
     livewire(ListTiers::class)
+        ->filterTable(TrashedFilter::class)
         ->callTableAction(ForceDeleteAction::class, $tier)
         ->assertOk();
 

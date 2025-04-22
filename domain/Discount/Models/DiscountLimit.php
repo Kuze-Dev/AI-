@@ -53,21 +53,23 @@ class DiscountLimit extends Model
         'code',
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, \Domain\Discount\Models\DiscountLimit> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, $this> */
     public function discount(): BelongsTo
     {
         return $this->belongsTo(Discount::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Customer\Models\Customer, \Domain\Discount\Models\DiscountLimit> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Customer\Models\Customer, $this> */
     public function customer(): MorphTo
     {
+        /** @phpstan-ignore return.type */
         return $this->morphTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Order\Models\Order, \Domain\Discount\Models\DiscountLimit>*/
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Domain\Order\Models\Order, $this>*/
     public function order(): MorphTo
     {
+        /** @phpstan-ignore return.type */
         return $this->morphTo(Order::class);
     }
 }

@@ -29,9 +29,9 @@ class MediaFieldData extends FieldData
         public readonly ?int $max_files = null,
         public readonly ?string $helper_text = null,
         public readonly array $conversions = [],
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         //        if ( ! $data['type'] instanceof FieldType) {
@@ -45,7 +45,7 @@ class MediaFieldData extends FieldData
             multiple: $data['multiple'] ?? false,
             reorder: $data['reorder'] ?? false,
             accept: $data['accept'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             min_size: $data['min_size'] ?? null,
             max_size: $data['max_size'] ?? null,
             min_files: $data['min_files'] ?? null,
@@ -59,7 +59,8 @@ class MediaFieldData extends FieldData
     }
 
     /** @return array<string, mixed> */
-    public function toArray()
+    #[\Override]
+    public function toArray(): array
     {
         return (array) $this;
     }

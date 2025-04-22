@@ -16,8 +16,7 @@ class CreatePaymentAction
 {
     public function __construct(
         public readonly CreatePaymentLink $createPaymentlink
-    ) {
-    }
+    ) {}
 
     /** Execute create collection query. */
     public function execute(PayableInterface $model, CreatepaymentData $paymentData): PaymentAuthorize

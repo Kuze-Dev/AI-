@@ -53,26 +53,29 @@ class TwoFactorAuthentication extends Model
 {
     use ConstraintsRelationships;
 
-    protected $casts = [
-        'secret' => 'encrypted',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'secret' => 'encrypted',
+        ];
+    }
 
-    /** @return HasMany<RecoveryCode> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Auth\Model\RecoveryCode, $this> */
     public function recoveryCodes(): HasMany
     {
         return $this->hasMany(RecoveryCode::class);
     }
 
-    /** @return HasMany<SafeDevice> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Auth\Model\SafeDevice, $this> */
     public function safeDevices(): HasMany
     {
         return $this->hasMany(SafeDevice::class);
     }
 
-    /** @return MorphTo<Model&TwoFactorAuthenticatable, self> */
+    /** @return MorphTo<Model&TwoFactorAuthenticatable, $this> */
     public function authenticatable(): MorphTo
     {
-        /** @var MorphTo<Model&TwoFactorAuthenticatable, self> */
+        /** @phpstan-ignore return.type  */
         return $this->morphTo();
     }
 
@@ -81,7 +84,7 @@ class TwoFactorAuthentication extends Model
         $svg = (new Writer(
             new ImageRenderer(
                 new RendererStyle(192, 0, null, null, Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
-                new SvgImageBackEnd()
+                new SvgImageBackEnd
             )
         ))->writeString($this->qrCodeUrl());
 
@@ -92,7 +95,7 @@ class TwoFactorAuthentication extends Model
     {
         return app(TwoFactorAuthenticationProvider::class)->qrCodeUrl(
             config('app.name'),
-            $this->authenticatable->twoFactorHolder(), // @phpstan-ignore-line
+            $this->authenticatable->twoFactorHolder(), // @phpstan-ignore method.notFound
             $this->secret
         );
     }

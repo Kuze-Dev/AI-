@@ -34,11 +34,9 @@ use function Pest\Laravel\withHeader;
 use function PHPUnit\Framework\assertInstanceOf;
 
 beforeEach(function () {
-    testInTenantContext();
+    testInTenantContext(AllowGuestOrder::class);
 
-    tenancy()->tenant->features()->activate(AllowGuestOrder::class);
-
-    app(OrderSettings::class)->fill(['email_sender_name' => fake()->safeEmail()])->save();
+    OrderSettings::fake(['email_sender_name' => fake()->safeEmail()]);
 
     CurrencyFactory::new()->createOne([
         'code' => 'USD',
@@ -62,7 +60,7 @@ beforeEach(function () {
 
     $shippingMethod = ShippingMethodFactory::new()->createOne(['title' => 'Store Pickup']);
 
-    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver());
+    app(ShippingManagerInterface::class)->extend($shippingMethod->driver->value, fn () => new StorePickupDriver);
 
     $shippingMethod->update([
         'shipper_country_id' => $country->id,
@@ -71,7 +69,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Cod']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment);
 
     ProductFactory::new()->times(3)->create([
         'status' => true,

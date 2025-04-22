@@ -1,0 +1,39 @@
+{
+    "$schema": "https://laravel-ide.com/schema/laravel-ide-v2.json",
+    "completions": [
+        {
+            "complete": "assetPath",
+            "condition": [
+                {
+                    "functionNames": ["activation_asset"],
+                    "parameters": [1]
+                }
+            ]
+        },
+        {
+            "complete": "bladeIcon",
+            "condition": [
+                {
+                    "methodNames": [
+                        "activeIcon",
+                        "badgeIcon",
+                        "completedIcon",
+                        "descriptionIcon",
+                        "emptyStateIcon",
+                        "falseIcon",
+                        "groupedIcon",
+                        "hintIcon",
+                        "icon",
+                        "modalIcon",
+                        "offIcon",
+                        "onIcon",
+                        "prefixIcon",
+                        "suffixIcon",
+                        "trueIcon"
+                    ],
+                    "parameters": [1]
+                }
+            ]
+        }
+    ]
+}

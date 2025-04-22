@@ -9,7 +9,7 @@ use Filament\Forms\Components\Concerns\CanDisableOptions;
 
 class CheckBoxList extends ComponentsCheckboxList
 {
-    use CanDisableOptions;
+    // use CanDisableOptions;
 
     protected string $view = 'filament.forms.components.checkbox-list';
 }

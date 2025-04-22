@@ -8,12 +8,12 @@ use App\FilamentTenant\Resources\PageResource;
 use Domain\Page\Actions\DeletePageAction;
 use Domain\Page\Models\Page;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+// use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 // use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
@@ -26,19 +26,20 @@ class PageTranslationRelationManager extends RelationManager
 
     public Model $ownerRecord;
 
-    /** @phpstan-ignore-next-line */
+    /** @phpstan-ignore missingType.generics, missingType.generics */
     public function getRelationship(): Relation|Builder
     {
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound */
         if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0 || is_null($this->getOwnerRecord()->translation_id)) {
             return $this->getOwnerRecord()->{static::getRelationshipName()}();
         }
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound, property.notFound, property.notFound */
         return $this->getOwnerRecord()->{static::getRelationshipName()}()->orwhere('id', $this->ownerRecord->translation_id)->orwhere('translation_id', $this->ownerRecord->translation_id)->where('id', '!=', $this->ownerRecord->id);
     }
 
-    public static function table(Table $table): Table
+    #[\Override]
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -47,26 +48,28 @@ class PageTranslationRelationManager extends RelationManager
                         /** @var Builder|Page $query */
                         return $query->Where('name', 'like', "%{$search}%");
                     })
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('name')
                     ->hidden()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-                Tables\Columns\BadgeColumn::make('visibility')
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class)),
+                Tables\Columns\TextColumn::make('visibility')
+                    ->badge()
                     ->formatStateUsing(fn ($state) => Str::headline($state))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TagsColumn::make('sites.name')
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
-                    }, isToggledHiddenByDefault: fn () => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
+                    ->toggleable(condition: fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class),
+                        isToggledHiddenByDefault: fn () => \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class)),
                 Tables\Columns\IconColumn::make('published_at')
                     ->label(trans('Published'))
-                    ->options([
+                    ->icons([
                         'heroicon-o-check-circle' => fn ($state) => $state !== null,
                         'heroicon-o-x-circle' => fn ($state) => $state === null,
                     ])
@@ -81,7 +84,7 @@ class PageTranslationRelationManager extends RelationManager
                         });
                     }),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
 

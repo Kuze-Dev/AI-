@@ -46,20 +46,20 @@ return [
      * Database tenancy config. Used by DatabaseTenancyBootstrapper.
      */
     'database' => [
-        'central_connection' => env('DB_CONNECTION', 'central'),
+        'central_connection' => env('DB_CONNECTION', 'mysql'),
 
         /**
          * Connection used as a "template" for the dynamically created tenant database connection.
          * Note: don't name your template connection tenant. That name is reserved by package.
          */
-        'template_tenant_connection' => 'tenant_template',
+        'template_tenant_connection' => env('TENANCY_TEMPLATE_TENANT_CONNECTION','tenant_template'),
 
         /**
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
         'prefix' => Str::of(env('APP_NAME'))->lower()->snake().'_',
-        'suffix' => '_'.Str::random(7),
+        'suffix' => env('TENANCY_SUFFIX', '_db'),
 
         /**
          * TenantDatabaseManagers are classes that handle the creation & deletion of tenant databases.
@@ -69,16 +69,16 @@ return [
             'mysql' => Stancl\Tenancy\TenantDatabaseManagers\MySQLDatabaseManager::class,
             'pgsql' => Stancl\Tenancy\TenantDatabaseManagers\PostgreSQLDatabaseManager::class,
 
-        /**
-         * Use this database manager for MySQL to have a DB user created for each tenant database.
-         * You can customize the grants given to these users by changing the $grants property.
-         */
+            /**
+             * Use this database manager for MySQL to have a DB user created for each tenant database.
+             * You can customize the grants given to these users by changing the $grants property.
+             */
             // 'mysql' => Stancl\Tenancy\TenantDatabaseManagers\PermissionControlledMySQLDatabaseManager::class,
 
-        /**
-         * Disable the pgsql manager above, and enable the one below if you
-         * want to separate tenant DBs by schemas rather than databases.
-         */
+            /**
+             * Disable the pgsql manager above, and enable the one below if you
+             * want to separate tenant DBs by schemas rather than databases.
+             */
             // 'pgsql' => Stancl\Tenancy\TenantDatabaseManagers\PostgreSQLSchemaManager::class, // Separate by schema instead of database
         ],
     ],
@@ -119,7 +119,7 @@ return [
          * See https://tenancyforlaravel.com/docs/v3/tenancy-bootstrappers/#filesystem-tenancy-boostrapper
          */
         'root_override' => [
-            // Disks whose roots should be overriden after storage_path() is suffixed.
+            // Disks whose roots should be overridden after storage_path() is suffixed.
             'local' => '%storage_path%/app/',
             'public' => '%storage_path%/app/public/',
         ],

@@ -18,8 +18,7 @@ class AddressValidateRequestData
         public readonly string $State,
         public readonly string $Zip5,
         public readonly string $Zip4,
-    ) {
-    }
+    ) {}
 
     // public static function formAddress(Address $address): self
     // {

@@ -7,11 +7,11 @@ namespace App\FilamentTenant\Resources\TaxonomyResource\RelationManagers;
 use App\FilamentTenant\Resources\TaxonomyResource;
 use Domain\Taxonomy\Models\Taxonomy;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+// use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 
 class TaxonomyTranslationRelationManager extends RelationManager
 {
@@ -19,34 +19,36 @@ class TaxonomyTranslationRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @phpstan-ignore-next-line */
+    /** @phpstan-ignore missingType.generics, missingType.generics */
     public function getRelationship(): Relation|Builder
     {
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound */
         if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0 || is_null($this->getOwnerRecord()->translation_id)) {
             return $this->getOwnerRecord()->{static::getRelationshipName()}();
         }
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound, property.notFound, property.notFound */
         return $this->getOwnerRecord()->{static::getRelationshipName()}()->orwhere('id', $this->ownerRecord->translation_id)->orwhere('translation_id', $this->ownerRecord->translation_id)->where('id', '!=', $this->ownerRecord->id);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable()
-                    ->truncate('max-w-xs 2xl:max-w-xl', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-                Tables\Columns\BadgeColumn::make('taxonomy_terms_count')
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class)),
+                Tables\Columns\TextColumn::make('taxonomy_terms_count')
+                    ->badge()
                     ->counts('taxonomyTerms')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([

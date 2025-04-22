@@ -16,8 +16,6 @@ class InProgressServiceOrderNotification extends Notification implements ShouldQ
 {
     use Queueable;
 
-    private ServiceOrder $serviceOrder;
-
     private string $logo;
 
     private string $title;
@@ -30,10 +28,8 @@ class InProgressServiceOrderNotification extends Notification implements ShouldQ
 
     private ?string $footer = null;
 
-    public function __construct(ServiceOrder $serviceOrder)
+    public function __construct(private ServiceOrder $serviceOrder)
     {
-        $this->serviceOrder = $serviceOrder;
-
         $this->logo = app(SiteSettings::class)->getLogoUrl();
 
         $this->title = app(SiteSettings::class)->name;
@@ -55,7 +51,7 @@ class InProgressServiceOrderNotification extends Notification implements ShouldQ
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject('Service In Progress')
             ->replyTo($this->replyTo)
             ->from($this->from)

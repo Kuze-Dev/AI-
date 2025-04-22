@@ -11,6 +11,7 @@ use Vyuldashev\XmlToArray\XmlToArray;
 
 class AddressClient extends BaseClient
 {
+    #[\Override]
     public static function uri(): string
     {
         return 'ShippingAPI.dll';

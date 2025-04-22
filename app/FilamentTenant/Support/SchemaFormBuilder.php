@@ -43,6 +43,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
 use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -53,7 +54,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class SchemaFormBuilder extends Component
 {
-    protected string $view = 'forms::components.group';
+    protected string $view = 'filament-forms::components.group';
 
     protected SchemaData|Closure|null $schemaData = null;
 
@@ -76,6 +77,7 @@ class SchemaFormBuilder extends Component
         return $static;
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -95,6 +97,7 @@ class SchemaFormBuilder extends Component
         return $this->evaluate($this->schemaData);
     }
 
+    #[\Override]
     public function getChildComponents(): array
     {
         return ($schema = $this->getSchemaData())
@@ -115,7 +118,8 @@ class SchemaFormBuilder extends Component
             DatetimeFieldData::class => $this->makeDateTimePickerComponent($field),
             FileFieldData::class => $this->makeFileUploadComponent($field),
             MarkdownFieldData::class => MarkdownEditor::make($field->state_name)
-                ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons)),
+                ->toolbarButtons(array_map(fn (MarkdownButton $button) => $button->value, $field->buttons
+                )),
             RichtextFieldData::class => $this->makeRichTextComponent($field),
             SelectFieldData::class => $this->makeSelectComponent($field),
             CheckBoxFieldData::class => $this->makeCheckBoxListComponent($field),
@@ -141,7 +145,7 @@ class SchemaFormBuilder extends Component
 
         return $fieldComponent
             ->label($field->title)
-            ->required(fn () => in_array('required', $field->rules))
+            ->required(fn () => in_array('required', $field->rules, true))
             ->helperText($field->helper_text)
             ->rules($field->rules);
     }
@@ -176,11 +180,11 @@ class SchemaFormBuilder extends Component
         }
 
         if ($fileFieldData->can_download) {
-            $fileUpload->enableDownload($fileFieldData->can_download);
+            $fileUpload->downloadable($fileFieldData->can_download);
         }
 
         if ($fileFieldData->reorder) {
-            $fileUpload->enableReordering($fileFieldData->reorder);
+            $fileUpload->reorderable($fileFieldData->reorder);
         }
 
         if (! empty($fileFieldData->accept)) {
@@ -201,7 +205,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $fileUpload->reactive();
-            $fileUpload->hidden(function (Closure $get) use ($enum, $option) {
+            $fileUpload->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -226,15 +230,15 @@ class SchemaFormBuilder extends Component
                 ->imagePreviewHeight('256');
         }
 
-        if ($mediaFieldData->conversions) {
-            $media->image();
-        }
+        // if ($mediaFieldData->conversions) {
+        //     $media->image();
+        // }
 
         if ($mediaFieldData->reorder) {
-            $media->enableReordering($mediaFieldData->reorder);
+            $media->reorderable($mediaFieldData->reorder);
         }
 
-        $media->enableOpen();
+        $media->openable();
 
         $media->formatStateUsing(function (?array $state): array {
 
@@ -260,32 +264,27 @@ class SchemaFormBuilder extends Component
             return [];
         });
 
-        $media->dehydrateStateUsing(function (?array $state) {
-            return array_values($state ?? []) ?: null;
-        });
+        $media->dehydrateStateUsing(fn (?array $state) => array_values($state ?? []) ?: null);
 
-        $media->getUploadedFileUrlUsing(function ($file) {
+        $media->getUploadedFileUsing(function ($file) {
 
             if (! is_null($file)) {
-
-                $media = Media::where('uuid', $file)
+                $mediaModel = Media::where('uuid', $file)
                     ->orWhere('file_name', $file)
                     ->first();
+                if ($mediaModel) {
 
-                if ($media) {
-                    return $media->getUrl();
+                    return [
+                        'name' => $mediaModel->getAttributeValue('name') ?? $mediaModel->getAttributeValue('file_name'),
+                        'size' => $mediaModel->getAttributeValue('size'),
+                        'type' => $mediaModel->getAttributeValue('mime_type'),
+                        'url' => $mediaModel->getUrl(),
+                    ];
+
                 }
 
-                $storage = Storage::disk(config('filament.default_filesystem_disk'));
-
-                if ($storage->exists($file)) {
-                    return $storage->url($file);
-                }
-
+                return [];
             }
-
-            return [];
-
         });
 
         if (! empty($mediaFieldData->accept)) {
@@ -323,7 +322,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $textarea->reactive();
-            $textarea->hidden(function (Closure $get) use ($enum, $option) {
+            $textarea->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -362,7 +361,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $textInput->reactive();
-            $textInput->hidden(function (Closure $get) use ($enum, $option) {
+            $textInput->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -381,6 +380,10 @@ class SchemaFormBuilder extends Component
         $repeater = Repeater::make($repeaterFieldData->state_name)
             ->collapsible()
             ->schema(array_map(fn (FieldData $field) => $this->generateFieldComponent($field), $repeaterFieldData->fields));
+
+        if ($repeaterFieldData->columns) {
+            $repeater->columns($repeaterFieldData->columns);
+        }
 
         if ($repeaterFieldData->min) {
             $repeater->minItems($repeaterFieldData->min);
@@ -423,17 +426,17 @@ class SchemaFormBuilder extends Component
             )
             ->getUploadedAttachmentUrlUsing(function ($file) {
 
-                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
                 try {
                     if (! $storage->exists($file)) {
                         return null;
                     }
-                } catch (UnableToCheckFileExistence $exception) {
+                } catch (UnableToCheckFileExistence) {
                     return null;
                 }
 
-                if (config('filament.default_filesystem_disk') === 'r2') {
+                if (config()->string('filament.default_filesystem_disk') === 'r2') {
                     return $storage->url($file);
                 } else {
                     if ($storage->getVisibility($file) === 'private') {
@@ -442,7 +445,7 @@ class SchemaFormBuilder extends Component
                                 $file,
                                 now()->addMinutes(5),
                             );
-                        } catch (\Throwable $exception) {
+                        } catch (\Throwable) {
                             // This driver does not support creating temporary URLs.
                         }
                     }
@@ -459,7 +462,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $richEditor->reactive();
-            $richEditor->hidden(function (Closure $get) use ($enum, $option) {
+            $richEditor->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -475,22 +478,22 @@ class SchemaFormBuilder extends Component
     {
 
         $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
-            ->fileAttachmentsDisk(config('filament.default_filesystem_disk'))
+            ->fileAttachmentsDisk(config()->string('filament.default_filesystem_disk'))
             ->fileAttachmentsVisibility('public')
             ->showMenuBar()
             ->getUploadedAttachmentUrlUsing(function ($file) {
 
-                $storage = Storage::disk(config('filament.default_filesystem_disk'));
+                $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
 
                 try {
                     if (! $storage->exists($file)) {
                         return null;
                     }
-                } catch (UnableToCheckFileExistence $exception) {
+                } catch (UnableToCheckFileExistence) {
                     return null;
                 }
 
-                if (config('filament.default_filesystem_disk') === 'r2') {
+                if (config()->string('filament.default_filesystem_disk') === 'r2') {
                     return $storage->url($file);
                 } else {
                     if ($storage->getVisibility($file) === 'private') {
@@ -499,7 +502,7 @@ class SchemaFormBuilder extends Component
                                 $file,
                                 now()->addMinutes(5),
                             );
-                        } catch (\Throwable $exception) {
+                        } catch (\Throwable) {
                             // This driver does not support creating temporary URLs.
                         }
                     }
@@ -524,7 +527,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $tinyEditor->reactive();
-            $tinyEditor->hidden(function (Closure $get) use ($enum, $option) {
+            $tinyEditor->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -546,7 +549,7 @@ class SchemaFormBuilder extends Component
             ->directory('attachments')
             ->extraInputAttributes(['style' => 'min-height: 12rem;'])
             ->maxContentWidth('full')
-            ->output(\FilamentTiptapEditor\Enums\TiptapOutput::Html->value); // optional, change the format for saved data, default is html
+            ->output(\FilamentTiptapEditor\Enums\TiptapOutput::Html); // optional, change the format for saved data, default is html
 
         if (count($tiptapEditorData->hidden_option)) {
 
@@ -554,7 +557,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $tiptapEditor->reactive();
-            $tiptapEditor->hidden(function (Closure $get) use ($enum, $option) {
+            $tiptapEditor->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -578,7 +581,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $checkboxlist->reactive();
-            $checkboxlist->hidden(function (Closure $get) use ($enum, $option) {
+            $checkboxlist->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -603,7 +606,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $select->reactive();
-            $select->hidden(function (Closure $get) use ($enum, $option) {
+            $select->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }
@@ -630,7 +633,7 @@ class SchemaFormBuilder extends Component
             $enum = ConditionEnum::tryFrom($option['condition']);
 
             $radio->reactive();
-            $radio->hidden(function (Closure $get) use ($enum, $option) {
+            $radio->hidden(function (Get $get) use ($enum, $option) {
                 if ($enum) {
                     return $enum->evaluate($get($option['base_state_name']), $option['value']);
                 }

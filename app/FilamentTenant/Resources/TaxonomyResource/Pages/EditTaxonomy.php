@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\TaxonomyResource\Pages;
 
-use App\Filament\Livewire\Actions\CustomPageActionGroup;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TaxonomyResource;
 use Domain\Internationalization\Models\Locale;
@@ -12,16 +11,20 @@ use Domain\Taxonomy\Actions\CreateTaxonomyTranslationAction;
 use Domain\Taxonomy\Actions\UpdateTaxonomyAction;
 use Domain\Taxonomy\DataTransferObjects\TaxonomyData;
 use Domain\Taxonomy\Models\Taxonomy;
+use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Notifications\Notification;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Livewire\Redirector;
+// use Filament\Pages\Actions;
+// use Filament\Pages\Actions\Action;
+// use Filament\Resources\Pages\EditRecord;
+// use Illuminate\Database\Eloquent\Model;
+use Livewire\Features\SupportRedirects\Redirector;
 
 class EditTaxonomy extends EditRecord
 {
@@ -29,50 +32,45 @@ class EditTaxonomy extends EditRecord
 
     protected static string $resource = TaxonomyResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
-            'page_actions' => CustomPageActionGroup::make([
+            ActionGroup::make([
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    ->action('createTranslation')
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->action(fn (Action $action) => $this->createTranslation($action->getFormData()))
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
-                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->required(),
                     ]),
 
             ])
-                ->view('filament.pages.actions.custom-action-group.index')
-                ->setName('other_page_actions')
-                ->color('secondary')
-                ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
+                ->button()
+                ->icon('')
                 ->label(trans('More Actions')),
 
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /** @param  \Domain\Taxonomy\Models\Taxonomy  $record */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        // dd($data);
-        return DB::transaction(fn () => app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data)));
+        return app(UpdateTaxonomyAction::class)->execute($record, TaxonomyData::fromArray($data));
     }
 
     public function createTranslation(array $data): RedirectResponse|Redirector|false
@@ -116,8 +114,7 @@ class EditTaxonomy extends EditRecord
         /** @var \Domain\Internationalization\Models\Locale */
         $locale = Locale::whereCode($data['locale'])->first();
 
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = auth()->user();
+        $admin = filament_admin();
 
         if ($exist) {
 
@@ -161,7 +158,7 @@ class EditTaxonomy extends EditRecord
         $segments = explode('/', $url);
 
         // Check if the first segment is a valid locale code from the array
-        if (in_array($segments[0], $locales)) {
+        if (in_array($segments[0], $locales, true)) {
             // Replace the existing locale with the new one
             $segments[0] = $locale;
         } else {
@@ -175,6 +172,6 @@ class EditTaxonomy extends EditRecord
 
     protected function getRedirectUrl(): ?string
     {
-        return TaxonomyResource::getUrl('edit', $this->record);
+        return TaxonomyResource::getUrl('edit', [$this->record]);
     }
 }

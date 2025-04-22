@@ -4,39 +4,37 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
-use Domain\Customer\Actions\DeleteCustomerAction;
-use Domain\Customer\Actions\ForceDeleteCustomerAction;
-use Domain\Customer\Actions\RestoreCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
 use Domain\Customer\Enums\RegisterStatus;
+use Domain\Customer\Exceptions\NoSenderEmailException;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Enums\TierApprovalStatus;
 use ErrorException;
 use Exception;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class InviteCustomerResource extends CustomerResource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-speakerphone';
+    protected static ?string $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'invite-customers';
 
+    #[\Override]
     public static function getModelLabel(): string
     {
         return trans('Invite Customer');
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         $table = parent::table($table);
@@ -63,11 +61,18 @@ class InviteCustomerResource extends CustomerResource
                         })
                         ->translateLabel()
                         ->requiresConfirmation()
-                        ->icon('heroicon-o-speakerphone')
+                        ->icon('heroicon-o-megaphone')
                         ->action(function (Customer $record, Tables\Actions\Action $action): void {
 
-                            $success = app(SendRegisterInvitationAction::class)
-                                ->execute($record);
+                            try {
+                                $success = app(SendRegisterInvitationAction::class)
+                                    ->execute($record);
+                            } catch (NoSenderEmailException $e) {
+                                $action->failureNotificationTitle($e->getMessage())
+                                    ->failure();
+
+                                return;
+                            }
 
                             if ($success) {
                                 $action
@@ -87,37 +92,17 @@ class InviteCustomerResource extends CustomerResource
                             description: fn (Customer $record) => $record->full_name.' register invitation link sent'
                         ),
                     Tables\Actions\DeleteAction::make()
-                        ->translateLabel()
-                        ->using(function (Customer $record) {
-                            try {
-                                return app(DeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
+                        ->translateLabel(),
                     Tables\Actions\RestoreAction::make()
-                        ->translateLabel()
-                        ->using(
-                            fn (Customer $record) => DB::transaction(
-                                fn () => app(RestoreCustomerAction::class)
-                                    ->execute($record)
-                            )
-                        ),
+                        ->translateLabel(),
                     Tables\Actions\ForceDeleteAction::make()
-                        ->translateLabel()
-                        ->using(function (Customer $record) {
-                            try {
-                                return app(ForceDeleteCustomerAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
+                        ->translateLabel(),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkAction::make('send-register-invitation')
                     ->translateLabel()
-                    ->icon('heroicon-o-speakerphone')
+                    ->icon('heroicon-o-megaphone')
                     ->requiresConfirmation()
                     ->deselectRecordsAfterCompletion()
                     ->successNotificationTitle(
@@ -139,6 +124,7 @@ class InviteCustomerResource extends CustomerResource
             ]);
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -149,6 +135,7 @@ class InviteCustomerResource extends CustomerResource
     }
 
     /** @return Builder<\Domain\Customer\Models\Customer> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         /** @var Builder<Customer> $query */
@@ -161,6 +148,7 @@ class InviteCustomerResource extends CustomerResource
             ->whereNot('register_status', RegisterStatus::REGISTERED);
     }
 
+    #[\Override]
     public static function canCreate(): bool
     {
         return static::can('create');

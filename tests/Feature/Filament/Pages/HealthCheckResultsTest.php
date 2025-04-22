@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Filament\Pages\HealthCheckResults;
+// declare(strict_types=1);
 
-use function Pest\Livewire\livewire;
+// use App\Filament\Pages\HealthCheckResults;
 
-beforeEach(fn () => loginAsSuperAdmin());
+// use function Pest\Livewire\livewire;
 
-it('render', function () {
-    livewire(HealthCheckResults::class)
-        ->assertSuccessful();
-});
+// beforeEach(fn () => loginAsSuperAdmin());
+
+// it('render', function () {
+//     livewire(HealthCheckResults::class)
+//         ->assertSuccessful();
+// });

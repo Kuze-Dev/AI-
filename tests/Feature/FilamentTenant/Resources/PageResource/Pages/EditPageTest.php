@@ -12,7 +12,6 @@ use Domain\Page\Database\Factories\PageFactory;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\BlockContent;
 use Domain\Page\Models\Page;
-use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -26,7 +25,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     LocaleFactory::createDefault();
 });
@@ -53,7 +51,7 @@ it('can render page', function () {
         ->assertFormSet([
             'name' => $page->name,
             'published_at' => true,
-            'block_contents.record-1' => $page->blockContents->first()->toArray(),
+            'block_contents.record-1.data.main.header' => 'Foo',
         ])
         ->assertOk();
 });

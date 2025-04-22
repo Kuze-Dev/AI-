@@ -7,7 +7,6 @@ use Domain\Content\Database\Factories\ContentEntryFactory;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyFactory;
 use Domain\Taxonomy\Database\Factories\TaxonomyTermFactory;
-use Filament\Facades\Filament;
 use Filament\Pages\Actions\DeleteAction;
 
 use function Pest\Laravel\assertDatabaseMissing;
@@ -16,7 +15,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 

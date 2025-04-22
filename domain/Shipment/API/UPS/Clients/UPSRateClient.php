@@ -10,6 +10,7 @@ use Domain\Shipment\DataTransferObjects\ShippingAddressData;
 
 class UPSRateClient extends BaseClient
 {
+    #[\Override]
     public static function uri(): string
     {
         return 'api/rating/v1/Rate';
@@ -26,6 +27,7 @@ class UPSRateClient extends BaseClient
 
         $customer = $parcelData->reciever;
         // Create the associative array representing the JSON structure
+
         $data = [
             'RateRequest' => [
                 'Request' => [
@@ -86,7 +88,8 @@ class UPSRateClient extends BaseClient
             ],
         ];
 
-        /** @var string */
+        /** @var string $jsonString */
+        /** @phpstan-ignore varTag.nativeType */
         $jsonString = json_encode($data);
 
         $response = $this->client->getClient()
@@ -177,7 +180,8 @@ class UPSRateClient extends BaseClient
             ],
         ];
 
-        /** @var string */
+        /** @var string $jsonString */
+        /** @phpstan-ignore varTag.nativeType */
         $jsonString = json_encode($data);
 
         $response = $this->client->getClient()

@@ -7,8 +7,6 @@ namespace Support\RouteUrl\Rules;
 use Closure;
 use Domain\Content\Models\ContentEntry;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Support\RouteUrl\Contracts\HasRouteUrl;
 use Support\RouteUrl\Models\RouteUrl;
@@ -18,26 +16,24 @@ class MicrositeContentEntryUniqueRouteUrlRule implements ValidationRule
     public function __construct(
         protected readonly ?HasRouteUrl $ignoreModel,
         protected readonly array $route_url,
-    ) {
-
-    }
+    ) {}
 
     /** @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail */
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
 
-        $content = ContentEntry::select('id')->wherehas('sites', function ($q) use ($value) {
-            return $q->whereIn('site_id', $value);
-        })->pluck('id')->toArray();
+        $content = ContentEntry::select('id')->wherehas('sites', fn ($q) => $q->whereIn('site_id', $value))->pluck('id')->toArray();
 
         $query = RouteUrl::whereUrl($this->route_url['url'])
             ->whereIn(
                 'id',
-                RouteUrl::select('id')
+                RouteUrl::query()
+                    ->select('id')
                     ->where(
                         'updated_at',
-                        fn (QueryBuilder $query) => $query->select(DB::raw('MAX(`updated_at`)'))
-                            ->from((new RouteUrl())->getTable(), 'sub_query_table')
+                        fn ($query) => $query->select(DB::raw('MAX(`updated_at`)'))
+                            ->from((new RouteUrl)->getTable(), 'sub_query_table')
                             ->whereColumn('sub_query_table.model_type', 'route_urls.model_type')
                             ->whereColumn('sub_query_table.model_id', 'route_urls.model_id')
                     )
@@ -46,7 +42,7 @@ class MicrositeContentEntryUniqueRouteUrlRule implements ValidationRule
         $query->whereIN('model_id', $content)->where('url', $this->route_url['url']);
 
         if ($this->ignoreModel) {
-            $query->whereNot(fn (EloquentBuilder $query) => $query
+            $query->whereNot(fn ($query) => $query
                 ->where('model_type', $this->ignoreModel->getMorphClass())
                 ->where('model_id', $this->ignoreModel->getKey()));
         }

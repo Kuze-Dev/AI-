@@ -14,8 +14,7 @@ class GlobalsData extends TranslationDTO
         public readonly string $locale,
         public readonly ?array $data = [],
         public readonly array $sites = [],
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

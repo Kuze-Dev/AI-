@@ -14,6 +14,5 @@ class PackageData
         public readonly string $container,
         public readonly int $zone,
         public readonly PostageData $postage
-    ) {
-    }
+    ) {}
 }

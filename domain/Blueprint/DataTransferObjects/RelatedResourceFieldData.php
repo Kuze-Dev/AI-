@@ -29,9 +29,9 @@ class RelatedResourceFieldData extends FieldData
         public readonly ?int $min = null,
         public readonly ?int $max = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -43,7 +43,7 @@ class RelatedResourceFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             type: $data['type'],
             rules: $data['rules'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             resource: $data['resource'],
             multiple: $data['multiple'] ?? false,
             relation_scopes: $data['relation_scopes'] ?? [],
@@ -72,7 +72,7 @@ class RelatedResourceFieldData extends FieldData
         $modelClass = $this->getRelatedModelClass();
 
         /** @var Model */
-        return new $modelClass();
+        return new $modelClass;
     }
 
     /** @return Collection<array-key, Model>|Model|null */
@@ -84,7 +84,7 @@ class RelatedResourceFieldData extends FieldData
             ? $this->getRelatedResourceQuery()
                 ->whereIn($related->getKeyName(), $value)
                 ->get()
-                ->sortBy(fn (Model $model) => array_search($model->getKey(), $value))
+                ->sortBy(fn (Model $model) => array_search($model->getKey(), $value, true))
             : $this->getRelatedResourceQuery()
                 ->where($related->getKeyName(), $value)
                 ->first();
@@ -97,7 +97,10 @@ class RelatedResourceFieldData extends FieldData
         $modelQuery = $model->query();
 
         foreach ($this->relation_scopes as $relationName => $value) {
-            /** @var Relation<Model> $relationship */
+            /**
+             * @var Relation<Model> $relationship
+             *
+             * @phpstan-ignore generics.lessTypes */
             $relationship = $model->{$relationName}();
 
             $modelQuery->whereRelation($relationName, $relationship->getRelated()->getKeyName(), $value);

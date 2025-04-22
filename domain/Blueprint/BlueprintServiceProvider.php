@@ -9,7 +9,8 @@ use Illuminate\Support\ServiceProvider;
 
 class BlueprintServiceProvider extends ServiceProvider
 {
-    public function register()
+    #[\Override]
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/config/blueprint.php', 'domain.blueprint');
 
@@ -25,6 +26,7 @@ class BlueprintServiceProvider extends ServiceProvider
         foreach (config('domain.blueprint.relations') as $relationName => $modelClass) {
             Blueprint::resolveRelationUsing(
                 $relationName,
+                /** @phpstan-ignore argument.templateType */
                 fn (Blueprint $model) => $model->hasMany($modelClass)
             );
         }

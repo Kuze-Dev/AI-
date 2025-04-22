@@ -62,14 +62,18 @@ class Form extends Model
         'blueprint_id',
         'name',
         'slug',
+        'locale',
         'store_submission',
         'uses_captcha',
     ];
 
-    protected $casts = [
-        'store_submission' => 'bool',
-        'uses_captcha' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'store_submission' => 'bool',
+            'uses_captcha' => 'bool',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -79,24 +83,25 @@ class Form extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Form\Models\Form> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Form\Models\FormEmailNotification> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Form\Models\FormEmailNotification, $this> */
     public function formEmailNotifications(): HasMany
     {
         return $this->hasMany(FormEmailNotification::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Form\Models\FormSubmission> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Form\Models\FormSubmission, $this> */
     public function formSubmissions(): HasMany
     {
         return $this->hasMany(FormSubmission::class);
     }
 
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';

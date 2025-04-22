@@ -20,8 +20,7 @@ class UpdateProductAction
         protected UpdateProductOptionAction $updateProductOption,
         protected CreateOrUpdateProductVariantAction $createOrUpdateProductVariant,
         protected SyncMediaCollectionAction $syncMediaCollection,
-    ) {
-    }
+    ) {}
 
     public function execute(Product $product, ProductData $productData): Product
     {
@@ -54,13 +53,12 @@ class UpdateProductAction
     protected function uploadMediaMaterials(Product $product, array $mediaCollection): void
     {
         collect($mediaCollection)->each(function ($media, $key) use ($product) {
-            /** @var array<int, array> $mediaMaterials */
+            /** @var array<int, \Illuminate\Http\UploadedFile|string> $mediaMaterials */
             $mediaMaterials = $media['materials'];
 
-            $mediaData = collect($mediaMaterials)->map(function ($material) {
+            $mediaData = collect($mediaMaterials)->map(fn ($material) =>
                 /** @var \Illuminate\Http\UploadedFile|string $material */
-                return new MediaData(media: $material);
-            })->toArray();
+                new MediaData(media: $material))->toArray();
 
             $this->syncMediaCollection->execute($product, new MediaCollectionData(
                 collection: $media['collection'],

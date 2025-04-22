@@ -12,6 +12,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class ReviewResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [
@@ -27,6 +28,7 @@ class ReviewResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         $relationships = [

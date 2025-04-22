@@ -14,7 +14,7 @@ class CheckoutAction
     {
         $checkoutReference = (string) Str::uuid();
 
-        CartLine::whereIn((new CartLine())->getRouteKeyName(), $checkoutData->cart_line_ids)
+        CartLine::whereIn((new CartLine)->getRouteKeyName(), $checkoutData->cart_line_ids)
             ->update([
                 'checkout_reference' => $checkoutReference,
                 'checkout_expiration' => now()->addHours(5),

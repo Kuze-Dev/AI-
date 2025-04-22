@@ -11,8 +11,7 @@ class AusPostResponse implements RateResponse
 {
     public function __construct(
         public readonly array $package,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -22,20 +21,22 @@ class AusPostResponse implements RateResponse
         );
     }
 
+    #[\Override]
     public function getRateResponseAPI(): array
     {
         return get_object_vars($this);
     }
 
+    #[\Override]
     public function getRate(int|string|null $serviceID = null): float
     {
 
         foreach ($this->package['service'] as $service) {
-            if ($service['code'] == $serviceID) {
+            if ($service['code'] === $serviceID) {
                 return (float) $service['price'];
             }
         }
 
-        throw new AusPostServiceNotFoundException();
+        throw new AusPostServiceNotFoundException;
     }
 }

@@ -6,6 +6,7 @@ namespace App\Policies;
 
 use App\Features\ECommerce\RewardPoints;
 use App\Policies\Concerns\ChecksWildcardPermissions;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -15,7 +16,7 @@ class RewardPointsPolicy
 
     public function before(): ?Response
     {
-        if (tenancy()->tenant?->features()->inactive(RewardPoints::class)) {
+        if (TenantFeatureSupport::inactive(RewardPoints::class)) {
             return Response::denyAsNotFound();
         }
 

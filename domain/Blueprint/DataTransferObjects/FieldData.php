@@ -19,8 +19,7 @@ abstract class FieldData implements Arrayable
         public readonly FieldType $type,
         public readonly array $rules = [],
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -32,7 +31,8 @@ abstract class FieldData implements Arrayable
     }
 
     /** @return array<string, mixed> */
-    public function toArray()
+    #[\Override]
+    public function toArray(): array
     {
         return (array) $this;
     }

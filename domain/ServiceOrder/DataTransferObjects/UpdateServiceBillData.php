@@ -11,8 +11,7 @@ class UpdateServiceBillData
         public readonly float $tax_total,
         public readonly float $total_amount,
         public readonly ?array $additional_charges,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

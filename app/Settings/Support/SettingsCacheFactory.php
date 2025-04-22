@@ -13,15 +13,17 @@ class SettingsCacheFactory extends \Spatie\LaravelSettings\Support\SettingsCache
         // to totally ignore initializeCaches()
     }
 
+    #[\Override]
     public function all(): array
     {
         return [$this->build()];
     }
 
+    #[\Override]
     public function build(?string $repository = null): SettingsCache
     {
         return new SettingsCache(
-            (bool) config('settings.cache.enabled', false),
+            config()->boolean('settings.cache.enabled', false),
             config('settings.cache.store'),
             tenant()?->getTenantKey() ?? 'central',
             config('settings.cache.ttl'),

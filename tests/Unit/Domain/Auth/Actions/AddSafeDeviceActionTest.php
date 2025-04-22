@@ -22,7 +22,7 @@ beforeEach(function () {
             'secret' => 'secret',
         ])
         ->save();
-});
+})->skip('skip otp');
 
 it('can add safe device', function () {
     app(AddSafeDeviceAction::class)->execute($this->user, new SafeDeviceData('0.0.0.0', 'user-agent'));

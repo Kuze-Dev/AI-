@@ -26,24 +26,7 @@ use Throwable;
 #[Middleware('feature.tenant:'.CustomerBase::class)]
 class RegisterController
 {
-    protected CreateCustomerAction $createCustomerAction;
-
-    protected EditCustomerAction $editCustomerAction;
-
-    protected VerifyEmailAction $verifyEmailAction;
-
-    protected SendForApprovalRegistrationAction $sendForApprovalRegistrationAction;
-
-    public function __construct(CreateCustomerAction $createCustomerAction,
-        EditCustomerAction $editCustomerAction,
-        VerifyEmailAction $verifyEmailAction,
-        SendForApprovalRegistrationAction $sendForApprovalRegistrationAction)
-    {
-        $this->createCustomerAction = $createCustomerAction;
-        $this->editCustomerAction = $editCustomerAction;
-        $this->verifyEmailAction = $verifyEmailAction;
-        $this->sendForApprovalRegistrationAction = $sendForApprovalRegistrationAction;
-    }
+    public function __construct(protected CreateCustomerAction $createCustomerAction, protected EditCustomerAction $editCustomerAction, protected VerifyEmailAction $verifyEmailAction, protected SendForApprovalRegistrationAction $sendForApprovalRegistrationAction) {}
 
     /** @throws Throwable */
     #[Post('register', name: 'customer.register')]
@@ -55,7 +38,7 @@ class RegisterController
         $customerBlueprint = Blueprint::where('id', app(CustomerSettings::class)->blueprint_id)->first();
 
         /** @var \Domain\Tier\Models\Tier $defaultTier */
-        $defaultTier = Tier::whereName(config('domain.tier.default'))->first();
+        $defaultTier = Tier::whereName(config()->string('domain.tier.default'))->first();
 
         if ($request->invited) {
 

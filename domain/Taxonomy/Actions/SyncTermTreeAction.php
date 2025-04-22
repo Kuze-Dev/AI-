@@ -28,8 +28,7 @@ class SyncTermTreeAction
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** @param  array<TaxonomyTermData>  $taxonomyTermDataSet */
     public function execute(Taxonomy $taxonomy, array $taxonomyTermDataSet): Taxonomy
@@ -69,7 +68,7 @@ class SyncTermTreeAction
         TaxonomyTerm::setNewOrder($termIds);
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)
         ) {
 
             foreach ($termIds as $term_id) {
@@ -111,7 +110,7 @@ class SyncTermTreeAction
             $this->updateBlueprintDataAction->execute($updated_term);
 
             if (
-                tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+                \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)
             ) {
                 app(HandleUpdateDataTranslation::class)->execute($updated_term, $termData);
             }
@@ -123,7 +122,7 @@ class SyncTermTreeAction
             $this->createBlueprintDataAction->execute($term);
 
             if (
-                tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)
+                \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)
             ) {
 
                 if ($term->translation_id) {
@@ -152,7 +151,7 @@ class SyncTermTreeAction
 
                     foreach ($taxonomyCollection as $taxonomy_item) {
 
-                        if ($taxonomy->id == $taxonomy_item->id) {
+                        if ($taxonomy->id === $taxonomy_item->id) {
                             continue;
                         }
 
@@ -173,7 +172,7 @@ class SyncTermTreeAction
                             name: $termData->name,
                             data: $termData->data,
                             is_custom: $termData->is_custom,
-                            url: $termUrl ? ($defaultLocale == $taxonomy_item->locale ? $termUrl : "/$taxonomy_item->locale$termUrl") : null,
+                            url: $termUrl ? ($defaultLocale === $taxonomy_item->locale ? $termUrl : "/$taxonomy_item->locale$termUrl") : null,
                             translation_id: (string) $term->id
                             // children: $taxonomy
                         );
@@ -276,7 +275,7 @@ class SyncTermTreeAction
         $taxonomyTerm->refresh();
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class) &&
+            \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class) &&
             $parentTerm) {
 
             if ($taxonomy->translation_id) {
@@ -309,7 +308,7 @@ class SyncTermTreeAction
                 $taxonomyCollection as $taxonomy_item
             ) {
 
-                if ($taxonomy_item->id == $this->taxonomy->id) {
+                if ($taxonomy_item->id === $this->taxonomy->id) {
                     continue;
                 }
 

@@ -6,12 +6,8 @@ namespace App\FilamentTenant\Resources\DiscountResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\DiscountResource;
-use DB;
-use Domain\Discount\Actions\CreateDiscountAction;
-use Domain\Discount\DataTransferObjects\DiscountData;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
 
 class CreateDiscount extends CreateRecord
 {
@@ -19,26 +15,14 @@ class CreateDiscount extends CreateRecord
 
     protected static string $resource = DiscountResource::class;
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('create')
-                ->label(trans('filament::resources/pages/create-record.form.actions.create.label'))
+                ->label(trans('filament-panels::resources/pages/create-record.form.actions.create.label'))
                 ->action('create')
                 ->keyBindings(['mod+s']),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
-    protected function handleRecordCreation(array $data): Model
-    {
-        return DB::transaction(
-            fn () => app(CreateDiscountAction::class)
-                ->execute(DiscountData::fromArray($data))
-        );
     }
 }

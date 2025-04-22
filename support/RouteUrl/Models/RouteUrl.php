@@ -43,16 +43,20 @@ class RouteUrl extends Model implements Stringable
         'is_override',
     ];
 
-    protected $casts = [
-        'is_override' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_override' => 'bool',
+        ];
+    }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function model(): MorphTo
     {
         return $this->morphTo();
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->url;

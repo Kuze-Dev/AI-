@@ -11,6 +11,7 @@ use Domain\Shipment\Enums\UnitEnum;
 
 class AusPostRateClient extends BaseClient
 {
+    #[\Override]
     public static function uri(): string
     {
         return 'postage/parcel/domestic/service.json';

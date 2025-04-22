@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
-use App\Filament\Livewire\Actions\CustomPageActionGroup;
+use App\Features\CMS\SitesManagement;
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use App\Settings\CMSSettings;
 use App\Settings\SiteSettings;
-use Closure;
 use Domain\Content\Actions\CreateContentEntryDraftAction;
 use Domain\Content\Actions\CreateContentEntryTranslationAction;
 use Domain\Content\Actions\PublishedContentEntryDraftAction;
@@ -20,20 +19,28 @@ use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\StaticAction;
 use Filament\Forms;
 use Filament\Forms\Components\Radio;
 use Filament\Notifications\Notification;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
-use Filament\Pages\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Exceptions\Halt;
+use Filament\Support\Facades\FilamentView;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use Livewire\Redirector;
+use League\Flysystem\UnableToCheckExistence;
+use Livewire\Features\SupportRedirects\Redirector;
+use Throwable;
+
+use function Filament\Support\is_app_url;
 
 /** @method class-string<\Illuminate\Database\Eloquent\Model> getModel()
  *
@@ -47,91 +54,96 @@ class EditContentEntry extends EditRecord
 
     public mixed $ownerRecord;
 
-    /**
-     * Override mount and
-     * call parent component mount.
-     *
-     * @param  mixed  $record
-     */
-    public function mount($record, string $ownerRecord = ''): void
+    #[\Override]
+    public function mount(int|string $record, string $ownerRecord = ''): void
     {
         $this->ownerRecord = app(Content::class)
             ->resolveRouteBinding($ownerRecord)
             ?->load('taxonomies.taxonomyTerms');
 
         if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel(Content::class, ['']);
+            throw (new ModelNotFoundException)->setModel(Content::class, ['']);
         }
 
         parent::mount($record);
     }
 
     /** @param  string  $key */
+    #[\Override]
     protected function resolveRecord($key): Model
     {
         $record = $this->ownerRecord->resolveChildRouteBinding('contentEntries', $key, null);
 
         if ($record === null) {
-            throw (new ModelNotFoundException())->setModel($this->getModel(), [$key]);
+            throw (new ModelNotFoundException)->setModel($this->getModel(), [$key]);
         }
 
         return $record;
     }
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
-            'content_entries_group_actions' => CustomPageActionGroup::make([
+            ActionGroup::make([
                 Action::make('published')
                     ->label(trans('Published Draft'))
                     ->action('published')
-                    ->hidden(function () {
-                        return $this->record->draftable_id == null ? true : false;
-                    }),
+                    ->hidden(fn () => $this->record->draftable_id === null),
                 Action::make('draft')
                     ->label(trans('Save As Draft'))
                     ->action('draft')
                     ->hidden(function () {
 
-                        if ($this->record->draftable_id != null) {
+                        if ($this->record->draftable_id !== null) {
                             return true;
                         }
 
-                        return ($this->record->draftable_id == null && $this->record->pageDraft) ? true : false;
+                        return $this->record->draftable_id === null && $this->record->pageDraft;
                     }),
                 Action::make('overwriteDraft')
                     ->label(trans('Save As Draft'))
-                    ->action('overwriteDraft')
+                    ->action(function (Action $action) {
+                        $data = $this->form->getState();
+
+                        $record = $this->record;
+
+                        $record->pageDraft?->delete();
+
+                        $pageData = ContentEntryData::fromArray($data);
+
+                        $draftpage = app(CreateContentEntryDraftAction::class)->execute($record, $pageData);
+
+                        Notification::make()
+                            ->success()
+                            ->title(trans('Overwritten Draft'))
+                            ->body(trans('Content Entry Draft has been overwritten'))
+                            ->send();
+
+                        $action->redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $draftpage]));
+
+                    })
                     ->requiresConfirmation()
                     ->modalHeading('Draft for this content already exists')
-                    ->modalSubheading('You have an existing draft for this content. Do you want to overwrite the existing draft?')
-                    ->modalCancelAction(function () {
-                        return Action::makeModalAction('redirect')
-                            ->label(trans('Edit Existing Draft'))
-                            ->color('secondary')
-                            ->url(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft]));
-                    })
-                    ->hidden(function () {
-
-                        return ($this->record->pageDraft && $this->record->draftable_id == null) ? false : true;
-                    }),
+                    ->modalDescription('You have an existing draft for this content. Do you want to overwrite the existing draft?')
+                    ->modalCancelActionLabel('Redirect')
+                    ->modalCancelAction(fn (StaticAction $action) => $action->url(
+                        ContentEntryResource::getUrl('edit', [$this->ownerRecord, $this->record->pageDraft])
+                    ))
+                    ->hidden(fn () => ($this->record->pageDraft && $this->record->draftable_id === null) ? false : true),
                 Action::make('save')
                     ->label(trans('Save and Continue Editing'))
                     ->action('save')
                     ->keyBindings(['mod+s']),
             ])
-                ->view('filament.pages.actions.custom-action-group.index')
-                ->setName('page_draft_actions')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label')),
-            // Action::make('save')
-            //     ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
-            //     ->action('save')
-            //     ->keyBindings(['mod+s']),
+                ->button()
+                ->icon('')
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label')),
             Actions\DeleteAction::make(),
-            'other_page_actions' => CustomPageActionGroup::make([
+            ActionGroup::make([
                 Action::make('preview')
-                    ->color('secondary')
-                    ->hidden((bool) tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                    ->color('gray')
+                    ->hidden(TenantFeatureSupport::active(SitesManagement::class))
                     ->label(trans('Preview Page'))
                     ->url(function (SiteSettings $siteSettings, CMSSettings $cmsSettings) {
                         $domain = $siteSettings->front_end_domain ?? $cmsSettings->front_end_domain;
@@ -147,21 +159,28 @@ class EditContentEntry extends EditRecord
                 Action::make('createTranslation')
                     ->color('secondary')
                     ->slideOver(true)
-                    ->action('createTranslation')
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->action(function (Action $action) {
+                        /** @var array */
+                        $data = $action->getFormData();
+
+                        return $this->createTranslation($data);
+
+                    })
+                    // ->action('createTranslation')
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                     ->form([
                         Forms\Components\Select::make('locale')
                             ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                             ->default((string) Locale::where('is_default', true)->first()?->code)
                             ->searchable()
-                            ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                            ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                             ->reactive()
                             ->required(),
                     ]),
                 Action::make('preview_microsite_action')
                     ->label('Preview Microsite')
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class))
-                    ->color('secondary')
+                    ->hidden(TenantFeatureSupport::inactive(SitesManagement::class))
+                    ->color('gray')
                     ->record($this->getRecord())
                     ->modalHeading('Preview Microsite')
                     ->slideOver(true)
@@ -170,7 +189,7 @@ class EditContentEntry extends EditRecord
                         /** @var Site */
                         $site = Site::find($data['preview_microsite']);
 
-                        if ($site->domain == null) {
+                        if ($site->domain === null) {
 
                             Notification::make()
                                 ->danger()
@@ -184,36 +203,34 @@ class EditContentEntry extends EditRecord
                             ->required()
                             ->options(function () {
 
-                                /** @var ContentEntry */
+                                /** @var ContentEntry $site */
                                 $site = $this->getRecord();
 
                                 return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
                             })
                             ->descriptions(function () {
 
-                                /** @var ContentEntry */
+                                /** @var ContentEntry $site */
                                 $site = $this->getRecord();
 
                                 return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
                             })
                             ->reactive()
-                            ->afterStateUpdated(function (Closure $set, $state, $livewire) {
+                            ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, self $livewire) {
 
-                                /** @var Site */
+                                /** @var Site $site */
                                 $site = Site::find($state);
 
                                 $domain = $site->domain;
 
-                                /** @var CustomPageActionGroup */
-                                $other_page_actions = $livewire->getCachedActions()['other_page_actions'];
+                                /** @var Action $modelAction */
+                                $modelAction = $livewire->getAction('preview_microsite_action');
 
-                                $modelAction = $other_page_actions->getActions()['preview_microsite_action'];
-
-                                $modelAction->modalSubmitAction(function () use ($domain) {
+                                $modelAction->modalSubmitAction(function (StaticAction $action) use ($domain) {
 
                                     $queryString = Str::after(URL::temporarySignedRoute('tenant.api.contents.entries.show', now()->addMinutes(15), [$this->ownerRecord, $this->record], false), '?');
 
-                                    return Action::makeModalAction('preview')->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
+                                    return $action->url("https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}", true);
                                 });
 
                                 $set('domain', $domain);
@@ -229,16 +246,12 @@ class EditContentEntry extends EditRecord
                         'clone' => $record->slug,
                     ])),
 
-            ])->view('filament.pages.actions.custom-action-group.index')
-                ->setName('other_page_draft')
-                ->color('secondary')
+            ])
+                ->button()
+                ->color('gray')
+                ->icon('')
                 ->label(trans('More Actions')),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
     }
 
     public function draft(): RedirectResponse|Redirector|false
@@ -249,7 +262,7 @@ class EditContentEntry extends EditRecord
 
         $pageData = ContentEntryData::fromArray($data);
 
-        //check if page has existing draft
+        // check if page has existing draft
 
         if (! is_null($record->pageDraft)) {
 
@@ -294,24 +307,23 @@ class EditContentEntry extends EditRecord
 
         $pageDraft = $this->record;
 
-        /** @var \Domain\Content\Models\ContentEntry */
+        /** @var \Domain\Content\Models\ContentEntry $parentPage */
         $parentPage = $pageDraft->parentPage;
 
         $data['published_draft'] = true;
 
         $contentEntryData = ContentEntryData::fromArray($data);
 
-        $contentEntry = DB::transaction(
-            fn () => app(PublishedContentEntryDraftAction::class)->execute(
-                $parentPage,
-                $pageDraft,
-                $contentEntryData
-            )
+        $contentEntry = app(PublishedContentEntryDraftAction::class)->execute(
+            $parentPage,
+            $pageDraft,
+            $contentEntryData
         );
 
         return redirect(ContentEntryResource::getUrl('edit', [$this->ownerRecord, $contentEntry]));
     }
 
+    #[\Override]
     protected function configureDeleteAction(DeleteAction $action): void
     {
         $resource = static::getResource();
@@ -323,7 +335,8 @@ class EditContentEntry extends EditRecord
             ->successRedirectUrl(static::getResource()::getUrl('index', [$this->ownerRecord]));
     }
 
-    protected function getBreadcrumbs(): array
+    #[\Override]
+    public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
 
@@ -341,20 +354,18 @@ class EditContentEntry extends EditRecord
     }
 
     /** @param  \Domain\Content\Models\ContentEntry  $record */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateContentEntryAction::class)
-                ->execute($record, ContentEntryData::fromArray($data))
-        );
+        return app(UpdateContentEntryAction::class)
+            ->execute($record, ContentEntryData::fromArray($data));
     }
 
     public function createTranslation(array $data): RedirectResponse|Redirector|false
     {
         $record = $this->record;
 
-        /** @var \Domain\Admin\Models\Admin */
-        $admin = auth()->user();
+        $admin = filament_admin();
 
         if ($record->draftable_id) {
 
@@ -430,7 +441,7 @@ class EditContentEntry extends EditRecord
         $segments = explode('/', $url);
 
         // Check if the first segment is a valid locale code from the array
-        if (in_array($segments[0], $locales)) {
+        if (in_array($segments[0], $locales, true)) {
             // Replace the existing locale with the new one
             $segments[0] = $locale;
         } else {
@@ -440,5 +451,61 @@ class EditContentEntry extends EditRecord
 
         // Rebuild the URL and add a leading "/"
         return '/'.implode('/', $segments);
+    }
+
+    #[\Override]
+    public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
+    {
+        $this->authorizeAccess();
+
+        try {
+            $this->beginDatabaseTransaction();
+
+            $this->callHook('beforeValidate');
+
+            $data = $this->form->getState(afterValidate: function () {
+                $this->callHook('afterValidate');
+
+                $this->callHook('beforeSave');
+            });
+
+            $data = $this->mutateFormDataBeforeSave($data);
+
+            $this->handleRecordUpdate($this->record, $data);
+
+            $this->callHook('afterSave');
+
+            $this->commitDatabaseTransaction();
+        } catch (Halt $exception) {
+            $exception->shouldRollbackDatabaseTransaction() ?
+                $this->rollBackDatabaseTransaction() :
+                $this->commitDatabaseTransaction();
+
+            return;
+        } catch (UnableToCheckExistence $exception) {
+            $this->rollBackDatabaseTransaction();
+
+            Notification::make()
+                ->danger()
+                ->title(trans('UnableToCheckExistence'))
+                ->body(trans(' Unable To Find File you where trying to upload please try to refresh the page before proceeding.'))
+                ->send();
+
+            return;
+        } catch (Throwable $exception) {
+            $this->rollBackDatabaseTransaction();
+
+            throw $exception;
+        }
+
+        $this->rememberData();
+
+        if ($shouldSendSavedNotification) {
+            $this->getSavedNotification()?->send();
+        }
+
+        if ($shouldRedirect && ($redirectUrl = $this->getRedirectUrl())) {
+            $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode() && is_app_url($redirectUrl));
+        }
     }
 }

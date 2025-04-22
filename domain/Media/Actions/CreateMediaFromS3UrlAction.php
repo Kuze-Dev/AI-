@@ -18,7 +18,7 @@ class CreateMediaFromS3UrlAction
         foreach ($medias as $imageUrl) {
             if (Str::contains($imageUrl, 'tmp/')) {
                 if (Storage::disk(config('filament.default_filesystem_disk'))->exists($imageUrl)) {
-                    /** @phpstan-ignore-next-line */
+                    /** @phpstan-ignore method.notFound */
                     $media = $model->addMediaFromDisk($imageUrl, config('filament.default_filesystem_disk'))
                         ->toMediaCollection($collection);
 
@@ -37,7 +37,7 @@ class CreateMediaFromS3UrlAction
 
     private function getMediaName(string $mediaUrl): string
     {
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore argument.type */
         $pathInfo = pathinfo(parse_url($mediaUrl, PHP_URL_PATH));
 
         if (Str::contains($pathInfo['filename'], '-preview')) {

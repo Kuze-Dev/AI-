@@ -16,14 +16,13 @@ use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
 use Domain\Address\Models\State;
 use Exception;
-use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
@@ -33,7 +32,8 @@ class AddressesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'full_detail';
 
-    public static function form(Form $form): Form
+    #[\Override]
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -49,7 +49,7 @@ class AddressesRelationManager extends RelationManager
                     ->preload()
                     ->optionsFromModel(Country::class, 'name', fn (Builder $query) => $query->where('active', true))
                     ->reactive()
-                    ->afterStateUpdated(function (callable $set) {
+                    ->afterStateUpdated(function (Forms\Set $set) {
                         $set('state_id', null);
                     })
                     ->dehydrated(false),
@@ -60,7 +60,7 @@ class AddressesRelationManager extends RelationManager
                     ->optionsFromModel(
                         State::class,
                         'name',
-                        fn (Builder $query, callable $get) => $query->where('country_id', $get('country_id'))
+                        fn (Builder $query, Forms\Get $get) => $query->where('country_id', $get('country_id'))
                     )
                     ->reactive(),
                 Forms\Components\TextInput::make('zip_code')
@@ -96,7 +96,8 @@ class AddressesRelationManager extends RelationManager
     }
 
     /** @throws Exception */
-    public static function table(Table $table): Table
+    #[\Override]
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -112,15 +113,10 @@ class AddressesRelationManager extends RelationManager
                     ->searchable()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('country')
-                    ->formatStateUsing(function ($record) {
-                        return $record->state->country->name;
-                    })
-                    ->sortable(query: function (Builder $query, string $direction) {
-                        return $query
-                            ->join('states', 'addresses.state_id', '=', 'states.id')
-                            ->join('countries', 'states.country_id', '=', 'countries.id')
-                            ->orderBy('countries.name', $direction);
-                    })
+                    ->formatStateUsing(fn ($record) => $record->state->country->name)
+                    ->sortable(query: fn (Builder $query, string $direction) => $query
+                        ->join('states', 'addresses.state_id', '=', 'states.id')
+                        ->join('countries', 'states.country_id', '=', 'countries.id')->oldest('countries.name'))
                     ->translateLabel()
                     ->wrap(),
                 Tables\Columns\TextColumn::make('state.name')
@@ -140,20 +136,26 @@ class AddressesRelationManager extends RelationManager
                     ->translateLabel()
                     ->sortable()
                     ->updateStateUsing(function (Address $record) {
-                        DB::transaction(function () use ($record) {
-                            app(SetAddressAsDefaultShippingAction::class)->execute($record);
-                            Filament::notify('success', trans('Address set to default shipping successfully!'));
-                        });
+
+                        app(SetAddressAsDefaultShippingAction::class)->execute($record);
+                        Notification::make()
+                            ->title(trans('Address set to default shipping successfully!'))
+                            ->success()
+                            ->send();
+
                     })
                     ->disabled(fn (Address $record) => $record->is_default_shipping),
                 Tables\Columns\ToggleColumn::make('is_default_billing')
                     ->translateLabel()
                     ->sortable()
                     ->updateStateUsing(function (Address $record) {
-                        DB::transaction(function () use ($record) {
-                            app(SetAddressAsDefaultBillingAction::class)->execute($record);
-                            Filament::notify('success', trans('Address set to default billing successfully!'));
-                        });
+
+                        app(SetAddressAsDefaultBillingAction::class)->execute($record);
+                        Notification::make()
+                            ->title(trans('Address set to default billing successfully!'))
+                            ->success()
+                            ->send();
+
                     })
                     ->disabled(fn (Address $record) => $record->is_default_billing),
             ])
@@ -170,10 +172,8 @@ class AddressesRelationManager extends RelationManager
 
                         $data['customer_id'] = $livewire->getOwnerRecord()->getKey();
 
-                        return DB::transaction(
-                            fn () => app(CreateAddressAction::class)
-                                ->execute(AddressData::fromArray($data))
-                        );
+                        return app(CreateAddressAction::class)
+                            ->execute(AddressData::fromArray($data));
                     }),
             ])
             ->actions([
@@ -187,12 +187,8 @@ class AddressesRelationManager extends RelationManager
                     ->using(function (self $livewire, Address $record, array $data) {
                         $data['customer_id'] = $livewire->getOwnerRecord()->getKey();
 
-                        return DB::transaction(
-                            fn () => DB::transaction(
-                                fn () => app(UpdateAddressAction::class)
-                                    ->execute($record, AddressData::fromArray($data))
-                            )
-                        );
+                        return app(UpdateAddressAction::class)
+                            ->execute($record, AddressData::fromArray($data));
                     }),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DeleteAction::make()
@@ -201,7 +197,10 @@ class AddressesRelationManager extends RelationManager
                             try {
                                 return app(DeleteAddressAction::class)->execute($record);
                             } catch (CantDeleteDefaultAddressException) {
-                                Filament::notify('danger', trans('Deleting default address not allowed.'));
+                                Notification::make()
+                                    ->title(trans(trans('Deleting default address not allowed.')))
+                                    ->danger()
+                                    ->send();
 
                                 return false;
                             } catch (DeleteRestrictedException) {

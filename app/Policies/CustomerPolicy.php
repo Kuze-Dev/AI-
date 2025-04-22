@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\Customer\CustomerBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Customer\Models\Customer;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -16,7 +17,7 @@ class CustomerPolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(CustomerBase::class)) {
+        if (TenantFeatureSupport::inactive(CustomerBase::class)) {
             return Response::denyAsNotFound();
         }
 

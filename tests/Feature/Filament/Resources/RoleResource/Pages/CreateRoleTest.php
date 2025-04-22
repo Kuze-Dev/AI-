@@ -5,15 +5,20 @@ declare(strict_types=1);
 use App\Filament\Resources\RoleResource\Pages\CreateRole;
 use App\Filament\Resources\RoleResource\Support\PermissionGroupCollection;
 use Spatie\Permission\Models\Role;
+use Tests\TestSeeder;
 
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\seed;
 use function Pest\Livewire\livewire;
 
-beforeEach(fn () => loginAsSuperAdmin());
+beforeEach(function () {
+    seed(TestSeeder::class);
+    loginAsSuperAdmin();
+});
 
 it('can create', function () {
-    /** @var Role */
-    $role = livewire(CreateRole::class)
+
+    livewire(CreateRole::class)
         ->fillForm([
             'name' => 'Foo',
             'guard_name' => 'admin',

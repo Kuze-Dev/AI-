@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\Internationalization;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\MenuResource\Pages;
 use App\FilamentTenant\Support\Tree;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
@@ -18,45 +18,49 @@ use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Page\Models\Page;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 
 class MenuResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Menu::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-menu';
+    protected static ?string $navigationIcon = 'heroicon-o-bars-3';
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
+    #[\Override]
     public static function getGloballySearchableAttributes(): array
     {
         return ['name', 'nodes.url', 'nodes.label'];
     }
 
     /** @return Builder<Menu> */
-    protected static function getGlobalSearchEloquentQuery(): Builder
+    #[\Override]
+    public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('nodes');
     }
 
-    /** @param  Menu  $record */
+    /** @param  Menu  $record
+     * @return array<string, string|\Illuminate\Support\HtmlString|int>
+     */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
 
@@ -66,7 +70,8 @@ class MenuResource extends Resource
         ]);
     }
 
-    public static function resolveRecordRouteBinding(mixed $key): ?Model
+    #[\Override]
+    public static function resolveRecordRouteBinding(int|string $key): ?Model
     {
         return app(static::getModel())
             ->resolveRouteBindingQuery(static::getEloquentQuery(), $key, static::getRecordRouteKeyName())
@@ -74,19 +79,20 @@ class MenuResource extends Resource
             ->first();
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->unique(
-                            callback: function ($livewire, Unique $rule, $state, Closure $get, $record) {
-                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                            modifyRuleUsing: function ($livewire, Unique $rule, $state, \Filament\Forms\Get $get, $record) {
+                                if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
                                     return false;
                                 }
-                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\Internationalization::class)) {
+                                if (TenantFeatureSupport::active(Internationalization::class)) {
                                     $exist = Menu::whereName($state)->whereLocale($get('locale'))->whereNot('id', $record?->id)->count();
                                     if (! $exist) {
                                         return false;
@@ -100,39 +106,36 @@ class MenuResource extends Resource
                         ->string()
                         ->maxLength(255),
                 ]),
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     // Forms\Components\CheckboxList::make('sites')
                     \App\FilamentTenant\Support\CheckBoxList::make('sites')
-                        ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                        ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
                         ->rules([
-                            function (?Menu $record, Closure $get) {
+                            fn (?Menu $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                $siteIDs = $value;
 
-                                    $siteIDs = $value;
+                                if ($record) {
+                                    $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
 
-                                    if ($record) {
-                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
-
-                                        $menu = Menu::where('name', $get('name'))
-                                            ->where('id', '!=', $record->id)
-                                            ->whereHas(
-                                                'sites',
-                                                fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                            )->count();
-                                    } else {
-                                        $menu = Menu::where('name', $get('name'))->whereHas(
+                                    $menu = Menu::where('name', $get('name'))
+                                        ->where('id', '!=', $record->id)
+                                        ->whereHas(
                                             'sites',
                                             fn ($query) => $query->whereIn('site_id', $siteIDs)
                                         )->count();
+                                } else {
+                                    $menu = Menu::where('name', $get('name'))->whereHas(
+                                        'sites',
+                                        fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                    )->count();
 
-                                    }
+                                }
 
-                                    if ($menu > 0) {
-                                        $fail("Menu {$get('name')} is already available in selected sites.");
-                                    }
+                                if ($menu > 0) {
+                                    $fail("Menu {$get('name')} is already available in selected sites.");
+                                }
 
-                                };
                             },
                         ])
                         ->options(
@@ -142,49 +145,45 @@ class MenuResource extends Resource
                         )
                         ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
-                            /** @var \Domain\Admin\Models\Admin */
-                            $user = Auth::user();
+                            $admin = filament_admin();
 
-                            if ($user->hasRole(config('domain.role.super_admin'))) {
+                            if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
                                 return false;
                             }
 
-                            $user_sites = $user->userSite->pluck('id')->toArray();
+                            $user_sites = $admin->userSite->pluck('id')->toArray();
 
                             $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                            return ! in_array($value, $intersect);
+                            return ! in_array($value, $intersect, true);
                         })
                         ->formatStateUsing(fn (?Menu $record) => $record ? $record->sites->pluck('id')->toArray() : []),
 
                 ])
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))),
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))),
                 Forms\Components\Select::make('locale')
                     ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                     ->default((string) Locale::where('is_default', true)->first()?->code)
                     ->searchable()
                     ->rules([
-                        function (?Menu $record, Closure $get) {
+                        fn (?Menu $record, Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                            return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                            if ($record) {
+                                $selectedLocale = $value;
 
-                                if ($record) {
-                                    $selectedLocale = $value;
+                                $originalContentId = $record->translation_id ?: $record->id;
 
-                                    $originalContentId = $record->translation_id ?: $record->id;
+                                $exist = Menu::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
+                                )->where('locale', $selectedLocale)->first();
 
-                                    $exist = Menu::where(fn ($query) => $query->where('translation_id', $originalContentId)->orWhere('id', $originalContentId)
-                                    )->where('locale', $selectedLocale)->first();
-
-                                    if ($exist && $exist->id != $record->id) {
-                                        $fail("Menu {$get('name')} has a existing ({$selectedLocale}) translation.");
-                                    }
+                                if ($exist && $exist->id !== $record->id) {
+                                    $fail("Menu {$get('name')} has a existing ({$selectedLocale}) translation.");
                                 }
+                            }
 
-                            };
                         },
                     ])
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
                     ->required(),
                 Forms\Components\Section::make(trans('Nodes'))
                     ->schema([
@@ -211,9 +210,9 @@ class MenuResource extends Resource
                                             )
                                             ->columnSpan(['md' => 1]),
                                     ]),
-                                Forms\Components\Card::make([
+                                Forms\Components\Section::make([
                                     Forms\Components\Radio::make('type')
-                                        ->lazy()
+                                        ->live()
                                         ->inline()
                                         ->options(
                                             collect(NodeType::cases())
@@ -221,9 +220,9 @@ class MenuResource extends Resource
                                                 ->toArray()
                                         ),
                                     Forms\Components\Group::make()
-                                        ->visible(fn (Closure $get) => filled($get('type')))
+                                        ->visible(fn (\Filament\Forms\Get $get) => filled($get('type')))
                                         ->schema(
-                                            fn (Closure $get) => match ($get('type')) {
+                                            fn (\Filament\Forms\Get $get) => match ($get('type')) {
                                                 NodeType::URL->value => [
                                                     Forms\Components\TextInput::make('url')
                                                         ->inputMode('url')
@@ -239,23 +238,22 @@ class MenuResource extends Resource
                                                                 ContentEntry::class,
                                                             ])
                                                                 ->mapWithKeys(
-                                                                    function (string $model) {
-                                                                        /** @var class-string<\Illuminate\Database\Eloquent\Model> $model */
-                                                                        return [(new $model())->getMorphClass() => Str::of($model)->classBasename()->headline()];
-                                                                    }
+                                                                    fn (string $model) =>
+                                                                        /** @phpstan-ignore method.notFound */
+                                                                        [(new $model)->getMorphClass() => Str::of($model)->classBasename()->headline()]
                                                                 )
                                                                 ->sort()
                                                                 ->toArray()
                                                         )
-                                                        ->lazy(),
+                                                        ->live(),
                                                     Forms\Components\Select::make('model_id')
                                                         ->label(
-                                                            fn (Closure $get) => ($modelClass = Relation::getMorphedModel($get('model_type')))
+                                                            fn (\Filament\Forms\Get $get) => ($modelClass = Relation::getMorphedModel($get('model_type')))
                                                                 ? (string) Str::of($modelClass)->classBasename()->headline()
                                                                 : null
                                                         )
                                                         ->options(
-                                                            fn (Closure $get) => ($modeClass = Relation::getMorphedModel($get('model_type')))
+                                                            fn (\Filament\Forms\Get $get) => ($modeClass = Relation::getMorphedModel($get('model_type')))
                                                                 ? match ($modeClass) {
                                                                     ContentEntry::class => $modeClass::pluck('title', 'id')->toArray(),
                                                                     default => $modeClass::pluck('name', 'id')->toArray()
@@ -263,7 +261,7 @@ class MenuResource extends Resource
                                                             : null
                                                         )
                                                         ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null)
-                                                        ->visible(fn (Closure $get) => filled($get('model_type'))),
+                                                        ->visible(fn (\Filament\Forms\Get $get) => filled($get('model_type'))),
                                                 ],
                                                 default => []
                                             }
@@ -275,6 +273,7 @@ class MenuResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -282,27 +281,28 @@ class MenuResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable()
-                    ->truncate('max-w-xs lg:max-w-md 2xl:max-w-3xl', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-                Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
-                    }, isToggledHiddenByDefault: fn () => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                    ->hidden(TenantFeatureSupport::inactive(Internationalization::class)),
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class),
+                        isToggledHiddenByDefault: fn () => TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class)),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
-                        if (Auth::user()?->can('site.siteManager') &&
-                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
-                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        if (filament_admin()->can('site.siteManager') &&
+                        ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
+                            return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
                         }
 
                         return $query;
@@ -322,25 +322,27 @@ class MenuResource extends Resource
     }
 
     /** @return Builder<\Domain\Menu\Models\Menu> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
-        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
-            Auth::user()?->can('site.siteManager') &&
-            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) &&
+            filament_admin()->can('site.siteManager') &&
+            /** @phpstan-ignore booleanNot.alwaysTrue */
+            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
-            });
+            return static::getModel()::query()
+                ->wherehas('sites', fn ($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();
 
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -348,6 +350,7 @@ class MenuResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

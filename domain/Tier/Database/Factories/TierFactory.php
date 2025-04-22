@@ -14,6 +14,7 @@ class TierFactory extends Factory
 {
     protected $model = Tier::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

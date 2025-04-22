@@ -13,16 +13,15 @@ use Domain\Product\Models\ProductVariant;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class CreateCartLineAction
+readonly class CreateCartLineAction
 {
     public function __construct(
-        private readonly CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
-    ) {
-    }
+        private CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
+    ) {}
 
     public function execute(Cart $cart, CreateCartData $cartLineData): CartLine
     {
-        $product = Product::where((new Product())->getRouteKeyName(), $cartLineData->purchasable_id)->first();
+        $product = Product::where((new Product)->getRouteKeyName(), $cartLineData->purchasable_id)->first();
 
         if (! $product) {
             throw new BadRequestHttpException('Product not found');

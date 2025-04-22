@@ -12,6 +12,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class ShippingMethodResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
 
@@ -27,6 +28,7 @@ class ShippingMethodResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [

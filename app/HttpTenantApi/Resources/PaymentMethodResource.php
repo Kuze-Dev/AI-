@@ -12,6 +12,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class PaymentMethodResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         $image = $this->getFirstMedia('logo');
@@ -29,6 +30,7 @@ class PaymentMethodResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [

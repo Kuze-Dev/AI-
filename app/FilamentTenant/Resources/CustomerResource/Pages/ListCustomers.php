@@ -6,22 +6,29 @@ namespace App\FilamentTenant\Resources\CustomerResource\Pages;
 
 use App\FilamentTenant\Resources\CustomerResource;
 use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Export\Exports;
+use Domain\Customer\Exports\CustomerExporter;
 use Exception;
-use Filament\Pages\Actions;
+use Filament\Actions;
+use Filament\Actions\ExportAction;
 use Filament\Resources\Pages\ListRecords;
-
-//use Support\Excel\Actions\ExportAction;
 
 class ListCustomers extends ListRecords
 {
     protected static string $resource = CustomerResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
-            Exports::headerList([RegisterStatus::REGISTERED]),
+            // TODO: export only RegisterStatus::REGISTERED
+            ExportAction::make()
+                ->exporter(CustomerExporter::class)
+//                ->authorize() // TODO: authorize customer export
+                ->withActivityLog(
+                    event: 'exported',
+                    description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
+                ),
             Actions\CreateAction::make(),
         ];
     }

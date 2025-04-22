@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Facade;
 
 class PaymentManager extends Facade
 {
-    public static function getFacadeAccessor()
+    #[\Override]
+    public static function getFacadeAccessor(): string
     {
         return PaymentsPaymentManager::class;
     }

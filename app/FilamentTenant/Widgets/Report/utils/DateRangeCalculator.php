@@ -32,7 +32,7 @@ class DateRangeCalculator
     }
 
     /** @return Builder<Model> */
-    public static function pieDateRange(Builder $query, ?string $activeFilter): Builder // @phpstan-ignore-line
+    public static function pieDateRange(Builder $query, ?string $activeFilter): Builder // @phpstan-ignore missingType.generics
     {
 
         if ($activeFilter === 'thisYear') {

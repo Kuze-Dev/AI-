@@ -11,6 +11,7 @@ use App\Features\Shopconfiguration\PaymentGateway\StripeGateway;
 use App\Features\Shopconfiguration\PaymentGateway\VisionpayGateway;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -20,7 +21,7 @@ class PaymentMethodPolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->someAreActive([
+        if (! TenantFeatureSupport::someAreActive([
             PaypalGateway::class,
             OfflineGateway::class,
             StripeGateway::class,

@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class ServiceOrderNotYetPaidException extends LogicException
-{
-}
+class ServiceOrderNotYetPaidException extends LogicException {}
