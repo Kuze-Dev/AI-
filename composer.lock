@@ -6797,6 +6797,7 @@
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
             "time": "2024-05-08T12:36:18+00:00"
+<<<<<<< HEAD
         },
         {
             "name": "php-http/discovery",
@@ -7113,6 +7114,8 @@
                 "source": "https://github.com/php-http/promise/tree/1.3.1"
             },
             "time": "2024-03-15T13:55:21+00:00"
+=======
+>>>>>>> 3f7d682a03eff39bacb85301aace0ae9e1f4458f
         },
         {
             "name": "php-http/discovery",

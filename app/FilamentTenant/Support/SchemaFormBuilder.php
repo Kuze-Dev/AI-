@@ -244,17 +244,8 @@ class SchemaFormBuilder extends Component
 
             if ($state) {
 
-                /** @var array $media */
-                $media = Media::whereIn('uuid', $state)
-                    ->orwhereIN('file_name', $state)
-                    ->orderby('order_column')
-                    ->get()
-                    ->mapWithKeys(function (Media $file): array {
-                        $uuid = $file->getAttributeValue('uuid');
-
-                        return [$uuid => $uuid];
-                    })
-                    ->toArray();
+                /** @var array */
+                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name', $state)->pluck('uuid')->toArray();
 
                 if ($media) {
                     return $media;
