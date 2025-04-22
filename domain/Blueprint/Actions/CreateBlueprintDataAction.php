@@ -35,6 +35,10 @@ class CreateBlueprintDataAction
             'type' => $blueprintDataData->type,
         ]);
 
+        if ($blueprintDataData->type === FieldType::LOCATION_PICKER && $blueprintData->value) {
+            return $blueprintData;
+        }
+
         if (is_array($blueprintDataData->value)) {
             $filtered = array_filter($blueprintDataData->value, function ($value) {
                 $pathInfo = pathinfo($value);

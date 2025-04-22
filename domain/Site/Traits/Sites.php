@@ -14,10 +14,10 @@ trait Sites
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
      *
-     * @phpstan-ignore generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes, generics.lessTypes */
+     * @phpstan-ignore-next-line  ignore type */
     public function sites()
     {
-        /** @phpstan-ignore return.type, return.type, return.type, return.type, return.type, return.type, return.type, return.type */
+        /** @phpstan-ignore-next-line  ignore type */
         return $this->morphToMany(Site::class, 'model_sites');
     }
 }
