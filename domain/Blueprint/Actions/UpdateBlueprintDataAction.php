@@ -7,6 +7,7 @@ namespace Domain\Blueprint\Actions;
 use App\Settings\CustomerSettings;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
 use Domain\Blueprint\Enums\FieldType;
+use Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Models\BlueprintData;
 use Domain\Content\Models\ContentEntry;
@@ -180,9 +181,27 @@ class UpdateBlueprintDataAction
                     $currentMedia[] = $blueprintData->getMedia('blueprint_media')->last()?->uuid;
                 }
 
+                // media ordering..
+
                 $existingMedia = $blueprintData->getMedia('blueprint_media')->pluck('uuid')->toArray();
 
                 $updatedMedia = array_intersect($existingMedia, $currentMedia);
+
+                foreach ($currentMedia as $key => $media_uuid) {
+
+                    if (in_array($media_uuid, $updatedMedia, true)) {
+
+                        /** @var Media|null $media_item */
+                        $media_item = Media::where('uuid', $media_uuid)->first();
+
+                        if ($media_item) {
+                            $media_item->order_column = $key + 1;
+                            $media_item->save();
+                        }
+                    }
+
+                }
+
                 /**
                  *  $exceptedMedia = Media::whereIN('uuid', $updatedMedia)->get();
                  *  temporary disabled causing coversions to disappear only in production but working in local environment.
@@ -219,12 +238,12 @@ class UpdateBlueprintDataAction
 
         $statepaths = array_column($flattenData, 'statepath');
 
-        /** @phpstan-ignore method.notFound */
+        /** @phpstan-ignore-next-line */
         $removeBlueprintData = $model->blueprintData()->whereNotIn('state_path', $statepaths)->get();
 
         foreach ($flattenData as $item) {
 
-            /** @phpstan-ignore method.notFound */
+            /** @phpstan-ignore-next-line */
             $blueprint_data_entity = $model->BlueprintData()->where('state_path', $item['statepath'])->get();
 
             if ($blueprint_data_entity->count() > 1) {
@@ -261,9 +280,9 @@ class UpdateBlueprintDataAction
 
             }
 
-            dispatch(new \Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob(array_unique($toRemove)));
+            DeleteS3FilesFromDeletedBlueprintDataJob::dispatch(array_unique($toRemove));
 
-            /** @phpstan-ignore method.notFound */
+            /** @phpstan-ignore-next-line */
             $model->blueprintData()->whereNotIn('state_path', $statepaths)->delete();
 
         }
