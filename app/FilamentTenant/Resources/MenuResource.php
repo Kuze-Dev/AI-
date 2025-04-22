@@ -58,7 +58,8 @@ class MenuResource extends Resource
     }
 
     /** @param  Menu  $record
-  @return array<string, string|\Illuminate\Support\HtmlString|int> */
+     * @return array<string, string|\Illuminate\Support\HtmlString|int>
+     */
     #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
