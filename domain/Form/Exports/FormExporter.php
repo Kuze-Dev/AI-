@@ -16,10 +16,10 @@ class FormExporter extends Exporter
 {
     protected static ?string $model = Form::class;
 
-    // public function getJobQueue(): ?string
-    // {
-    //     return QueueJobPriority::DEFAULT;
-    // }
+    public function getJobQueue(): ?string
+    {
+        return QueueJobPriority::DEFAULT;
+    }
 
     #[\Override]
     public static function getColumns(): array
