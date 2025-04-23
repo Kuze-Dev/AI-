@@ -8,6 +8,8 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Form\Mail\FormEmailNotificationMail;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormSubmission;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -62,7 +64,31 @@ class CreateFormSubmissionAction
             : null;
 
         foreach ($form->formEmailNotifications as $emailNotification) {
-            Mail::send(new FormEmailNotificationMail($emailNotification, $data, $attachments, $formSubmission?->id));
+
+            try {
+
+                Mail::send(new FormEmailNotificationMail($emailNotification, $data, $attachments, $formSubmission?->id));
+
+            } catch (\Throwable $th) {
+
+                foreach (super_users() as $admin) {
+                    Notification::make()
+                        ->danger()
+                        ->title('Error Sending Email | '.$form->name)
+                        ->body($th->getMessage())
+                        ->actions([
+                            Action::make('View Form')
+                                ->url(route('filament.tenant.resources.forms.edit', [
+                                    'record' => $form,
+                                ]))
+                                ->button(),
+
+                        ])
+                        ->sendToDatabase($admin);
+                }
+
+            }
+
         }
 
         return $formSubmission;

@@ -17,10 +17,10 @@ class TaxonomiesExporter extends Exporter
 {
     protected static ?string $model = Taxonomy::class;
 
-    public function getJobQueue(): ?string
-    {
-        return QueueJobPriority::DEFAULT;
-    }
+    // public function getJobQueue(): ?string
+    // {
+    //     return QueueJobPriority::DEFAULT;
+    // }
 
     #[\Override]
     public static function getColumns(): array
