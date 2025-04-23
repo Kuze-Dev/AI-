@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Domain\Admin\Models\Admin;
 use Domain\Customer\Models\Customer;
 use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
 if (! function_exists('filament_admin')) {
@@ -29,5 +30,12 @@ if (! function_exists('customer_logged_in')) {
     {
         /** @phpstan-ignore return.type */
         return guest_customer_logged_in();
+    }
+}
+
+if (! function_exists('super_users')) {
+    function super_users(): Collection
+    {
+        return once(fn () => Admin::role(config('domain.role.super_admin'))->get());
     }
 }
