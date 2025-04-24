@@ -130,11 +130,21 @@ class DiscountResource extends Resource
 
                             DateTimePicker::make('valid_start_at')
                                 ->required()
-                                ->before('valid_end_at')
+                                // ->before('valid_end_at')
+                                ->rules([
+                                    fn (Get $get) => $get('valid_end_at')
+                                        ? 'before:valid_end_at'
+                                        : null,
+                                ])
                                 ->label(trans('Start Date')),
 
                             DateTimePicker::make('valid_end_at')
-                                ->after('valid_start_at')
+                                // ->after('valid_start_at')
+                                ->rules([
+                                    fn (Get $get) => $get('valid_start_at')
+                                        ? 'after:valid_start_at'
+                                        : null,
+                                ])
                                 ->label(trans('Expiration Date'))
                                 ->helperText(trans('Leave this blank if no expiry.')),
                         ]),
