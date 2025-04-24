@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Widgets\Report;
 
 use Domain\Order\Models\Order;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Widgets\Widget;
 
 class TotalOrder extends Widget
@@ -16,6 +17,12 @@ class TotalOrder extends Widget
     public string $filter = 'allTime';
 
     public array $status = ['pending', 'cancelled', 'packed', 'delivered', 'shipped', 'refunded',  'fulfilled'];
+
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
 
     #[\Override]
     protected function getViewData(): array

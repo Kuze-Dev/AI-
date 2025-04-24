@@ -9,6 +9,7 @@ use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
@@ -22,6 +23,12 @@ class TotalSales extends ChartWidget
     protected int|string|array $columnSpan = 'full';
 
     protected static ?string $pollingInterval = null;
+
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
 
     #[\Override]
     protected function getType(): string
