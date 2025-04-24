@@ -159,25 +159,6 @@ class ActivityResource extends Resource
                             )
                             ->helperText('use this https://onlinejsonformatter.com/'),
 
-                        //                        Infolists\Components\RepeatableEntry::make('data')
-                        //                            ->hiddenLabel()
-                        //                            ->state(
-                        //                                fn (Activity $record): ?Collection => $record
-                        //                                    ->properties
-                        //                                    ?->except('old', 'attributes')
-                        //                            )
-                        //                            ->schema(
-                        //                                fn (?Collection $state): array => $state
-                        //                                    ?->map(
-                        //                                        fn (string $value, string $property): Infolists\Components\TextEntry => Infolists\Components\TextEntry::make($property)
-                        //                                            ->color('primary')
-                        //                                            ->state($value)
-                        //                                            ->inlineLabel()
-                        //                                    )
-                        //                                    ->toArray() ?? []
-                        //                            )
-                        //                            ->contained(false),
-
                     ]),
 
                 Infolists\Components\Section::make()
@@ -251,11 +232,13 @@ class ActivityResource extends Resource
                     ->schema([
 
                         Infolists\Components\KeyValueEntry::make('old')
+                            ->extraEntryWrapperAttributes(['style' => 'overflow-wrap: anywhere'])
                             ->translateLabel()
                             ->inlineLabel(false)
                             ->state(self::changes('old')),
 
                         Infolists\Components\KeyValueEntry::make('new')
+                            ->extraEntryWrapperAttributes(['style' => 'overflow-wrap: anywhere'])
                             ->translateLabel()
                             ->inlineLabel(false)
                             ->state(self::changes('attributes')),

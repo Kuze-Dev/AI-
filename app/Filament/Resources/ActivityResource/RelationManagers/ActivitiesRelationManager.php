@@ -6,7 +6,7 @@ namespace App\Filament\Resources\ActivityResource\RelationManagers;
 
 use App\Filament\Resources\ActivityResource;
 use Exception;
-use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Table;
@@ -20,9 +20,9 @@ class ActivitiesRelationManager extends RelationManager
 
     /** @throws Exception */
     #[\Override]
-    public function form(Form $form): Form
+    public function infolist(Infolist $infolist): Infolist
     {
-        return ActivityResource::form($form);
+        return ActivityResource::infolist($infolist);
     }
 
     /** @throws Exception */

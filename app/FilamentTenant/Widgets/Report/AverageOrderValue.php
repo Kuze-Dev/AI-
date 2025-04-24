@@ -8,6 +8,7 @@ use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Order\Models\Order;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
@@ -19,6 +20,12 @@ class AverageOrderValue extends ChartWidget
     protected static ?string $pollingInterval = null;
 
     public ?string $filter = 'perMonth';
+
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
 
     #[\Override]
     protected function getType(): string
