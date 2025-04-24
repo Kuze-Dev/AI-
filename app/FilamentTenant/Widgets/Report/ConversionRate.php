@@ -9,6 +9,7 @@ use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Cart\Models\CartLine;
 use Domain\Customer\Models\Customer;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
@@ -22,6 +23,12 @@ class ConversionRate extends ChartWidget
     public ?string $filter = 'perMonth';
 
     protected int|string|array $columnSpan = 'full';
+
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
 
     #[\Override]
     protected function getType(): string

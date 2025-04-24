@@ -9,6 +9,7 @@ use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\OrderLine;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Widgets\ChartWidget;
 
 class MostSoldProduct extends ChartWidget
@@ -18,6 +19,12 @@ class MostSoldProduct extends ChartWidget
     protected static ?string $pollingInterval = null;
 
     public ?string $filter = 'allTime';
+
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
 
     #[\Override]
     protected function getType(): string

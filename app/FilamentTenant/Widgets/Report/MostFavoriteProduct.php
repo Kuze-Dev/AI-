@@ -7,6 +7,7 @@ namespace App\FilamentTenant\Widgets\Report;
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
 use Domain\Favorite\Models\Favorite;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Widgets\ChartWidget;
 
 class MostFavoriteProduct extends ChartWidget
@@ -16,6 +17,12 @@ class MostFavoriteProduct extends ChartWidget
     protected static ?string $pollingInterval = null;
 
     public ?string $filter = 'allTime';
+
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
 
     #[\Override]
     protected function getType(): string
