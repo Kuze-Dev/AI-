@@ -185,7 +185,7 @@ class ContentImporter extends Importer
         }
 
         /** @var array $siteIDs */
-        $siteIDs = array_key_exists('sites', $this->data) ?
+        $siteIDs = (array_key_exists('sites', $this->data) && ! is_null($this->data['sites'])) ?
             Site::whereIn('domain', explode(',', $this->data['sites']))->pluck('id')->toArray() :
             [];
 
