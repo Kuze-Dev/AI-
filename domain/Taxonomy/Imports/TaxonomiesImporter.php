@@ -56,6 +56,7 @@ class TaxonomiesImporter extends Importer
                 ->requiredMapping(),
 
             ImportColumn::make('blueprint_id')
+                ->rules(['exists:blueprints,id'])
                 ->requiredMapping(),
 
             ImportColumn::make('has_route')
@@ -159,7 +160,9 @@ class TaxonomiesImporter extends Importer
 
                     },
                 ])
-                ->requiredMapping(),
+                ->requiredMapping(
+                    fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
+                ),
 
         ];
     }

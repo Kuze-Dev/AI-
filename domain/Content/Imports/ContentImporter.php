@@ -88,6 +88,7 @@ class ContentImporter extends Importer
                 ->requiredMapping(),
 
             ImportColumn::make('blueprint_id')
+                ->rules(['exists:blueprints,id'])
                 ->requiredMapping(),
             ImportColumn::make('visibility')
                 ->requiredMapping(),
@@ -141,7 +142,9 @@ class ContentImporter extends Importer
 
                     },
                 ])
-                ->requiredMapping(),
+                ->requiredMapping(
+                    fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
+                ),
 
             ImportColumn::make('taxonomies')
                 ->requiredMapping(),

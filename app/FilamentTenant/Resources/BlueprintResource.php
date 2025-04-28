@@ -17,6 +17,7 @@ use Domain\Blueprint\Enums\ManipulationType;
 use Domain\Blueprint\Enums\MarkdownButton;
 use Domain\Blueprint\Enums\RichtextButton;
 use Domain\Blueprint\Enums\TiptapTools;
+use Domain\Blueprint\Exports\BlueprintExporter;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Tenant\TenantFeatureSupport;
 use ErrorException;
@@ -123,31 +124,52 @@ class BlueprintResource extends Resource
 
             ])
             ->bulkActions([
-                ExportBulkAction::make()
-                    ->queue()
-                    ->query(fn (Builder $query) => $query)
-                    ->mapUsing(
-                        ['Id', 'Name', 'Schema'],
-                        fn (Blueprint $blueprint): array => [
-                            $blueprint->id,
-                            $blueprint->name,
-                            json_encode($blueprint->schema),
-                        ]
-                    )
-                    ->tags([
-                        'tenant:'.(tenant('id') ?? 'central'),
-                    ])
+
+                Tables\Actions\ExportBulkAction::make()
+                    ->label(trans('Export Selected Blueprint'))
+                    ->exporter(BlueprintExporter::class)
                     ->withActivityLog(
                         event: 'bulk-exported',
-                        description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
-                        properties: function (ExportBulkAction $action) {
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Blueprint $model): Blueprint {
+                                        if ($model instanceof Blueprint) {
+                                            return $model;
+                                        }
 
-                            /** @var EloquentCollection $records */
-                            $records = $action->getRecords();
-
-                            return ['selected_record_ids' => $records->modelKeys()];
-                        }
+                                        /** @phpstan-ignore return.type */
+                                        return Blueprint::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
                     ),
+                // ExportBulkAction::make()
+                //     ->queue()
+                //     ->query(fn (Builder $query) => $query)
+                //     ->mapUsing(
+                //         ['Id', 'Name', 'Schema'],
+                //         fn (Blueprint $blueprint): array => [
+                //             $blueprint->id,
+                //             $blueprint->name,
+                //             json_encode($blueprint->schema),
+                //         ]
+                //     )
+                //     ->tags([
+                //         'tenant:'.(tenant('id') ?? 'central'),
+                //     ])
+                //     ->withActivityLog(
+                //         event: 'bulk-exported',
+                //         description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                //         properties: function (ExportBulkAction $action) {
+
+                //             /** @var EloquentCollection $records */
+                //             $records = $action->getRecords();
+
+                //             return ['selected_record_ids' => $records->modelKeys()];
+                //         }
+                //     ),
             ])
             ->defaultSort('created_at', 'desc');
     }
