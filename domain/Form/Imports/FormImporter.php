@@ -54,6 +54,7 @@ class FormImporter extends Importer
                 ->requiredMapping(),
 
             ImportColumn::make('blueprint_id')
+                ->rules(['exists:blueprints,id'])
                 ->requiredMapping(),
 
             ImportColumn::make('store_submission')
@@ -103,7 +104,9 @@ class FormImporter extends Importer
 
                     },
                 ])
-                ->requiredMapping(),
+                ->requiredMapping(
+                    fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
+                ),
 
             ImportColumn::make('formEmailNotifications')
                 ->requiredMapping(),
@@ -170,7 +173,7 @@ class FormImporter extends Importer
     #[\Override]
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your Taxonmy import has completed and '.
+        $body = 'Your Form import has completed and '.
             number_format($import->successful_rows).' '.
             Str::of('row')->plural($import->successful_rows).' imported.';
 

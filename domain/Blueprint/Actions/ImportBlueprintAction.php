@@ -22,20 +22,14 @@ readonly class ImportBlueprintAction
             return $blueprint;
         }
 
-        $blueprintbyName = Blueprint::whereName($row['name'])->first();
-
-        if ($blueprintbyName) {
-
-            return $blueprintbyName;
-        }
-
         $data = $row;
         $data['schema'] = json_decode((string) $row['schema'], true);
 
-        unset($row);
+        // unset($row);
 
         return $this->createBlueprintAction->execute(
             new BlueprintData(
+                id: $data['id'] ?? null,
                 name: $data['name'],
                 schema: SchemaData::fromArray($data['schema'])
 

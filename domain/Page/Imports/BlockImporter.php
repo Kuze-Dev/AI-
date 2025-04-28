@@ -82,7 +82,9 @@ class BlockImporter extends Importer
 
                     },
                 ])
-                ->requiredMapping(),
+                ->requiredMapping(
+                    fn () => TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)
+                ),
 
             ImportColumn::make('image')
                 ->requiredMapping(),
