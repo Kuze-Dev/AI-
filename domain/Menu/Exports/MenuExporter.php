@@ -55,7 +55,7 @@ class MenuExporter extends Exporter
     #[\Override]
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your Taxonomy export has completed and '.number_format($export->successful_rows).
+        $body = 'Your Menu export has completed and '.number_format($export->successful_rows).
             ' '.Str::of('row')->plural($export->successful_rows).' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {

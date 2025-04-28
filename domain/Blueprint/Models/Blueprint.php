@@ -41,6 +41,7 @@ class Blueprint extends Model
     use LogsActivity;
 
     protected $fillable = [
+        'id',
         'name',
         'schema',
     ];
