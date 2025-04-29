@@ -12,6 +12,7 @@ class CreateBlueprintAction
     public function execute(BlueprintData $blueprintData): Blueprint
     {
         return Blueprint::create([
+            'id' => $blueprintData->id,
             'name' => $blueprintData->name,
             'schema' => $blueprintData->schema,
         ]);

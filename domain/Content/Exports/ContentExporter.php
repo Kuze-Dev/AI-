@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Content\Exports;
 
-use App\Jobs\QueueJobPriority;
 use Domain\Content\Models\Content;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -15,11 +15,6 @@ use Illuminate\Support\Str;
 class ContentExporter extends Exporter
 {
     protected static ?string $model = Content::class;
-
-    // public function getJobQueue(): ?string
-    // {
-    //     return QueueJobPriority::DEFAULT;
-    // }
 
     #[\Override]
     public static function getColumns(): array
@@ -74,5 +69,11 @@ class ContentExporter extends Exporter
         }
 
         return $body;
+    }
+
+    #[\Override]
+    public function getFormats(): array
+    {
+        return [ExportFormat::Csv];
     }
 }

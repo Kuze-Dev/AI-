@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Resources\BlueprintResource\Pages;
 
 use App\FilamentTenant\Resources\BlueprintResource;
-use Domain\Blueprint\Actions\ImportBlueprintAction;
-use Domain\Blueprint\Models\Blueprint;
+use Domain\Blueprint\Exports\BlueprintExporter;
+use Domain\Blueprint\Imports\BlueprintImporter;
 use Filament\Actions;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
-use HalcyonAgile\FilamentImport\Actions\ImportAction;
 
 class ListBlueprints extends ListRecords
 {
@@ -19,29 +20,28 @@ class ListBlueprints extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            ImportAction::make()
-                ->model(Blueprint::class)
-                ->uniqueBy('name')
-                ->tags([
-                    'tenant:'.(tenant('id') ?? 'central'),
-                ])
-                ->processRowsUsing(
-                    fn (array $row): Blueprint => app(ImportBlueprintAction::class)
-                        ->execute($row)
-                )
-                ->withValidation(
-                    rules: [
-                        'id' => [
-                            'required',
-                            'distinct',
-                        ],
-                        'name' => 'required',
-                        'schema' => 'required',
-
-                    ],
-                ),
 
             Actions\CreateAction::make(),
+
+            Actions\ActionGroup::make([
+
+                ExportAction::make()
+                    ->label(trans('Export Blueprints'))
+                    ->exporter(BlueprintExporter::class)
+                    ->withActivityLog(
+                        event: 'exported',
+                        description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
+                    ),
+
+                ImportAction::make()
+                    ->label(trans('Import Blueprints'))
+                    ->importer(BlueprintImporter::class)
+                    ->withActivityLog(
+                        event: 'imported',
+                        description: fn (ImportAction $action) => 'Imported '.$action->getModelLabel(),
+                    ),
+            ])->hidden(fn () => ! filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
+
         ];
     }
 }
