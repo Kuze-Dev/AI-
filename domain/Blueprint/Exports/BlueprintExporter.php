@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Blueprint\Exports;
 
 use Domain\Blueprint\Models\Blueprint;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -42,5 +43,11 @@ class BlueprintExporter extends Exporter
         }
 
         return $body;
+    }
+
+    #[\Override]
+    public function getFormats(): array
+    {
+        return [ExportFormat::Csv];
     }
 }
