@@ -6,6 +6,7 @@ namespace Domain\Form\Exports;
 
 use App\Jobs\QueueJobPriority;
 use Domain\Form\Models\Form;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -72,5 +73,11 @@ class FormExporter extends Exporter
         }
 
         return $body;
+    }
+
+    #[\Override]
+    public function getFormats(): array
+    {
+        return [ExportFormat::Csv];
     }
 }
