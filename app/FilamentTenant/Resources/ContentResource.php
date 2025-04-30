@@ -317,6 +317,7 @@ class ContentResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ExportBulkAction::make()
                     ->label(trans('Export Selected Content'))
+                    ->authorize(filament_admin()->hasRole(config()->string('domain.role.super_admin')))
                     ->exporter(ContentExporter::class)
                     ->withActivityLog(
                         event: 'bulk-exported',
