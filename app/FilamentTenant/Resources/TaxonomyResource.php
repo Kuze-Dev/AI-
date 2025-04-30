@@ -16,6 +16,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
 use Domain\Taxonomy\Actions\DeleteTaxonomyAction;
+use Domain\Taxonomy\Exports\TaxonomiesExporter;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\TenantFeatureSupport;
@@ -375,6 +376,27 @@ class TaxonomyResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
+                Tables\Actions\ExportBulkAction::make()
+                    ->label(trans('Export Selected Taxonomies'))
+                    ->authorize(filament_admin()->hasRole(config()->string('domain.role.super_admin')))
+                    ->exporter(TaxonomiesExporter::class)
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Taxonomy $model): Taxonomy {
+                                        if ($model instanceof Taxonomy) {
+                                            return $model;
+                                        }
+
+                                        /** @phpstan-ignore return.type */
+                                        return Taxonomy::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
+                    ),
             ]);
     }
 

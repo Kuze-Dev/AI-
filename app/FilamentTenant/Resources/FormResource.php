@@ -13,6 +13,7 @@ use App\FilamentTenant\Support\SchemaInterpolations;
 use App\Settings\FormSettings;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Form\Exports\FormExporter;
 use Domain\Form\Models\Form as FormModel;
 use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
@@ -341,6 +342,27 @@ class FormResource extends Resource
             ])->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
+                Tables\Actions\ExportBulkAction::make()
+                    ->label(trans('Export Selected Form'))
+                    ->authorize(filament_admin()->hasRole(config()->string('domain.role.super_admin')))
+                    ->exporter(FormExporter::class)
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|FormModel $model): FormModel {
+                                        if ($model instanceof FormModel) {
+                                            return $model;
+                                        }
+
+                                        /** @phpstan-ignore return.type */
+                                        return FormModel::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
+                    ),
             ])
             ->defaultSort('updated_at', 'desc');
     }
