@@ -10,6 +10,7 @@ use App\FilamentTenant\Support\SchemaFormBuilder;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
 use Domain\Page\Actions\DeleteBlockAction;
+use Domain\Page\Exports\BlockExporter;
 use Domain\Page\Models\Block;
 use Domain\Site\Models\Site;
 use Exception;
@@ -318,6 +319,27 @@ class BlockResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ExportBulkAction::make()
+                    ->label(trans('Export Selected Blocks'))
+                    ->exporter(BlockExporter::class)
+                    ->authorize(filament_admin()->hasRole(config()->string('domain.role.super_admin')))
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Block $model): Block {
+                                        if ($model instanceof Block) {
+                                            return $model;
+                                        }
+
+                                        /** @phpstan-ignore return.type */
+                                        return Block::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
+                    ),
             ])
             ->defaultSort('updated_at', 'desc');
     }

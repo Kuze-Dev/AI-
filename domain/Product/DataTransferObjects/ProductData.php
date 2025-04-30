@@ -119,6 +119,7 @@ class ProductData
             name: $data['name'],
             meta_data: MetaDataData::fromArray($data['meta_data']),
             sku: $data['sku'],
+            status: $data['status'] ?? true,
             retail_price: $data['retail_price'],
             selling_price: $data['selling_price'],
             length: $data['length'],

@@ -244,6 +244,7 @@ class ProductBatchUpdateImporter extends Importer
             'height' => $row['height'],
             'weight' => $row['weight'],
             'stock' => $row['stock'],
+            'status' => $row['status'] === 'active' ? true : false,
             'meta_data' => ['title' => $row['name']],
         ];
 

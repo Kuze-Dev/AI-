@@ -14,6 +14,7 @@ use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Models\Locale;
 use Domain\Menu\Enums\NodeType;
 use Domain\Menu\Enums\Target;
+use Domain\Menu\Exports\MenuExporter;
 use Domain\Menu\Models\Menu;
 use Domain\Menu\Models\Node;
 use Domain\Page\Models\Page;
@@ -318,6 +319,27 @@ class MenuResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ExportBulkAction::make()
+                    ->label(trans('Export Selected Menus'))
+                    ->authorize(filament_admin()->hasRole(config()->string('domain.role.super_admin')))
+                    ->exporter(MenuExporter::class)
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|Menu $model): Menu {
+                                        if ($model instanceof Menu) {
+                                            return $model;
+                                        }
+
+                                        /** @phpstan-ignore return.type */
+                                        return Menu::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
+                    ),
             ]);
     }
 
