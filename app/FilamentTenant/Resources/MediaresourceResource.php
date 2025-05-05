@@ -30,6 +30,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Support\Media\Actions\RegenerateImageConversions;
 use Support\MetaData\Models\MetaData;
 
 class MediaresourceResource extends Resource
@@ -118,6 +119,14 @@ class MediaresourceResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('regenerate Conversion')
+                    ->action(function (Media $record) {
+                        app(RegenerateImageConversions::class)->execute($record);
+                    })
+                    ->requiresConfirmation()
+                    ->color('success')
+                    ->icon('heroicon-o-arrow-path')
+                    ->label('Regenerate Conversion'),
             ])
             ->bulkActions([
                 // Tables\Actions\DeleteBulkAction::make(),
