@@ -57,3 +57,5 @@ ignore:
     - storage
     - tests
     - build
+    - CHANGELOG.md
+    
