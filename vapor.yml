@@ -9,7 +9,7 @@ environments:
     cache: hasp-cache
     memory: 1024
     cli-memory: 512
-    runtime: 'docker'
+    runtime: 'docker-arm'
     tmp-storage: 1024
     cli-tmp-storage: 512
     queue-tmp-storage: 10240
