@@ -102,6 +102,7 @@ pipelines:
                 - apk add --no-cache bash curl git php php-cli php-phar php-mbstring php-json php-openssl php-tokenizer php-ctype php-curl php-dom php-xml php-zlib php-pdo php-pdo_mysql php-posix php-fileinfo composer
                 - composer global require laravel/vapor-cli
                 - export PATH="$PATH:$HOME/.composer/vendor/bin"
+                - COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev
                 - vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
               # name: Deploy to Ecommerce Branch
               # deployment: ecommerce
