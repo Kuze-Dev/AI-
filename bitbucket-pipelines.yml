@@ -90,13 +90,26 @@ pipelines:
           - step: *analyse
           - step: *test
           - step:
-              <<: *common-step
               name: Deploy to Ecommerce Branch
-              deployment: ecommerce
+              image: docker:20.10.24
+              services:
+                - docker
+              size: 2x  # Increase if needed
+              caches:
+                - docker
               script:
-                - *setup-script
-                - composer require laravel/vapor-cli
-                - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
+                - apk add --no-cache bash curl git php php-cli php-phar php-mbstring php-json php-openssl php-tokenizer php-ctype php-curl php-dom php-xml php-zlib php-pdo php-pdo_mysql php-posix php-fileinfo composer
+                - composer global require laravel/vapor-cli
+                - export PATH="$PATH:$HOME/.composer/vendor/bin"
+                - vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
+          # - step:
+          #     <<: *common-step
+          #     name: Deploy to Ecommerce Branch
+          #     deployment: ecommerce
+          #     script:
+          #       - *setup-script
+          #       - composer require laravel/vapor-cli
+          #       - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
   pull-requests:
     "**":
       - parallel:
