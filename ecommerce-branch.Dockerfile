@@ -1,4 +1,4 @@
-# Use the official Vapor Docker base image for PHP 8.3 on ARM
+# Use the official Vapor Docker base image for PHP 8.3
 FROM laravelphp/vapor:php83
 
 # Install system dependencies as needed (e.g., for image processing, queues, etc.)
@@ -48,9 +48,10 @@ COPY . /var/task
 # Set working directory
 WORKDIR /var/task
 
-# Run Laravel-specific build steps (handled by vapor.yml too, this is fallback)
+# Ensure necessary directories exist and set correct permissions
+RUN mkdir -p /var/task/storage /var/task/bootstrap/cache && \
+    chmod -R 755 /var/task/storage /var/task/bootstrap/cache
+
+# Optional Laravel build steps (if not handled by vapor.yml)
 # RUN COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev --optimize-autoloader && \
 #     php artisan event:cache
-
-# Ensure correct permissions for storage and bootstrap
-RUN chmod -R 755 /var/task/storage /var/task/bootstrap/cache
