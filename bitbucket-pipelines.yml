@@ -97,7 +97,7 @@ pipelines:
                 - docker
               script:
                 - *setup-script
-                - composer require laravel/vapor-cli
+                - composer global require laravel/vapor-cli --update-with-dependencies
                 - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
   pull-requests:
     "**":
