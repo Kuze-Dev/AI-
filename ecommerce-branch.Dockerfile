@@ -49,8 +49,8 @@ COPY . /var/task
 WORKDIR /var/task
 
 # Run Laravel-specific build steps (handled by vapor.yml too, this is fallback)
-RUN COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev --optimize-autoloader && \
-    php artisan event:cache
+# RUN COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev --optimize-autoloader && \
+#     php artisan event:cache
 
 # Ensure correct permissions for storage and bootstrap
 RUN chmod -R 755 /var/task/storage /var/task/bootstrap/cache
