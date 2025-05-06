@@ -90,6 +90,7 @@ pipelines:
           - step: *analyse
           - step: *test
           - step:
+              <<: *common-step
               name: Deploy to Ecommerce Branch
               image: docker:20.10.24
               services:
@@ -102,14 +103,12 @@ pipelines:
                 - composer global require laravel/vapor-cli
                 - export PATH="$PATH:$HOME/.composer/vendor/bin"
                 - vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
-          # - step:
-          #     <<: *common-step
-          #     name: Deploy to Ecommerce Branch
-          #     deployment: ecommerce
-          #     script:
-          #       - *setup-script
-          #       - composer require laravel/vapor-cli
-          #       - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
+              # name: Deploy to Ecommerce Branch
+              # deployment: ecommerce
+              # script:
+              #   - *setup-script
+              #   - composer require laravel/vapor-cli
+              #   - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
   pull-requests:
     "**":
       - parallel:
