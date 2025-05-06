@@ -1,5 +1,5 @@
 # Use the official Vapor Docker base image for PHP 8.3 on ARM
-FROM laravelphp/vapor:php83-arm
+FROM laravelphp/vapor:php83
 
 # Install system dependencies as needed (e.g., for image processing, queues, etc.)
 RUN apk --no-cache add \
