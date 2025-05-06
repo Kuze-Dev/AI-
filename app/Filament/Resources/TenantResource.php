@@ -218,6 +218,7 @@ class TenantResource extends Resource
                                                 Features\Shopconfiguration\PaymentGateway\OfflineGateway::class,
                                                 Features\Shopconfiguration\PaymentGateway\BankTransfer::class,
                                                 Features\Shopconfiguration\PaymentGateway\VisionpayGateway::class,
+                                                Features\Shopconfiguration\PaymentGateway\MayaGateway::class,
                                             ],
                                             groupLabel: FeatureEnum::PAYMENTS->value,
                                         ),
