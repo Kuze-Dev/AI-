@@ -16,6 +16,7 @@ RUN apk --no-cache add \
     zlib \
     libzip \
     oniguruma \
+    ca-certificates \
     && apk --no-cache add --virtual .build-deps \
     gmp-dev \
     libpng-dev \
