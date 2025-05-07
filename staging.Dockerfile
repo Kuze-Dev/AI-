@@ -29,13 +29,20 @@ RUN apk --no-cache add \
     autoconf \
     build-base
 
+# Configure GD with WebP support
+RUN docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg \
+    --with-webp
+
 # Install PHP extensions
 RUN docker-php-ext-install \
     gmp \
     zip \
     pdo_mysql \
     bcmath \
-    exif
+    exif \
+    gd
 
 # Clean up to reduce image size
 RUN apk del .build-deps
