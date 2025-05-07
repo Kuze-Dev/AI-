@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Form\Exports;
 
-use App\Jobs\QueueJobPriority;
 use Domain\Form\Models\Form;
 use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Actions\Exports\ExportColumn;
@@ -16,11 +15,6 @@ use Illuminate\Support\Str;
 class FormExporter extends Exporter
 {
     protected static ?string $model = Form::class;
-
-    // public function getJobQueue(): ?string
-    // {
-    //     return QueueJobPriority::DEFAULT;
-    // }
 
     #[\Override]
     public static function getColumns(): array
