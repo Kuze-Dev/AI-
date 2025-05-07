@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Customer\Exports;
 
-use App\Jobs\QueueJobPriority;
 use Domain\Customer\Models\Customer;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
@@ -15,11 +14,6 @@ use Illuminate\Support\Str;
 class CustomerExporter extends Exporter
 {
     protected static ?string $model = Customer::class;
-
-    //    public function getJobQueue(): ?string
-    //    {
-    //        return QueueJobPriority::EXCEL;
-    //    }
 
     #[\Override]
     public static function getColumns(): array
