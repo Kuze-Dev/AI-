@@ -49,6 +49,9 @@ COPY . /var/task
 # Set working directory
 WORKDIR /var/task
 
+# Combine RDS and system CA certs for universal MySQL SSL and for planetscale
+RUN cat /var/task/rds-combined-ca-bundle.pem /etc/ssl/certs/ca-certificates.crt > /etc/ssl/certs/combined-mysql-ca.pem
+
 # Ensure necessary directories exist and set correct permissions
 RUN mkdir -p /var/task/storage /var/task/bootstrap/cache && \
     chmod -R 755 /var/task/storage /var/task/bootstrap/cache
