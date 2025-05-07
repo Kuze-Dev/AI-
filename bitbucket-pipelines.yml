@@ -66,6 +66,8 @@ pipelines:
           <<: *common-step
           name: Deploy to Staging
           deployment: staging
+          services:
+            - docker
           script:
             - *setup-script
             - composer require laravel/vapor-cli
