@@ -53,6 +53,8 @@ enum ActivityLogEvent: string implements HasLabel
 
     case deployed_hook = 'deployed-hook';
 
+    case bulk_export = 'bulk-export';
+
     public function getLabel(): string
     {
         return Str::headline($this->value);

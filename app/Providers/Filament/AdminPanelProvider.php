@@ -84,6 +84,7 @@ class AdminPanelProvider extends PanelProvider
                         default => Color::Zinc,
                     }),
                 VersionsPlugin::make(),
+                \Hasnayeen\Themes\ThemesPlugin::make(),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
@@ -105,6 +106,7 @@ class AdminPanelProvider extends PanelProvider
             ->middleware(
                 [
                     'universal',
+                    \Hasnayeen\Themes\Http\Middleware\SetTheme::class,
                 ],
                 isPersistent: true
             )
