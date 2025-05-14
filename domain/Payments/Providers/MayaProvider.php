@@ -13,17 +13,19 @@ use Domain\Payments\Events\PaymentProcessEvent;
 use Domain\Payments\Models\Payment;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
+use Lloricode\Paymaya\Client\Checkout\CheckoutClient;
 use Lloricode\Paymaya\PaymayaClient;
 use Lloricode\Paymaya\Request\Checkout\Amount\AmountDetail;
 use Lloricode\Paymaya\Request\Checkout\Checkout;
 use Lloricode\Paymaya\Request\Checkout\RedirectUrl;
 use Lloricode\Paymaya\Request\Checkout\TotalAmount;
-use PaymayaSDK;
 use Throwable;
 
 class MayaProvider extends Provider
 {
     protected string $name = 'maya';
+
+    protected PaymayaClient $mayaClient;
 
     protected string $secretKey;
 
@@ -35,19 +37,19 @@ class MayaProvider extends Provider
 
         $this->secretKey = (string) $paymentSettings->maya_secret_key;
 
-        $mode = $paymentSettings->maya_production_mode
-            ? PaymayaClient::ENVIRONMENT_PRODUCTION
-            : PaymayaClient::ENVIRONMENT_SANDBOX;
-
         $this->baseUrl = $paymentSettings->maya_production_mode
             ? 'https://pg.paymaya.com'
             : 'https://pg-sandbox.paymaya.com';
 
-        config([
-            'paymaya-sdk.mode' => $mode,
-            'paymaya-sdk.keys.public' => $paymentSettings->maya_publishable_key,
-            'paymaya-sdk.keys.secret' => $paymentSettings->maya_secret_key,
-        ]);
+        $environment = $paymentSettings->maya_production_mode
+        ? PaymayaClient::ENVIRONMENT_PRODUCTION
+        : PaymayaClient::ENVIRONMENT_SANDBOX;
+
+        $this->mayaClient = new PaymayaClient(
+            (string) $paymentSettings->maya_secret_key,
+            (string) $paymentSettings->maya_publishable_key,
+            $environment
+        );
     }
 
     #[\Override]
@@ -85,7 +87,9 @@ class MayaProvider extends Provider
                 )
                 ->setRequestReferenceNumber($transaction->reference_id);
 
-            $checkoutResponse = PaymayaSDK::checkout()->execute($checkout);
+            $checkoutClient = new CheckoutClient($this->mayaClient);
+
+            $checkoutResponse = $checkoutClient->execute($checkout);
 
             if (! isset($checkoutResponse->checkoutId) || ! isset($checkoutResponse->redirectUrl)) {
                 throw new \Exception('Invalid response from PayMaya Checkout API.');
@@ -133,10 +137,6 @@ class MayaProvider extends Provider
                 'status' => 'success',
                 'transaction_id' => $paymentModel->transaction_id,
                 'refund_details' => $refundResponse,
-            ]);
-
-            $paymentModel->update([
-                'status' => PaymentStatus::REFUNDED->value,
             ]);
 
             $refunded_amount = $paymentModel->refunds->sum('amount');
@@ -212,5 +212,5 @@ class MayaProvider extends Provider
                 message: $th->getMessage()
             );
         }
-    }
+    } 
 }
