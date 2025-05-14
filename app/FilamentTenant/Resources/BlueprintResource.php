@@ -27,9 +27,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use HalcyonAgile\FilamentExport\Actions\ExportBulkAction;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -145,31 +142,6 @@ class BlueprintResource extends Resource
                                 ),
                         ]
                     ),
-                // ExportBulkAction::make()
-                //     ->queue()
-                //     ->query(fn (Builder $query) => $query)
-                //     ->mapUsing(
-                //         ['Id', 'Name', 'Schema'],
-                //         fn (Blueprint $blueprint): array => [
-                //             $blueprint->id,
-                //             $blueprint->name,
-                //             json_encode($blueprint->schema),
-                //         ]
-                //     )
-                //     ->tags([
-                //         'tenant:'.(tenant('id') ?? 'central'),
-                //     ])
-                //     ->withActivityLog(
-                //         event: 'bulk-exported',
-                //         description: fn (ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
-                //         properties: function (ExportBulkAction $action) {
-
-                //             /** @var EloquentCollection $records */
-                //             $records = $action->getRecords();
-
-                //             return ['selected_record_ids' => $records->modelKeys()];
-                //         }
-                //     ),
             ])
             ->defaultSort('created_at', 'desc');
     }

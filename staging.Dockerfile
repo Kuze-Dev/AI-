@@ -1,0 +1,68 @@
+# Use the official Vapor Docker base image for PHP 8.3
+FROM laravelphp/vapor:php83
+
+# Install system dependencies as needed (e.g., for image processing, queues, etc.)
+RUN apk --no-cache add \
+    git \
+    unzip \
+    ffmpeg \
+    mysql-client \
+    gmp \
+    libpng \
+    libjpeg-turbo \
+    libwebp \
+    libxpm \
+    freetype \
+    zlib \
+    libzip \
+    oniguruma \
+    ca-certificates \
+    && apk --no-cache add --virtual .build-deps \
+    gmp-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    libxpm-dev \
+    freetype-dev \
+    zlib-dev \
+    libzip-dev \
+    autoconf \
+    build-base
+
+# Configure GD with WebP support
+RUN docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg \
+    --with-webp
+
+# Install PHP extensions
+RUN docker-php-ext-install \
+    gmp \
+    zip \
+    pdo_mysql \
+    bcmath \
+    exif \
+    gd
+
+# Clean up to reduce image size
+RUN apk del .build-deps
+
+# Optional: Copy PHP config overrides (uncomment if needed)
+# COPY ./php.ini /usr/local/etc/php/conf.d/overrides.ini
+
+# Copy application source code
+COPY . /var/task
+
+# Set working directory
+WORKDIR /var/task
+
+# Combine RDS and system CA certs for universal MySQL SSL and for planetscale
+RUN cat /var/task/rds-combined-ca-bundle.pem /etc/ssl/certs/ca-certificates.crt > /etc/ssl/certs/combined-mysql-ca.pem
+
+# Ensure necessary directories exist and set correct permissions
+RUN mkdir -p /var/task/storage /var/task/bootstrap/cache && \
+    chmod -R 755 /var/task/storage /var/task/bootstrap/cache
+
+# Optional Laravel build steps (if not handled by vapor.yml)
+# RUN COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev --optimize-autoloader && \
+#     php artisan event:cache

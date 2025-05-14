@@ -80,6 +80,7 @@ class TenantPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentPasswordConfirmationPlugin::make()->routeMiddleware(['tenant']),
+                \Hasnayeen\Themes\ThemesPlugin::make(),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
@@ -97,6 +98,7 @@ class TenantPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \Hasnayeen\Themes\Http\Middleware\SetTheme::class,
             ])
             ->middleware(
                 [
