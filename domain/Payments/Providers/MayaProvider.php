@@ -212,5 +212,5 @@ class MayaProvider extends Provider
                 message: $th->getMessage()
             );
         }
-    } 
+    }
 }
