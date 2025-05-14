@@ -174,12 +174,12 @@ class UpdateBlueprintDataAction
                 foreach ($filtered as $image) {
                     if (Storage::disk(config('filament.default_filesystem_disk'))->exists($image)) {
 
-                        $blueprintData->addMediaFromDisk($image, config('filament.default_filesystem_disk'))
+                        $image = $blueprintData->addMediaFromDisk($image, config('filament.default_filesystem_disk'))
                             ->preservingOriginal()
                             ->toMediaCollection('blueprint_media');
-                    }
 
-                    $currentMedia[] = $blueprintData->getMedia('blueprint_media')->last()?->uuid;
+                        $currentMedia[] = $image->uuid;
+                    }
                 }
 
                 //media ordering..
