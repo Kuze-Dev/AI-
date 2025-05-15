@@ -6,6 +6,7 @@ namespace App\Providers\Filament;
 
 use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
 use App\FilamentTenant\Pages\AccountDeactivatedNotice;
+use App\FilamentTenant\Widgets\CmsWidget;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\FilamentTenant\Widgets\Report as ReportWidget;
 use App\Settings\SiteSettings;
@@ -62,6 +63,7 @@ class TenantPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 DeployStaticSite::class,
+                CmsWidget::class,
                 ReportWidget\TotalSales::class,
                 ReportWidget\ConversionRate::class,
                 ReportWidget\MostSoldProduct::class,
