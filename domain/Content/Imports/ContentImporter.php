@@ -147,7 +147,31 @@ class ContentImporter extends Importer
                 ),
 
             ImportColumn::make('taxonomies')
-                ->requiredMapping(),
+                ->rules([
+                    function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator): void {
+
+                        if (! is_null($value)) {
+                            $taxonomiesId = Taxonomy::whereIn('slug', explode(',', $value))->pluck('id')->toArray();
+
+                            if (count($taxonomiesId) !== count(explode(',', $value))) {
+
+                                Notification::make()
+                                    ->title(trans('Taxonomy Import Error'))
+                                    ->body("Item from Taxonomy list ( {$value} ) Not Found.")
+                                    ->danger()
+                                    ->when(config('queue.default') === 'sync',
+                                        fn (Notification $notification) => $notification
+                                            ->persistent()
+                                            ->send(),
+                                        fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                    );
+
+                                $fail("Taxonomy {$value} not found.");
+                            }
+                        }
+
+                    },
+                ]),
 
             ImportColumn::make('is_sortable')
                 ->requiredMapping(),
@@ -190,7 +214,7 @@ class ContentImporter extends Importer
             [];
 
         /** @var array $taxonomyIds */
-        $taxonomyIds = array_key_exists('taxonomies', $this->data) ?
+        $taxonomyIds = (array_key_exists('taxonomies', $this->data) && ! is_null($this->data['taxonomies'])) ?
             Taxonomy::whereIn('slug', explode(',', $this->data['taxonomies']))->pluck('id')->toArray() :
              [];
 
