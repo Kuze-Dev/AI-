@@ -38,8 +38,8 @@ class MayaProvider extends Provider
         $this->secretKey = (string) $paymentSettings->maya_secret_key;
 
         $this->baseUrl = $paymentSettings->maya_production_mode
-            ? 'https://pg.paymaya.com'
-            : 'https://pg-sandbox.paymaya.com';
+            ? PaymayaClient::BASE_URL_PRODUCTION
+            : PaymayaClient::BASE_URL_SANDBOX;
 
         $environment = $paymentSettings->maya_production_mode
         ? PaymayaClient::ENVIRONMENT_PRODUCTION
