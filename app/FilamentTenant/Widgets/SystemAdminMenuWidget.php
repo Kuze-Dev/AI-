@@ -7,7 +7,7 @@ namespace App\FilamentTenant\Widgets;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 
-class CmsWidget extends BaseAdminMenuWidget
+class SystemAdminMenuWidget extends BaseAdminMenuWidget
 {
 
     public static function canView(): bool
@@ -17,13 +17,13 @@ class CmsWidget extends BaseAdminMenuWidget
 
     public function label(): string
     {
-        return 'CMS';
+        return 'System';
     }
 
     protected static string $view = 'filament.widgets.menu-nav-widget';
 
     public function getNavigationByGroup(): NavigationGroup
     {
-        return Filament::getNavigation()['CMS'];
+        return Filament::getNavigation()['System'];
     }
 }

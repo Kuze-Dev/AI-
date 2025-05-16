@@ -6,8 +6,9 @@ namespace App\FilamentTenant\Widgets;
 
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
+use Filament\Widgets\Widget;
 
-class CmsWidget extends BaseAdminMenuWidget
+class BaseAdminMenuWidget extends Widget
 {
 
     public static function canView(): bool
@@ -25,5 +26,18 @@ class CmsWidget extends BaseAdminMenuWidget
     public function getNavigationByGroup(): NavigationGroup
     {
         return Filament::getNavigation()['CMS'];
+    }
+
+    public function getNavigationItems(): array
+    {
+        return Filament::getNavigation(); // returns all nav groups and items
+    }
+
+    protected function getViewData(): array
+    {
+        return [
+            'navigationItems' => $this->getNavigationItems(),
+            'navigationGroup' => $this->getNavigationByGroup(),
+        ];
     }
 }

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Themes\Mint;
 use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
 use App\FilamentTenant\Pages\AccountDeactivatedNotice;
+use App\FilamentTenant\Widgets\AccessMenuWidget;
 use App\FilamentTenant\Widgets\CmsWidget;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use App\FilamentTenant\Widgets\Report as ReportWidget;
+use App\FilamentTenant\Widgets\SystemAdminMenuWidget;
 use App\Settings\SiteSettings;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -64,6 +67,8 @@ class TenantPanelProvider extends PanelProvider
                 AccountWidget::class,
                 DeployStaticSite::class,
                 CmsWidget::class,
+                AccessMenuWidget::class,
+                SystemAdminMenuWidget::class,
                 ReportWidget\TotalSales::class,
                 ReportWidget\ConversionRate::class,
                 ReportWidget\MostSoldProduct::class,
@@ -82,7 +87,17 @@ class TenantPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentPasswordConfirmationPlugin::make()->routeMiddleware(['tenant']),
-                \Hasnayeen\Themes\ThemesPlugin::make(),
+                \Hasnayeen\Themes\ThemesPlugin::make()
+                ->registerTheme(
+                    [
+                        // 'default' => \Hasnayeen\Themes\Themes\DefaultTheme::class,
+                        // 'sunset' => \Hasnayeen\Themes\Themes\Sunset::class,
+                        // 'nord' => \Hasnayeen\Themes\Themes\Nord::class,
+                        'mint' => Mint::class,
+                       
+                    ],
+                    // override: true,
+                ),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
