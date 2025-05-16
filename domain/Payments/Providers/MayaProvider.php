@@ -10,7 +10,9 @@ use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentCapture;
 use Domain\Payments\DataTransferObjects\PaymentGateway\PaymentRefund;
 use Domain\Payments\Enums\PaymentStatus;
 use Domain\Payments\Events\PaymentProcessEvent;
+use Domain\Payments\Interfaces\HandlesWebhook;
 use Domain\Payments\Models\Payment;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 use Lloricode\Paymaya\Client\Checkout\CheckoutClient;
@@ -21,7 +23,7 @@ use Lloricode\Paymaya\Request\Checkout\RedirectUrl;
 use Lloricode\Paymaya\Request\Checkout\TotalAmount;
 use Throwable;
 
-class MayaProvider extends Provider
+class MayaProvider extends Provider implements HandlesWebhook
 {
     protected string $name = 'maya';
 
@@ -211,6 +213,31 @@ class MayaProvider extends Provider
                 success: false,
                 message: $th->getMessage()
             );
+        }
+    }
+
+    #[\Override]
+    public function handleWebhook(Request $request, string $status): PaymentCapture
+    {
+        switch ($status) {
+            case 'success':
+                $paymentId = $request->input('paymentId') ?? $request->input('id');
+                $payment = Payment::where('payment_id', $paymentId)->first();
+
+                if (! $payment) {
+                    return new PaymentCapture(
+                        success: false,
+                        message: 'Payment not found.'
+                    );
+                }
+
+                return new PaymentCapture(
+                    success: true,
+                    message: 'Webhook processed successfully.'
+                );
+
+            default:
+                throw new \Exception("Unhandled webhook status: $status");
         }
     }
 }
