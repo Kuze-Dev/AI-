@@ -12,7 +12,6 @@ use Filament\Widgets\ChartWidget;
 
 class MostFavoriteProduct extends ChartWidget
 {
-
     protected static ?int $sort = 10;
 
     protected static ?string $heading = 'Most Favorite Product';

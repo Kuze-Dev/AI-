@@ -31,7 +31,7 @@ class Mint implements CanModifyPanelConfig, HasChangeableColor, Theme
 
     public function getPrimaryColor(): array
     {
-        return ['primary' => $this->getThemeColor()['blue']];
+        return ['primary' => $this->getThemeColor()['green']];
     }
 
     public function modifyPanelConfig(Panel $panel): Panel

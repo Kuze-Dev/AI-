@@ -16,7 +16,6 @@ use Flowframe\Trend\TrendValue;
 
 class TotalSales extends ChartWidget
 {
-
     protected static ?int $sort = 5;
 
     protected static ?string $heading = 'Total sales';

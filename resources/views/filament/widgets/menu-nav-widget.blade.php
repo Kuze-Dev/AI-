@@ -1,6 +1,6 @@
 <x-filament-widgets::widget>
     <div class="grid grid-cols-2 gap-4 mb-4">
-        @foreach ($navigationGroup as $navigationGroup )
+        @foreach ($navigationGroups as $navigationGroup )
         
         <div class="w-full">
             <x-filament::section class="w-full max-w-full" collapsible>

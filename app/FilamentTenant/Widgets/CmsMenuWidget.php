@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Widgets;
 
-use Filament\Facades\Filament;
-use Filament\Navigation\NavigationGroup;
-
 class CmsMenuWidget extends BaseAdminMenuWidget
 {
     protected static ?int $sort = -1;
@@ -14,8 +11,7 @@ class CmsMenuWidget extends BaseAdminMenuWidget
     /**
      * @var int | string | array<string, int | null>
      */
-    protected int | string | array $columnSpan = 2;
-    
+    protected int|string|array $columnSpan = 2;
 
     public static function canView(): bool
     {
@@ -23,6 +19,4 @@ class CmsMenuWidget extends BaseAdminMenuWidget
     }
 
     protected static string $view = 'filament.widgets.menu-nav-widget';
-
-
 }
