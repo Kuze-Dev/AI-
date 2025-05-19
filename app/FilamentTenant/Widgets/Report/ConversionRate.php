@@ -16,6 +16,8 @@ use Flowframe\Trend\TrendValue;
 
 class ConversionRate extends ChartWidget
 {
+    protected static ?int $sort = 6;
+
     protected static ?string $heading = 'Conversion Rate';
 
     protected static ?string $pollingInterval = null;

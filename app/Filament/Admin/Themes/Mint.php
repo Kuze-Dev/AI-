@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Admin\Themes;
 
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
+use Filament\Support\Colors\Color;
 use Hasnayeen\Themes\Contracts\CanModifyPanelConfig;
 use Hasnayeen\Themes\Contracts\HasChangeableColor;
 use Hasnayeen\Themes\Contracts\Theme;
 use Illuminate\Support\Arr;
-use Filament\Support\Colors\Color;
 
-class Mint implements HasChangeableColor, CanModifyPanelConfig, Theme
+class Mint implements CanModifyPanelConfig, HasChangeableColor, Theme
 {
     public static function getName(): string
     {
@@ -35,6 +38,18 @@ class Mint implements HasChangeableColor, CanModifyPanelConfig, Theme
     {
         return $panel
             ->viteTheme($this->getPath())
+            ->widgets([
+                \App\FilamentTenant\Widgets\CmsMenuWidget::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()->label(fn () => trans('CMS')),
+                NavigationGroup::make()->label(fn () => trans('eCommerce')),
+                NavigationGroup::make()->label(fn () => trans('Access')),
+                NavigationGroup::make()->label(fn () => trans('Shop Configuration')),
+                NavigationGroup::make()->label(fn () => trans('Service Management')),
+                NavigationGroup::make()->label(fn () => trans('Customer Management')),
+                NavigationGroup::make()->label(fn () => trans('System')),
+            ])
             ->topNavigation(true)
             ->sidebarCollapsibleOnDesktop(false);
     }

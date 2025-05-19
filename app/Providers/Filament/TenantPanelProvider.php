@@ -66,9 +66,6 @@ class TenantPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 DeployStaticSite::class,
-                CmsWidget::class,
-                AccessMenuWidget::class,
-                SystemAdminMenuWidget::class,
                 ReportWidget\TotalSales::class,
                 ReportWidget\ConversionRate::class,
                 ReportWidget\MostSoldProduct::class,
@@ -78,26 +75,27 @@ class TenantPanelProvider extends PanelProvider
                 ReportWidget\MostFavoriteProduct::class,
             ])
             ->navigationGroups([
-                NavigationGroup::make()->label(fn () => trans('Shop Configuration')),
-                NavigationGroup::make()->label(fn () => trans('Customer Management')),
                 NavigationGroup::make()->label(fn () => trans('CMS')),
                 NavigationGroup::make()->label(fn () => trans('eCommerce')),
                 NavigationGroup::make()->label(fn () => trans('Access')),
+                NavigationGroup::make()->label(fn () => trans('Shop Configuration')),
+                NavigationGroup::make()->label(fn () => trans('Service Management')),
+                NavigationGroup::make()->label(fn () => trans('Customer Management')),
                 NavigationGroup::make()->label(fn () => trans('System')),
             ])
             ->plugins([
                 FilamentPasswordConfirmationPlugin::make()->routeMiddleware(['tenant']),
                 \Hasnayeen\Themes\ThemesPlugin::make()
-                ->registerTheme(
-                    [
-                        // 'default' => \Hasnayeen\Themes\Themes\DefaultTheme::class,
-                        // 'sunset' => \Hasnayeen\Themes\Themes\Sunset::class,
-                        // 'nord' => \Hasnayeen\Themes\Themes\Nord::class,
-                        'mint' => Mint::class,
-                       
-                    ],
-                    // override: true,
-                ),
+                    ->registerTheme(
+                        [
+                            // 'default' => \Hasnayeen\Themes\Themes\DefaultTheme::class,
+                            // 'sunset' => \Hasnayeen\Themes\Themes\Sunset::class,
+                            // 'nord' => \Hasnayeen\Themes\Themes\Nord::class,
+                            'mint' => Mint::class,
+
+                        ],
+                        // override: true,
+                    ),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()

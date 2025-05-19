@@ -8,6 +8,7 @@ export default defineConfig({
                 /**
                  * Filament asset entrypoints
                  */
+                'resources/css/filament/tenant/themes/mint.css', // Add this line
                 'resources/css/filament/app.css',
                 'resources/js/filament/app.js',
 

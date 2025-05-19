@@ -10,7 +10,6 @@ use Filament\Widgets\Widget;
 
 class BaseAdminMenuWidget extends Widget
 {
-
     public static function canView(): bool
     {
         return true;
@@ -23,9 +22,13 @@ class BaseAdminMenuWidget extends Widget
 
     protected static string $view = 'filament.widgets.menu-nav-widget';
 
-    public function getNavigationByGroup(): NavigationGroup
+    public function getNavigationByGroup(): array
     {
-        return Filament::getNavigation()['CMS'];
+        $menu = Filament::getNavigation();
+        
+        return array_filter($menu, function ($value, $key) {
+            return $key !== null && $key !== '';
+        }, ARRAY_FILTER_USE_BOTH);
     }
 
     public function getNavigationItems(): array

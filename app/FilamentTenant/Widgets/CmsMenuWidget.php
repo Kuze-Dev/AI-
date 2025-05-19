@@ -7,23 +7,22 @@ namespace App\FilamentTenant\Widgets;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 
-class SystemAdminMenuWidget extends BaseAdminMenuWidget
+class CmsMenuWidget extends BaseAdminMenuWidget
 {
+    protected static ?int $sort = -1;
+
+    /**
+     * @var int | string | array<string, int | null>
+     */
+    protected int | string | array $columnSpan = 2;
+    
 
     public static function canView(): bool
     {
         return true;
     }
 
-    public function label(): string
-    {
-        return 'System';
-    }
-
     protected static string $view = 'filament.widgets.menu-nav-widget';
 
-    public function getNavigationByGroup(): NavigationGroup
-    {
-        return Filament::getNavigation()['System'];
-    }
+
 }

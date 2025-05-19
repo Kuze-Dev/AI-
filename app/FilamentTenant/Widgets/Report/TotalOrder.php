@@ -10,6 +10,8 @@ use Filament\Widgets\Widget;
 
 class TotalOrder extends Widget
 {
+    protected static ?int $sort = 8;
+
     protected static string $view = 'filament.widgets.total-order';
 
     public array $widgetData = [];

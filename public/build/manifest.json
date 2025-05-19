@@ -4,6 +4,11 @@
     "isEntry": true,
     "src": "resources/css/filament/app.css"
   },
+  "resources/css/filament/tenant/themes/mint.css": {
+    "file": "assets/mint-c3eae76a.css",
+    "isEntry": true,
+    "src": "resources/css/filament/tenant/themes/mint.css"
+  },
   "resources/css/web/app.css": {
     "file": "assets/app-d4101897.css",
     "isEntry": true,
