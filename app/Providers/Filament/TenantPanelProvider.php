@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Themes\Mint;
 use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
 use App\FilamentTenant\Pages\AccountDeactivatedNotice;
 use App\FilamentTenant\Widgets\DeployStaticSite;
@@ -71,16 +72,27 @@ class TenantPanelProvider extends PanelProvider
                 ReportWidget\MostFavoriteProduct::class,
             ])
             ->navigationGroups([
-                NavigationGroup::make()->label(fn () => trans('Shop Configuration')),
-                NavigationGroup::make()->label(fn () => trans('Customer Management')),
                 NavigationGroup::make()->label(fn () => trans('CMS')),
                 NavigationGroup::make()->label(fn () => trans('eCommerce')),
                 NavigationGroup::make()->label(fn () => trans('Access')),
+                NavigationGroup::make()->label(fn () => trans('Shop Configuration')),
+                NavigationGroup::make()->label(fn () => trans('Service Management')),
+                NavigationGroup::make()->label(fn () => trans('Customer Management')),
                 NavigationGroup::make()->label(fn () => trans('System')),
             ])
             ->plugins([
                 FilamentPasswordConfirmationPlugin::make()->routeMiddleware(['tenant']),
-                \Hasnayeen\Themes\ThemesPlugin::make(),
+                \Hasnayeen\Themes\ThemesPlugin::make()
+                    ->registerTheme(
+                        [
+                            // 'default' => \Hasnayeen\Themes\Themes\DefaultTheme::class,
+                            // 'sunset' => \Hasnayeen\Themes\Themes\Sunset::class,
+                            // 'nord' => \Hasnayeen\Themes\Themes\Nord::class,
+                            'mint' => Mint::class,
+
+                        ],
+                        // override: true,
+                    ),
             ])
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()

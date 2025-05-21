@@ -14,6 +14,8 @@ use Filament\Widgets\ChartWidget;
 
 class MostSoldProduct extends ChartWidget
 {
+    protected static ?int $sort = 7;
+
     protected static ?string $heading = 'Most Sold Product';
 
     protected static ?string $pollingInterval = null;
