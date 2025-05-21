@@ -25,6 +25,7 @@ return [
     App\Providers\Filament\CommonServiceProvider::class,
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\Filament\TenantPanelProvider::class,
+    App\Providers\Filament\CustomThemeServiceProvider::class,
 
     /*
      * Domain Service Providers...

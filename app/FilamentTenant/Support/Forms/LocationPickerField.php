@@ -23,11 +23,6 @@ class LocationPickerField extends Field
         $this->schema([
             Group::make([
                 Group::make([
-                    TextInput::make('full_address')
-                        ->label(trans('Search Address'))
-                        ->dehydrated(false)
-                        ->columnspan(2)
-                        ->placeholder('Search Address'),
                     TextInput::make('address_name')
                         ->label(trans('Address Name'))
                         ->columnspan(2)
@@ -41,7 +36,7 @@ class LocationPickerField extends Field
                                 'lng' => floatval($get('longitude')),
                             ]);
                         })
-                        ->columnspan(1),
+                        ->columnspan(2),
                     TextInput::make('longitude')
                         ->reactive()
                         // ->default('121.0686773')
@@ -51,9 +46,10 @@ class LocationPickerField extends Field
                                 'lng' => floatval($state),
                             ]);
                         })
-                        ->columnspan(1),
+                        ->columnspan(2),
                 ])->columns(2),
                 Map::make('map')
+                    ->view('filament.forms.components.filament-google-maps')
                     ->dehydrated(false)
                     ->reactive()
                     ->mapControls([
@@ -62,10 +58,10 @@ class LocationPickerField extends Field
                         'streetViewControl' => true,
                         'rotateControl' => true,
                         'fullscreenControl' => true,
-                        'searchBoxControl' => false, // creates geocomplete field inside map
+                        'searchBoxControl' => true, // creates geocomplete field inside map
                         'zoomControl' => false,
                     ])
-                    ->height(fn () => '400px') // map height (width is controlled by Filament options)
+                    ->height(fn () => '350px') // map height (width is controlled by Filament options)
                     ->defaultZoom(18) // default zoom level when opening form
                     ->autocomplete(
                         fieldName: 'full_address',
@@ -75,8 +71,8 @@ class LocationPickerField extends Field
                     ->autocompleteReverse(true) // reverse geocode marker location to autocomplete field
                     ->draggable() // allow dragging to move marker
                     ->defaultLocation([
-                        '14.5454321',
-                        '121.0686773',
+                        '14.5557631',
+                        '121.0208774',
                     ])
                     ->afterStateUpdated(function ($state, Get $get, Set $set) {
 
@@ -85,15 +81,16 @@ class LocationPickerField extends Field
                     })
                     ->afterStateHydrated(function (Map $component, Get $get, Set $set) {
 
-                        // $component->state([
-                        //     'lat' => floatval($get('latitude')),
-                        //     'lng' => floatval($get('longitude')),
-                        // ]);
+                        $component->state([
+                            'lat' => floatval($get('latitude')),
+                            'lng' => floatval($get('longitude')),
+                        ]);
 
-                    }),
+                    })
+                    ->columnSpan(2),
 
             ])
-                ->columns(2),
+                ->columns(3),
             Divider::make('div')
                 ->dehydrated(false),
         ]);

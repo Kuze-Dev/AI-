@@ -15,6 +15,8 @@ use Flowframe\Trend\TrendValue;
 
 class AverageOrderValue extends ChartWidget
 {
+    protected static ?int $sort = 9;
+
     protected static ?string $heading = 'Average Order Value';
 
     protected static ?string $pollingInterval = null;
