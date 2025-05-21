@@ -25,7 +25,7 @@ class DeployStaticSite extends Widget
 
         if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
-            return redirect()->away(route('filament-tenant.resources.sites.index'));
+            return redirect()->away(route('filament.tenant.resources.sites.index'));
         }
 
         if ($this->getDeployHook() === null) {
