@@ -81,6 +81,8 @@ pipelines:
           <<: *common-step
           name: Deploy to Production
           deployment: production
+          services:
+            - docker
           trigger: manual
           script:
             - *setup-script
