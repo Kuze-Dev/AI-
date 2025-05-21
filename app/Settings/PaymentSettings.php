@@ -24,11 +24,13 @@ class PaymentSettings extends Settings
 
     public bool $vision_pay_production_mode;
 
+    #[\Override]
     public static function group(): string
     {
         return 'payments';
     }
 
+    #[\Override]
     public static function encrypted(): array
     {
         return [
@@ -36,7 +38,9 @@ class PaymentSettings extends Settings
             'paypal_secret_key',
             'stripe_publishable_key',
             'stripe_secret_key',
+            'stripe_secret_key',
             'vision_pay_apiKey',
+
         ];
     }
 }

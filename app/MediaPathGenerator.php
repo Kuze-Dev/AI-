@@ -10,6 +10,7 @@ use Spatie\MediaLibrary\Support\PathGenerator\DefaultPathGenerator;
 
 class MediaPathGenerator extends DefaultPathGenerator
 {
+    #[\Override]
     protected function getBasePath(Media $media): string
     {
         if ($media->model_type === Customer::class) {
@@ -26,7 +27,7 @@ class MediaPathGenerator extends DefaultPathGenerator
             return parent::getBasePath($media);
         }
 
-        $prefix = config('media-library.prefix', '');
+        $prefix = config()->string('media-library.prefix', '');
 
         $md5 = md5(
             $media->getKey().

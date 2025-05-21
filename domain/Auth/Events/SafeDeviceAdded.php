@@ -12,6 +12,5 @@ class SafeDeviceAdded
     public function __construct(
         public TwoFactorAuthenticatable $user,
         public SafeDeviceData $safeDeviceData
-    ) {
-    }
+    ) {}
 }

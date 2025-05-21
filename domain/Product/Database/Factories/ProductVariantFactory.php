@@ -14,6 +14,7 @@ class ProductVariantFactory extends Factory
 {
     protected $model = ProductVariant::class;
 
+    #[\Override]
     public function definition()
     {
         return [

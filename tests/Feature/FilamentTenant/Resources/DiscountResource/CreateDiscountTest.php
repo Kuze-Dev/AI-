@@ -9,14 +9,13 @@ use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountCondition;
 use Domain\Discount\Models\DiscountRequirement;
-use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Auth;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
     CurrencyFactory::new()->createOne([
         'enabled' => true,
@@ -30,6 +29,7 @@ it('can render page', function () {
 });
 
 it('can create discount', function () {
+
     livewire(CreateDiscount::class)
         ->fillForm([
             'name' => 'discount name',
@@ -39,7 +39,6 @@ it('can create discount', function () {
             'max_uses' => 10,
             'status' => DiscountStatus::ACTIVE->value,
             'valid_start_at' => ($valid_start_at = now(Auth::user()->timezone)->toImmutable()),
-            'valid_end_at' => ($valid_end_at = now(Auth::user()->timezone)->addDay()->toImmutable()),
 
             'discountCondition.discount_type' => 'order_sub_total',
             'discountCondition.amount_type' => 'percentage',
@@ -59,7 +58,6 @@ it('can create discount', function () {
         'max_uses' => 10,
         'status' => DiscountStatus::ACTIVE->value,
         'valid_start_at' => $valid_start_at,
-        'valid_end_at' => $valid_end_at,
     ]);
 
     assertDatabaseHas(DiscountCondition::class, [

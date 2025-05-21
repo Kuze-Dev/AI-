@@ -5,8 +5,8 @@ namespace Spatie\Permission\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property string $name
- * @property string $guard_name
+ * @property-read string $name
+ * @property-read string $guard_name
  */
 class Permission extends Model
 {

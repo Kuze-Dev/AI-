@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 
+use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
 use Domain\Content\Models\Content;
-use Filament\Pages\Actions;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ListContentEntry extends ListRecords
@@ -20,36 +21,37 @@ class ListContentEntry extends ListRecords
 
     public mixed $ownerRecord;
 
+    #[\Override]
     public function mount(string $ownerRecord = ''): void
     {
+
         $this->ownerRecord = app(Content::class)->resolveRouteBinding($ownerRecord)?->load('taxonomies.taxonomyTerms');
 
         if ($this->ownerRecord === null) {
-            throw (new ModelNotFoundException())->setModel(Content::class, ['']);
+            throw (new ModelNotFoundException)->setModel(Content::class, ['']);
         }
 
         parent::mount();
     }
 
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()
-                ->label(trans('Edit Content'))
-                ->visible(ContentResource::canEdit($this->ownerRecord))
-                ->url(ContentResource::getUrl('edit', [$this->ownerRecord])),
             Actions\CreateAction::make()
                 ->label(trans('Create entry'))
                 ->url(self::getResource()::getUrl('create', [$this->ownerRecord])),
         ];
     }
 
-    protected function getTitle(): string
+    #[\Override]
+    public function getTitle(): string
     {
         return $this->ownerRecord->name.' '.Str::headline(static::getResource()::getPluralModelLabel());
     }
 
-    protected function getBreadcrumbs(): array
+    #[\Override]
+    public function getBreadcrumbs(): array
     {
         $resource = static::getResource();
 
@@ -71,20 +73,22 @@ class ListContentEntry extends ListRecords
     }
 
     /** @return Builder<\Domain\Content\Models\ContentEntry> */
+    #[\Override]
     protected function getTableQuery(): Builder
     {
 
-        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
             return $this->ownerRecord->contentEntries()->getQuery();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
-            Auth::user()?->can('site.siteManager') &&
-            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
+            filament_admin()->can('site.siteManager') &&
+            /** @phpstan-ignore booleanNot.alwaysTrue */
+            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
-            return $this->ownerRecord->contentEntries()->getQuery()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
-            });
+            return $this->ownerRecord->contentEntries()
+                ->getQuery()
+                ->wherehas('sites', fn ($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));
         }
 
         return $this->ownerRecord->contentEntries()->getQuery();

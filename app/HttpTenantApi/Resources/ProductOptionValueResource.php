@@ -12,6 +12,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class ProductOptionValueResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [
@@ -22,6 +23,7 @@ class ProductOptionValueResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [

@@ -8,16 +8,32 @@ use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
 use Domain\Order\Models\OrderLine;
-use Filament\Widgets\PieChartWidget;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Widgets\ChartWidget;
 
-class LeastSoldProduct extends PieChartWidget
+class LeastSoldProduct extends ChartWidget
 {
+    protected static ?int $sort = 7;
+
     protected static ?string $heading = 'Least Sold Product';
 
     protected static ?string $pollingInterval = null;
 
     public ?string $filter = 'allTime';
 
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
+
+    #[\Override]
+    protected function getType(): string
+    {
+        return 'pie';
+    }
+
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -28,6 +44,7 @@ class LeastSoldProduct extends PieChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $activeFilter = $this->filter;

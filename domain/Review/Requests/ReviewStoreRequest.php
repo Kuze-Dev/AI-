@@ -14,22 +14,12 @@ use Illuminate\Validation\Rule;
 
 class ReviewStoreRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, mixed>
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             'order_line_id' => [
@@ -40,7 +30,7 @@ class ReviewStoreRequest extends FormRequest
                     $review = Review::where('order_line_id', $orderLineId);
                     $orderLine = OrderLine::find($orderLineId);
                     if ($orderLine && isset($orderLine->order)) {
-                        if ($orderLine->order->status != OrderStatuses::FULFILLED) {
+                        if ($orderLine->order->status !== OrderStatuses::FULFILLED) {
                             $fail('You cannot review this item; the product hasn\'t been fulfilled yet.');
                         }
                     }
@@ -71,14 +61,8 @@ class ReviewStoreRequest extends FormRequest
         ];
     }
 
-    /**
-     * Handle a failed validation attempt.
-     *
-     * @return void
-     *
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException
-     */
-    protected function failedValidation(Validator $validator)
+    #[\Override]
+    protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
             'message' => 'Validation Error',

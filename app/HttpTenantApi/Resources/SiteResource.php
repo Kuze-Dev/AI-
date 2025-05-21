@@ -12,6 +12,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class SiteResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [

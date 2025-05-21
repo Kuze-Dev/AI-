@@ -15,6 +15,7 @@ class CartFactory extends Factory
 {
     protected $model = Cart::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

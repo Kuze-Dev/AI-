@@ -54,7 +54,10 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
 class Block extends Model implements HasMedia
 {
     use ConstraintsRelationships;
+
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
+
     use LogsActivity;
     use Sites;
 
@@ -66,10 +69,13 @@ class Block extends Model implements HasMedia
         'data',
     ];
 
-    protected $casts = [
-        'data' => 'array',
-        'is_fixed_content' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+            'is_fixed_content' => 'bool',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -79,18 +85,19 @@ class Block extends Model implements HasMedia
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return BelongsTo<Blueprint, Block> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
-    /** @return HasMany<BlockContent> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Page\Models\BlockContent, $this> */
     public function blockContents(): HasMany
     {
         return $this->hasMany(BlockContent::class);
     }
 
+    #[\Override]
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')

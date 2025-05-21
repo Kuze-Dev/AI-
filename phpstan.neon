@@ -1,5 +1,6 @@
 includes:
     - phpstan-baseline.neon
+    - phar://phpstan.phar/conf/bleedingEdge.neon
 
 services:
     -
@@ -44,7 +45,6 @@ services:
             - collect
             - csrf_field
             - csrf_token
-            - env
             - method_field
             - now
             - old
@@ -70,38 +70,53 @@ services:
             - auth
             - request
             - data_set
+            - once
 
 parameters:
 
     tmpDir: build/phpstan
 
+
     stubFiles:
+        - phpstan-stubs/MountableAction.stub
         - phpstan-stubs/Permission.stub
         - phpstan-stubs/PermissionRegistrar.stub
-        - phpstan-stubs/Tenancy.stub
+        - phpstan-stubs/Select.stub
         - phpstan-stubs/SimpleMessage.stub
+        - phpstan-stubs/TextInput.stub
 
     paths:
         - app
-        - config
-        - database
         - domain
         - support
 
     # The level 9 is the highest level
     level: 8
 
+    type_coverage:
+        return_type: 99.7
+        param_type: 89.3
+        property_type: 100
+        declare: 100
+
     ignoreErrors:
         #- '#Access to property \$value on an unknown class StringBackedEnum.#'
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
+        - identifier: nullsafe.neverNull
 
     excludePaths:
-        # - ./*/*/FileToBeExcluded.php
+        - domain/*/config/*
+        - support/*/config/*
+        - domain/*/Database/*
+        - support/*/Database/*
 
     earlyTerminatingFunctionCalls:
         - rd
         - dd
 
     checkOctaneCompatibility: true
-    checkModelProperties: true
-    checkMissingIterableValueType: false
+#    checkModelProperties: true
 
+    errorFormat: ticketswap
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

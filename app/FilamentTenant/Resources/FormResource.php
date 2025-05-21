@@ -4,52 +4,57 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Resources;
 
+use App\Features\CMS\Internationalization;
+use App\Features\CMS\SitesManagement;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\FormResource\Pages;
 use App\FilamentTenant\Resources\FormResource\RelationManagers\FormSubmissionsRelationManager;
 use App\FilamentTenant\Support\SchemaInterpolations;
 use App\Settings\FormSettings;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Blueprint\Models\Blueprint;
+use Domain\Form\Exports\FormExporter;
 use Domain\Form\Models\Form as FormModel;
 use Domain\Internationalization\Models\Locale;
 use Domain\Site\Models\Site;
+use Domain\Tenant\TenantFeatureSupport;
 use Exception;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 
 class FormResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = FormModel::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('CMS');
     }
 
     /** @return Builder<FormModel> */
-    protected static function getGlobalSearchEloquentQuery(): Builder
+    #[\Override]
+    public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->withCount('formSubmissions');
     }
 
-    /** @param  FormModel  $record */
+    /** @param  FormModel  $record
+     @return array<string, string|\Illuminate\Support\HtmlString|int>
+     */
+    #[\Override]
     public static function getGlobalSearchResultDetails(Model $record): array
     {
 
@@ -59,16 +64,17 @@ class FormResource extends Resource
         ]);
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->unique(
-                            callback: function ($livewire, Unique $rule) {
+                            modifyRuleUsing: function ($livewire, Unique $rule) {
 
-                                if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+                                if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class) || \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\Internationalization::class)) {
                                     return false;
                                 }
 
@@ -84,49 +90,46 @@ class FormResource extends Resource
                         ->required()
                         ->preload()
                         ->optionsFromModel(Blueprint::class, 'name')
-                        ->disabled(fn (?FormModel $record) => $record !== null)
+                        ->disableOptionWhen(fn (?FormModel $record) => $record !== null)
                         ->reactive(),
                     Forms\Components\Select::make('locale')
                         ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
                         ->default((string) Locale::where('is_default', true)->first()?->code)
                         ->searchable()
-                        ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class))
+                        ->hidden(TenantFeatureSupport::inactive(Internationalization::class))
                         ->required(),
                     Forms\Components\Toggle::make('store_submission'),
-                    Forms\Components\Card::make([
+                    Forms\Components\Section::make([
                         // Forms\Components\CheckboxList::make('sites')
                         \App\FilamentTenant\Support\CheckBoxList::make('sites')
-                            ->required(fn () => tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class))
+                            ->required(fn () => \Domain\Tenant\TenantFeatureSupport::active(SitesManagement::class))
                             ->rules([
-                                function (?FormModel $record, Closure $get) {
+                                fn (?FormModel $record, \Filament\Forms\Get $get) => function (string $attribute, $value, Closure $fail) use ($record, $get) {
 
-                                    return function (string $attribute, $value, Closure $fail) use ($record, $get) {
+                                    $siteIDs = $value;
 
-                                        $siteIDs = $value;
+                                    if ($record) {
+                                        $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
 
-                                        if ($record) {
-                                            $siteIDs = array_diff($siteIDs, $record->sites->pluck('id')->toArray());
-
-                                            $form = FormModel::where('name', $get('name'))
-                                                ->where('id', '!=', $record->id)
-                                                ->whereHas(
-                                                    'sites',
-                                                    fn ($query) => $query->whereIn('site_id', $siteIDs)
-                                                )->count();
-
-                                        } else {
-
-                                            $form = FormModel::where('name', $get('name'))->whereHas(
+                                        $form = FormModel::where('name', $get('name'))
+                                            ->where('id', '!=', $record->id)
+                                            ->whereHas(
                                                 'sites',
                                                 fn ($query) => $query->whereIn('site_id', $siteIDs)
                                             )->count();
-                                        }
 
-                                        if ($form > 0) {
-                                            $fail("Form {$get('name')} is already available in selected sites.");
-                                        }
+                                    } else {
 
-                                    };
+                                        $form = FormModel::where('name', $get('name'))->whereHas(
+                                            'sites',
+                                            fn ($query) => $query->whereIn('site_id', $siteIDs)
+                                        )->count();
+                                    }
+
+                                    if ($form > 0) {
+                                        $fail("Form {$get('name')} is already available in selected sites.");
+                                    }
+
                                 },
                             ])
                             ->options(
@@ -136,18 +139,17 @@ class FormResource extends Resource
                             )
                             ->disableOptionWhen(function (string $value, Forms\Components\CheckboxList $component) {
 
-                                /** @var \Domain\Admin\Models\Admin */
-                                $user = Auth::user();
+                                $admin = filament_admin();
 
-                                if ($user->hasRole(config('domain.role.super_admin'))) {
+                                if ($admin->hasRole(config()->string('domain.role.super_admin'))) {
                                     return false;
                                 }
 
-                                $user_sites = $user->userSite->pluck('id')->toArray();
+                                $user_sites = $admin->userSite->pluck('id')->toArray();
 
                                 $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                                return ! in_array($value, $intersect);
+                                return ! in_array($value, $intersect, true);
                             })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?FormModel $record): void {
                                 if (! $record) {
@@ -164,11 +166,11 @@ class FormResource extends Resource
                                 );
                             }),
                     ])
-                        ->hidden((bool) ! (tenancy()->tenant?->features()
-                            ->active(
-                                \App\Features\CMS\SitesManagement::class)
-                            // && Auth::user()?->hasRole(config('domain.role.super_admin'))
-                        )),
+                        ->hidden(
+                            ! (TenantFeatureSupport::active(SitesManagement::class) &&
+                                filament_admin()->hasRole(config()->string('domain.role.super_admin'))
+                            )
+                        ),
                     Forms\Components\Toggle::make('uses_captcha')
                         ->disabled(fn (FormSettings $formSettings) => ! $formSettings->provider)
                         ->helperText(
@@ -177,11 +179,11 @@ class FormResource extends Resource
                                 : null
                         ),
                 ]),
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\Section::make('Available Values')
                         ->schema([
                             SchemaInterpolations::make('data')
-                                ->schemaData(fn (Closure $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
+                                ->schemaData(fn (\Filament\Forms\Get $get) => Blueprint::where('id', $get('blueprint_id'))->first()?->schema),
                         ])
                         ->columnSpan(['md' => 1])
                         ->extraAttributes(['class' => 'md:sticky top-[5.5rem]']),
@@ -255,7 +257,7 @@ class FormResource extends Resource
                                 ->columnSpanFull(),
                             Forms\Components\MarkdownEditor::make('template')
                                 ->required()
-                                ->default(function (Closure $get) {
+                                ->default(function (\Filament\Forms\Get $get) {
                                     $blueprint = Blueprint::whereId($get('../../blueprint_id'))->first();
 
                                     if ($blueprint === null) {
@@ -284,10 +286,12 @@ class FormResource extends Resource
                         ])
                         ->columnSpan(['md' => 3]),
                 ])->columns(4),
+
             ]);
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -295,32 +299,34 @@ class FormResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable()
-                    ->truncate('max-w-xs 2xl:max-w-xl', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
-                Tables\Columns\BadgeColumn::make('form_submissions_count')
+                    ->hidden((bool) TenantFeatureSupport::inactive(Internationalization::class)),
+                Tables\Columns\TextColumn::make('form_submissions_count')
+                    ->badge()
                     ->counts('formSubmissions')
                     ->formatStateUsing(fn (FormModel $record, ?int $state) => $record->store_submission ? $state : 'N/A')
-                    ->icon('heroicon-s-mail')
+                    ->icon('heroicon-m-envelope')
                     ->color(fn (FormModel $record) => $record->store_submission ? 'success' : 'secondary'),
-                Tables\Columns\TagsColumn::make('sites.name')
-                    ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
-                    }, isToggledHiddenByDefault: fn () => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
+                    ->toggleable(condition: fn () => TenantFeatureSupport::active(SitesManagement::class),
+                        isToggledHiddenByDefault: fn () => TenantFeatureSupport::inactive(SitesManagement::class)),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(SitesManagement::class)))
                     ->relationship('sites', 'name', function (Builder $query) {
 
-                        if (Auth::user()?->can('site.siteManager') &&
-                        ! (Auth::user()->hasRole(config('domain.role.super_admin')))) {
-                            return $query->whereIn('id', Auth::user()->userSite->pluck('id')->toArray());
+                        if (filament_admin()->can('site.siteManager') &&
+                        ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))) {
+                            return $query->whereIn('id', filament_admin()->userSite->pluck('id')->toArray());
                         }
 
                         return $query;
@@ -335,31 +341,53 @@ class FormResource extends Resource
                 ]),
             ])->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-                    ->authorize(fn () => Auth::user()?->hasRole(config('domain.role.super_admin'))),
+                    ->authorize(fn () => filament_admin()->hasRole(config()->string('domain.role.super_admin'))),
+                Tables\Actions\ExportBulkAction::make()
+                    ->label(trans('Export Selected Form'))
+                    ->authorize(filament_admin()->hasRole(config()->string('domain.role.super_admin')))
+                    ->exporter(FormExporter::class)
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|FormModel $model): FormModel {
+                                        if ($model instanceof FormModel) {
+                                            return $model;
+                                        }
+
+                                        /** @phpstan-ignore return.type */
+                                        return FormModel::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
+                    ),
             ])
             ->defaultSort('updated_at', 'desc');
     }
 
     /** @return Builder<\Domain\Form\Models\Form> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
-        if (Auth::user()?->hasRole(config('domain.role.super_admin'))) {
+        if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
             return static::getModel()::query();
         }
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
-            Auth::user()?->can('site.siteManager') &&
-            ! (Auth::user()->hasRole(config('domain.role.super_admin')))
+        if (TenantFeatureSupport::active(SitesManagement::class) &&
+            filament_admin()->can('site.siteManager') &&
+            /** @phpstan-ignore booleanNot.alwaysTrue */
+            ! (filament_admin()->hasRole(config()->string('domain.role.super_admin')))
         ) {
-            return static::getModel()::query()->wherehas('sites', function ($q) {
-                return $q->whereIn('site_id', Auth::user()?->userSite->pluck('id')->toArray());
-            });
+            return static::getModel()::query()->wherehas('sites', fn ($q) => $q->whereIn('site_id', filament_admin()->userSite->pluck('id')->toArray()));
         }
 
         return static::getModel()::query();
 
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -370,6 +398,7 @@ class FormResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

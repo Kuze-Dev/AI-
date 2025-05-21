@@ -9,7 +9,6 @@ use Filament\Facades\Filament;
 
 beforeEach(function () {
     testInTenantContext();
-    Filament::setContext('filament-tenant');
     loginAsSuperAdmin();
 });
 

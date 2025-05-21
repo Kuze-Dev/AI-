@@ -18,11 +18,7 @@ trait ChecksWildcardPermissions
 
     private function getResourceName(): string
     {
-        if (isset($this->wildcardResourceName)) {
-            return $this->wildcardResourceName;
-        }
-
-        return (string) Str::of(static::class)
+        return $this->wildcardResourceName ?? (string) Str::of(static::class)
             ->classBasename()
             ->remove('Policy')
             ->camel();

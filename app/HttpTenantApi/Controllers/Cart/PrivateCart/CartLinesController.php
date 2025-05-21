@@ -11,11 +11,12 @@ use Domain\Cart\Actions\DestroyCartLineAction;
 use Domain\Cart\Actions\UpdateCartLineAction;
 use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
-use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CreateCartLineRequest;
 use Domain\Cart\Requests\UpdateCartLineRequest;
+use Domain\Customer\Models\Customer;
 use Exception;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
@@ -30,22 +31,13 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 ]
 class CartLinesController extends Controller
 {
-    public function store(CreateCartLineRequest $request): mixed
+    public function store(CreateCartLineRequest $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validatedData = $request->validated();
-
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $customer) {
                 $cart = app(CreateCartAction::class)->execute($customer);
-
-                if (! $cart instanceof Cart) {
-                    return response()->json([
-                        'message' => 'Invalid action',
-                    ], 400);
-                }
 
                 app(CreateCartLineAction::class)
                     ->execute($cart, CreateCartData::fromArray($validatedData));
@@ -81,19 +73,19 @@ class CartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $cartline) {
-                $result = app(UpdateCartLineAction::class)
+
+                app(UpdateCartLineAction::class)
                     ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
-                if ($result instanceof CartLine) {
-                    return [
-                        'message' => 'Cart updated successfully',
-                    ];
-                }
+                return [
+                    'message' => 'Cart updated successfully',
+                ];
+
             });
 
             return response()->json($dbResult);
         } catch (Exception $e) {
-            $maxFileSize = File::getHumanReadableSize(config('media-library.max_file_size'));
+            $maxFileSize = File::getHumanReadableSize(config()->integer('media-library.max_file_size'));
             if ($e instanceof FileIsTooBig) {
                 return response()->json([
                     'message' => "File is too big , please upload file less than $maxFileSize",

@@ -21,9 +21,9 @@ class DatetimeFieldData extends FieldData
         public readonly ?Carbon $max = null,
         public readonly ?string $format = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -42,7 +42,7 @@ class DatetimeFieldData extends FieldData
             title: $data['title'],
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             min: $data['min'] ?? null,
             max: $data['max'] ?? null,
             format: $data['format'] ?? null,

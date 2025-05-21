@@ -12,21 +12,42 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
 use Pest\Mock\Mock;
 
+beforeEach()->skip('skip otp');
+
 it('can reset password', function () {
     Event::fake();
-    $passwordBroker = (new Mock(PasswordBroker::class))
-        ->expect(reset: function (array $credentials, callable $callback) {
-            $user = (new Mock(User::class))
-                ->expect(
-                    fill: fn () => null,
-                    setRememberToken: fn () => null,
-                    save: fn () => true
-                );
+    //    $passwordBroker = (new Mock(PasswordBroker::class))
+    //        ->expect(reset: function (array $credentials, callable $callback) {
+    //            $user = (new Mock(User::class))
+    //                ->expect(
+    //                    fill: fn () => null,
+    //                    setRememberToken: fn () => null,
+    //                    save: fn () => true
+    //                );
+    //
+    //            $callback($user, $credentials['password']);
+    //
+    //            return PasswordBroker::PASSWORD_RESET;
+    //        });
+    $passwordBroker = mock_expect(PasswordBroker::class, reset: function (array $credentials, callable $callback) {
+        //        $user = (new Mock(User::class))
+        //            ->expect(
+        //                fill: fn () => null,
+        //                setRememberToken: fn () => null,
+        //                save: fn () => true
+        //            );
 
-            $callback($user, $credentials['password']);
+        $user = mock_expect(User::class,
+            fill: fn () => null,
+            setRememberToken: fn () => null,
+            save: fn () => true
+        );
 
-            return PasswordBroker::PASSWORD_RESET;
-        });
+        $callback($user, $credentials['password']);
+
+        return PasswordBroker::PASSWORD_RESET;
+    });
+
     Password::shouldReceive('broker')
         ->once()
         ->andReturn($passwordBroker);

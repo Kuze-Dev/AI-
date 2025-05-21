@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\Shopconfiguration\TaxZone as ShopconfigurationTaxZone;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Taxation\Models\TaxZone;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
 
@@ -16,7 +17,7 @@ class TaxZonePolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(ShopconfigurationTaxZone::class)) {
+        if (TenantFeatureSupport::inactive(ShopconfigurationTaxZone::class)) {
             return Response::denyAsNotFound();
         }
 

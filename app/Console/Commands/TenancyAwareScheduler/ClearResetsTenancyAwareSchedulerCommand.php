@@ -16,18 +16,19 @@ class ClearResetsTenancyAwareSchedulerCommand extends ClearResetsCommand
 
     protected $signature = 'app:tenants:auth:clear-resets {name? : The name of the password broker}';
 
+    #[\Override]
     public function handle(): int
     {
         // solve `Call to a member function prepare() on null`
 
-        $driver = $this->argument('name') ?? config('auth.defaults.passwords');
+        $driver = $this->argument('name') ?? config()->string('auth.defaults.passwords');
 
-        $table = config('auth.passwords.'.$driver.'.table');
+        $table = config()->string('auth.passwords.'.$driver.'.table');
 
         DB::table($table)
             ->where('created_at', '<', now()->addHour())->delete();
 
-        $this->components->info('Expired reset tokens cleared successfully.');
+        $this->info('Expired reset tokens cleared successfully.');
 
         return self::SUCCESS;
     }

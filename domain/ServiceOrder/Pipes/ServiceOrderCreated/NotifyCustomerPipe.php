@@ -6,7 +6,6 @@ namespace Domain\ServiceOrder\Pipes\ServiceOrderCreated;
 
 use Domain\ServiceOrder\DataTransferObjects\ServiceOrderCreatedPipelineData;
 use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
-use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 
 class NotifyCustomerPipe
 {
@@ -15,7 +14,7 @@ class NotifyCustomerPipe
         callable $next
     ): ServiceOrderCreatedPipelineData {
 
-        NotifyCustomerServiceOrderStatusJob::dispatch($serviceOrderCreatedPipelineData->serviceOrder)
+        dispatch(new \Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob($serviceOrderCreatedPipelineData->serviceOrder))
             ->chain([
                 new NotifyCustomerLatestServiceBillJob($serviceOrderCreatedPipelineData->serviceOrder),
             ]);

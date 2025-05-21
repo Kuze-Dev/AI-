@@ -28,11 +28,11 @@ return new class extends Migration
             });
         }
 
-        DB::table((new Content())->getTable())
-            ->orderBy('id')
+        DB::table((new Content)->getTable())
+            ->oldest('id')
             ->lazy()
             ->each(
-                fn ($row) => DB::table((new Content())->getTable())
+                fn ($row) => DB::table((new Content)->getTable())
                     ->where('id', $row->id)
                     ->update(['prefix' => $row->slug])
             );

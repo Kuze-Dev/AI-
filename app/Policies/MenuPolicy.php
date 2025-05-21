@@ -7,6 +7,7 @@ namespace App\Policies;
 use App\Features\CMS\CMSBase;
 use App\Policies\Concerns\ChecksWildcardPermissions;
 use Domain\Menu\Models\Menu;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Auth\User;
@@ -18,7 +19,7 @@ class MenuPolicy
 
     public function before(): ?Response
     {
-        if (! tenancy()->tenant?->features()->active(CMSBase::class)) {
+        if (TenantFeatureSupport::inactive(CMSBase::class)) {
             return Response::denyAsNotFound();
         }
 

@@ -28,6 +28,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
  * @property string $slug
  * @property string $blueprint_id
  * @property string $locale
+ * @property string|null $translation_id
  * @property mixed|null $data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -71,9 +72,12 @@ class Globals extends Model implements HasInternationalizationInterface
         'translation_id',
     ];
 
-    protected $casts = [
-        'data' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -87,14 +91,14 @@ class Globals extends Model implements HasInternationalizationInterface
      * Declare relationship of
      * current model to blueprint.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, \Domain\Globals\Models\Globals>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this>
      */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
-    /** @return MorphMany<BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Domain\Blueprint\Models\BlueprintData, $this> */
     public function blueprintData(): MorphMany
     {
         return $this->morphMany(BlueprintData::class, 'model');
@@ -104,6 +108,7 @@ class Globals extends Model implements HasInternationalizationInterface
      * Set the column reference
      * for route keys.
      */
+    #[\Override]
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -118,13 +123,13 @@ class Globals extends Model implements HasInternationalizationInterface
             ->saveSlugsTo($this->getRouteKeyName());
     }
 
-    /** @return HasMany<Globals> */
+    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<\Domain\Globals\Models\Globals, $this> */
     public function dataTranslation(): HasMany
     {
         return $this->hasMany(self::class, 'translation_id');
     }
 
-    /** @return BelongsTo<Globals, Globals> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Globals\Models\Globals, $this> */
     public function parentTranslation(): BelongsTo
     {
         return $this->belongsTo(self::class, 'translation_id');

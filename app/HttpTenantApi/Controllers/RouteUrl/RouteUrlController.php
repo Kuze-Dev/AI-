@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\RouteUrl;
 
 use App\Features\CMS\CMSBase;
+use App\Features\CMS\SitesManagement;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
 use App\HttpTenantApi\Resources\TaxonomyResource;
@@ -15,6 +16,7 @@ use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Spatie\RouteAttributes\Attributes\Get;
@@ -32,18 +34,17 @@ class RouteUrlController
     ]
     public function __invoke(string $url = ''): JsonApiResource
     {
-        /** @var array */
         $notDraftableModels = [
             app(Taxonomy::class)->getMorphClass(),
             app(TaxonomyTerm::class)->getMorphClass(),
         ];
 
-        /** @var \Illuminate\Database\Eloquent\Builder<RouteUrl> */
+        /** @var \Illuminate\Database\Eloquent\Builder<RouteUrl> $queryRouteUrl */
         $queryRouteUrl = RouteUrl::whereUrl(Str::start($url, '/'))
             ->with('model');
 
         if (
-            tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class) &&
+            TenantFeatureSupport::active(SitesManagement::class) &&
             request('site')
         ) {
 
@@ -51,12 +52,9 @@ class RouteUrlController
 
             $queryRouteUrl->whereHas('model', function ($query) use ($siteId) {
 
-                if ($query->getModel()->getMorphClass() == app(TaxonomyTerm::class)->getMorphClass()) {
+                if ($query->getModel()->getMorphClass() === app(TaxonomyTerm::class)->getMorphClass()) {
 
-                    return $query->whereHas('taxonomy', function ($parentQuery) use ($siteId) {
-
-                        return $parentQuery->whereHas('sites', fn ($q) => $q->where('site_id', $siteId));
-                    });
+                    return $query->whereHas('taxonomy', fn ($parentQuery) => $parentQuery->whereHas('sites', fn ($q) => $q->where('site_id', $siteId)));
                     // fn ($q) => $q->where('site_id', $siteId));
                 }
 
@@ -67,7 +65,7 @@ class RouteUrlController
 
         $queryRouteUrl->whereHas('model', function ($query) use ($notDraftableModels) {
 
-            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels)) {
+            if (! in_array($query->getModel()->getMorphClass(), $notDraftableModels, true)) {
 
                 return $query->where('draftable_id', null);
             }
@@ -93,7 +91,7 @@ class RouteUrlController
 
         abort_if($content->visibility === Visibility::AUTHENTICATED->value, 403);
 
-        abort_if($contentEntry->status == false, 404);
+        abort_if($contentEntry->status === false, 404);
 
         return ContentEntryResource::make($contentEntry);
     }

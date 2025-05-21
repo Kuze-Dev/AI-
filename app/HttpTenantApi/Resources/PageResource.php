@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use TiMacDonald\JsonApi\JsonApiResource;
+use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 /**
  * @mixin \Domain\Page\Models\Page
  */
 class PageResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [
@@ -26,6 +28,7 @@ class PageResource extends JsonApiResource
     }
 
     /** @return array<string, callable> */
+    #[\Override]
     public function toRelationships(Request $request): array
     {
         return [
@@ -37,7 +40,8 @@ class PageResource extends JsonApiResource
         ];
     }
 
-    public static function newCollection(mixed $resource)
+    #[\Override]
+    public static function newCollection(mixed $resource): JsonApiResourceCollection
     {
         if ($resource instanceof Collection) {
             $resource->loadMissing('activeRouteUrl');

@@ -21,8 +21,7 @@ class CreateBlueprintDataAction
 {
     public function __construct(
         protected ExtractDataAction $extractDataAction,
-    ) {
-    }
+    ) {}
 
     public function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
@@ -36,12 +35,11 @@ class CreateBlueprintDataAction
             'type' => $blueprintDataData->type,
         ]);
 
-        if ($blueprintDataData->type == FieldType::LOCATION_PICKER && $blueprintData->value) {
+        if ($blueprintDataData->type === FieldType::LOCATION_PICKER && $blueprintData->value) {
             return $blueprintData;
         }
 
         if (is_array($blueprintDataData->value)) {
-
             $filtered = array_filter($blueprintDataData->value, function ($value) {
                 $pathInfo = pathinfo($value);
                 if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
@@ -53,7 +51,7 @@ class CreateBlueprintDataAction
             }
         }
 
-        if ($blueprintDataData->type == FieldType::MEDIA && $blueprintData->value) {
+        if ($blueprintDataData->type === FieldType::MEDIA && $blueprintData->value) {
 
             if (is_array($blueprintDataData->value)) {
                 foreach ($blueprintDataData->value as $value) {

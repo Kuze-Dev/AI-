@@ -13,9 +13,11 @@ trait Sites
      * current model to site.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site>
-     */
+     *
+     * @phpstan-ignore-next-line  ignore type */
     public function sites()
     {
+        /** @phpstan-ignore-next-line  ignore type */
         return $this->morphToMany(Site::class, 'model_sites');
     }
 }

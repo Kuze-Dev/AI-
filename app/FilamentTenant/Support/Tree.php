@@ -21,6 +21,7 @@ class Tree extends Field
 
     protected string|Closure $childrenStateName = 'children';
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -92,13 +93,12 @@ class Tree extends Field
             ],
         ]);
 
-        $this->mutateDehydratedStateUsing(static function (?array $state): array {
-            return array_values($state ?? []);
-        });
+        $this->mutateDehydratedStateUsing(static fn (?array $state): array => array_values($state ?? []));
 
         $this->registerActions([TreeFormAction::make()]);
     }
 
+    #[\Override]
     public function getChildComponentContainers(bool $withHidden = false, ?string $statePath = null): array
     {
         return [];

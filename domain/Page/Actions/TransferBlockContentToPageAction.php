@@ -13,8 +13,7 @@ class TransferBlockContentToPageAction
 {
     public function __construct(
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     public function execute(Page $page, BlockContentData $blockContentData): BlockContent
     {

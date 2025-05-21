@@ -6,6 +6,4 @@ namespace Domain\Shipment\Exceptions;
 
 use Exception;
 
-class ShippingException extends Exception
-{
-}
+class ShippingException extends Exception {}

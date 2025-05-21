@@ -11,8 +11,7 @@ abstract class BaseClient
 {
     public function __construct(
         protected readonly UPSClient $client
-    ) {
-    }
+    ) {}
 
     abstract public static function uri(): string;
 

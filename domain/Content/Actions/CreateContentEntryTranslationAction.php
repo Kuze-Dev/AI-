@@ -21,8 +21,7 @@ class CreateContentEntryTranslationAction
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
         protected CreateBlueprintDataAction $createBlueprintDataAction,
         protected UpdateBlueprintDataAction $updateBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     /** Execute create content entry query. */
     public function execute(ContentEntry $content, ContentEntryData $contentEntryData): ContentEntry
@@ -48,7 +47,7 @@ class CreateContentEntryTranslationAction
 
         $this->createOrUpdateRouteUrl->execute($contentEntryTranslation, $contentEntryData->route_url_data);
 
-        if (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)) {
+        if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
             $contentEntryTranslation->sites()->sync($contentEntryData->sites);
         }

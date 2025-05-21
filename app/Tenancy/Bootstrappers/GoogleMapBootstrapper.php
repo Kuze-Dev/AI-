@@ -25,10 +25,11 @@ class GoogleMapBootstrapper implements TenancyBootstrapper
 
     public function bootstrap(Tenant $tenant): void
     {
+        $apiKey = $tenant->google_map_api_key ?? $tenant->getInternal('google_map_api_key');
 
-        $this->app->make('config')->set('filament-google-maps.key', $tenant->getInternal('google_map_api_key'));
-        $this->app->make('config')->set('filament-google-maps.keys.web_key', $tenant->getInternal('google_map_api_key'));
-        $this->app->make('config')->set('filament-google-maps.keys.server_key', $tenant->getInternal('google_map_api_key'));
+        $this->app->make('config')->set('filament-google-maps.key', $apiKey);
+        $this->app->make('config')->set('filament-google-maps.keys.web_key', $apiKey);
+        $this->app->make('config')->set('filament-google-maps.keys.server_key', $apiKey);
 
     }
 

@@ -7,13 +7,12 @@ namespace Domain\Address\Actions;
 use Domain\Address\DataTransferObjects\AddressData;
 use Domain\Address\Models\Address;
 
-class CreateAddressAction
+readonly class CreateAddressAction
 {
     public function __construct(
-        private readonly SetAddressAsDefaultShippingAction $setAddressAsDefaultShipping,
-        private readonly SetAddressAsDefaultBillingAction $setAddressAsDefaultBilling,
-    ) {
-    }
+        private SetAddressAsDefaultShippingAction $setAddressAsDefaultShipping,
+        private SetAddressAsDefaultBillingAction $setAddressAsDefaultBilling,
+    ) {}
 
     public function execute(AddressData $addressData): Address
     {

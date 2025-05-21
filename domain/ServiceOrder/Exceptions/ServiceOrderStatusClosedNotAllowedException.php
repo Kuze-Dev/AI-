@@ -6,6 +6,4 @@ namespace Domain\ServiceOrder\Exceptions;
 
 use LogicException;
 
-class ServiceOrderStatusClosedNotAllowedException extends LogicException
-{
-}
+class ServiceOrderStatusClosedNotAllowedException extends LogicException {}

@@ -16,8 +16,7 @@ class CreatePageDraftAction
         protected CreateBlockContentAction $createBlockContent,
         protected CreateMetaDataAction $createMetaTags,
         protected CreateOrUpdateRouteUrlAction $createOrUpdateRouteUrl,
-    ) {
-    }
+    ) {}
 
     public function execute(Page $page, PageData $pageData): Page
     {

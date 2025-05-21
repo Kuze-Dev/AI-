@@ -15,7 +15,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 trait EmailVerificationOTP
 {
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Auth\Model\EmailVerificationOneTimePassword> */
+    /** @return \Illuminate\Database\Eloquent\Relations\MorphOne<\Domain\Auth\Model\EmailVerificationOneTimePassword, $this>
+     *  @phpstan-ignore method.childReturnType */
     public function emailVerificationOneTimePassword(): MorphOne
     {
         return $this->morphOne(EmailVerificationOneTimePassword::class, 'authenticatable');

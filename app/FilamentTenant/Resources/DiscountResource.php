@@ -8,7 +8,6 @@ use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationM
 use App\FilamentTenant\Resources\DiscountResource\Pages\CreateDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\EditDiscount;
 use App\FilamentTenant\Resources\DiscountResource\Pages\ListDiscounts;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
 use Closure;
 use Domain\Currency\Models\Currency;
 use Domain\Discount\Actions\AutoGenerateCode;
@@ -17,63 +16,65 @@ use Domain\Discount\Actions\RestoreDiscountAction;
 use Domain\Discount\Actions\SoftDeleteDiscountAction;
 use Domain\Discount\Enums\DiscountAmountType;
 use Domain\Discount\Enums\DiscountConditionType;
+use Domain\Discount\Enums\DiscountRequirementType;
 use Domain\Discount\Enums\DiscountStatus;
 use Domain\Discount\Models\Discount;
 use Domain\Discount\Models\DiscountLimit;
 use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TextInput\Mask;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class DiscountResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Discount::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('eCommerce');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Card::make([
+                Section::make([
                     TextInput::make('name')
                         ->label(trans('Name'))
                         ->required()
                         ->maxLength(255),
+
+                    Hidden::make('slug')
+                        ->dehydrateStateUsing(fn (Get $get) => Str::slug($get('name'))),
 
                     RichEditor::make('description')
                         ->label(trans('Description'))
@@ -92,7 +93,7 @@ class DiscountResource extends Resource
                         ->suffixAction(
                             fn (?string $state): Action => Action::make('code')
                                 ->icon('heroicon-o-cog')
-                                ->action(fn (TextInput $component) => $component->state((new AutoGenerateCode())()))
+                                ->action(fn (TextInput $component) => $component->state((new AutoGenerateCode)()))
                                 ->tooltip(trans('auto generate code')),
                         )->unique(ignoreRecord: true)
                         ->required()
@@ -100,24 +101,19 @@ class DiscountResource extends Resource
 
                     TextInput::make('max_uses')
                         ->numeric()
-                        ->rules([
-                            function ($record) {
-
-                                return function (string $attribute, mixed $value, Closure $fail) use ($record) {
-                                    if ($value < $record?->max_uses) {
-                                        $fail('The maximum usage must not be less than current. Current is: '.$record->max_uses);
-                                    }
-                                };
+                        ->rule(
+                            fn ($record) => function (string $attribute, mixed $value, Closure $fail) use ($record) {
+                                if ($value < $record?->max_uses) {
+                                    $fail('The maximum usage must not be less than current. Current is: '.$record->max_uses);
+                                }
                             },
-                        ])
+                        )
 
                         ->label(trans('Maximum Usage'))
-                        ->helperText(new HtmlString(<<<'HTML'
-                                Leave this blank if no maximum usage.
-                            HTML)),
+                        ->helperText(trans('Leave this blank if no maximum usage.')),
                     Placeholder::make('times_used')
                         ->disabled()
-                        ->content(fn ($record) => $record = DiscountLimit::whereCode($record?->code)->count()),
+                        ->content(fn (?Discount $record) => DiscountLimit::whereCode($record?->code)->count()),
 
                 ])
                     ->columnSpan(['lg' => 2]),
@@ -125,87 +121,92 @@ class DiscountResource extends Resource
                     Section::make(trans('Status & Period'))
                         ->schema([
                             Select::make('status')
-                                ->options([
-                                    'active' => 'Active',
-                                    'inactive' => 'Inactive',
-                                ])->required()
-                                ->default('active')
-                                ->disablePlaceholderSelection()
-                                ->label(trans('Status')),
+                                ->translateLabel()
+                                ->options(DiscountStatus::class)
+                                ->required()
+                                ->enum(DiscountStatus::class)
+                                ->default(DiscountStatus::ACTIVE)
+                                ->selectablePlaceholder(),
 
                             DateTimePicker::make('valid_start_at')
                                 ->required()
+                                // ->before('valid_end_at')
+                                ->rules([
+                                    fn (Get $get) => $get('valid_end_at')
+                                        ? 'before:valid_end_at'
+                                        : null,
+                                ])
                                 ->label(trans('Start Date')),
 
                             DateTimePicker::make('valid_end_at')
-                                ->after('valid_start_at')
+                                // ->after('valid_start_at')
+                                ->rules([
+                                    fn (Get $get) => $get('valid_start_at')
+                                        ? 'after:valid_start_at'
+                                        : null,
+                                ])
                                 ->label(trans('Expiration Date'))
-                                ->helperText(new HtmlString(<<<'HTML'
-                                        Leave this blank if no expiry.
-                                    HTML)),
+                                ->helperText(trans('Leave this blank if no expiry.')),
                         ]),
                 ])
                     ->columnSpan(['lg' => 1]),
                 Group::make([
                     Section::make(trans('Discount Type'))
+                        ->relationship('discountCondition')
                         ->schema([
-                            Radio::make('discountCondition.discount_type')->options([
-                                'order_sub_total' => 'Order Sub Total',
-                                'delivery_fee' => 'Delivery Fee',
-                            ])
+                            Radio::make('discount_type')
+                                ->translateLabel()
                                 ->required()
-                                ->default('order_sub_total')
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition()->withTrashed()->first()?->discount_type)
-                                ->label(trans('Discount Type')),
+                                ->options(DiscountConditionType::class)
+                                ->enum(DiscountConditionType::class)
+                                ->default(DiscountConditionType::ORDER_SUB_TOTAL),
 
-                            Radio::make('discountCondition.amount_type')->options([
-                                'fixed_value' => 'Fixed Value',
-                                'percentage' => 'Percentage',
-                            ])
-                                ->reactive()
+                            Radio::make('amount_type')
+                                ->translateLabel()
                                 ->required()
-                                ->default('fixed_value')
+                                ->options(DiscountAmountType::class)
+                                ->enum(DiscountAmountType::class)
+                                ->default(DiscountAmountType::FIXED_VALUE)
                                 ->filled()
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition()->withTrashed()->first()?->amount_type)
-                                ->label(trans('Amount Type')),
+                                ->label(trans('Amount Type'))
+                                ->reactive(),
 
-                            TextInput::make('discountCondition.amount')
+                            TextInput::make('amount')
+                                ->label(trans('Discount Amount'))
                                 ->required()
-                                ->mask(fn (Mask $mask) => $mask->money(
-                                    prefix: Currency::whereEnabled(true)->value('symbol'),
-                                    thousandsSeparator: ',',
-                                    decimalPlaces: 2,
-                                    isSigned: false
-                                ))
+//                                ->mask(fn (Mask $mask) => $mask->money(
+//                                    prefix: Currency::whereEnabled(true)->value('symbol'),
+//                                    thousandsSeparator: ',',
+//                                    decimalPlaces: 2,
+//                                    isSigned: false
+//                                ))
                                 ->minValue(1)
-                                ->rules(['max:100'], fn (Closure $get) => $get('discountCondition.amount_type') === 'percentage')
-                                ->formatStateUsing(fn ($record) => $record?->discountCondition()->withTrashed()->first()?->amount)
-                                ->label(trans('Discount Amount')),
+                                ->numeric()
+                                ->rule(
+                                    'max:100',
+                                    fn (Get $get) => $get('amount_type') === DiscountAmountType::PERCENTAGE
+                                ),
                         ]),
 
                 ])->columnSpan(['lg' => 2]),
                 Group::make([
                     Section::make(trans('Requirements'))
+                        ->relationship('discountRequirement')
                         ->schema([
-                            // Select::make('discountRequirement.requirement_type')
-                            //     ->options([
-                            //         'minimum_order_amount' => 'Minimum Purchase Amount',
-                            //     ])
-                            //     // ->reactive()
-                            //     ->formatStateUsing(fn ($record) => $record?->discountRequirement?->requirement_type),
 
-                            TextInput::make('discountRequirement.minimum_amount')
+                            Hidden::make('requirement_type')
+                                ->dehydrateStateUsing(fn () => DiscountRequirementType::MINIMUM_ORDER_AMOUNT),
+
+                            TextInput::make('minimum_amount')
                                 ->label(trans('Minimum purchase amount'))
-                                ->mask(fn (Mask $mask) => $mask->money(
-                                    prefix: Currency::whereEnabled(true)->value('symbol'),
-                                    thousandsSeparator: ',',
-                                    decimalPlaces: 2,
-                                    isSigned: false
-                                ))
-                                ->formatStateUsing(fn ($record) => $record?->discountRequirement?->minimum_amount)
-                                ->helperText(new HtmlString(<<<'HTML'
-                                        Leave this blank if no minimum purchase amount.
-                                    HTML))
+//                                ->mask(fn (Mask $mask) => $mask->money(
+//                                    prefix: Currency::whereEnabled(true)->value('symbol'),
+//                                    thousandsSeparator: ',',
+//                                    decimalPlaces: 2,
+//                                    isSigned: false
+//                                ))
+                                ->numeric()
+                                ->helperText(trans('Leave this blank if no minimum purchase amount.'))
                                 ->minValue(1),
                         ]),
 
@@ -213,6 +214,10 @@ class DiscountResource extends Resource
             ])->columns(3);
     }
 
+    /**
+     * @throws \Exception
+     */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -251,23 +256,19 @@ class DiscountResource extends Resource
                     })
                     ->label(trans('Amount')),
                 TextColumn::make('valid_start_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->date('F j, Y, g:i a')
                     ->label(trans('Start Date')),
 
                 TextColumn::make('valid_end_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->date('F j, Y, g:i a')
                     ->placeholder('No expiry')
                     ->label(trans('Expiration Date')),
 
-                BadgeColumn::make('status')
-                    ->colors([
-
-                        'success' => DiscountStatus::ACTIVE->value,
-                        'warning' => DiscountStatus::INACTIVE->value,
-
-                    ])->formatStateUsing(fn (string $state): string => trans(ucfirst($state)))->weight('bold'),
+                TextColumn::make('status')
+                    ->badge()
+                    ->weight('bold'),
             ])
             ->filters([
                 TrashedFilter::make()
@@ -275,14 +276,14 @@ class DiscountResource extends Resource
                 SelectFilter::make('status')
                     ->label(trans('Status'))
                     ->options([
-                        DiscountStatus::ACTIVE->value => 'Active',
-                        DiscountStatus::INACTIVE->value => 'Inactive',
+                        DiscountStatus::ACTIVE->value => DiscountStatus::ACTIVE->getLabel(),
+                        DiscountStatus::INACTIVE->value => DiscountStatus::INACTIVE->getLabel(),
                     ]),
             ])
             ->actions([
                 ActionGroup::make([
                     EditAction::make()
-                        ->authorize('update'),
+                        ->grouped(),
                     ForceDeleteAction::make()
                         ->using(function (Discount $record) {
                             try {
@@ -290,8 +291,7 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException) {
                                 return false;
                             }
-                        })
-                        ->authorize('forceDelete'),
+                        }),
 
                     DeleteAction::make()
                         ->using(function (Discount $record) {
@@ -300,8 +300,7 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException) {
                                 return false;
                             }
-                        })
-                        ->authorize('delete'),
+                        }),
 
                     RestoreAction::make()
                         ->using(function (Discount $record) {
@@ -310,8 +309,7 @@ class DiscountResource extends Resource
                             } catch (DeleteRestrictedException) {
                                 return false;
                             }
-                        })
-                        ->authorize('restore'),
+                        }),
                 ]),
 
             ])
@@ -320,6 +318,7 @@ class DiscountResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -328,6 +327,7 @@ class DiscountResource extends Resource
     }
 
     /** @return Builder<\Domain\Discount\Models\Discount> */
+    #[\Override]
     public static function getEloquentQuery(): EloquentBuilder
     {
         return parent::getEloquentQuery()
@@ -337,6 +337,7 @@ class DiscountResource extends Resource
             ]);
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [

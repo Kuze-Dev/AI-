@@ -16,6 +16,7 @@ use Throwable;
 
 class GuestPlaceOrderRequest extends AddressRequest
 {
+    #[\Override]
     public function rules(): array
     {
 
@@ -65,14 +66,14 @@ class GuestPlaceOrderRequest extends AddressRequest
                     /** @var int|string $userId */
                     $userId = $sessionId;
 
-                    //auth check
+                    // auth check
                     $checkAuth = app(CartPurchasableValidatorAction::class)->validateAuth($cartLineIds, $userId, $type);
                     if ($checkAuth !== count($cartLineIds)) {
                         $fail('Invalid cart line IDs.');
                     }
 
                     try {
-                        //stock check
+                        // stock check
                         $checkStocks = app(CartPurchasableValidatorAction::class)->validateCheckout($cartLineIds, $userId, $type);
                         if ($checkStocks !== count($cartLineIds)) {
                             $fail('Invalid stocks');
@@ -98,11 +99,11 @@ class GuestPlaceOrderRequest extends AddressRequest
             ],
             'payment_method' => [
                 'required',
-                Rule::exists(PaymentMethod::class, (new PaymentMethod())->getRouteKeyName()),
+                Rule::exists(PaymentMethod::class, (new PaymentMethod)->getRouteKeyName()),
             ],
             'shipping_method' => [
                 'required',
-                Rule::exists(ShippingMethod::class, (new ShippingMethod())->getRouteKeyName()),
+                Rule::exists(ShippingMethod::class, (new ShippingMethod)->getRouteKeyName()),
             ],
             'service_id' => [
                 'nullable',

@@ -20,8 +20,7 @@ class Ratev2InternationalRequestData
         public readonly string $OriginZip,
         public readonly string $AcceptanceDateTime,
         public readonly string $DestinationPostalCode,
-    ) {
-    }
+    ) {}
 
     public function toArray(): array
     {

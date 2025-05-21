@@ -11,8 +11,10 @@ use Domain\Cart\DataTransferObjects\CartSummaryTaxData;
 use Domain\Cart\Events\SanitizeCartEvent;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CartSummaryRequest;
+use Domain\Customer\Models\Customer;
 use Domain\Shipment\API\AusPost\Exceptions\AusPostServiceNotFoundException;
 use Domain\Shipment\API\USPS\Exceptions\USPSServiceNotFoundException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Throwable;
@@ -23,11 +25,11 @@ use Throwable;
 class CartSummaryController extends Controller
 {
     #[Get('carts/count', name: 'carts.count')]
-    public function count(): mixed
+    public function count(#[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $cartLines = CartLine::with('purchasable')
-            ->whereHas('cart', function ($query) {
-                $query->whereBelongsTo(auth()->user());
+            ->whereHas('cart', function ($query) use ($customer) {
+                $query->whereBelongsTo($customer);
             })
             ->whereNull('checked_out_at')
             ->get();
@@ -54,13 +56,10 @@ class CartSummaryController extends Controller
     }
 
     #[Get('carts/summary', name: 'carts.summary')]
-    public function summary(CartSummaryRequest $request): mixed
+    public function summary(CartSummaryRequest $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $validated = $request->validated();
         $discountCode = $validated['discount_code'] ?? null;
-
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
 
         $cartLines = $request->getCartLines();
 
@@ -75,7 +74,7 @@ class CartSummaryController extends Controller
                 new CartSummaryTaxData($country?->id, $state?->id),
                 new CartSummaryShippingData($customer, $request->getShippingAddress(), $request->getShippingMethod()),
                 $discount,
-                $serviceId ? $serviceId : null
+                $serviceId ?: null
             );
 
             $responseArray = [

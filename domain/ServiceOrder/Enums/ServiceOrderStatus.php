@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace Domain\ServiceOrder\Enums;
 
-enum ServiceOrderStatus: string
+use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Models\ServiceOrder;
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+use Illuminate\Support\Str;
+
+enum ServiceOrderStatus: string implements HasColor, HasLabel
 {
     case INPROGRESS = 'in_progress';
     case FORPAYMENT = 'for_payment';
@@ -14,4 +20,59 @@ enum ServiceOrderStatus: string
     case INACTIVE = 'inactive';
     case CLOSED = 'closed';
     case FOR_APPROVAL = 'for_approval';
+
+    public static function fromService(Service $service): self
+    {
+        $status = self::FORPAYMENT;
+
+        if ($service->needs_approval) {
+            $status = self::PENDING;
+        } elseif (! $service->pay_upfront && ! $service->is_subscription) {
+            $status = self::INPROGRESS;
+        }
+
+        return $status;
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            ServiceOrderStatus::PENDING, ServiceOrderStatus::INPROGRESS => 'warning',
+            ServiceOrderStatus::INACTIVE, ServiceOrderStatus::CLOSED => 'danger',
+            ServiceOrderStatus::COMPLETED, ServiceOrderStatus::ACTIVE => 'success',
+            default => 'secondary',
+        };
+    }
+
+    public function getLabel(): string
+    {
+        return Str::headline($this->value);
+    }
+
+    public static function casesForServiceOrder(ServiceOrder $serviceOrder): array
+    {
+        $cases = [
+            self::PENDING,
+            self::FORPAYMENT,
+        ];
+
+        if ($serviceOrder->billing_cycle === null) {
+            $additionalStatuses = [
+                self::INPROGRESS,
+                self::COMPLETED,
+            ];
+        } else {
+            $additionalStatuses = [
+                self::ACTIVE,
+                self::CLOSED,
+            ];
+        }
+
+        $cases = array_merge($cases, $additionalStatuses);
+
+        return collect($cases)
+            ->mapWithKeys(fn (self $case) => [
+                $case->value => $case->getLabel(),
+            ])->toArray();
+    }
 }

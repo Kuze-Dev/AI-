@@ -23,7 +23,7 @@ final class CustomerSendInvitationJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    private const LIMIT = 1_00;
+    private const int LIMIT = 1_00;
 
     private readonly SendRegisterInvitationAction $sendRegisterInvitation;
 
@@ -40,7 +40,7 @@ final class CustomerSendInvitationJob implements ShouldQueue
     ) {
         $this->records?->ensure(Customer::class);
 
-        $this->keyName = (new Customer())->getKeyName();
+        $this->keyName = (new Customer)->getKeyName();
 
         $this->initialCustomerKey
             ??= $this->records?->sortByDesc($this->keyName)->value($this->keyName)
@@ -91,17 +91,15 @@ final class CustomerSendInvitationJob implements ShouldQueue
             ->whereNot('register_status', RegisterStatus::REGISTERED)
             ->when(
                 $this->records,
-                function (Builder $query, Collection $records) {
+                fn (Builder $query, Collection $records) =>
                     /** @var Builder<Customer> $query */
-                    return $query->whereIn($this->keyName, $records->pluck($this->keyName));
-                }
+                    $query->whereIn($this->keyName, $records->pluck($this->keyName))
             )
             ->when(
                 $this->registerStatuses,
-                function (Builder $query, array $registerStatuses) {
+                fn (Builder $query, array $registerStatuses) =>
                     /** @var Builder<Customer> $query */
-                    return $query->whereIn('register_status', $registerStatuses);
-                }
+                    $query->whereIn('register_status', $registerStatuses)
             );
     }
 }

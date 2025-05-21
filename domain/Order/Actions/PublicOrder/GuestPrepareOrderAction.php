@@ -172,7 +172,7 @@ class GuestPrepareOrderAction
 
     public function prepareShippingMethod(GuestPlaceOrderData $guestPlaceOrderData): ?ShippingMethod
     {
-        return ShippingMethod::where((new ShippingMethod())->getRouteKeyName(), $guestPlaceOrderData->shipping_method)->first() ?? null;
+        return ShippingMethod::where((new ShippingMethod)->getRouteKeyName(), $guestPlaceOrderData->shipping_method)->first() ?? null;
     }
 
     public function prepareShippingData(GuestPlaceOrderData $guestPlaceOrderData): array
@@ -188,10 +188,10 @@ class GuestPrepareOrderAction
         $countryId = $guestPlaceOrderData->addresses->shipping->country_id;
 
         /** @var \Domain\Address\Models\State $state */
-        $state = app(State::class)->where((new State())->getRouteKeyName(), $stateId)->first();
+        $state = app(State::class)->where((new State)->getRouteKeyName(), $stateId)->first();
 
         /** @var \Domain\Address\Models\Country $country */
-        $country = app(Country::class)->where((new Country())->getRouteKeyName(), $countryId)->first();
+        $country = app(Country::class)->where((new Country)->getRouteKeyName(), $countryId)->first();
 
         $shippingAddress = new ShippingAddressData(
             address: $guestPlaceOrderData->addresses->shipping->address_line_1,
@@ -226,10 +226,10 @@ class GuestPrepareOrderAction
         $billingStateId = $guestPlaceOrderData->addresses->billing->state_id;
 
         /** @var \Domain\Address\Models\State $shippingState */
-        $shippingState = app(State::class)->where((new State())->getRouteKeyName(), $shippingStateId)->first();
+        $shippingState = app(State::class)->where((new State)->getRouteKeyName(), $shippingStateId)->first();
 
         /** @var \Domain\Address\Models\State $billingState */
-        $billingState = app(State::class)->where((new State())->getRouteKeyName(), $billingStateId)->first();
+        $billingState = app(State::class)->where((new State)->getRouteKeyName(), $billingStateId)->first();
 
         $stateData = [
             'shippingState' => $shippingState,
@@ -245,10 +245,10 @@ class GuestPrepareOrderAction
         $billingCountryId = $guestPlaceOrderData->addresses->billing->country_id;
 
         /** @var \Domain\Address\Models\Country $shippingCountry */
-        $shippingCountry = app(Country::class)->where((new Country())->getRouteKeyName(), $shippingCountryId)->first();
+        $shippingCountry = app(Country::class)->where((new Country)->getRouteKeyName(), $shippingCountryId)->first();
 
         /** @var \Domain\Address\Models\Country $billingCountry */
-        $billingCountry = app(Country::class)->where((new Country())->getRouteKeyName(), $billingCountryId)->first();
+        $billingCountry = app(Country::class)->where((new Country)->getRouteKeyName(), $billingCountryId)->first();
 
         $countryData = [
             'shippingCountry' => $shippingCountry,

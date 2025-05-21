@@ -7,11 +7,11 @@ namespace App\FilamentTenant\Resources\ContentEntryResource\RelationManagers;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use Domain\Content\Models\ContentEntry;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+// use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 
 class ContentEntryTranslationRelationManager extends RelationManager
 {
@@ -19,34 +19,37 @@ class ContentEntryTranslationRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    /** @phpstan-ignore-next-line */
+    /** @phpstan-ignore missingType.generics, missingType.generics */
     public function getRelationship(): Relation|Builder
     {
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound */
         if ($this->getOwnerRecord()->{static::getRelationshipName()}()->count() > 0 || is_null($this->getOwnerRecord()->translation_id)) {
             return $this->getOwnerRecord()->{static::getRelationshipName()}();
         }
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound, property.notFound, property.notFound */
         return $this->getOwnerRecord()->{static::getRelationshipName()}()->orwhere('id', $this->ownerRecord->translation_id)->orwhere('translation_id', $this->ownerRecord->translation_id)->where('id', '!=', $this->ownerRecord->id)->with('content');
     }
 
-    public static function table(Table $table): Table
+    #[\Override]
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('routeUrls.url')
                     ->label('URL')
                     ->sortable()
                     ->searchable()
-                    ->truncate('xs', true),
+                    ->lineClamp(1)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('locale')
                     ->searchable()
-                    ->hidden((bool) tenancy()->tenant?->features()->inactive(\App\Features\CMS\Internationalization::class)),
+                    ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class)),
                 Tables\Columns\TextColumn::make('author.full_name')
                     ->sortable(['first_name', 'last_name'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -56,20 +59,21 @@ class ContentEntryTranslationRelationManager extends RelationManager
                                 ->orWhere('last_name', 'like', "%{$search}%");
                         });
                     }),
-                Tables\Columns\TagsColumn::make('taxonomyTerms.name')
+                Tables\Columns\TextColumn::make('taxonomyTerms.name')
+                    ->badge()
                     ->limit()
                     ->searchable(),
-                Tables\Columns\TagsColumn::make('sites.name')
-                    ->hidden((bool) ! (tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class)))
-                    ->toggleable(condition: function () {
-                        return tenancy()->tenant?->features()->active(\App\Features\CMS\SitesManagement::class);
-                    }, isToggledHiddenByDefault: fn () => tenancy()->tenant?->features()->inactive(\App\Features\CMS\SitesManagement::class)),
+                Tables\Columns\TextColumn::make('sites.name')
+                    ->badge()
+                    ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
+                    ->toggleable(condition: fn () => \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class),
+                        isToggledHiddenByDefault: fn () => \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class)),
                 Tables\Columns\TextColumn::make('published_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable()
                     ->visible(fn ($livewire) => $livewire->ownerRecord->content->hasPublishDates()),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Auth::user()?->timezone)
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([

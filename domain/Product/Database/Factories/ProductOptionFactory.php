@@ -14,6 +14,7 @@ class ProductOptionFactory extends Factory
 {
     protected $model = ProductOption::class;
 
+    #[\Override]
     public function definition()
     {
         return [

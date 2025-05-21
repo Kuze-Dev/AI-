@@ -1,21 +1,26 @@
 {
   "resources/css/filament/app.css": {
-    "file": "assets/app-a9afdd55.css",
+    "file": "assets/app-e3b0c442.css",
     "isEntry": true,
     "src": "resources/css/filament/app.css"
   },
+  "resources/css/filament/tenant/themes/mint.css": {
+    "file": "assets/mint-c3eae76a.css",
+    "isEntry": true,
+    "src": "resources/css/filament/tenant/themes/mint.css"
+  },
   "resources/css/web/app.css": {
-    "file": "assets/app-59ab699d.css",
+    "file": "assets/app-d4101897.css",
     "isEntry": true,
     "src": "resources/css/web/app.css"
   },
   "resources/js/filament/app.js": {
-    "file": "assets/app-ffa2faf6.js",
+    "file": "assets/app-7efdc69a.js",
     "isEntry": true,
     "src": "resources/js/filament/app.js"
   },
   "resources/js/web/app.js": {
-    "file": "assets/app-1e6689a3.js",
+    "file": "assets/app-f408c833.js",
     "imports": [
       "resources/js/filament/app.js"
     ],

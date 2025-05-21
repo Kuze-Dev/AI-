@@ -41,13 +41,17 @@ class Blueprint extends Model
     use LogsActivity;
 
     protected $fillable = [
+        'id',
         'name',
         'schema',
     ];
 
-    protected $casts = [
-        'schema' => SchemaDataCast::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'schema' => SchemaDataCast::class,
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

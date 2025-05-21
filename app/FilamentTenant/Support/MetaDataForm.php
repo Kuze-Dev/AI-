@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Support;
 
-use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Throwable;
 
+/**
+ * @deprecated use MetaDataFormV2
+ */
 class MetaDataForm extends Section
 {
+    #[\Override]
     public function setUp(): void
     {
         parent::setUp();
@@ -35,11 +38,9 @@ class MetaDataForm extends Section
                 ->maxLength(fn (int $value = 160) => $value)
                 ->formatStateUsing(fn ($record) => $record?->metaData?->description),
             Forms\Components\FileUpload::make('image')
-                ->formatStateUsing(function ($record) {
-                    return $record?->metaData?->getMedia('image')
-                        ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
-                        ->toArray() ?? [];
-                })
+                ->formatStateUsing(fn ($record) => $record?->metaData?->getMedia('image')
+                    ->mapWithKeys(fn (Media $file) => [$file->uuid => $file->uuid])
+                    ->toArray() ?? [])
                 // ->image()
                 ->acceptedFileTypes([
                     'image/jpg',
@@ -50,24 +51,42 @@ class MetaDataForm extends Section
                 ])
                 // ->beforeStateDehydrated(null)
                 ->dehydrateStateUsing(fn (?array $state) => array_values($state ?? [])[0] ?? null)
-                ->getUploadedFileUrlUsing(static function (Forms\Components\FileUpload $component, string $file): ?string {
-                    $mediaClass = config('media-library.media_model', Media::class);
+                ->getUploadedFileUsing(static function (Forms\Components\FileUpload $component, string $file): array {
+                    $mediaClass = config()->string('media-library.media_model', Media::class);
 
                     /** @var ?Media $media */
-                    $media = $mediaClass::findByUuid($file);
+                    $media = $mediaClass::where('uuid', $file)
+                        ->orWhere('file_name', $file)
+                        ->first();
 
-                    if ($component->getVisibility() === 'private') {
-                        try {
-                            return $media?->getTemporaryUrl(now()->addMinutes(5));
-                        } catch (Throwable) {
-                            // This driver does not support creating temporary URLs.
+                    if ($media) {
+
+                        if ($component->getVisibility() === 'private') {
+                            try {
+                                return [
+                                    'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                                    'size' => $media->getAttributeValue('size'),
+                                    'type' => $media->getAttributeValue('mime_type'),
+                                    'url' => $media->getTemporaryUrl(now()->addMinutes(5)),
+                                ];
+
+                            } catch (Throwable) {
+                                // This driver does not support creating temporary URLs.
+                            }
                         }
+
+                        return [
+                            'name' => $media->getAttributeValue('name') ?? $media->getAttributeValue('file_name'),
+                            'size' => $media->getAttributeValue('size'),
+                            'type' => $media->getAttributeValue('mime_type'),
+                            'url' => $media->getUrl(),
+                        ];
                     }
 
-                    return $media?->getUrl();
+                    return [];
                 }),
             Forms\Components\TextInput::make('image_alt_text')
-                ->visible(fn (Closure $get) => filled($get('image')))
+                ->visible(fn (\Filament\Forms\Get $get) => filled($get('image')))
                 ->formatStateUsing(fn ($record) => $record?->metaData?->getFirstMedia('image')?->getCustomProperty('alt_text')),
         ]);
     }

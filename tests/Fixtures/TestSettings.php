@@ -12,6 +12,7 @@ class TestSettings extends Settings
 
     public string $property2;
 
+    #[\Override]
     public static function group(): string
     {
         return 'test_group';

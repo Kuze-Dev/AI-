@@ -25,7 +25,7 @@ class GuestBulkRemoveRequest extends FormRequest
                         ->whereHas('cart', function ($query) use ($sessionId) {
                             $query->where('session_id', $sessionId);
                         })
-                        ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
+                        ->whereIn((new CartLine)->getRouteKeyName(), $cartLineIds)
                         ->whereNull('checked_out_at');
 
                     if (count($cartLineIds) !== $cartLines->count()) {
@@ -35,7 +35,7 @@ class GuestBulkRemoveRequest extends FormRequest
             ],
             'cart_line_ids.*' => [
                 'required',
-                Rule::exists(CartLine::class, (new CartLine())->getRouteKeyName()),
+                Rule::exists(CartLine::class, (new CartLine)->getRouteKeyName()),
             ],
         ];
     }

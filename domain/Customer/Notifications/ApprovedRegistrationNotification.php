@@ -22,7 +22,7 @@ class ApprovedRegistrationNotification extends Notification implements ShouldQue
 
     public function toMail(Customer $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(trans('Approved Registration'))
             ->line(trans('Congratulations! Your request for this tier has been approved!'))
             ->line(trans('You now have access to exclusive benefits and discounts.'))

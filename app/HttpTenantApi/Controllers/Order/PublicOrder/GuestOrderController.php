@@ -65,8 +65,13 @@ class GuestOrderController extends Controller
                 'service_id' => 'Shipping method service id is required',
             ], 404);
         } catch (PaymentException) {
+
+            Log::error('payment error', [
+                'message' => json_encode($validatedData),
+            ]);
+
             app(OrderFailedNotifyAdmin::class)->execute('This error is occurring due to an issue with the payment credentials on your website.
-            Please ensure that your payment settings are configured correctly.', 'ecommerceSettings.payments');
+            Please ensure that your payment settings are configured correctly. using '.$validatedData['payment_method'], 'ecommerceSettings.payments');
 
             return response()->json([
                 'payment' => 'Invalid Payment Credentials',

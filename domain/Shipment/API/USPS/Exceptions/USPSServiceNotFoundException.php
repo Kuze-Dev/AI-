@@ -6,6 +6,4 @@ namespace Domain\Shipment\API\USPS\Exceptions;
 
 use LogicException;
 
-class USPSServiceNotFoundException extends LogicException
-{
-}
+class USPSServiceNotFoundException extends LogicException {}

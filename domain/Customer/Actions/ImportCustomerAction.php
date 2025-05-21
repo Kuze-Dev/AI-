@@ -19,8 +19,7 @@ readonly class ImportCustomerAction
     public function __construct(
         private CreateCustomerAction $createCustomerAction,
         private EditCustomerAction $editCustomerAction,
-    ) {
-    }
+    ) {}
 
     public function execute(array $row): void
     {
@@ -37,12 +36,12 @@ readonly class ImportCustomerAction
         }
 
         $data = CustomerData::fromArrayImportByAdmin(
-            customerPassword: isset($row['registered']) && $row['registered'] != '' ? (string) $row['password'] : $customer?->password,
+            customerPassword: isset($row['registered']) && $row['registered'] !== '' ? (string) $row['password'] : $customer?->password,
             tierKey: isset($row['tier'])
                 ? Tier::whereName($row['tier'])->first()?->getKey()
                 : null,
             row: $row,
-            customerStatus: isset($row['registered']) && $row['registered'] != '' ? RegisterStatus::REGISTERED : RegisterStatus::UNREGISTERED
+            customerStatus: isset($row['registered']) && $row['registered'] !== '' ? RegisterStatus::REGISTERED : RegisterStatus::UNREGISTERED
 
         );
 
@@ -51,10 +50,8 @@ readonly class ImportCustomerAction
         if ($customer === null) {
             $customer = $this->createCustomerAction->execute($data);
             if (! empty(app(CustomerSettings::class)->customer_email_notifications)) {
-                //customer imported event.
-                $importedNotification = array_filter(app(CustomerSettings::class)->customer_email_notifications, function ($mail_notification) {
-                    return $mail_notification['events'] == CustomerEvent::IMPORTED->value;
-                });
+                // customer imported event.
+                $importedNotification = array_filter(app(CustomerSettings::class)->customer_email_notifications, fn ($mail_notification) => $mail_notification['events'] === CustomerEvent::IMPORTED->value);
 
                 if (! empty($importedNotification)) {
                     foreach ($importedNotification as $notification) {

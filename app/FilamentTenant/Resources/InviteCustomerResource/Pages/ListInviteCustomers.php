@@ -13,8 +13,9 @@ use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Models\Customer;
 use Domain\Tier\Models\Tier;
+use Filament\Actions;
+// use Filament\Actions\ImportAction;
 use Filament\Forms;
-use Filament\Pages\Actions;
 use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -24,7 +25,8 @@ class ListInviteCustomers extends ListCustomers
     protected static string $resource = InviteCustomerResource::class;
 
     /** @throws \Exception */
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         $date_format = app(CustomerSettings::class)->date_format;
 
@@ -55,8 +57,8 @@ class ListInviteCustomers extends ListCustomers
                         'gender' => ['nullable', Rule::enum(Gender::class)],
                         'birth_date' => [
                             'nullable',
-                            ($date_format == 'default' ||
-                            $date_format == '') ? 'date' : 'date_format:'.$date_format],
+                            ($date_format === 'default' ||
+                            $date_format === '') ? 'date' : 'date_format:'.$date_format],
                         'password' => 'nullable',
                         'registered' => 'nullable',
                         'data' => 'nullable',
@@ -68,7 +70,7 @@ class ListInviteCustomers extends ListCustomers
                 ),
             Actions\Action::make('send-register-invitation')
                 ->translateLabel()
-                ->icon('heroicon-o-speakerphone')
+                ->icon('heroicon-o-megaphone')
                 ->form(fn () => [
                     Forms\Components\CheckboxList::make('register_status')
                         ->translateLabel()

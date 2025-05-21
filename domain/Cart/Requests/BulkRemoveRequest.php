@@ -21,9 +21,9 @@ class BulkRemoveRequest extends FormRequest
 
                     $cartLines = CartLine::query()
                         ->whereHas('cart', function ($query) {
-                            $query->whereBelongsTo(auth()->user());
+                            $query->whereBelongsTo(customer_logged_in());
                         })
-                        ->whereIn((new CartLine())->getRouteKeyName(), $cartLineIds)
+                        ->whereIn((new CartLine)->getRouteKeyName(), $cartLineIds)
                         ->whereNull('checked_out_at');
 
                     if (count($cartLineIds) !== $cartLines->count()) {
@@ -33,7 +33,7 @@ class BulkRemoveRequest extends FormRequest
             ],
             'cart_line_ids.*' => [
                 'required',
-                Rule::exists(CartLine::class, (new CartLine())->getRouteKeyName()),
+                Rule::exists(CartLine::class, (new CartLine)->getRouteKeyName()),
             ],
         ];
     }

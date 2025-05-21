@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Admin\Models;
 
-use Domain\Admin\Notifications\ResetPassword;
-use Domain\Admin\Notifications\VerifyEmail;
 use Domain\Auth\Contracts\HasActiveState as HasActiveStateContract;
 use Domain\Auth\Contracts\TwoFactorAuthenticatable as TwoFactorAuthenticatableContract;
 use Domain\Auth\HasActiveState;
@@ -13,17 +11,17 @@ use Domain\Auth\TwoFactorAuthenticatable;
 use Domain\Site\Models\Site;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Activitylog\ActivitylogServiceProvider;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 use Support\ConstraintsRelationships\Attributes\OnDeleteCascade;
@@ -90,6 +88,7 @@ use Support\ConstraintsRelationships\ConstraintsRelationships;
 #[OnDeleteCascade(['twoFactorAuthentication', 'roles', 'permissions', 'tokens'])]
 class Admin extends Authenticatable implements FilamentUser, HasActiveStateContract, HasName, MustVerifyEmail, TwoFactorAuthenticatableContract
 {
+    use CausesActivity;
     use ConstraintsRelationships;
     use HasActiveState;
     use HasApiTokens;
@@ -113,14 +112,17 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         'remember_token',
     ];
 
-    protected $casts = [
-        'password' => 'hashed',
-        'email_verified_at' => 'datetime',
-        'password_changed_at' => 'datetime',
-        'active' => 'boolean',
-        'last_login_at' => 'datetime',
-        'to_be_logged_out' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'email_verified_at' => 'datetime',
+            'password_changed_at' => 'datetime',
+            'active' => 'boolean',
+            'last_login_at' => 'datetime',
+            'to_be_logged_out' => 'boolean',
+        ];
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -136,7 +138,7 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         return $this->id === 1;
     }
 
-    /** @return Attribute<string, never> */
+    /** @return Attribute<non-falsy-string, never> */
     protected function fullName(): Attribute
     {
         return Attribute::get(
@@ -144,7 +146,7 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         );
     }
 
-    /** @return Attribute<string, never> */
+    /** @return Attribute<non-falsy-string, never> */
     protected function siteLabel(): Attribute
     {
         return Attribute::get(
@@ -152,35 +154,21 @@ class Admin extends Authenticatable implements FilamentUser, HasActiveStateContr
         );
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\Domain\Site\Models\Site, $this> */
     public function userSite(): BelongsToMany
     {
         return $this->belongsToMany(Site::class);
     }
 
+    #[\Override]
     public function getFilamentName(): string
     {
         return $this->full_name;
     }
 
-    public function canAccessFilament(): bool
+    #[\Override]
+    public function canAccessPanel(Panel $panel): bool
     {
         return true;
-    }
-
-    public function sendEmailVerificationNotification(): void
-    {
-        $this->notify(new VerifyEmail());
-    }
-
-    public function sendPasswordResetNotification($token): void
-    {
-        $this->notify(new ResetPassword($token));
-    }
-
-    /** @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Spatie\Activitylog\Models\Activity> */
-    public function causerActivities(): MorphMany
-    {
-        return $this->morphMany(ActivitylogServiceProvider::determineActivityModel(), 'causer');
     }
 }

@@ -25,11 +25,20 @@ it('can render page', function () {
 });
 
 it('can edit tenant', function () {
-    $tenant = TenantFactory::new()->withDomains()->createOne();
+    /** @var Tenant $tenant */
+    $tenant = TenantFactory::new()
+        ->withDomains()
+        ->withDatabase()
+        ->createOne();
 
     livewire(EditTenant::class, ['record' => $tenant->getKey()])
         ->fillForm([
             'name' => 'Test',
+            Tenant::internalPrefix().'db_host' => $tenant->getInternal('db_host'),
+            Tenant::internalPrefix().'db_port' => $tenant->getInternal('db_port'),
+            Tenant::internalPrefix().'db_name' => $tenant->getInternal('db_name'),
+            Tenant::internalPrefix().'db_username' => $tenant->getInternal('db_username'),
+            Tenant::internalPrefix().'db_password' => $tenant->getInternal('db_password'),
             'domains.0.domain' => 'test.localhost',
         ])
         ->call('save')

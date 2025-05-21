@@ -13,7 +13,6 @@ return [
     'profiles' => [
 
         'default' => [
-            
             'plugins' => 'advlist autoresize codesample directionality emoticons code fullscreen hr image imagetools charmap link lists media table toc export wordcount',
             'toolbar' => 'code | undo redo removeformat | formatselect fontsizeselect| charmap | bold italic underline Strikethrough Superscript Subscript | rtl ltr |  JustifyFull |  alignjustify | alignright aligncenter alignleft | numlist bullist | forecolor backcolor | \n blockquote table toc hr | image link media codesample emoticons | wordcount fullscreen',
             'upload_directory' => null,

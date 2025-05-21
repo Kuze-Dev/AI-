@@ -6,6 +6,4 @@ namespace Domain\Address\Exceptions;
 
 use LogicException;
 
-class CantDeleteDefaultAddressException extends LogicException
-{
-}
+class CantDeleteDefaultAddressException extends LogicException {}

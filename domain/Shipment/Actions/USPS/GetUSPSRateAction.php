@@ -13,8 +13,7 @@ class GetUSPSRateAction
 {
     public function __construct(
         private readonly GetShippingRateAction $getShippingRateAction,
-    ) {
-    }
+    ) {}
 
     public function execute(
         ParcelData $parcelData,

@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ActivityResource\RelationManagers;
 
 use App\Filament\Resources\ActivityResource;
-use Closure;
 use Exception;
-use Filament\Resources\Form;
+use Filament\Infolists\Infolist;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
 use Filament\Tables\Actions\ViewAction;
-use Illuminate\Contracts\Support\Htmlable;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class ActivitiesRelationManager extends RelationManager
 {
@@ -22,13 +19,15 @@ class ActivitiesRelationManager extends RelationManager
     protected static ?string $recordTitleAttribute = 'description';
 
     /** @throws Exception */
-    public static function form(Form $form): Form
+    #[\Override]
+    public function infolist(Infolist $infolist): Infolist
     {
-        return ActivityResource::form($form);
+        return ActivityResource::infolist($infolist);
     }
 
     /** @throws Exception */
-    public static function table(Table $table): Table
+    #[\Override]
+    public function table(Table $table): Table
     {
         return ActivityResource::table($table)
             ->actions([
@@ -36,26 +35,21 @@ class ActivitiesRelationManager extends RelationManager
             ]);
     }
 
+    #[\Override]
     protected function canCreate(): bool
     {
         return false;
     }
 
+    #[\Override]
     protected function canEdit(Model $record): bool
     {
         return false;
     }
 
+    #[\Override]
     protected function canDelete(Model $record): bool
     {
         return false;
-    }
-
-    protected function getTableHeading(): string|Htmlable|Closure|null
-    {
-        return (string) Str::of($this->getOwnerRecord()::class)
-            ->classBasename()
-            ->headline()
-            ->append(' '.static::getTitle());
     }
 }

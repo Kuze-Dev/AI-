@@ -10,8 +10,7 @@ class CheckoutServiceOrderData
         public readonly string $payment_method,
         public readonly string $reference_id,
         public readonly ?float $amount_to_pay = null
-    ) {
-    }
+    ) {}
 
     public static function fromRequest(array $data): self
     {

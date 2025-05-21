@@ -22,8 +22,7 @@ class CreateS3Bucket implements ShouldQueue
 
     public function __construct(
         protected Tenant $tenant
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {
@@ -38,7 +37,7 @@ class CreateS3Bucket implements ShouldQueue
         }
 
         if (
-            $this->tenant->getInternal('bucket_driver') == 'r2' ||
+            $this->tenant->getInternal('bucket_driver') === 'r2' ||
             ! is_null($this->tenant->getInternal('bucket_access_key')) ||
             ! is_null($this->tenant->getInternal('bucket_secret_key'))
         ) {
@@ -56,6 +55,6 @@ class CreateS3Bucket implements ShouldQueue
 
     protected function generateBucketName(): string
     {
-        return Str::of(config('app.name'))->slug().'-'.Str::of($this->tenant->name)->slug();
+        return Str::of(config()->string('app.name'))->slug().'-'.Str::of($this->tenant->name)->slug();
     }
 }

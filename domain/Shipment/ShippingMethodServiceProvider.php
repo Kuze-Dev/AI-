@@ -15,11 +15,13 @@ use Domain\Shipment\Drivers\UpsDriver;
 use Domain\Shipment\Drivers\UspsDriver;
 use Domain\ShippingMethod\Enums\Driver;
 use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Tenant\TenantSupport;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
 class ShippingMethodServiceProvider extends ServiceProvider implements DeferrableProvider
 {
+    #[\Override]
     public function register(): void
     {
         $this->app->singleton(
@@ -82,7 +84,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
 
     public function boot(): void
     {
-        if (tenancy()->initialized) {
+        if (TenantSupport::initialized()) {
 
             $shippingMethods = ShippingMethod::whereActive(true);
 
@@ -92,10 +94,10 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
                         ->extend(
                             $shippingMethod->driver->value,
                             fn () => match ($shippingMethod->driver) {
-                                Driver::STORE_PICKUP => new StorePickupDriver(),
-                                Driver::USPS => new UspsDriver(),
-                                Driver::UPS => new UpsDriver(),
-                                Driver::AUSPOST => new AusPostDriver(),
+                                Driver::STORE_PICKUP => new StorePickupDriver,
+                                Driver::USPS => new UspsDriver,
+                                Driver::UPS => new UpsDriver,
+                                Driver::AUSPOST => new AusPostDriver,
                             }
                         );
                 }
@@ -103,6 +105,7 @@ class ShippingMethodServiceProvider extends ServiceProvider implements Deferrabl
         }
     }
 
+    #[\Override]
     public function provides(): array
     {
         return [

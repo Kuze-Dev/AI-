@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Favorite;
 
 use App\HttpTenantApi\Resources\FavoriteResource;
+use Domain\Customer\Models\Customer;
 use Domain\Favorite\Actions\CreateFavoriteAction;
 use Domain\Favorite\Actions\DestroyFavoriteAction;
 use Domain\Favorite\DataTransferObjects\FavoriteData;
 use Domain\Favorite\Models\Favorite;
 use Domain\Favorite\Requests\FavoriteStoreRequest;
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Resource;
@@ -23,12 +24,8 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 ]
 class FavoriteController
 {
-    public function index(): JsonApiResourceCollection
+    public function index(#[CurrentUser('sanctum')] Customer $customer): JsonApiResourceCollection
     {
-        $customer = auth()->user();
-        if (! $customer) {
-            throw new AuthenticationException();
-        }
 
         return FavoriteResource::collection(
             QueryBuilder::for(Favorite::whereCustomerId($customer->id))
@@ -44,13 +41,8 @@ class FavoriteController
         );
     }
 
-    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction): JsonResponse
+    public function store(FavoriteStoreRequest $request, CreateFavoriteAction $createFavoriteAction, #[CurrentUser('sanctum')] Customer $customer): JsonResponse
     {
-        $customer = auth()->user();
-        if (! $customer) {
-            throw new AuthenticationException();
-        }
-
         $validatedData = $request->validated();
 
         $favoriteData = FavoriteData::fromArray([
@@ -65,12 +57,8 @@ class FavoriteController
         }
     }
 
-    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction): JsonResponse
+    public function destroy(int $favorite, DestroyFavoriteAction $destroyFavoriteAction, #[CurrentUser('sanctum')] Customer $customer): JsonResponse
     {
-        $customer = auth()->user();
-        if (! $customer) {
-            throw new AuthenticationException();
-        }
 
         $favoriteData = FavoriteData::fromArray([
             'customer_id' => $customer->id,

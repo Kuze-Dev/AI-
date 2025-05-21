@@ -14,6 +14,7 @@ class FormSubmissionFactory extends Factory
 {
     protected $model = FormSubmission::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

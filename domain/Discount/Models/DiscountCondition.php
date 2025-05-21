@@ -51,13 +51,16 @@ class DiscountCondition extends Model
         'amount',
     ];
 
-    protected $casts = [
-        'discount_type' => DiscountConditionType::class,
-        'amount_type' => DiscountAmountType::class,
-        'amount' => 'float',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'discount_type' => DiscountConditionType::class,
+            'amount_type' => DiscountAmountType::class,
+            'amount' => 'float',
+        ];
+    }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, \Domain\Discount\Models\DiscountCondition> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Discount\Models\Discount, $this> */
     public function discount(): BelongsTo
     {
         return $this->belongsTo(Discount::class);

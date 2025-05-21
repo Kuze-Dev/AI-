@@ -54,16 +54,24 @@ use Domain\Taxation\Models\TaxZone;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\Models\TenantApiCall;
+use Domain\Tenant\TenantSupport;
 use Domain\Tier\Models\Tier;
+use Filament\Actions\Exports\Downloaders\XlsxDownloader;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Pennant\Feature;
 use Sentry\Laravel\Integration;
+use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
+use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Stancl\Tenancy\Database\Models\Tenant;
 use Support\Captcha\CaptchaManager;
@@ -73,10 +81,6 @@ use TiMacDonald\JsonApi\JsonApiResource;
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-    }
-
     public function boot(): void
     {
         Model::shouldBeStrict($this->app->isLocal() || $this->app->runningUnitTests());
@@ -91,6 +95,7 @@ class AppServiceProvider extends ServiceProvider
             throw new MissingAttributeException($model, $key);
         });
 
+        /** @phpstan-ignore argument.type */
         Relation::enforceMorphMap([
             Admin::class,
             config('permission.models.role'),
@@ -176,17 +181,18 @@ class AppServiceProvider extends ServiceProvider
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
 
         CaptchaManager::resolveProviderUsing(
-            fn () => tenancy()->initialized
+            fn () => TenantSupport::initialized()
                 ? app(FormSettings::class)->provider
                 : config('catpcha.provider')
         );
 
         CaptchaManager::resolveCredentialsUsing(
-            fn () => tenancy()->initialized
+            fn () => TenantSupport::initialized()
                 ? app(FormSettings::class)->getCredentials()
                 : config('catpcha.credentials')
         );
 
+        Feature::useMorphMap();
         Feature::discover('App\\Features\\CMS', app_path('Features/CMS'));
         Feature::discover('App\\Features\\ECommerce', app_path('Features/ECommerce'));
         Feature::discover('App\\Features\\Customer', app_path('Features/Customer'));
@@ -194,5 +200,30 @@ class AppServiceProvider extends ServiceProvider
         Feature::discover('App\\Features\\Shopconfiguration', app_path('Features/Shopconfiguration'));
         Feature::discover('App\\Features\\Shopconfiguration\PaymentGateway', app_path('Features/Shopconfiguration/PaymentGateway'));
         Feature::discover('App\\Features\\Shopconfiguration\Shipping', app_path('Features/Shopconfiguration/Shipping'));
+
+        ThrottleRequests::shouldHashKeys(false);
+
+        RateLimiter::for('api', function (Request $request) {
+            if (
+                $request->hasHeader('x-rate-key') &&
+                $request->header('x-rate-key') === config()->string('custom.rate_limit_key')
+            ) {
+                return Limit::none();
+            }
+
+            /** @phpstan-ignore class.notFound */
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        $this->optimizes(
+            optimize: CacheDiscoveredSettingsCommand::class,
+            clear: ClearDiscoveredSettingsCacheCommand::class,
+            key: 'settings',
+        );
+
+        $this->app->bind(XlsxDownloader::class, function () {
+            return new \App\Filament\Actions\Exports\Downloaders\XlsxDownloader;
+        });
+
     }
 }

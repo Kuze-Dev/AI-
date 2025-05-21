@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\FilamentTenant\Widgets\Report;
 
 use Domain\Order\Models\Order;
+use Domain\Tenant\TenantFeatureSupport;
 use Filament\Widgets\Widget;
 
 class TotalOrder extends Widget
 {
+    protected static ?int $sort = 8;
+
     protected static string $view = 'filament.widgets.total-order';
 
     public array $widgetData = [];
@@ -17,12 +20,19 @@ class TotalOrder extends Widget
 
     public array $status = ['pending', 'cancelled', 'packed', 'delivered', 'shipped', 'refunded',  'fulfilled'];
 
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
+
+    #[\Override]
     protected function getViewData(): array
     {
         $statusCounts = [];
 
         foreach ($this->status as $s) {
-            $statusCounts[strtolower($s)] = $this->getOrderByStatus($s);
+            $statusCounts[strtolower((string) $s)] = $this->getOrderByStatus($s);
         }
 
         return [

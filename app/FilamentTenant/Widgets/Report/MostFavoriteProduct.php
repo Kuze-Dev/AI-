@@ -7,16 +7,32 @@ namespace App\FilamentTenant\Widgets\Report;
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
 use Domain\Favorite\Models\Favorite;
-use Filament\Widgets\PieChartWidget;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Widgets\ChartWidget;
 
-class MostFavoriteProduct extends PieChartWidget
+class MostFavoriteProduct extends ChartWidget
 {
+    protected static ?int $sort = 10;
+
     protected static ?string $heading = 'Most Favorite Product';
 
     protected static ?string $pollingInterval = null;
 
     public ?string $filter = 'allTime';
 
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
+
+    #[\Override]
+    protected function getType(): string
+    {
+        return 'pie';
+    }
+
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -27,6 +43,7 @@ class MostFavoriteProduct extends PieChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $activeFilter = $this->filter;

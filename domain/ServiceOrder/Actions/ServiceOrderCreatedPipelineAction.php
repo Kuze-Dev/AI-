@@ -13,15 +13,24 @@ use Illuminate\Support\Facades\Pipeline;
 class ServiceOrderCreatedPipelineAction
 {
     public function execute(
-        ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData
+        ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData,
+        bool $createServiceOrderAddress = true,
     ): void {
 
+        $addressPipe = [];
+
+        if ($createServiceOrderAddress) {
+            $addressPipe[] = CreateServiceOrderAddressPipe::class;
+        }
+
+        $pipes = [
+            ...$addressPipe,
+            CreateServiceBillPipe::class,
+            NotifyCustomerPipe::class,
+        ];
+
         Pipeline::send($serviceOrderCreatedPipelineData)
-            ->through([
-                CreateServiceOrderAddressPipe::class,
-                CreateServiceBillPipe::class,
-                NotifyCustomerPipe::class,
-            ])
+            ->through($pipes)
             ->thenReturn();
     }
 }

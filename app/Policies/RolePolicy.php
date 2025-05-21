@@ -16,7 +16,7 @@ class RolePolicy
 
     public function before(?User $user, string $ability, mixed $role = null): ?bool
     {
-        if ($role instanceof Role && $role->name === config('domain.role.super_admin')) {
+        if ($role instanceof Role && $role->name === config()->string('domain.role.super_admin')) {
             return false;
         }
 

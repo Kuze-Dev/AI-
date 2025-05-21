@@ -11,6 +11,7 @@ class ECommerceSettings extends Settings
 {
     public ?string $front_end_domain = null;
 
+    #[\Override]
     public static function group(): string
     {
         return 'e-commerce';

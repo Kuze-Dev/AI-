@@ -24,9 +24,9 @@ class RadioFieldData extends FieldData
         public readonly bool $inline = false,
         public readonly bool $translatable = true,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -48,7 +48,7 @@ class RadioFieldData extends FieldData
             options: $data['options'] ?? [],
             descriptions: $data['descriptions'] ?? [],
             inline: $data['inline'] ?? false,
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             helper_text: $data['helper_text'] ?? null,
         );
     }

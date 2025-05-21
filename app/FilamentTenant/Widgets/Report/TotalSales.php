@@ -9,18 +9,36 @@ use App\FilamentTenant\Widgets\Report\utils\DateLabelGenerator;
 use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\Order;
-use Filament\Widgets\BarChartWidget;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 
-class TotalSales extends BarChartWidget
+class TotalSales extends ChartWidget
 {
+    protected static ?int $sort = 5;
+
     protected static ?string $heading = 'Total sales';
 
     public ?string $filter = 'perMonth';
 
+    protected int|string|array $columnSpan = 'full';
+
     protected static ?string $pollingInterval = null;
 
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
+
+    #[\Override]
+    protected function getType(): string
+    {
+        return 'bar';
+    }
+
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -30,6 +48,7 @@ class TotalSales extends BarChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $activeFilter = $this->filter;

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Features\CMS\SitesManagement;
 use Domain\Blueprint\Database\Factories\BlueprintFactory;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Globals\Actions\CreateGlobalsAction;
@@ -40,7 +41,7 @@ it('can create globals  ', function () {
 
 it('can create globals for micro sites  ', function () {
 
-    tenancy()->tenant?->features()->activate(\App\Features\CMS\SitesManagement::class);
+    activateFeatures(SitesManagement::class);
 
     loginAsSuperAdmin();
 

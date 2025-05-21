@@ -13,8 +13,7 @@ class BoxItem
         public readonly int|float $height,
         public readonly int|float $weight,
         public readonly int|float $volume,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

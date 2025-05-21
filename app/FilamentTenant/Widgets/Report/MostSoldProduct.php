@@ -9,16 +9,32 @@ use App\FilamentTenant\Widgets\Report\utils\DateRangeCalculator;
 use App\FilamentTenant\Widgets\Report\utils\PercentageCalculator;
 use Domain\Order\Enums\OrderStatuses;
 use Domain\Order\Models\OrderLine;
-use Filament\Widgets\PieChartWidget;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Widgets\ChartWidget;
 
-class MostSoldProduct extends PieChartWidget
+class MostSoldProduct extends ChartWidget
 {
+    protected static ?int $sort = 7;
+
     protected static ?string $heading = 'Most Sold Product';
 
     protected static ?string $pollingInterval = null;
 
     public ?string $filter = 'allTime';
 
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
+
+    #[\Override]
+    protected function getType(): string
+    {
+        return 'pie';
+    }
+
+    #[\Override]
     protected function getFilters(): ?array
     {
         return [
@@ -29,6 +45,7 @@ class MostSoldProduct extends PieChartWidget
         ];
     }
 
+    #[\Override]
     protected function getData(): array
     {
         $activeFilter = $this->filter;
@@ -41,7 +58,7 @@ class MostSoldProduct extends PieChartWidget
 
         $products = $query
             ->selectRaw('name, COUNT(*) as count')
-            ->groupBy('name')->limit(10)->orderByDesc('count')
+            ->groupBy('name')->limit(10)->latest('count')
             ->get()->toArray();
 
         $productCounts = collect($products)->pluck('count')->toArray();

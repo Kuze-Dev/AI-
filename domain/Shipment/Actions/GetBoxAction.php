@@ -58,7 +58,7 @@ class GetBoxAction
 
         if (is_null($fit)) {
 
-            if ($shippingMethod->driver === Driver::USPS && $addressDTO->country->code != 'US') {
+            if ($shippingMethod->driver === Driver::USPS && $addressDTO->country->code !== 'US') {
 
                 throw new ShippingException(' Unabled to ship products please choose other alternative shipping method');
             }

@@ -10,8 +10,6 @@ use Domain\ServiceOrder\Actions\ComputeServiceBillingCycleAction;
 use Domain\ServiceOrder\Actions\CreateServiceBillAction;
 use Domain\ServiceOrder\DataTransferObjects\ServiceBillData;
 use Domain\ServiceOrder\Events\AdminServiceOrderStatusUpdatedEvent;
-use Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob;
-use Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob;
 use Domain\ServiceOrder\Models\ServiceBill;
 use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\ServiceOrder\Notifications\ChangeByAdminNotification;
@@ -23,12 +21,11 @@ class AdminServiceOrderStatusUpdatedListener
 {
     public function __construct(
         private ServiceOrder $serviceOrder,
-        private CreateServiceBillAction $createServiceBillAction,
-        private ComputeServiceBillingCycleAction $computeServiceBillingCycleAction,
-        private ServiceSettings $serviceSettings,
+        private readonly CreateServiceBillAction $createServiceBillAction,
+        private readonly ComputeServiceBillingCycleAction $computeServiceBillingCycleAction,
+        private readonly ServiceSettings $serviceSettings,
         private bool $shouldNotifyCustomer = false,
-    ) {
-    }
+    ) {}
 
     public function handle(AdminServiceOrderStatusUpdatedEvent $event): void
     {
@@ -91,7 +88,7 @@ class AdminServiceOrderStatusUpdatedListener
             return;
         }
 
-        NotifyCustomerLatestServiceBillJob::dispatch($this->serviceOrder);
+        dispatch(new \Domain\ServiceOrder\Jobs\NotifyCustomerLatestServiceBillJob($this->serviceOrder));
     }
 
     private function notifyCustomer(): void
@@ -100,7 +97,7 @@ class AdminServiceOrderStatusUpdatedListener
             return;
         }
 
-        NotifyCustomerServiceOrderStatusJob::dispatch($this->serviceOrder);
+        dispatch(new \Domain\ServiceOrder\Jobs\NotifyCustomerServiceOrderStatusJob($this->serviceOrder));
     }
 
     private function notifyAdmin(): void

@@ -13,6 +13,7 @@ use TiMacDonald\JsonApi\JsonApiResource;
  */
 class BlueprintResource extends JsonApiResource
 {
+    #[\Override]
     public function toAttributes(Request $request): array
     {
         return [

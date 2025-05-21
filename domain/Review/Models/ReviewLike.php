@@ -6,6 +6,7 @@ namespace Domain\Review\Models;
 
 use Domain\Customer\Models\Customer;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Domain\Review\Models\ReviewLike
@@ -35,14 +36,14 @@ class ReviewLike extends Model
         'customer_id',
     ];
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Review\Models\Review, \Domain\Review\Models\ReviewLike> */
-    public function review()
+    /** @return BelongsTo<\Domain\Review\Models\Review, $this> */
+    public function review(): BelongsTo
     {
         return $this->belongsTo(Review::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Review\Models\ReviewLike> */
-    public function customer()
+    /** @return BelongsTo<\Domain\Customer\Models\Customer, $this> */
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }

@@ -7,6 +7,8 @@ namespace App\HttpTenantApi\Controllers\Auth\Customer;
 use App\Features\Customer\CustomerBase;
 use App\Http\Controllers\Controller;
 use Domain\Customer\Actions\UpdateCustomerProfileImageAction;
+use Domain\Customer\Models\Customer;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
@@ -19,14 +21,12 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 class ProfileImageUpdateController extends Controller
 {
     #[Post('/')]
-    public function __invoke(Request $request): mixed
+    public function __invoke(Request $request, #[CurrentUser('sanctum')] Customer $customer): mixed
     {
         $profileImage = $this->validate($request, [
             'profile_image' => 'required|image',
         ])['profile_image'];
 
-        /** @var \Domain\Customer\Models\Customer $customer */
-        $customer = auth()->user();
         if (app(UpdateCustomerProfileImageAction::class)->execute($customer, $profileImage)) {
             return response([
                 'message' => trans('Success!'),

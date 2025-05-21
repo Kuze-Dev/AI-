@@ -21,7 +21,7 @@ final class CreateDiscountLimitAction
             ]);
         }
 
-        $discountLimit = new DiscountLimit();
+        $discountLimit = new DiscountLimit;
 
         $discountLimit->create([
             'discount_id' => $discount->getKey(),

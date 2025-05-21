@@ -10,19 +10,18 @@ use Domain\Order\Models\OrderLine;
 use Domain\Review\DataTransferObjects\CreateReviewData;
 use Domain\Review\Models\Review;
 
-class CreateReviewAction
+readonly class CreateReviewAction
 {
     public function __construct(
-        private readonly CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
-    ) {
-    }
+        private CreateMediaFromS3UrlAction $createMediaFromS3UrlAction
+    ) {}
 
     public function execute(CreateReviewData $createReviewData, Customer $customer): Review
     {
 
         $orderLine = OrderLine::find($createReviewData->order_line_id);
         if (! $orderLine) {
-            return new Review();
+            return new Review;
         }
 
         $order_id = $orderLine->order_id ?? null;
@@ -30,7 +29,7 @@ class CreateReviewAction
         $product_id = null;
 
         if (! $orderLine->purchasable_data) {
-            return new Review();
+            return new Review;
         }
 
         if (isset($orderLine->purchasable_data['combination'])) {

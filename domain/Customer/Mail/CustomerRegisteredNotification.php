@@ -31,8 +31,7 @@ class CustomerRegisteredNotification extends Mailable implements ShouldQueue
         protected readonly Customer $customer,
         protected readonly CustomerNotificationData $notfi_data,
         protected readonly array $data = [],
-    ) {
-    }
+    ) {}
 
     public function envelope(): Envelope
     {
@@ -55,6 +54,7 @@ class CustomerRegisteredNotification extends Mailable implements ShouldQueue
         return $string;
     }
 
+    #[\Override]
     protected function buildView(): array
     {
         return [
@@ -72,7 +72,7 @@ class CustomerRegisteredNotification extends Mailable implements ShouldQueue
 
         $contents = Blade::render($compiledTemplate, $this->getMailVariables());
 
-        return new HtmlString((new CssToInlineStyles())->convert(
+        return new HtmlString((new CssToInlineStyles)->convert(
             $contents,
             View::make($this->getTheme(), $this->getMailVariables())->render()
         ));
@@ -107,7 +107,7 @@ class CustomerRegisteredNotification extends Mailable implements ShouldQueue
             return $customTheme;
         }
 
-        if (str_contains($this->theme, '::')) {
+        if (str_contains((string) $this->theme, '::')) {
             return $this->theme;
         }
 

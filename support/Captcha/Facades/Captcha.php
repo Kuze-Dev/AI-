@@ -14,6 +14,7 @@ use Support\Captcha\CaptchaManager;
  */
 class Captcha extends Facade
 {
+    #[\Override]
     protected static function getFacadeAccessor(): string
     {
         return CaptchaManager::class;

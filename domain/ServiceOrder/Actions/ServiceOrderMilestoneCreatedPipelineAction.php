@@ -12,14 +12,22 @@ use Illuminate\Support\Facades\Pipeline;
 class ServiceOrderMilestoneCreatedPipelineAction
 {
     public function execute(
-        ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData
+        ServiceOrderCreatedPipelineData $serviceOrderCreatedPipelineData,
+        bool $createServiceOrderAddress = true,
     ): void {
+        $addressPipe = [];
+
+        if ($createServiceOrderAddress) {
+            $addressPipe[] = CreateServiceOrderAddressPipe::class;
+        }
+
+        $pipes = [
+            ...$addressPipe,
+            NotifyCustomerServiceOrderPipe::class,
+        ];
 
         Pipeline::send($serviceOrderCreatedPipelineData)
-            ->through([
-                CreateServiceOrderAddressPipe::class,
-                NotifyCustomerServiceOrderPipe::class,
-            ])
+            ->through($pipes)
             ->thenReturn();
     }
 }

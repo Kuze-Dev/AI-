@@ -64,11 +64,14 @@ class Address extends Model
         'is_default_billing',
     ];
 
-    protected $casts = [
-        'label_as' => AddressLabelAs::class,
-        'is_default_billing' => 'bool',
-        'is_default_shipping' => 'bool',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'label_as' => AddressLabelAs::class,
+            'is_default_billing' => 'bool',
+            'is_default_shipping' => 'bool',
+        ];
+    }
 
     /** @return Attribute<string, never> */
     protected function fullDetail(): Attribute
@@ -95,13 +98,13 @@ class Address extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, \Domain\Address\Models\Address> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Customer\Models\Customer, $this> */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\State, \Domain\Address\Models\Address> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Address\Models\State, $this> */
     public function state(): BelongsTo
     {
         return $this->belongsTo(State::class);

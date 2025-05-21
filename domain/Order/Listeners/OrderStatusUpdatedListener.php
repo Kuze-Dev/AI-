@@ -42,7 +42,7 @@ class OrderStatusUpdatedListener
                 if ($customer) {
                     Notification::send($customer, new OrderFulfilledNotification($order));
 
-                    // if ( tenancy()->tenant?->features()->active(RewardPoints::class)) {
+                    // if ( TenantFeatureSupport::active(RewardPoints::class)) {
                     app(EarnPointAction::class)->execute($customer, $order);
 
                     // }

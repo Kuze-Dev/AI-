@@ -2,13 +2,10 @@
 
 declare(strict_types=1);
 
-use Rector\Config\RectorConfig;
-use Rector\Core\ValueObject\PhpVersion;
-use Rector\Set\ValueObject\SetList;
-use RectorLaravel\Set\LaravelSetList;
-
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([
+return Rector\Config\RectorConfig::configure()
+    ->withParallel(maxNumberOfProcess: 6)
+    ->withPhpSets()
+    ->withPaths([
         __DIR__.'/app',
         __DIR__.'/database',
         __DIR__.'/domain',
@@ -16,21 +13,40 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__.'/routes',
         __DIR__.'/support',
         __DIR__.'/tests',
-    ]);
-
-    $rectorConfig->sets([
-        LaravelSetList::LARAVEL_100,
-        SetList::PHP_82,
-    ]);
-
-    $rectorConfig->rules([
-        Rector\Php55\Rector\ClassConstFetch\StaticToSelfOnFinalClassRector::class,
-        Rector\Php72\Rector\FuncCall\GetClassOnNullRector::class,
-        Rector\Php80\Rector\Catch_\RemoveUnusedVariableInCatchRector::class,
-        Rector\Php81\Rector\ClassConst\FinalizePublicClassConstantRector::class,
-    ]);
-
-    $rectorConfig->phpVersion(PhpVersion::PHP_82);
-
-    //     $rectorConfig->phpstanConfig(__DIR__.'/phpstan.neon');
-};
+    ])
+//    ->withSkip([
+// //        Rector\Php81\Rector\Array_\FirstClassCallableRector::class => [
+// //            __DIR__.'/app/Http/Controllers/Backend/Dev/ArtisanController.php',
+// //            __DIR__.'/app/Http/Controllers/Backend/Dev/QueueDatabaseMonitoringController.php',
+// //            __DIR__.'/routes',
+// //        ],
+//        //        Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
+//        //            __DIR__.'/domain/Http/Actions/Order/ConfirmOrderComputationAction.php',
+//        //            __DIR__.'/domain/Http/Actions/Order/PurchaseOrderComputationAction.php',
+//        //        ],
+//    ])
+    ->withSets([
+        RectorLaravel\Set\LaravelSetList::LARAVEL_110,
+        RectorLaravel\Set\LaravelSetList::LARAVEL_ARRAY_STR_FUNCTION_TO_STATIC_CALL,
+        //        LaravelSetList::LARAVEL_FACADE_ALIASES_TO_FULL_NAMES,
+    ])
+    ->withRules([
+        Spatie\Ray\Rector\RemoveRayCallRector::class,
+        RectorLaravel\Rector\Class_\AddExtendsAnnotationToModelFactoriesRector::class,
+        //        RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector::class,
+        RectorLaravel\Rector\ClassMethod\AddParentBootToModelClassMethodRector::class,
+        RectorLaravel\Rector\ClassMethod\AddParentRegisterToEventServiceProviderRector::class,
+        //        RectorLaravel\Rector\Class_\AnonymousMigrationsRector::class,
+        RectorLaravel\Rector\Expr\AppEnvironmentComparisonToParameterRector::class,
+        RectorLaravel\Rector\MethodCall\AssertStatusToAssertMethodRector::class,
+        RectorLaravel\Rector\StaticCall\DispatchToHelperFunctionsRector::class,
+        RectorLaravel\Rector\MethodCall\EloquentOrderByToLatestOrOldestRector::class,
+        RectorLaravel\Rector\PropertyFetch\OptionalToNullsafeOperatorRector::class,
+        RectorLaravel\Rector\FuncCall\RemoveDumpDataDeadCodeRector::class,
+        RectorLaravel\Rector\Expr\SubStrToStartsWithOrEndsWithStaticMethodCallRector\SubStrToStartsWithOrEndsWithStaticMethodCallRector::class,
+        RectorLaravel\Rector\MethodCall\UseComponentPropertyWithinCommandsRector::class,
+    ])
+    ->withCache(
+        cacheDirectory: 'build/rector',
+        cacheClass: Rector\Caching\ValueObject\Storage\FileCacheStorage::class,
+    );

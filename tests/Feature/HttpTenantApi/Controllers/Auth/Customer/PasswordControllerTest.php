@@ -24,17 +24,18 @@ use function PHPUnit\Framework\assertTrue;
 uses()->group('customer');
 
 beforeEach(function () {
-    $tenant = testInTenantContext();
-    $tenant->features()->activate(CustomerBase::class);
-    $tenant->features()->activate(AddressBase::class);
-    $tenant->features()->activate(TierBase::class);
+    testInTenantContext([
+        CustomerBase::class,
+        AddressBase::class,
+        TierBase::class,
+    ]);
 });
 
 it('can send link', function () {
     $customer = CustomerFactory::new()
         ->createOne();
 
-    Event::fake();
+    Event::fake(PasswordResetSent::class);
     Notification::fake();
     Queue::fake();
 
@@ -54,7 +55,7 @@ it('can reset password', function () {
             'remember_token' => 'old-remember_token',
         ]);
 
-    Event::fake();
+    Event::fake(PasswordReset::class);
     Notification::fake();
     Queue::fake();
 

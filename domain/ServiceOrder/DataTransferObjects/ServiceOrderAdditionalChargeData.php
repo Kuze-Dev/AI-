@@ -9,8 +9,7 @@ class ServiceOrderAdditionalChargeData
     public function __construct(
         public float $price,
         public int $quantity,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

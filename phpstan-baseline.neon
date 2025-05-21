@@ -1,46 +1,213 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Access to an undefined property Support\\\\RouteUrl\\\\Contracts\\\\HasRouteUrl\\:\\:\\$activeRouteUrl\\.$#"
+			message: '#^Match arm comparison between Domain\\Blueprint\\Enums\\ManipulationType\:\:FIT and Domain\\Blueprint\\Enums\\ManipulationType\:\:FIT is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/FilamentTenant/Resources/BlueprintResource.php
+
+		-
+			message: '#^Parameter \#2 \$callback of static method Illuminate\\Support\\Arr\:\:first\(\) expects \(callable\(Domain\\Blueprint\\DataTransferObjects\\SectionData, int\|string\)\: bool\)\|null, Closure\(Domain\\Blueprint\\DataTransferObjects\\SectionData\)\: \(Domain\\Blueprint\\DataTransferObjects\\FieldData\|null\) given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/FilamentTenant/Resources/BlueprintResource.php
+
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class App\\FilamentTenant\\Support\\MetaDataForm\:
+				use MetaDataFormV2$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: app/FilamentTenant/Resources/ContentEntryResource.php
+
+		-
+			message: '#^Offset ''combination'' might not exist on array\|null\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/FilamentTenant/Resources/OrderResource/Pages/ViewOrderDetails.php
+
+		-
+			message: '''
+				#^Call to static method make\(\) on deprecated class App\\FilamentTenant\\Support\\MetaDataForm\:
+				use MetaDataFormV2$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: app/FilamentTenant/Resources/PageResource.php
+
+		-
+			message: '#^Access to an undefined property Support\\RouteUrl\\Contracts\\HasRouteUrl\:\:\$activeRouteUrl\.$#'
+			identifier: property.notFound
 			count: 2
 			path: app/FilamentTenant/Support/RouteUrlFieldset.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			message: '#^Parameter \#1 \$value of method Filament\\Support\\Components\\Component\:\:evaluate\(\) expects \(callable\(\)\: void\)\|void, Closure\(string\|Support\\RouteUrl\\Contracts\\HasRouteUrl, Filament\\Forms\\Get, Filament\\Forms\\Set, array\)\: void given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/FilamentTenant/Support/RouteUrlFieldset.php
+
+		-
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/BlockContentResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResource\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/BlockContentResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResourceCollection\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/BlockContentResource.php
+
+		-
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/ContentEntryResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResource\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/ContentEntryResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResourceCollection\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/ContentEntryResource.php
+
+		-
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/GlobalsResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResource\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/GlobalsResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResourceCollection\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/GlobalsResource.php
+
+		-
+			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/TaxonomyTermResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResource\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/TaxonomyTermResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResourceCollection\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/TaxonomyTermResource.php
+
+		-
+			message: '#^Call to method connectToTenant\(\) of internal class Stancl\\Tenancy\\Database\\DatabaseManager from outside its root namespace Stancl\.$#'
+			identifier: method.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Call to method createTenantConnection\(\) of internal class Stancl\\Tenancy\\Database\\DatabaseManager from outside its root namespace Stancl\.$#'
+			identifier: method.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Call to method reconnectToCentral\(\) of internal class Stancl\\Tenancy\\Database\\DatabaseManager from outside its root namespace Stancl\.$#'
+			identifier: method.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Parameter \$database of method App\\Tenancy\\Bootstrappers\\DatabaseTenancyBootstrapper\:\:__construct\(\) has typehint with internal class Stancl\\Tenancy\\Database\\DatabaseManager\.$#'
+			identifier: parameter.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Property \$database references internal class Stancl\\Tenancy\\Database\\DatabaseManager in its type\.$#'
+			identifier: property.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Call to method createTenantConnection\(\) of internal class Stancl\\Tenancy\\Database\\DatabaseManager from outside its root namespace Stancl\.$#'
+			identifier: method.internalClass
+			count: 1
+			path: app/Tenancy/Jobs/CreateDatabase.php
+
+		-
+			message: '#^Parameter \$databaseManager of method App\\Tenancy\\Jobs\\CreateDatabase\:\:handle\(\) has typehint with internal class Stancl\\Tenancy\\Database\\DatabaseManager\.$#'
+			identifier: parameter.internalClass
+			count: 1
+			path: app/Tenancy/Jobs/CreateDatabase.php
+
+		-
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
 			count: 3
 			path: domain/Auth/Actions/AddSafeDeviceAction.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
 			count: 1
 			path: domain/Auth/Actions/CheckIfOnSafeDeviceAction.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
 			count: 1
 			path: domain/Auth/Actions/FlushSafeDevicesAction.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\HasEmailVerificationOTP&Illuminate\\\\Contracts\\\\Auth\\\\MustVerifyEmail\\:\\:\\$emailVerificationOneTimePassword\\.$#"
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\HasEmailVerificationOTP&Illuminate\\Contracts\\Auth\\MustVerifyEmail\:\:\$emailVerificationOneTimePassword\.$#'
+			identifier: property.notFound
 			count: 1
 			path: domain/Auth/Actions/GenerateOTPForEmailVerificationAction.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
 			count: 2
 			path: domain/Auth/Actions/GenerateRecoveryCodesAction.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
 			count: 1
 			path: domain/Auth/Actions/ValidateRecoveryCodeAction.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\TwoFactorAuthenticatable\\:\\:\\$twoFactorAuthentication\\.$#"
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'
+			identifier: property.notFound
 			count: 1
 			path: domain/Auth/Actions/ValidateTotpCodeAction.php
 
 		-
-			message: "#^Access to an undefined property Domain\\\\Auth\\\\Contracts\\\\HasEmailVerificationOTP&Illuminate\\\\Contracts\\\\Auth\\\\MustVerifyEmail\\:\\:\\$emailVerificationOneTimePassword\\.$#"
+			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\HasEmailVerificationOTP&Illuminate\\Contracts\\Auth\\MustVerifyEmail\:\:\$emailVerificationOneTimePassword\.$#'
+			identifier: property.notFound
 			count: 1
 			path: domain/Auth/Actions/VerifyEmailViaOTPAction.php
+
+

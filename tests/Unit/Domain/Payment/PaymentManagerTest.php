@@ -14,7 +14,7 @@ beforeEach(function () {
 
     $paymentMethod = PaymentMethodFactory::new()->createOne(['title' => 'Cod']);
 
-    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment());
+    app(PaymentManagerInterface::class)->extend($paymentMethod->slug, fn () => new OfflinePayment);
 
 });
 

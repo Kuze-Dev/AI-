@@ -15,8 +15,7 @@ class MetaDataData
         public readonly ?string $keywords = null,
         public readonly UploadedFile|string|null $image = null,
         public readonly ?string $image_alt_text = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

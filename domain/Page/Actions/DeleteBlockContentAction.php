@@ -12,8 +12,7 @@ class DeleteBlockContentAction
 {
     public function __construct(
         protected DeleteBlueprintDataAction $deleteBlueprintDataAction,
-    ) {
-    }
+    ) {}
 
     public function execute(BlockContent $blockContent): ?bool
     {

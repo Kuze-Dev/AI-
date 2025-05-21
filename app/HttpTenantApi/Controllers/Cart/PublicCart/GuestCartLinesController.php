@@ -13,7 +13,6 @@ use Domain\Cart\Actions\UpdateCartLineAction;
 use Domain\Cart\DataTransferObjects\CreateCartData;
 use Domain\Cart\DataTransferObjects\UpdateCartLineData;
 use Domain\Cart\Helpers\PublicCart\AuthorizeGuestCart;
-use Domain\Cart\Models\Cart;
 use Domain\Cart\Models\CartLine;
 use Domain\Cart\Requests\CreateCartLineRequest;
 use Domain\Cart\Requests\UpdateCartLineRequest;
@@ -41,12 +40,6 @@ class GuestCartLinesController extends Controller
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $sessionId) {
                 $cart = app(GuestCreateCartAction::class)->execute($sessionId);
-
-                if (! $cart instanceof Cart) {
-                    return response()->json([
-                        'message' => 'Invalid action',
-                    ], 400);
-                }
 
                 app(CreateCartLineAction::class)
                     ->execute($cart, CreateCartData::fromArray($validatedData));
@@ -90,19 +83,18 @@ class GuestCartLinesController extends Controller
 
         try {
             $dbResult = DB::transaction(function () use ($validatedData, $cartline) {
-                $result = app(UpdateCartLineAction::class)
+                app(UpdateCartLineAction::class)
                     ->execute($cartline, UpdateCartLineData::fromArray($validatedData));
 
-                if ($result instanceof CartLine) {
-                    return [
-                        'message' => 'Cart updated successfully',
-                    ];
-                }
+                return [
+                    'message' => 'Cart updated successfully',
+                ];
+
             });
 
             return response()->json($dbResult);
         } catch (Exception $e) {
-            $maxFileSize = File::getHumanReadableSize(config('media-library.max_file_size'));
+            $maxFileSize = File::getHumanReadableSize(config()->integer('media-library.max_file_size'));
             if ($e instanceof FileIsTooBig) {
                 return response()->json([
                     'message' => "File is too big , please upload file less than $maxFileSize",

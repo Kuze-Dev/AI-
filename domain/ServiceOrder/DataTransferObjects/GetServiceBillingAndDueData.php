@@ -14,6 +14,5 @@ class GetServiceBillingAndDueData
         public readonly ServiceOrder $service_order,
         public readonly ServiceBill $service_bill,
         public readonly ServiceTransaction $service_transaction
-    ) {
-    }
+    ) {}
 }

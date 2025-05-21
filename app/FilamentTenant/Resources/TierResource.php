@@ -6,45 +6,36 @@ namespace App\FilamentTenant\Resources;
 
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 use App\FilamentTenant\Resources\TierResource\RelationManagers\CustomersRelationManager;
-use Artificertech\FilamentMultiContext\Concerns\ContextualResource;
-use Domain\Tier\Actions\DeleteTierAction;
-use Domain\Tier\Actions\ForceDeleteTierAction;
-use Domain\Tier\Actions\RestoreTierAction;
 use Domain\Tier\Models\Tier;
 use Exception;
-use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Notifications\Notification;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\DB;
-use Support\ConstraintsRelationships\Exceptions\DeleteRestrictedException;
 
 class TierResource extends Resource
 {
-    use ContextualResource;
-
     protected static ?string $model = Tier::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[\Override]
     public static function getNavigationGroup(): ?string
     {
         return trans('Customer Management');
     }
 
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
                         ->translateLabel()
                         ->required()
@@ -61,6 +52,7 @@ class TierResource extends Resource
     }
 
     /** @throws Exception */
+    #[\Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -74,9 +66,23 @@ class TierResource extends Resource
                     ->sortable()
                     ->counts('customers')
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(timezone: Filament::auth()->user()?->timezone)
+                    ->translateLabel()
+                    ->dateTime()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->dateTime(),
+
+                Tables\Columns\TextColumn::make('deleted_at')
+                    ->translateLabel()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->dateTime(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -84,41 +90,9 @@ class TierResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()
-                        ->before(function (DeleteAction $action, Tier $record) {
-                            if ($record->customers()->exists()) {
-                                Notification::make()
-                                    ->warning()
-                                    ->title('Customers exists in this tier!')
-                                    ->body('disassociate first before deleting!')
-                                    ->persistent()
-                                    ->send();
-
-                                $action->cancel();
-                            }
-                        })
-                        ->using(function (Tier $record) {
-                            try {
-                                return app(DeleteTierAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
-                    Tables\Actions\RestoreAction::make()
-                        ->using(
-                            fn (Tier $record) => DB::transaction(
-                                fn () => app(RestoreTierAction::class)
-                                    ->execute($record)
-                            )
-                        ),
-                    Tables\Actions\ForceDeleteAction::make()
-                        ->using(function (Tier $record) {
-                            try {
-                                return app(ForceDeleteTierAction::class)->execute($record);
-                            } catch (DeleteRestrictedException) {
-                                return false;
-                            }
-                        }),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
@@ -126,6 +100,7 @@ class TierResource extends Resource
             ->defaultSort('updated_at', 'desc');
     }
 
+    #[\Override]
     public static function getRelations(): array
     {
         return [
@@ -134,6 +109,7 @@ class TierResource extends Resource
         ];
     }
 
+    #[\Override]
     public static function getPages(): array
     {
         return [
@@ -144,6 +120,7 @@ class TierResource extends Resource
     }
 
     /** @return Builder<\Domain\Tier\Models\Tier> */
+    #[\Override]
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()

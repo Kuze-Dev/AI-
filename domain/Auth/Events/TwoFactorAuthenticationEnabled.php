@@ -10,6 +10,5 @@ class TwoFactorAuthenticationEnabled
 {
     public function __construct(
         public TwoFactorAuthenticatable $user
-    ) {
-    }
+    ) {}
 }

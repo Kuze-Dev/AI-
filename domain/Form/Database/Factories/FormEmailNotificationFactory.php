@@ -14,6 +14,7 @@ class FormEmailNotificationFactory extends Factory
 {
     protected $model = FormEmailNotification::class;
 
+    #[\Override]
     public function definition(): array
     {
         return [

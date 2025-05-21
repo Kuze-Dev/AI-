@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Domain\Review\DataTransferObjects;
 
-class CreateReviewData
+readonly class CreateReviewData
 {
     public function __construct(
-        public readonly int $rating,
-        public readonly int $order_line_id,
-        public readonly bool $is_anonymous,
-        public readonly ?string $comment,
-        public readonly ?array $media,
-    ) {
-    }
+        public int $rating,
+        public int $order_line_id,
+        public bool $is_anonymous,
+        public ?string $comment,
+        public ?array $media,
+    ) {}
 
     public static function fromArray(array $data): self
     {

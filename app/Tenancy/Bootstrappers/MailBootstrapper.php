@@ -27,7 +27,7 @@ class MailBootstrapper implements TenancyBootstrapper
             $this->app->make('config')->set('mail.from.address', $tenant->getInternal('mail_from_address'));
         }
 
-        /** @phpstan-ignore-next-line */
+        /** @phpstan-ignore property.notFound */
         $this->app->make('config')->set('mail.from.name', $tenant->name);
 
     }

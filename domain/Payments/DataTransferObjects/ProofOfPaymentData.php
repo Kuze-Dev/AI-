@@ -10,8 +10,7 @@ class ProofOfPaymentData
 {
     public function __construct(
         public readonly UploadedFile|string $proof_of_payment,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

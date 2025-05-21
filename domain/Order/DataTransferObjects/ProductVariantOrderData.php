@@ -8,18 +8,17 @@ use Domain\Cart\Helpers\PrivateCart\ComputedTierSellingPrice;
 use Domain\Product\Models\ProductOptionValue;
 use Domain\Product\Models\ProductVariant;
 
-class ProductVariantOrderData
+readonly class ProductVariantOrderData
 {
     public function __construct(
-        public readonly string $sku,
-        public readonly array $combination,
-        public readonly float|string $retail_price,
-        public readonly float|string $selling_price,
-        public readonly bool $status,
-        public readonly ProductOrderData $product,
-        public readonly ?int $stock,
-    ) {
-    }
+        public string $sku,
+        public array $combination,
+        public float|string $retail_price,
+        public float|string $selling_price,
+        public bool $status,
+        public ProductOrderData $product,
+        public ?int $stock,
+    ) {}
 
     public static function fromArray(array $data): self
     {
@@ -61,14 +60,14 @@ class ProductVariantOrderData
                 option: $combinationData['option'],
                 option_value_id: $productOptionValue->id,
                 option_value: $combinationData['option_value'],
-                option_value_data: $productOption?->is_custom ? $productOptionValue->data : null
+                option_value_data: $productOption?->is_custom ? (array) $productOptionValue->data : null
             );
         }
 
         /** @var \Domain\Product\Models\Product $product */
         $product = $productVariant->product;
 
-        //product tiering discount
+        // product tiering discount
         $selling_price = $productVariant->selling_price;
         if ($product->relationLoaded('productTier') && $product->productTier->isNotEmpty()) {
             $selling_price = app(ComputedTierSellingPrice::class)->execute($product, (float) $selling_price);

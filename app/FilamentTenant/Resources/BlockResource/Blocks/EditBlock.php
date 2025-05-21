@@ -9,12 +9,10 @@ use App\FilamentTenant\Resources\BlockResource;
 use Domain\Page\Actions\UpdateBlockAction;
 use Domain\Page\DataTransferObjects\BlockData;
 use Exception;
-use Filament\Pages\Actions;
-use Filament\Pages\Actions\Action;
+use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class EditBlock extends EditRecord
 {
@@ -23,43 +21,37 @@ class EditBlock extends EditRecord
     protected static string $resource = BlockResource::class;
 
     /** @throws Exception */
-    protected function getActions(): array
+    #[\Override]
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
-                ->label(trans('filament::resources/pages/edit-record.form.actions.save.label'))
+                ->label(trans('filament-panels::resources/pages/edit-record.form.actions.save.label'))
                 ->action('save')
                 ->keyBindings(['mod+s']),
             Actions\DeleteAction::make(),
         ];
     }
 
-    protected function getFormActions(): array
-    {
-        return $this->getCachedActions();
-    }
-
     /**
      * @param  \Domain\Page\Models\Block  $record
-     *
-     * @throws Throwable
      */
+    #[\Override]
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(
-            fn () => app(UpdateBlockAction::class)
-                ->execute(
-                    $record,
-                    new BlockData(
-                        name: $data['name'],
-                        component: $data['component'],
-                        image: $data['image'],
-                        blueprint_id: $data['blueprint_id'],
-                        is_fixed_content: $data['is_fixed_content'],
-                        data: $data['data'] ?? null,
-                        sites: $data['sites'] ?? [],
-                    )
+        return app(UpdateBlockAction::class)
+            ->execute(
+                $record,
+                new BlockData(
+                    name: $data['name'],
+                    component: $data['component'],
+                    image: $data['image'] ?? null,
+                    blueprint_id: $data['blueprint_id'],
+                    is_fixed_content: $data['is_fixed_content'],
+                    data: $data['data'] ?? null,
+                    sites: $data['sites'] ?? [],
                 )
-        );
+
+            );
     }
 }

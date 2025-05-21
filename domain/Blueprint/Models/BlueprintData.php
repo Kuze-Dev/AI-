@@ -14,6 +14,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -52,6 +53,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class BlueprintData extends Model implements HasMedia
 {
+    /** @use InteractsWithMedia<\Spatie\MediaLibrary\MediaCollections\Models\Media> */
     use InteractsWithMedia;
 
     protected $fillable = [
@@ -63,32 +65,35 @@ class BlueprintData extends Model implements HasMedia
         'type',
     ];
 
-    protected $casts = [
-        // 'type' => BlueprintDataType::class,
-        'value' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            // 'type' => BlueprintDataType::class,
+            'value' => 'array',
+        ];
+    }
 
-    /** @return BelongsTo<Blueprint, BlueprintData> */
+    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Domain\Blueprint\Models\Blueprint, $this> */
     public function blueprint(): BelongsTo
     {
         return $this->belongsTo(Blueprint::class);
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function model(): MorphTo
     {
         return $this->morphTo();
     }
 
-    /** @return MorphTo<Model, self> */
+    /** @return MorphTo<Model, $this> */
     public function resourceModel(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'model_type', 'model_id');
     }
 
-    /** @var bool */
-    public $registerMediaConversionsUsingModelInstance = true;
+    public bool $registerMediaConversionsUsingModelInstance = true;
 
+    #[\Override]
     public function registerMediaConversions(?Media $media = null): void
     {
         $blueprint = $this->blueprint;
@@ -129,22 +134,32 @@ class BlueprintData extends Model implements HasMedia
                     $width = null;
                     $height = null;
                     $type = null;
-                    $fit = 'contain';
+                    // $fit = 'contain';
+                    $fit = Fit::Contain;
                     if (isset($conversion->manipulations)) {
                         foreach ($conversion->manipulations as $manipulation) {
-                            if ($manipulation->type == ManipulationType::WIDTH) {
+                            if ($manipulation->type === ManipulationType::WIDTH) {
                                 $width = $manipulation->params[0];
                             }
-                            if ($manipulation->type == ManipulationType::HEIGHT) {
+                            if ($manipulation->type === ManipulationType::HEIGHT) {
                                 $height = $manipulation->params[0];
                             }
-                            if ($manipulation->type == ManipulationType::TYPE) {
+                            if ($manipulation->type === ManipulationType::TYPE) {
                                 if (! empty($manipulation->params[0])) {
                                     $type = $manipulation->params[0];
                                 }
                             }
-                            if ($manipulation->type == ManipulationType::FIT) {
-                                $fit = $manipulation->params[0];
+                            if ($manipulation->type === ManipulationType::FIT) {
+                                // $fit = $manipulation->params[0];
+                                /** @phpstan-ignore match.unhandled */
+                                $fit = match ($manipulation->params[0]) {
+                                    'contain' => Fit::Contain,
+                                    'max' => Fit::Max,
+                                    'fill' => Fit::Fill,
+                                    'fill-max' => Fit::FillMax,
+                                    'stretch' => Fit::Stretch,
+                                    'crop' => Fit::Crop,
+                                };
                             }
                         }
 
@@ -155,7 +170,7 @@ class BlueprintData extends Model implements HasMedia
                                 ->format($type)
                                 ->fit($fit, $width, $height);
                         } else {
-                            /** @phpstan-ignore-next-line */
+                            /** @phpstan-ignore method.notFound */
                             $this->addMediaConversion($title)
                                 ->width($width)
                                 ->height($height)

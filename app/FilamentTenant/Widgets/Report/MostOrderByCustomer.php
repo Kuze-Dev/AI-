@@ -6,14 +6,28 @@ namespace App\FilamentTenant\Widgets\Report;
 
 use App\FilamentTenant\Widgets\Report\utils\ChartColor;
 use Domain\Order\Models\OrderLine;
-use Filament\Widgets\PieChartWidget;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Widgets\ChartWidget;
 
-class MostOrderByCustomer extends PieChartWidget
+class MostOrderByCustomer extends ChartWidget
 {
     protected static ?string $heading = 'Most Order By Customer';
 
     protected static ?string $pollingInterval = null;
 
+    #[\Override]
+    public static function canView(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\ECommerce\ECommerceBase::class);
+    }
+
+    #[\Override]
+    protected function getType(): string
+    {
+        return 'pie';
+    }
+
+    #[\Override]
     protected function getData(): array
     {
         $products = OrderLine::whereHas('order')

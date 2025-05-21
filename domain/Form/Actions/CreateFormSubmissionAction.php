@@ -8,6 +8,8 @@ use Domain\Blueprint\Enums\FieldType;
 use Domain\Form\Mail\FormEmailNotificationMail;
 use Domain\Form\Models\Form;
 use Domain\Form\Models\FormSubmission;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,7 +23,7 @@ class CreateFormSubmissionAction
 
         foreach ($schema['sections'] as $section) {
             foreach ($section->fields as $field) {
-                if ($field->type == FieldType::FILE) {
+                if ($field->type === FieldType::FILE) {
                     $filesFields[] = $field->state_name;
                 }
             }
@@ -40,7 +42,7 @@ class CreateFormSubmissionAction
                             abort(422, 'File '.$value.' Not Found');
                         } else {
 
-                            $objectkey = 'uploads/forms/'.$form->id.'/'.basename($value);
+                            $objectkey = 'uploads/forms/'.$form->id.'/'.basename((string) $value);
 
                             Storage::disk(config('filament.default_filesystem_disk'))->move($value, $objectkey);
 
@@ -62,7 +64,31 @@ class CreateFormSubmissionAction
             : null;
 
         foreach ($form->formEmailNotifications as $emailNotification) {
-            Mail::send(new FormEmailNotificationMail($emailNotification, $data, $attachments, $formSubmission?->id));
+
+            try {
+
+                Mail::send(new FormEmailNotificationMail($emailNotification, $data, $attachments, $formSubmission?->id));
+
+            } catch (\Throwable $th) {
+
+                foreach (super_users() as $admin) {
+                    Notification::make()
+                        ->danger()
+                        ->title('Error Sending Email | '.$form->name)
+                        ->body($th->getMessage())
+                        ->actions([
+                            Action::make('View Form')
+                                ->url(route('filament.tenant.resources.forms.edit', [
+                                    'record' => $form,
+                                ]))
+                                ->button(),
+
+                        ])
+                        ->sendToDatabase($admin);
+                }
+
+            }
+
         }
 
         return $formSubmission;

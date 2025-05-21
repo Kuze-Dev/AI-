@@ -22,9 +22,9 @@ class TextareaFieldData extends FieldData
         public readonly ?int $rows = null,
         public readonly ?int $cols = null,
         public readonly ?string $helper_text = null,
-    ) {
-    }
+    ) {}
 
+    #[\Override]
     public static function fromArray(array $data): self
     {
         if (! $data['type'] instanceof FieldType) {
@@ -36,7 +36,7 @@ class TextareaFieldData extends FieldData
             state_name: $data['state_name'] ?? (string) Str::of($data['title'])->lower()->snake(),
             rules: $data['rules'] ?? [],
             hidden_option: $data['hidden_option'] ?? [],
-            translatable: isset($data['translatable']) ? $data['translatable'] : true,
+            translatable: $data['translatable'] ?? true,
             min_length: $data['min_length'] ?? null,
             max_length: $data['max_length'] ?? null,
             rows: $data['rows'] ?? null,

@@ -10,8 +10,7 @@ class ServiceBankTransferData
         public readonly string $reference_id,
         public readonly string $proof_of_payment,
         public readonly ?string $notes,
-    ) {
-    }
+    ) {}
 
     public static function fromRequest(array $data): self
     {

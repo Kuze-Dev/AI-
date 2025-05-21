@@ -12,8 +12,7 @@ class ProductOptionData
         public readonly string $slug,
         public array $productOptionValues,
         public bool $is_custom = false,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {
