@@ -10,6 +10,7 @@ use Filament\Widgets\Widget;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Http;
 use Spatie\Activitylog\ActivityLogger;
+use Livewire\Features\SupportRedirects\Redirector;
 
 class DeployStaticSite extends Widget
 {
@@ -20,7 +21,7 @@ class DeployStaticSite extends Widget
         return app(CMSSettings::class)->deploy_hook;
     }
 
-    public function deploy(): RedirectResponse|bool
+    public function deploy(): RedirectResponse|Redirector|bool
     {
 
         if (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
