@@ -150,7 +150,7 @@
                                     <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.no_light_mode') }}</h3>
                                 @else
                                     <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.light') }}</h3>
-                                    <img src="{{ url('/'.$name.'-light.png') }}" alt="{{ $name }} theme preview (light version)" class="border dark:border-gray-700 rounded-lg">
+                                    <img src="https://haspcms-landlord.s3.ap-southeast-1.amazonaws.com/theme/mint-light.png" alt="{{ $name }} theme preview (light version)" class="border dark:border-gray-700 rounded-lg">
                                 @endif
                             </div>
             
@@ -159,7 +159,7 @@
                                     <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.no_dark_mode') }}</h3>
                                 @else
                                     <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.dark') }}</h3>
-                                    <img src="{{ url('/'.$name.'-dark.png') }}" alt="{{ $name }} theme preview (dark version)" class="border dark:border-gray-700 rounded-lg">
+                                    <img src="https://haspcms-landlord.s3.ap-southeast-1.amazonaws.com/theme/mint-dark.png" alt="{{ $name }} theme preview (dark version)" class="border dark:border-gray-700 rounded-lg">
                                 @endif
                             </div>
                         </div>
