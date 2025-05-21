@@ -11,6 +11,7 @@ use App\FilamentTenant\Support\Traits\HasParentResource;
 use Domain\Content\Actions\CreateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
+use Domain\Content\Models\ContentEntry;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -84,6 +85,33 @@ class CreateContentEntry extends CreateRecord
     {
         return app(CreateContentEntryAction::class)
             ->execute($this->ownerRecord, ContentEntryData::fromArray($data));
+    }
+
+    protected function afterFill(): void
+    {
+        if ($cloneSlug = request()->input('clone')) {
+            $contentEntry = ContentEntry::whereSlug($cloneSlug)
+                ->with(['metaData.media', 'taxonomyTerms'])
+                ->firstOrFail();
+
+            $this->form->fill([
+                'status' => $contentEntry->status,
+                'published_at' => $contentEntry->published_at,
+                'data' => $contentEntry->data,
+            ]);
+
+            $this->data['meta_data'] = [
+                'author' => $contentEntry->metaData?->author,
+                'description' => $contentEntry->metaData?->description,
+                'keywords' => $contentEntry->metaData?->keywords,
+            ];
+
+            if ($image = $contentEntry->metaData?->getFirstMedia('image')) {
+                $this->data['meta_data']['image'] = [$image->uuid => $image->uuid];
+                $this->data['meta_data']['image_alt_text'] = $image->getCustomProperty('alt_text');
+            }
+        }
+
     }
 
     #[\Override]
