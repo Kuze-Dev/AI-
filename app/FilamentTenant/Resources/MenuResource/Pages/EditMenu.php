@@ -39,7 +39,6 @@ class EditMenu extends EditRecord
             ActionGroup::make([
 
                 Action::make('createTranslation')
-                    ->color('secondary')
                     ->slideOver(true)
                     ->action(fn (Action $action) => $this->createTranslation($action->getFormData()))
                     ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
