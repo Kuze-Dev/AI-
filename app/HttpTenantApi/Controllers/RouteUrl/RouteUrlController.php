@@ -76,7 +76,7 @@ class RouteUrlController
         $routeUrl = $queryRouteUrl->firstOrFail();
 
         return match ($routeUrl->model::class) {
-            Page::class => PageResource::make($routeUrl->model),
+            Page::class => $this->handlePageResource($routeUrl->model),
             ContentEntry::class => $this->handleContentEntryResource($routeUrl->model),
             Taxonomy::class => TaxonomyResource::make($routeUrl->model),
             TaxonomyTerm::class => TaxonomyTermResource::make($routeUrl->model),
@@ -84,6 +84,15 @@ class RouteUrlController
         };
     }
 
+    public function handlePageResource(Page $page): PageResource
+    {
+        abort_if($page->visibility === Visibility::AUTHENTICATED->value, 403);
+
+        abort_if($page->published_at === null, 404);
+
+        return PageResource::make($page);
+    }
+    
     private function handleContentEntryResource(ContentEntry $contentEntry): ContentEntryResource
     {
         /** @var \Domain\Content\Models\Content */
