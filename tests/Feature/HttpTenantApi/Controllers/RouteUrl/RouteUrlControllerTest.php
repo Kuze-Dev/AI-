@@ -36,6 +36,7 @@ it('can retrieve model at requested route url', function (HasRouteUrl $model, st
 })->with([
     [
         fn () => PageFactory::new()
+            ->published()
             ->has(RouteUrlFactory::new(['url' => '/test/page']))
             ->createOne(),
         '/test/page',
@@ -55,6 +56,7 @@ it('can retrieve model at requested route url', function (HasRouteUrl $model, st
 
 it('can retrieve model using inactive route url', function () {
     $page = PageFactory::new()
+        ->published()
         ->has(
             RouteUrlFactory::new()
                 ->count(2)

@@ -97,6 +97,7 @@ it('can not create page with same name', function () {
         ->getKey();
 
     PageFactory::new()
+        ->published()
         ->createOne(['name' => 'page 1']);
 
     livewire(CreatePage::class)
@@ -117,6 +118,7 @@ it('can not create page with same name', function () {
 
 it('can clone page', function () {
     $page = PageFactory::new()
+        ->published()
         ->addBlockContent(
             BlockFactory::new()
                 ->for(

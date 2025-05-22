@@ -26,7 +26,7 @@ class PageFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'published_at' => now(),
+            'published_at' => null,
             'visibility' => Arr::random(Visibility::cases()),
         ];
     }
