@@ -1,6 +1,9 @@
 # Use the official Vapor Docker base image for PHP 8.3
 FROM laravelphp/vapor:php83
 
+#Upgrade critical system libraries and apk-tools
+RUN apk upgrade -Ua 
+
 # Install system dependencies as needed (e.g., for image processing, queues, etc.)
 RUN apk --no-cache add \
     git \
