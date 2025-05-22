@@ -28,7 +28,7 @@ class ClearResetsTenancyAwareSchedulerCommand extends ClearResetsCommand
         DB::table($table)
             ->where('created_at', '<', now()->addHour())->delete();
 
-        $this->components->info('Expired reset tokens cleared successfully.');
+        $this->info('Expired reset tokens cleared successfully.');
 
         return self::SUCCESS;
     }

@@ -14,7 +14,7 @@ parameters:
 
 		-
 			message: '''
-				#^Call to method make\(\) of deprecated class Filament\\Forms\\Components\\Section\:
+				#^Call to static method make\(\) on deprecated class App\\FilamentTenant\\Support\\MetaDataForm\:
 				use MetaDataFormV2$#
 			'''
 			identifier: staticMethod.deprecatedClass
@@ -29,7 +29,7 @@ parameters:
 
 		-
 			message: '''
-				#^Call to method make\(\) of deprecated class Filament\\Forms\\Components\\Section\:
+				#^Call to static method make\(\) on deprecated class App\\FilamentTenant\\Support\\MetaDataForm\:
 				use MetaDataFormV2$#
 			'''
 			identifier: staticMethod.deprecatedClass
@@ -55,8 +55,32 @@ parameters:
 			path: app/HttpTenantApi/Resources/BlockContentResource.php
 
 		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResource\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/BlockContentResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResourceCollection\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/BlockContentResource.php
+
+		-
 			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/HttpTenantApi/Resources/ContentEntryResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResource\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/ContentEntryResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResourceCollection\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
 			count: 1
 			path: app/HttpTenantApi/Resources/ContentEntryResource.php
 
@@ -67,10 +91,76 @@ parameters:
 			path: app/HttpTenantApi/Resources/GlobalsResource.php
 
 		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResource\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/GlobalsResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResourceCollection\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/GlobalsResource.php
+
+		-
 			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: app/HttpTenantApi/Resources/TaxonomyTermResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResource\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/TaxonomyTermResource.php
+
+		-
+			message: '#^Call to internal method TiMacDonald\\JsonApi\\JsonApiResourceCollection\:\:withIncludePrefix\(\) from outside its root namespace TiMacDonald\.$#'
+			identifier: method.internal
+			count: 1
+			path: app/HttpTenantApi/Resources/TaxonomyTermResource.php
+
+		-
+			message: '#^Call to method connectToTenant\(\) of internal class Stancl\\Tenancy\\Database\\DatabaseManager from outside its root namespace Stancl\.$#'
+			identifier: method.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Call to method createTenantConnection\(\) of internal class Stancl\\Tenancy\\Database\\DatabaseManager from outside its root namespace Stancl\.$#'
+			identifier: method.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Call to method reconnectToCentral\(\) of internal class Stancl\\Tenancy\\Database\\DatabaseManager from outside its root namespace Stancl\.$#'
+			identifier: method.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Parameter \$database of method App\\Tenancy\\Bootstrappers\\DatabaseTenancyBootstrapper\:\:__construct\(\) has typehint with internal class Stancl\\Tenancy\\Database\\DatabaseManager\.$#'
+			identifier: parameter.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Property \$database references internal class Stancl\\Tenancy\\Database\\DatabaseManager in its type\.$#'
+			identifier: property.internalClass
+			count: 1
+			path: app/Tenancy/Bootstrappers/DatabaseTenancyBootstrapper.php
+
+		-
+			message: '#^Call to method createTenantConnection\(\) of internal class Stancl\\Tenancy\\Database\\DatabaseManager from outside its root namespace Stancl\.$#'
+			identifier: method.internalClass
+			count: 1
+			path: app/Tenancy/Jobs/CreateDatabase.php
+
+		-
+			message: '#^Parameter \$databaseManager of method App\\Tenancy\\Jobs\\CreateDatabase\:\:handle\(\) has typehint with internal class Stancl\\Tenancy\\Database\\DatabaseManager\.$#'
+			identifier: parameter.internalClass
+			count: 1
+			path: app/Tenancy/Jobs/CreateDatabase.php
 
 		-
 			message: '#^Access to an undefined property Domain\\Auth\\Contracts\\TwoFactorAuthenticatable\:\:\$twoFactorAuthentication\.$#'

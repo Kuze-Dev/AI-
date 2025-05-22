@@ -49,6 +49,7 @@
 
         <div class="grid grid-cols-1 gap-6 border-t py-6">
             @foreach ($this->getThemes() as $name => $theme)
+            
                 @php
                     $noLightMode = in_array(\Hasnayeen\Themes\Contracts\HasOnlyDarkMode::class, class_implements($theme));
                     $noDarkMode = in_array(\Hasnayeen\Themes\Contracts\HasOnlyLightMode::class, class_implements($theme));
@@ -140,25 +141,56 @@
                         $noLightMode = in_array(\Hasnayeen\Themes\Contracts\HasOnlyDarkMode::class, class_implements($theme));
                         $noDarkMode = in_array(\Hasnayeen\Themes\Contracts\HasOnlyLightMode::class, class_implements($theme));
                     @endphp
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            @if ($noLightMode)
-                                <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.no_light_mode') }}</h3>
-                            @else
-                                <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.light') }}</h3>
-                                <img src="{{ url('https://raw.githubusercontent.com/Hasnayeen/themes/3.x/assets/'.$name.'-light.png') }}" alt="{{ $name }} theme preview (light version)" class="border dark:border-gray-700 rounded-lg">
-                            @endif
+                    
+                    @switch($name)
+                        @case('mint')
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                @if ($noLightMode)
+                                    <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.no_light_mode') }}</h3>
+                                @else
+                                    <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.light') }}</h3>
+                                    <img src="https://haspcms-landlord.s3.ap-southeast-1.amazonaws.com/theme/mint-light.png" alt="{{ $name }} theme preview (light version)" class="border dark:border-gray-700 rounded-lg">
+                                @endif
+                            </div>
+            
+                            <div>
+                                @if ($noDarkMode)
+                                    <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.no_dark_mode') }}</h3>
+                                @else
+                                    <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.dark') }}</h3>
+                                    <img src="https://haspcms-landlord.s3.ap-southeast-1.amazonaws.com/theme/mint-dark.png" alt="{{ $name }} theme preview (dark version)" class="border dark:border-gray-700 rounded-lg">
+                                @endif
+                            </div>
                         </div>
-        
-                        <div>
-                            @if ($noDarkMode)
-                                <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.no_dark_mode') }}</h3>
-                            @else
-                                <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.dark') }}</h3>
-                                <img src="{{ url('https://raw.githubusercontent.com/Hasnayeen/themes/3.x/assets/'.$name.'-dark.png') }}" alt="{{ $name }} theme preview (dark version)" class="border dark:border-gray-700 rounded-lg">
-                            @endif
+                            
+                            @break
+    
+                    
+                        @default
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                @if ($noLightMode)
+                                    <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.no_light_mode') }}</h3>
+                                @else
+                                    <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.light') }}</h3>
+                                    <img src="{{ url('https://raw.githubusercontent.com/Hasnayeen/themes/3.x/assets/'.$name.'-light.png') }}" alt="{{ $name }} theme preview (light version)" class="border dark:border-gray-700 rounded-lg">
+                                @endif
+                            </div>
+            
+                            <div>
+                                @if ($noDarkMode)
+                                    <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.no_dark_mode') }}</h3>
+                                @else
+                                    <h3 class="text-sm font-semibold text-gray-600 pb-4">{{ __('themes::themes.dark') }}</h3>
+                                    <img src="{{ url('https://raw.githubusercontent.com/Hasnayeen/themes/3.x/assets/'.$name.'-dark.png') }}" alt="{{ $name }} theme preview (dark version)" class="border dark:border-gray-700 rounded-lg">
+                                @endif
+                            </div>
                         </div>
-                    </div>
+                            
+                    @endswitch
+                
                 </x-filament::section>
             @endforeach
         </div>
