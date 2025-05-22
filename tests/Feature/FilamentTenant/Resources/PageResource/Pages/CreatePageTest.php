@@ -120,7 +120,7 @@ it('can clone page', function () {
     $page = PageFactory::new([
         'visibility' => Visibility::PUBLIC,
     ])
-        ->published()
+        ->published(now())
         ->addBlockContent(
             BlockFactory::new()
                 ->for(
