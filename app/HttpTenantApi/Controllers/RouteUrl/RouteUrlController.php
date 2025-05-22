@@ -86,13 +86,13 @@ class RouteUrlController
 
     public function handlePageResource(Page $page): PageResource
     {
-        abort_if($page->visibility === Visibility::AUTHENTICATED->value, 403);
+        abort_if($page->visibility === Visibility::AUTHENTICATED, 403);
 
         abort_if($page->published_at === null, 404);
 
         return PageResource::make($page);
     }
-    
+
     private function handleContentEntryResource(ContentEntry $contentEntry): ContentEntryResource
     {
         /** @var \Domain\Content\Models\Content */

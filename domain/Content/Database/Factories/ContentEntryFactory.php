@@ -23,6 +23,7 @@ class ContentEntryFactory extends Factory
     {
         return [
             'title' => $this->faker->name(),
+            'published_at' => now(),
             'data' => [],
         ];
     }
