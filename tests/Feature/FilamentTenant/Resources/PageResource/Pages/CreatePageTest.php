@@ -117,7 +117,9 @@ it('can not create page with same name', function () {
 });
 
 it('can clone page', function () {
-    $page = PageFactory::new()
+    $page = PageFactory::new([
+        'visibility' => Visibility::PUBLIC,
+    ])
         ->published()
         ->addBlockContent(
             BlockFactory::new()
@@ -136,8 +138,6 @@ it('can clone page', function () {
     $block_content = $page->blockContents->toArray();
 
     unset($block_content['0']['block']);
-
-    // dd($block_content);
 
     $clonePage = livewire(CreatePage::class)
         ->assertFormSet([
