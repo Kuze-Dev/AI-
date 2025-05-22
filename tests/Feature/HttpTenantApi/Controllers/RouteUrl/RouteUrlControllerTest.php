@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Domain\Content\Database\Factories\ContentEntryFactory;
 use Domain\Content\Database\Factories\ContentFactory;
 use Domain\Page\Database\Factories\PageFactory;
+use Domain\Page\Enums\Visibility;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -35,7 +36,10 @@ it('can retrieve model at requested route url', function (HasRouteUrl $model, st
         );
 })->with([
     [
-        fn () => PageFactory::new()
+        fn () => PageFactory::new([
+            'visibility' => Visibility::PUBLIC,
+        ])
+            ->published(now())
             ->has(RouteUrlFactory::new(['url' => '/test/page']))
             ->createOne(),
         '/test/page',
@@ -55,6 +59,7 @@ it('can retrieve model at requested route url', function (HasRouteUrl $model, st
 
 it('can retrieve model using inactive route url', function () {
     $page = PageFactory::new()
+        ->published()
         ->has(
             RouteUrlFactory::new()
                 ->count(2)

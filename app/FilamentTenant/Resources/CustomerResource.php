@@ -29,7 +29,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Password;
 
 class CustomerResource extends Resource
@@ -100,7 +100,7 @@ class CustomerResource extends Resource
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->email()
-                        ->rule(Rule::email())
+                        ->rule(Email::defaults())
                         ->maxLength(255),
                     Forms\Components\TextInput::make('username')
                         ->label(trans('Username'))

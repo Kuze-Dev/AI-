@@ -67,6 +67,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Email;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Pennant\Feature;
 use Sentry\Laravel\Integration;
@@ -171,11 +172,12 @@ class AppServiceProvider extends ServiceProvider
                     )
         );
 
-        Rule::macro(
-            'email',
-            fn (): string => app()->isProduction()
-                ? 'email:rfc,dns'
-                : 'email'
+        Email::defaults(
+            fn () => $this->app->environment('local', 'testing')
+                ? Rule::email()
+                : Rule::email()
+                    ->rfcCompliant()
+                    ->validateMxRecord()
         );
 
         JsonApiResource::resolveIdUsing(fn (Model $resource): string => (string) $resource->getRouteKey());
