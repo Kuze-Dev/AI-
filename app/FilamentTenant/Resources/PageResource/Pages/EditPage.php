@@ -198,6 +198,7 @@ class EditPage extends EditRecord
                         ->label(trans('Published Draft'))
                         ->action('published')
                         ->hidden(fn () => $this->record->draftable_id === null ? true : false),
+
                     Action::make('draft')
                         ->label(trans('Save As Draft'))
                         ->action('draft')
@@ -239,10 +240,28 @@ class EditPage extends EditRecord
                 ActionGroup::make([
                     Action::make('clone-page')
                         ->label(trans('Clone Page'))
-                        ->color('secondary')
                         ->record($this->getRecord())
                         ->url(fn (Page $record) => PageResource::getUrl('create', ['clone' => $record->slug])),
                     // Array of actions
+                    Action::make('createTranslation')
+                        ->slideOver(true)
+                        ->action(function (Action $action) {
+                            /** @var array */
+                            $data = $action->getFormData();
+
+                            return $this->createTranslation($data);
+
+                        })
+                        ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
+                        ->form([
+                            Forms\Components\Select::make('locale')
+                                ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray())
+                                ->default((string) Locale::where('is_default', true)->first()?->code)
+                                ->searchable()
+                                ->hidden((bool) \Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\Internationalization::class))
+                                ->reactive()
+                                ->required(),
+                        ]),
                     Action::make('published'),
                 ])->dropdown(false),
                 // Array of actions
