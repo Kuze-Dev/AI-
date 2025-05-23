@@ -168,12 +168,16 @@ class BlueprintData extends Model implements HasMedia
                                 ->width($width)
                                 ->height($height)
                                 ->format($type)
+                                ->sharpen(10)
+                                ->quality(90)
                                 ->fit($fit, $width, $height);
                         } else {
                             /** @phpstan-ignore method.notFound */
                             $this->addMediaConversion($title)
                                 ->width($width)
                                 ->height($height)
+                                ->sharpen(10)
+                                ->quality(90)
                                 ->keepOriginalImageFormat()
                                 ->fit($fit, $width, $height);
                         }
