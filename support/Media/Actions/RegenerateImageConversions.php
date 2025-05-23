@@ -21,7 +21,7 @@ final class RegenerateImageConversions
         $this->fileManipulator->createDerivedFiles(
             $media,
             onlyConversionNames: [],
-            onlyMissing: true,
+            onlyMissing: false,
             withResponsiveImages: false,
             queueAll: false,
         );
