@@ -39,6 +39,10 @@ RUN docker-php-ext-install \
     bcmath \
     exif
 
+# Install Imagick PHP extension
+RUN pecl install imagick && \
+    docker-php-ext-enable imagick
+    
 # Clean up to reduce image size
 RUN apk del .build-deps
 
