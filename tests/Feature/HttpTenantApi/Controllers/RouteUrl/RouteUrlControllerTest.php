@@ -58,7 +58,9 @@ it('can retrieve model at requested route url', function (HasRouteUrl $model, st
 ]);
 
 it('can retrieve model using inactive route url', function () {
-    $page = PageFactory::new()
+    $page = PageFactory::new([
+        'visibility' => Visibility::PUBLIC,
+    ])
         ->published()
         ->has(
             RouteUrlFactory::new()
