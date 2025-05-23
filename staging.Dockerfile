@@ -1,10 +1,10 @@
 # Use the official Vapor Docker base image for PHP 8.3
 FROM laravelphp/vapor:php83
 
-#Upgrade critical system libraries and apk-tools
-RUN apk upgrade -Ua 
+# Upgrade critical system libraries and apk-tools
+RUN apk upgrade -Ua
 
-# Install system dependencies as needed (e.g., for image processing, queues, etc.)
+# Install runtime dependencies and optimizers
 RUN apk --no-cache add \
     git \
     unzip \
@@ -20,7 +20,15 @@ RUN apk --no-cache add \
     libzip \
     oniguruma \
     ca-certificates \
-    && apk --no-cache add --virtual .build-deps \
+    jpegoptim \
+    optipng \
+    pngquant \
+    gifsicle \
+    nodejs \
+    npm \
+    libwebp-tools \
+    avif-tools && \
+    apk --no-cache add --virtual .build-deps \
     gmp-dev \
     libpng-dev \
     libjpeg-turbo-dev \
@@ -38,6 +46,10 @@ RUN docker-php-ext-configure gd \
     --with-jpeg \
     --with-webp
 
+# Install Imagick PHP extension
+RUN pecl install imagick && \
+    docker-php-ext-enable imagick
+
 # Install PHP extensions
 RUN docker-php-ext-install \
     gmp \
@@ -47,7 +59,10 @@ RUN docker-php-ext-install \
     exif \
     gd
 
-# Clean up to reduce image size
+# Install SVGO (SVG optimizer)
+RUN npm install -g svgo
+
+# Clean up build dependencies to reduce image size
 RUN apk del .build-deps
 
 # Optional: Copy PHP config overrides (uncomment if needed)
@@ -59,7 +74,7 @@ COPY . /var/task
 # Set working directory
 WORKDIR /var/task
 
-# Combine RDS and system CA certs for universal MySQL SSL and for planetscale
+# Combine RDS and system CA certs for universal MySQL SSL and for PlanetScale
 RUN cat /var/task/rds-combined-ca-bundle.pem /etc/ssl/certs/ca-certificates.crt > /etc/ssl/certs/combined-mysql-ca.pem
 
 # Ensure necessary directories exist and set correct permissions
