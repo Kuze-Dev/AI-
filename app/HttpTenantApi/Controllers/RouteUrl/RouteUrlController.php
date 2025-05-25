@@ -86,8 +86,6 @@ class RouteUrlController
 
     public function handlePageResource(Page $page): PageResource
     {
-        abort_if($page->visibility === Visibility::AUTHENTICATED, 403);
-
         abort_if($page->published_at === null && ! $page->isHomePage(), 404);
 
         return PageResource::make($page);
