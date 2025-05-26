@@ -157,7 +157,6 @@ class EditContentEntry extends EditRecord
                         return "https://{$domain}/preview?contents={$this->ownerRecord->slug}&slug={$this->record->slug}&{$queryString}";
                     }, true),
                 Action::make('createTranslation')
-                    ->color('secondary')
                     ->slideOver(true)
                     ->action(function (Action $action) {
                         /** @var array */

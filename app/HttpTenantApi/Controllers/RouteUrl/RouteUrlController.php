@@ -76,12 +76,19 @@ class RouteUrlController
         $routeUrl = $queryRouteUrl->firstOrFail();
 
         return match ($routeUrl->model::class) {
-            Page::class => PageResource::make($routeUrl->model),
+            Page::class => $this->handlePageResource($routeUrl->model),
             ContentEntry::class => $this->handleContentEntryResource($routeUrl->model),
             Taxonomy::class => TaxonomyResource::make($routeUrl->model),
             TaxonomyTerm::class => TaxonomyTermResource::make($routeUrl->model),
             default => throw new InvalidArgumentException('No resource found for model '.$routeUrl->model::class),
         };
+    }
+
+    public function handlePageResource(Page $page): PageResource
+    {
+        abort_if($page->published_at === null && ! $page->isHomePage(), 404);
+
+        return PageResource::make($page);
     }
 
     private function handleContentEntryResource(ContentEntry $contentEntry): ContentEntryResource
