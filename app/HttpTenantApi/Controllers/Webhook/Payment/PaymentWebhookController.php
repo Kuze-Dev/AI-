@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\HttpTenantApi\Controllers\Payment;
+namespace App\HttpTenantApi\Controllers\Webhook\Payment;
 
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Contracts\PaymentManagerInterface;
@@ -14,7 +14,7 @@ use Throwable;
 
 class PaymentWebhookController
 {
-    #[Post('/paymentwebhook/{paymentmethod}/{status}', name: 'payment-webhook')]
+    #[Post('/payment-webhook/{paymentmethod}/{status}', name: 'payment-webhook')]
     public function handleWebhook(string $paymentmethod, string $status, Request $request): JsonResponse
     {
         try {
