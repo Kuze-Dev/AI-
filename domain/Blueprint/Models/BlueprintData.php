@@ -168,7 +168,6 @@ class BlueprintData extends Model implements HasMedia
                                 ->width($width)
                                 ->height($height)
                                 ->format($type)
-                                ->nonOptimized()
                                 // ->sharpen(10)
                                 // ->quality(90)
                                 ->fit($fit, $width, $height);
@@ -177,7 +176,6 @@ class BlueprintData extends Model implements HasMedia
                             $this->addMediaConversion($title)
                                 ->width($width)
                                 ->height($height)
-                                ->nonOptimized()
                                 // ->sharpen(10)
                                 // ->quality(90)
                                 ->keepOriginalImageFormat()

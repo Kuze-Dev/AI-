@@ -214,6 +214,8 @@ class SchemaFormBuilder extends Component
             });
         }
 
+        $fileUpload->imageEditor($fileFieldData->image_editor);
+
         return $fileUpload;
     }
 
@@ -239,6 +241,8 @@ class SchemaFormBuilder extends Component
         }
 
         $media->openable();
+
+        $media->imageEditor($mediaFieldData->image_editor);
 
         $media->formatStateUsing(function (?array $state): array {
 
