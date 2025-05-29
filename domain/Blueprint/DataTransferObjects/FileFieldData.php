@@ -23,6 +23,7 @@ class FileFieldData extends FieldData
         public readonly bool $reorder = false,
         public readonly bool $can_download = false,
         public readonly bool $translatable = true,
+        public readonly bool $image_editor = false,
         public readonly array $accept = [],
         public readonly ?int $min_size = null,
         public readonly ?int $max_size = null,
@@ -53,6 +54,7 @@ class FileFieldData extends FieldData
             min_files: $data['min_files'] ?? null,
             max_files: $data['max_files'] ?? null,
             helper_text: $data['helper_text'] ?? null,
+            image_editor: $data['image_editor'] ?? false,
         );
     }
 }
