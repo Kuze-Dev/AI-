@@ -214,6 +214,8 @@ class SchemaFormBuilder extends Component
             });
         }
 
+        $fileUpload->imageEditor($fileFieldData->image_editor);
+
         return $fileUpload;
     }
 
@@ -240,12 +242,14 @@ class SchemaFormBuilder extends Component
 
         $media->openable();
 
+        $media->imageEditor($mediaFieldData->image_editor);
+
         $media->formatStateUsing(function (?array $state): array {
 
             if ($state) {
 
                 /** @var array */
-                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name', $state)->pluck('uuid')->toArray();
+                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name', $state)->orderby('order_column', 'asc')->pluck('uuid')->toArray();
 
                 if ($media) {
                     return $media;

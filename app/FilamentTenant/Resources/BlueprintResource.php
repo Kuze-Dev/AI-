@@ -285,6 +285,8 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('can_download'),
                 Forms\Components\Toggle::make('translatable')
                     ->default(true),
+                Forms\Components\Toggle::make('image_editor')
+                    ->default(false),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
@@ -664,6 +666,8 @@ class BlueprintResource extends Resource
                 Forms\Components\Toggle::make('multiple')
                     ->reactive(),
                 Forms\Components\Toggle::make('reorder'),
+                Forms\Components\Toggle::make('image_editor')
+                    ->default(false),
                 Forms\Components\TextInput::make('accept')
                     ->afterStateHydrated(function (\Filament\Forms\Set $set, ?array $state): void {
                         $set('accept', implode(',', $state ?? []));
