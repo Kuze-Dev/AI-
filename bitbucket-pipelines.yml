@@ -136,8 +136,8 @@ pipelines:
               script:
                 - *setup-script
                 - composer global require laravel/vapor-cli --update-with-dependencies
+                - *docker-push-to-ecr
                 - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
-          - step: *docker-push-to-ecr
           
   pull-requests:
     "**":
