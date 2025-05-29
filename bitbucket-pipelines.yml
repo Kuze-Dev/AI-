@@ -51,7 +51,7 @@ definitions:
           - composer test-ci
     - step: &docker-push-to-ecr
         name: Build & Push Docker Image to ECR
-        image: amazon/aws-cli:2.0.0
+        image: public.ecr.aws/aws-cli/aws-cli:2.27.24
         services:
           - docker
         script:
@@ -127,7 +127,6 @@ pipelines:
           - step: *check-format
           - step: *analyse
           - step: *test
-          - step: *docker-push-to-ecr
           - step:
               <<: *common-step
               name: Deploy to Ecommerce Branch
@@ -138,6 +137,7 @@ pipelines:
                 - *setup-script
                 - composer global require laravel/vapor-cli --update-with-dependencies
                 - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
+          - step: *docker-push-to-ecr
           
   pull-requests:
     "**":
