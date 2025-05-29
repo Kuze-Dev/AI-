@@ -249,7 +249,7 @@ class SchemaFormBuilder extends Component
             if ($state) {
 
                 /** @var array */
-                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name', $state)->pluck('uuid')->toArray();
+                $media = Media::whereIn('uuid', $state)->orwhereIN('file_name', $state)->orderby('order_column', 'asc')->pluck('uuid')->toArray();
 
                 if ($media) {
                     return $media;
