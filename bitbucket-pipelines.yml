@@ -62,7 +62,7 @@ definitions:
             "ecommerce-branch") TAG_ENV="ecommerce";;
             "master") TAG_ENV="prod";;
             *) TAG_ENV="dev";;
-          esac
+            esac
         - export IMAGE_TAG="$TAG_ENV-$BITBUCKET_COMMIT"
         - export IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/hasp"
 
