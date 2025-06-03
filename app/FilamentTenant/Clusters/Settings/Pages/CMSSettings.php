@@ -51,7 +51,8 @@ class CMSSettings extends TenantBaseSettings
 
             Section::make([
                 Select::make('media_blueprint_id')
-                    ->label(trans('Blueprint'))
+                    ->label(trans('Media Custom Attribute Fields'))
+                    ->placeholder('Select blueprint for media custom attributes')
                     ->preload()
                     ->reactive()
                     ->optionsFromModel(Blueprint::class, 'name'),
