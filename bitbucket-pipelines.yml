@@ -49,40 +49,6 @@ definitions:
         script:
           - *setup-script
           - composer test-ci
-    - step: &docker-push-to-ecr
-        name: Build & Push Docker Image to ECR
-        image: public.ecr.aws/aws-cli/aws-cli:2.27.24
-        services:
-          - docker
-        script:
-          - export TAG_ENV=""
-          - |
-            case "$BITBUCKET_BRANCH" in
-              "staging") TAG_ENV="staging";;
-              "ecommerce-branch") TAG_ENV="ecommerce";;
-              "master") TAG_ENV="prod";;
-              *) TAG_ENV="dev";;
-              esac
-          - export IMAGE_TAG="$TAG_ENV-$BITBUCKET_COMMIT"
-          - export IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/hasp"
-
-          # AWS and ECR Login
-          - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-          - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-          - aws configure set default.region $AWS_DEFAULT_REGION
-          - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $IMAGE_URI
-
-          # Docker build and push
-          - docker build -t hasp .
-          - docker tag hasp:latest $IMAGE_URI:$IMAGE_TAG
-          - docker push $IMAGE_URI:$IMAGE_TAG
-
-          # Optionally also push :latest for production
-          - |
-            if [ "$BITBUCKET_BRANCH" = "master" ]; then
-              docker tag hasp:latest $IMAGE_URI:latest
-              docker push $IMAGE_URI:latest
-            fi
 
 pipelines:
   branches:
@@ -136,9 +102,7 @@ pipelines:
               script:
                 - *setup-script
                 - composer global require laravel/vapor-cli --update-with-dependencies
-                - *docker-push-to-ecr
                 - ./vendor/bin/vapor deploy ecommerce-branch --commit="$BITBUCKET_COMMIT"
-          
   pull-requests:
     "**":
       - parallel:
