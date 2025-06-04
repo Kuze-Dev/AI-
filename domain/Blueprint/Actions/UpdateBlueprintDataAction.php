@@ -6,6 +6,7 @@ namespace Domain\Blueprint\Actions;
 
 use App\Settings\CustomerSettings;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
+use Domain\Blueprint\DataTransferObjects\ConversionData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob;
 use Domain\Blueprint\Models\Blueprint;
@@ -147,7 +148,12 @@ class UpdateBlueprintDataAction
             $mediField = $this->getFieldByStatePathAction->execute($blueprint, $formattedStatePath);
             $conversions = $mediField->conversions;
 
-            if ($conversions != $blueprintData->blueprint_media_conversion || is_null($blueprintData->blueprint_media_conversion)) {
+            $savedConversions = array_map(
+                fn (array $conversion) => ConversionData::fromArray($conversion),
+                $blueprintData->blueprint_media_conversion ?? []
+            );
+
+            if (serialize($conversions) !== serialize($blueprintData->blueprint_media_conversion) || is_null($blueprintData->blueprint_media_conversion)) {
 
                 $blueprintData->update([
                     'blueprint_media_conversion' => $conversions,
