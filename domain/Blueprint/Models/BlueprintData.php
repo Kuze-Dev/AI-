@@ -28,6 +28,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $model_id
  * @property string $state_path
  * @property string|null $value
+ * @property array|null $blueprint_media_conversion
  * @property string $type
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -61,6 +62,7 @@ class BlueprintData extends Model implements HasMedia
         'model_id',
         'model_type',
         'state_path',
+        'blueprint_media_conversion',
         'value',
         'type',
     ];
@@ -69,6 +71,7 @@ class BlueprintData extends Model implements HasMedia
     {
         return [
             // 'type' => BlueprintDataType::class,
+            'blueprint_media_conversion' => 'array',
             'value' => 'array',
         ];
     }
@@ -96,14 +99,80 @@ class BlueprintData extends Model implements HasMedia
     #[\Override]
     public function registerMediaConversions(?Media $media = null): void
     {
-        $blueprint = $this->blueprint;
-        if (! $blueprint) {
-            return;
-        }
-        $schema = $blueprint->schema;
-        foreach ($schema->sections as $section) {
-            foreach ($section->fields as $field) {
-                $this->processRepeaterField($field, $section->state_name);
+        /**
+         * TODO: Remove old implementation of media conversions
+         * once all tenants is migrated to the process.
+         *
+         * Each media conversion will be defined in the blueprintdata model to handle
+         * conversion properly and to avoid loss of data when the blueprint is updated.
+         */
+        if (! is_null($this->blueprint_media_conversion) && count($this->blueprint_media_conversion) > 0) {
+            foreach ($this->blueprint_media_conversion as $conversion) {
+                $title = $conversion['name'];
+                $width = $conversion['width'] ?? null;
+                $height = $conversion['height'] ?? null;
+                $type = $conversion['type'] ?? null;
+                // $fit = 'contain';
+                $fit = Fit::Contain;
+                if (isset($conversion['manipulations'])) {
+                    foreach ($conversion['manipulations'] as $manipulation) {
+                        if ($manipulation['type'] === ManipulationType::WIDTH->value) {
+                            $width = $manipulation['params'][0];
+                        }
+                        if ($manipulation['type'] === ManipulationType::HEIGHT->value) {
+                            $height = $manipulation['params'][0];
+                        }
+                        if ($manipulation['type'] === ManipulationType::TYPE->value) {
+                            if (! empty($manipulation['params'][0])) {
+                                $type = $manipulation['params'][0];
+                            }
+                        }
+                        if ($manipulation['type'] === ManipulationType::FIT->value) {
+                            // $fit = $manipulation->params[0];
+                            /** @phpstan-ignore match.unhandled */
+                            $fit = match ($manipulation['params'][0]) {
+                                'contain' => Fit::Contain,
+                                'max' => Fit::Max,
+                                'fill' => Fit::Fill,
+                                'fill-max' => Fit::FillMax,
+                                'stretch' => Fit::Stretch,
+                                'crop' => Fit::Crop,
+                            };
+                        }
+                    }
+
+                    if ($type) {
+                        $this->addMediaConversion($title)
+                            ->width($width)
+                            ->height($height)
+                            ->format($type)
+                            // ->sharpen(10)
+                            // ->quality(90)
+                            ->fit($fit, $width, $height);
+                    } else {
+                        /** @phpstan-ignore method.notFound */
+                        $this->addMediaConversion($title)
+                            ->width($width)
+                            ->height($height)
+                            // ->sharpen(10)
+                            // ->quality(90)
+                            ->keepOriginalImageFormat()
+                            ->fit($fit, $width, $height);
+                    }
+                }
+            }
+
+        } else {
+
+            $blueprint = $this->blueprint;
+            if (! $blueprint) {
+                return;
+            }
+            $schema = $blueprint->schema;
+            foreach ($schema->sections as $section) {
+                foreach ($section->fields as $field) {
+                    $this->processRepeaterField($field, $section->state_name);
+                }
             }
         }
 
