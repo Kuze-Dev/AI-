@@ -6,6 +6,7 @@ namespace Domain\Blueprint\Actions;
 
 use App\Settings\CustomerSettings;
 use Domain\Blueprint\DataTransferObjects\BlueprintDataData;
+use Domain\Blueprint\DataTransferObjects\ConversionData;
 use Domain\Blueprint\Enums\FieldType;
 use Domain\Blueprint\Jobs\DeleteS3FilesFromDeletedBlueprintDataJob;
 use Domain\Blueprint\Models\Blueprint;
@@ -24,6 +25,7 @@ class UpdateBlueprintDataAction
     public function __construct(
         protected ExtractDataAction $extractDataAction,
         protected CreateBlueprintDataAction $createBlueprintData,
+        protected GetFieldByStatePathAction $getFieldByStatePathAction,
     ) {}
 
     public function execute(Model $model): void
@@ -135,6 +137,37 @@ class UpdateBlueprintDataAction
         }
 
         if ($blueprintData->type === FieldType::MEDIA->value) {
+            /** @var \Domain\Blueprint\Models\Blueprint */
+            $blueprint = Blueprint::where('id', $blueprintDataData->blueprint_id)->first();
+
+            $formattedStatePath = collect(explode('.', $blueprintDataData->state_path))
+                ->reject(fn ($segment) => is_numeric($segment))
+                ->implode('.');
+
+            /** @var \Domain\Blueprint\DataTransferObjects\MediaFieldData */
+            $mediField = $this->getFieldByStatePathAction->execute($blueprint, $formattedStatePath);
+            $conversions = $mediField->conversions;
+
+            $savedConversions = array_map(
+                fn (array $conversion) => ConversionData::fromArray($conversion),
+                $blueprintData->blueprint_media_conversion ?? []
+            );
+
+            if (serialize($conversions) !== serialize($blueprintData->blueprint_media_conversion) || is_null($blueprintData->blueprint_media_conversion)) {
+
+                $blueprintData->update([
+                    'blueprint_media_conversion' => $conversions,
+                ]);
+
+                $blueprintData->refresh();
+
+                $mediaItems = $blueprintData->getMedia('blueprint_media');
+
+                foreach ($mediaItems as $mediaItem) {
+                    app(\Support\Media\Actions\RegenerateImageConversions::class)->execute($mediaItem);
+                }
+
+            }
 
             if (! $blueprintDataData->value) {
 
