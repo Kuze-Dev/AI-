@@ -147,7 +147,7 @@ class UpdateBlueprintDataAction
             $mediField = $this->getFieldByStatePathAction->execute($blueprint, $formattedStatePath);
             $conversions = $mediField->conversions;
 
-            if ($conversions !== $blueprintData->blueprint_media_conversion || is_null($blueprintData->blueprint_media_conversion)) {
+            if ($conversions != $blueprintData->blueprint_media_conversion || is_null($blueprintData->blueprint_media_conversion)) {
 
                 $blueprintData->update([
                     'blueprint_media_conversion' => $conversions,
