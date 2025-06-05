@@ -43,7 +43,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $customer_first_name
  * @property string $customer_last_name
  * @property string $customer_email
- * @property string $customer_mobile
+ * @property string|null $customer_mobile
  * @property array $customer_form
  * @property array $additional_charges
  * @property string $currency_code
