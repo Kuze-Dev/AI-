@@ -96,7 +96,7 @@ return Application::configure(basePath: dirname(__DIR__))
             });
 
         $schedule
-            ->everyFifteenMinutes()
+            ->daily()
             ->group(function (Schedule $schedule) {
 
                 $schedule->command(
