@@ -30,20 +30,9 @@ class ProductVariantsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Group::make()
                     ->schema([
-                        Forms\Components\Group::make()
-                            ->schema(function ($state) {
-                                $schemaArray = [];
-                                foreach ($state['combination'] as $key => $combination) {
-                                    $schemaArray[$key] =
-                                        Forms\Components\TextInput::make("combination[{$key}].option_value")
-                                            ->formatStateUsing(fn () => ucfirst((string) $combination['option_value']))
-                                            ->label(trans(ucfirst((string) $combination['option'])))
-                                            ->dehydrated(false)
-                                            ->disabled();
-                                }
 
-                                return $schemaArray;
-                            })->dehydrated(false)->columns(2),
+                        Forms\Components\Placeholder::make('combination')
+                            ->content(fn ($record) => ' - '.$record->stringCombination),
                         Forms\Components\Section::make('Inventory')
                             ->translateLabel()
                             ->schema([
@@ -117,6 +106,7 @@ class ProductVariantsRelationManager extends RelationManager
                             ->translateLabel()
                             ->schema([
                                 SpatieMediaLibraryFileUpload::make('images')
+                                    ->imageEditor()
                                     ->collection('image'),
                             ]),
                     ]),

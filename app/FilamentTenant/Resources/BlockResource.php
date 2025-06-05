@@ -72,6 +72,7 @@ class BlockResource extends Resource
                     })
                     ->openable()
                     ->image()
+                    ->imageEditor()
                     ->getUploadedFileUsing(function ($file) {
 
                         if (! is_null($file)) {
