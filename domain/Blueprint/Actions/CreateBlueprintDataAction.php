@@ -21,10 +21,24 @@ class CreateBlueprintDataAction
 {
     public function __construct(
         protected ExtractDataAction $extractDataAction,
+        protected GetFieldByStatePathAction $getFieldByStatePathAction,
     ) {}
 
     public function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
+        /** @var \Domain\Blueprint\Models\Blueprint */
+        $blueprint = Blueprint::where('id', $blueprintDataData->blueprint_id)->first();
+
+        if ($blueprintDataData->type === FieldType::MEDIA) {
+
+            $formattedStatePath = collect(explode('.', $blueprintDataData->state_path))
+                ->reject(fn ($segment) => is_numeric($segment))
+                ->implode('.');
+            /** @var \Domain\Blueprint\DataTransferObjects\MediaFieldData */
+            $mediField = $this->getFieldByStatePathAction->execute($blueprint, $formattedStatePath);
+            $conversions = $mediField->conversions;
+
+        }
 
         $blueprintData = BlueprintData::create([
             'blueprint_id' => $blueprintDataData->blueprint_id,
@@ -33,6 +47,7 @@ class CreateBlueprintDataAction
             'state_path' => $blueprintDataData->state_path,
             'value' => $blueprintDataData->value,
             'type' => $blueprintDataData->type,
+            'blueprint_media_conversion' => $conversions ?? null,
         ]);
 
         if ($blueprintDataData->type === FieldType::LOCATION_PICKER && $blueprintData->value) {
