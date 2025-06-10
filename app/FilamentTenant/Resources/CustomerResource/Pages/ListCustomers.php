@@ -23,6 +23,8 @@ class ListCustomers extends ListRecords
         return [
             // TODO: export only RegisterStatus::REGISTERED
             ExportAction::make()
+                ->color('primary')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->exporter(CustomerExporter::class)
 //                ->authorize() // TODO: authorize customer export
                 ->withActivityLog(
