@@ -6,19 +6,13 @@ namespace App\FilamentTenant\Resources\InviteCustomerResource\Pages;
 
 use App\FilamentTenant\Resources\CustomerResource\Pages\ListCustomers;
 use App\FilamentTenant\Resources\InviteCustomerResource;
-use App\Settings\CustomerSettings;
-use Domain\Customer\Actions\ImportCustomerAction;
 use Domain\Customer\Actions\SendRegisterInvitationsAction;
-use Domain\Customer\Enums\Gender;
 use Domain\Customer\Enums\RegisterStatus;
-use Domain\Customer\Models\Customer;
-use Domain\Tier\Models\Tier;
+use Domain\Customer\Imports\CustomerImporter;
 use Filament\Actions;
 // use Filament\Actions\ImportAction;
 use Filament\Forms;
-use HalcyonAgile\FilamentImport\Actions\ImportAction;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class ListInviteCustomers extends ListCustomers
 {
@@ -28,45 +22,15 @@ class ListInviteCustomers extends ListCustomers
     #[\Override]
     protected function getHeaderActions(): array
     {
-        $date_format = app(CustomerSettings::class)->date_format;
-
         return [
-            ImportAction::make()
-                ->model(Customer::class)
-                ->uniqueBy('email')
-//                ->batchSize(100)
-//                ->chunkSize(100)
-                ->tags([
-                    'tenant:'.(tenant('id') ?? 'central'),
-                ])
-                ->processRowsUsing(
-                    fn (array $row) => app(ImportCustomerAction::class)
-                        ->execute(array_filter($row))
-                )
-                ->withValidation(
-                    rules: [
-                        'email' => [
-                            'required',
-                            Rule::email(),
-                            'distinct',
-                        ],
-                        'username' => 'nullable',
-                        'first_name' => 'nullable|string|min:1|max:100',
-                        'last_name' => 'nullable|string|min:1|max:100',
-                        'mobile' => 'nullable|min:3|max:100',
-                        'gender' => ['nullable', Rule::enum(Gender::class)],
-                        'birth_date' => [
-                            'nullable',
-                            ($date_format === 'default' ||
-                            $date_format === '') ? 'date' : 'date_format:'.$date_format],
-                        'password' => 'nullable',
-                        'registered' => 'nullable',
-                        'data' => 'nullable',
-                        'tier' => [
-                            'nullable',
-                            Rule::exists(Tier::class, 'name'),
-                        ],
-                    ],
+            \Filament\Actions\ImportAction::make()
+                ->color('primary')
+                ->icon('heroicon-o-arrow-up-tray')
+                ->label(trans('Import customer invite'))
+                ->importer(CustomerImporter::class)
+                ->withActivityLog(
+                    event: 'imported',
+                    description: fn (\Filament\Actions\ImportAction $action) => 'Imported '.$action->getModelLabel(),
                 ),
             Actions\Action::make('send-register-invitation')
                 ->translateLabel()
