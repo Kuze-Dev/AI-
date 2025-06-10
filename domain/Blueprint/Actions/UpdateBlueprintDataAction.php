@@ -153,7 +153,7 @@ class UpdateBlueprintDataAction
                 $blueprintData->blueprint_media_conversion ?? []
             );
 
-            if (serialize($conversions) !== serialize($blueprintData->blueprint_media_conversion) || is_null($blueprintData->blueprint_media_conversion)) {
+            if (serialize($conversions) !== serialize($savedConversions) || is_null($blueprintData->blueprint_media_conversion)) {
 
                 $blueprintData->update([
                     'blueprint_media_conversion' => $conversions,
@@ -168,6 +168,8 @@ class UpdateBlueprintDataAction
                 }
 
             }
+
+            $blueprintData->refresh();
 
             if (! $blueprintDataData->value) {
 
