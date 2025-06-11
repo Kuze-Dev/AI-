@@ -95,7 +95,10 @@ class UpdateBlueprintDataAction
 
             if ($decopuledData->type === FieldType::MEDIA->value) {
 
-                $newValue = $decopuledData->getMedia('blueprint_media')->pluck('uuid')->toArray();
+                // $newValue = $decopuledData->
+                $newValue = $decopuledData->value
+                    ? json_decode($decopuledData->value, true)
+                    : [];
             }
 
             $keys = explode('.', $statePath);
@@ -163,13 +166,12 @@ class UpdateBlueprintDataAction
 
                 $mediaItems = $blueprintData->getMedia('blueprint_media');
 
+                // regenerate conversions for media items
                 foreach ($mediaItems as $mediaItem) {
                     app(\Support\Media\Actions\RegenerateImageConversions::class)->execute($mediaItem);
                 }
 
             }
-
-            $blueprintData->refresh();
 
             if (! $blueprintDataData->value) {
 
@@ -217,10 +219,11 @@ class UpdateBlueprintDataAction
                 }
 
                 // media ordering..
+                $blueprintData->refresh();
 
                 $existingMedia = $blueprintData->getMedia('blueprint_media')->pluck('uuid')->toArray();
 
-                $updatedMedia = array_intersect($existingMedia, $currentMedia);
+                $updatedMedia = array_intersect($currentMedia, $existingMedia);
 
                 foreach ($currentMedia as $key => $media_uuid) {
 

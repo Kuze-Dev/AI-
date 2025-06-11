@@ -7,6 +7,7 @@ namespace App\HttpTenantApi\Controllers\Taxonomy;
 use App\Features\CMS\CMSBase;
 use App\HttpTenantApi\Resources\TaxonomyResource;
 use Domain\Taxonomy\Models\Taxonomy;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -22,7 +23,11 @@ class TaxonomyController
     {
         return TaxonomyResource::collection(
             QueryBuilder::for(Taxonomy::query())
-                ->allowedFilters(['name', 'slug'])
+                ->allowedFilters(
+                    ['name',
+                        'slug',
+                        AllowedFilter::exact('locale'),
+                    ])
                 ->allowedIncludes([
                     'parentTerms.children',
                     'parentTerms.taxonomy',
