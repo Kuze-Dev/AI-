@@ -36,6 +36,7 @@ class ContentEntryV2Controller
                 ->allowedFilters([
                     'title',
                     'slug',
+                    AllowedFilter::exact('locale'),
                     AllowedFilter::callback(
                         'publish_status',
                         fn (ContentEntryBuilder $query, $value) => $query->wherePublishStatus(PublishBehavior::tryFrom($value))

@@ -73,6 +73,7 @@ class ProductResource extends Resource
                             Forms\Components\SpatieMediaLibraryFileUpload::make('image')
                                 ->translateLabel()
                                 ->collection('image')
+                                ->imageEditor()
                                 ->image()
                                 ->multiple()
                                 ->required(),
