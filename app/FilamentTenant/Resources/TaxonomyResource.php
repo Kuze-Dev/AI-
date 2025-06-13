@@ -203,7 +203,7 @@ class TaxonomyResource extends Resource
 
                             $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                            return ! in_array($value, $intersect, true);
+                            return in_array($value, $intersect, true);
                         })
                         ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?Taxonomy $record): void {
                             if (! $record) {
