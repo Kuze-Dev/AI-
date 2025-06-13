@@ -17,30 +17,29 @@ class PaymentWebhookController
     #[Post('/payment-webhook/{paymentmethod}/{status}', name: 'payment-webhook')]
     public function handleWebhook(string $paymentmethod, string $status, Request $request): JsonResponse
     {
-        try {
-            $paymentMethod = PaymentMethod::where('slug', $paymentmethod)->first();
 
-            if (! $paymentMethod) {
-                abort(404, 'Payment method not found.');
-            }
+        abort(501, 'Payment webhook handling is not implemented yet.');
+        // try {
 
-            $paymentProvider = app(PaymentManagerInterface::class)->driver($paymentMethod->gateway);
+        //     $paymentMethod = PaymentMethod::where('slug', $paymentmethod)->firtorfail();
 
-            if (! $paymentProvider instanceof HandlesWebhook) {
-                abort(400, 'Webhook not supported for this provider.');
-            }
+        //     $paymentProvider = app(PaymentManagerInterface::class)->driver($paymentMethod->gateway);
 
-            $paymentProvider->handleWebhook($request, $status);
+        //     if (! $paymentProvider instanceof HandlesWebhook) {
+        //         abort(400, 'Webhook not supported for this provider.');
+        //     }
 
-            return response()->json([
-                'message' => ucfirst($paymentmethod).' webhook processed.',
-            ], 200);
+        //     $paymentProvider->handleWebhook($request, $status);
 
-        } catch (Throwable $e) {
-            return response()->json([
-                'message' => 'Webhook processing failed.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        //     return response()->json([
+        //         'message' => ucfirst($paymentmethod).' webhook processed.',
+        //     ], 200);
+
+        // } catch (Throwable $e) {
+        //     return response()->json([
+        //         'message' => 'Webhook processing failed.',
+        //         'error' => $e->getMessage(),
+        //     ], 500);
+        // }
     }
 }
