@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Domain\Payments\Actions;
 
 use App\Features\Shopconfiguration\PaymentGateway\BankTransfer;
+use App\Features\Shopconfiguration\PaymentGateway\MayaGateway;
 use App\Features\Shopconfiguration\PaymentGateway\OfflineGateway;
 use App\Features\Shopconfiguration\PaymentGateway\PaypalGateway;
 use App\Features\Shopconfiguration\PaymentGateway\StripeGateway;
@@ -30,6 +31,9 @@ class GetAvailablePaymentDriverAction
                 : false,
             'vision-pay' => TenantFeatureSupport::active(VisionpayGateway::class)
                 ? app(VisionpayGateway::class)->getLabel()
+                : false,
+            'maya' => TenantFeatureSupport::active(MayaGateway::class)
+                ? app(MayaGateway::class)->getLabel()
                 : false,
         ], fn ($value) => $value !== false);
 
