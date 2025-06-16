@@ -365,7 +365,7 @@ class ContentEntryResource extends Resource
                         // fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()
                     ),
                 Tables\Filters\SelectFilter::make('locale')
-                        ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
                     ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))
