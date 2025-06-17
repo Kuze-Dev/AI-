@@ -6,6 +6,7 @@ namespace Domain\Payments;
 
 use Domain\PaymentMethod\Models\PaymentMethod;
 use Domain\Payments\Contracts\PaymentManagerInterface;
+use Domain\Payments\Providers\MayaProvider;
 use Domain\Payments\Providers\OfflinePayment;
 use Domain\Payments\Providers\PaypalProvider;
 use Domain\Payments\Providers\StripeProvider;
@@ -42,6 +43,7 @@ class PaymentServiceProvider extends ServiceProvider implements DeferrableProvid
                         'stripe' => new StripeProvider,
                         'bank-transfer' => new OfflinePayment,
                         'vision-pay' => new VisionPayProvider,
+                        'maya' => new MayaProvider,
                         default => throw new InvalidArgumentException,
                     });
                 }

@@ -211,7 +211,7 @@ class ContentEntryResource extends Resource
 
                                 $intersect = array_intersect(array_keys($component->getOptions()), $user_sites);
 
-                                return ! in_array($value, $intersect, false);
+                                return in_array($value, $intersect, true);
                             })
                             ->afterStateHydrated(function (Forms\Components\CheckboxList $component, ?ContentEntry $record): void {
                                 if (! $record) {
@@ -364,6 +364,8 @@ class ContentEntryResource extends Resource
                     ->visible(
                         // fn ($livewire) => $livewire->ownerRecord->taxonomies->isNotEmpty()
                     ),
+                Tables\Filters\SelectFilter::make('locale')
+                    ->options(Locale::all()->sortByDesc('is_default')->pluck('name', 'code')->toArray()),
                 Tables\Filters\SelectFilter::make('sites')
                     ->multiple()
                     ->hidden((bool) ! (\Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)))

@@ -5,7 +5,7 @@
     "src": "resources/css/filament/app.css"
   },
   "resources/css/filament/tenant/themes/mint.css": {
-    "file": "assets/mint-c3eae76a.css",
+    "file": "assets/mint-289c49e9.css",
     "isEntry": true,
     "src": "resources/css/filament/tenant/themes/mint.css"
   },

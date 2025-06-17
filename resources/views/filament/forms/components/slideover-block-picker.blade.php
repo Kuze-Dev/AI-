@@ -14,7 +14,7 @@
 
 <x-slot name="trigger">
     <div class="flex justify-center">
-        <x-filament::button class="p-2 flex flex-col items-center justify-center space-y-2 border" style="background-color: transparent !important;">
+        <x-filament::button class="p-2 flex flex-col items-center justify-center space-y-2 border" style="background-color: transparent !important;"  >
             @if (isset($blocks[$getState()]['image']))
                 @if ($blocks[$getState()]['image'])
                     <img class="object-contain" style="height: 200px"
@@ -28,7 +28,7 @@
                     <p class="text-sm text-white">@lang('No preview available')</p>
                 @endif
             @else
-                <p class="text-sm text-white">@lang('Select a '){{ $getLabel() }}</p>
+                <p class="text-sm text-white">@lang('Select a block')</p>
             @endif
         </x-filament::button>
     </div>
@@ -38,7 +38,7 @@
 <x-slot name="heading">
     <div class="flex items-center justify-between">
         <h2 class="text-md font-semibold text-gray-900 dark:text-gray-100">
-            @lang('Select a '){{ $getLabel() }}
+            @lang('Select a block')
         </h2>
        
     </div>
