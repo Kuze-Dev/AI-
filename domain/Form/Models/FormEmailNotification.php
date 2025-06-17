@@ -27,7 +27,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property bool $has_attachments
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Domain\Form\Models\Form|null $form
+ * @property-read \Domain\Form\Models\Form $form
  *
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FormEmailNotification newQuery()
