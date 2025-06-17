@@ -1,18 +1,7 @@
-{{-- <x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :id="$getId()"
-    :label="$getLabel()"
-    :label-sr-only="$isLabelHidden()"
-    :helper-text="$getHelperText()"
-    :hint="$getHint()"
-    :hint-action="$getHintAction()"
-    :hint-color="$getHintColor()"
-    :hint-icon="$getHintIcon()"
-    :required="$isRequired()"
-    :state-path="$getStatePath()"
-> --}}
+
 @php
     $statePath = $getStatePath();
+    $stateBinding = $applyStateBindingModifiers("\$entangle('{$statePath}')");
 @endphp
 
 <x-dynamic-component
@@ -20,47 +9,80 @@
     :id="$getId()"
     :field="$field"
 >
+<div style="margin:auto !important">
+<x-filament::modal slide-over id="block-selection-modal" style="margin:auto">
 
+<x-slot name="trigger">
+    <div class="flex justify-center">
+        <x-filament::button class="p-2 flex flex-col items-center justify-center space-y-2 border" style="background-color: transparent !important;">
+            @if (isset($blocks[$getState()]['image']))
+                @if ($blocks[$getState()]['image'])
+                    <img class="object-contain" style="height: 200px"
+                         src="{{ $blocks[$getState()]['image'] }}"
+                         alt="{{ $blocks[$getState()]['name'] }} preview" />
+                         <br/>
+                    <span class="text-sm text-white text-center">
+                        {{ $blocks[$getState()]['name'] }}
+                    </span>
+                @else
+                    <p class="text-sm text-white">@lang('No preview available')</p>
+                @endif
+            @else
+                <p class="text-sm text-white">@lang('Select a '){{ $getLabel() }}</p>
+            @endif
+        </x-filament::button>
+    </div>
+</x-slot>
+
+
+<x-slot name="heading">
+    <div class="flex items-center justify-between">
+        <h2 class="text-md font-semibold text-gray-900 dark:text-gray-100">
+            @lang('Select a '){{ $getLabel() }}
+        </h2>
+       
+    </div>
+</x-slot>
+
+<x-slot name="description">
     <div
-        class="flex items-center w-full gap-2 overflow-x-auto whitespace-nowrap"
         x-data="{
-            state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
-            blocks: @js($blocks),
-            showModal: false,
-            blockEvent: function(i) {
-                if (this.state) {
-                    this.showModal = ! this.showModal;
-                }
-                this.state = i
+            state: $wire.{{ $stateBinding }},
+            blockEvent(i) {
+                this.state = i;
+                Livewire.dispatch('close-modal', { id: 'block-selection-modal' });
             }
         }"
-        x-bind:class="{ 'justify-center': state }"
+        class="flex flex-wrap gap-4 pt-5 mt-5"
     >
-    @php
-        $block_ids = $getdataFilter();
-    @endphp
+        @php
+            $block_ids = $getdataFilter();
+        @endphp
 
-        <div x-show="showModal" class="w-full fixed top-0 right-0 h-full flex items-center justify-center z-10" style="background-color: #00000066;">
-            <div @click.outside="showModal = false" class="relative" style="background-color: #262626; border-radius: 10px; box-shadow: 0px 0px 4px 1px #494949; padding-top:40px; padding-bottom:20px;">
-                <button type="button" class="absolute p-10 font-bolder cursor-pointer text-2xl text-white"
-                    @click="showModal = false"
-                    style="right:20px; top:5px;">X</button>
-                <button
-                    class="flex flex-col items-center justify-center cursor-pointer h-36 w-60"
-                    type="button"
-                    style="min-width: 750px; min-height: 550px;">
-                    <img class="inline-block object-contain w-full h-full" :src="blocks[state]['image']" alt="preview"/>
-                </button>
-            </div>
-        </div>
         @foreach ($blocks as $id => $block)
-            @if (count($block_ids) > 0)
-                @if (in_array($id,$block_ids) && \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
-                    <div wire:key="{{ $getId() }}.{{ $id }}" x-show="!state || {{ $id }} === state">
+            @if (count($block_ids) > 0 && is_null($getState()))
+                    @if (in_array($id,$block_ids) && \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
+                        <div wire:key="{{ $getId() }}.{{ $id }}">
+                            <button
+                                type="button"
+                                @click="blockEvent({{ $id }})"
+                                class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
+                            >
+                                @if($block['image'])
+                                    <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
+                                @else
+                                    <p class="text-sm text-white">@lang('No preview available')</p>
+                                @endif
+                            </button>
+                            <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
+                        </div>
+                    @endif
+                @elseif(\Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class) && is_null($getState()) )
+                    <div wire:key="{{ $getId() }}.{{ $id }}">
                         <button
-                            class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
                             type="button"
-                            @click="blockEvent({{$id}})"
+                            @click="blockEvent({{ $id }})"
+                            class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
                         >
                             @if($block['image'])
                                 <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
@@ -70,24 +92,27 @@
                         </button>
                         <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
                     </div>
-                @endif
-            @elseif(\Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class))
-            <div wire:key="{{ $getId() }}.{{ $id }}" x-show="!state || {{ $id }} === state">
-                <button
-                    class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
-                    type="button"
-                    @click="blockEvent({{$id}})"
-                >
-                    @if($block['image'])
-                        <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
-                    @else
-                        <p class="text-sm text-white">@lang('No preview available')</p>
-                    @endif
-                </button>
-                <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
-            </div>
+                @elseif(!is_null($getState()) && $id == $getState())
+                    <div wire:key="{{ $getId() }}.{{ $id }}">
+                        <button
+                            type="button"
+                            @click="blockEvent({{ $id }})"
+                            class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
+                        >
+                            @if($block['image'])
+                                <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
+                            @else
+                                <p class="text-sm text-white">@lang('No preview available')</p>
+                            @endif
+                        </button>
+                        <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
+                    </div>
+                    <small>Note: Changing blocks after selecting is not allowed. remove the block if you wish to change it.</small>
             @endif
-
+                <hr/>
         @endforeach
     </div>
+</x-slot>
+</x-filament::modal>
+</div>
 </x-dynamic-component>

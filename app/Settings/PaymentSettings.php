@@ -24,6 +24,12 @@ class PaymentSettings extends Settings
 
     public bool $vision_pay_production_mode;
 
+    public ?string $maya_publishable_key = null;
+
+    public ?string $maya_secret_key = null;
+
+    public bool $maya_production_mode;
+
     #[\Override]
     public static function group(): string
     {
@@ -40,6 +46,8 @@ class PaymentSettings extends Settings
             'stripe_secret_key',
             'stripe_secret_key',
             'vision_pay_apiKey',
+            'maya_publishable_key',
+            'maya_secret_key',
 
         ];
     }

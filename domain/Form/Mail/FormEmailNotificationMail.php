@@ -6,6 +6,9 @@ namespace Domain\Form\Mail;
 
 use App\Settings\FormSettings;
 use Domain\Form\Models\FormEmailNotification;
+use Domain\Tenant\TenantSupport;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,9 +17,11 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Throwable;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class FormEmailNotificationMail extends Mailable implements ShouldQueue
@@ -152,5 +157,27 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
     private function getMailVariables(): array
     {
         return array_merge($this->data, ['form_submission_id' => $this->form_submission_id]);
+    }
+
+    public function failed(Throwable $exception): void
+    {
+
+        $hostName = Request::getScheme().'://'.TenantSupport::model()->domains->first()?->domain;
+
+        foreach (super_users() as $admin) {
+            Notification::make()
+                ->danger()
+                ->title('Error Sending Email | '.$this->formEmailNotification->form->name)
+                ->body($exception->getMessage())
+                ->actions([
+                    Action::make('View Form')
+                        ->url(
+                            fn (): string => $hostName.'/admin/forms/'.$this->formEmailNotification->form->slug.'/edit',
+                            shouldOpenInNewTab: true)
+                        ->button(),
+
+                ])
+                ->sendToDatabase($admin);
+        }
     }
 }
