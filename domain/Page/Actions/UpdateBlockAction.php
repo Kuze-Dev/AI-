@@ -8,7 +8,7 @@ use Domain\Blueprint\Models\Blueprint;
 use Domain\Blueprint\Traits\SanitizeBlueprintDataTrait;
 use Domain\Page\DataTransferObjects\BlockData;
 use Domain\Page\Models\Block;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class UpdateBlockAction
 {
@@ -35,11 +35,16 @@ class UpdateBlockAction
             'is_fixed_content' => $blockData->is_fixed_content,
         ]);
 
-        if ($blockData->image instanceof UploadedFile && $imageString = $blockData->image->get()) {
-            $block->addmedia($blockData->image)
-                ->usingFileName($blockData->image->getClientOriginalName())
-                ->usingName(pathinfo($blockData->image->getClientOriginalName(), PATHINFO_FILENAME))
-                ->toMediaCollection('image');
+        if (is_array($blockData->image)) {
+            $images = $blockData->image;
+            $image = end($images);
+
+            if (Storage::disk(config('filament.default_filesystem_disk'))->exists($image)) {
+                $block->addMediaFromDisk($image, config('filament.default_filesystem_disk'))
+                    ->usingFileName($image)
+                    ->usingName(pathinfo($image, PATHINFO_FILENAME))
+                    ->toMediaCollection('image');
+            }
         }
 
         if ($blockData->image === null) {
