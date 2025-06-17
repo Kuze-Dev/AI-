@@ -159,7 +159,7 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         return array_merge($this->data, ['form_submission_id' => $this->form_submission_id]);
     }
 
-    public function failed(?Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
 
         $hostName = Request::getScheme().'://'.TenantSupport::model()->domains->first()?->domain;

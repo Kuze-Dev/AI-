@@ -60,58 +60,56 @@
         @endphp
 
         @foreach ($blocks as $id => $block)
-        
-        @if (count($block_ids) > 0 && is_null($getState()))
-            @if (in_array($id,$block_ids) && \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
-    
-                <div wire:key="{{ $getId() }}.{{ $id }}">
-                    <button
-                        type="button"
-                        @click="blockEvent({{ $id }})"
-                        class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
-                    >
-                        @if($block['image'])
-                            <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
-                        @else
-                            <p class="text-sm text-white">@lang('No preview available')</p>
-                        @endif
-                    </button>
-                    <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
-                </div>
-                @endif
-            @elseif(\Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class))
-            <div wire:key="{{ $getId() }}.{{ $id }}">
-                <button
-                    type="button"
-                    @click="blockEvent({{ $id }})"
-                    class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
-                >
-                    @if($block['image'])
-                        <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
-                    @else
-                        <p class="text-sm text-white">@lang('No preview available')</p>
+            @if (count($block_ids) > 0 && is_null($getState()))
+                    @if (in_array($id,$block_ids) && \Domain\Tenant\TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class))
+                        <div wire:key="{{ $getId() }}.{{ $id }}">
+                            <button
+                                type="button"
+                                @click="blockEvent({{ $id }})"
+                                class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
+                            >
+                                @if($block['image'])
+                                    <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
+                                @else
+                                    <p class="text-sm text-white">@lang('No preview available')</p>
+                                @endif
+                            </button>
+                            <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
+                        </div>
                     @endif
-                </button>
-                <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
-            </div>
-        @elseif(!is_null($getState()) && $id == $getState())
-            <div wire:key="{{ $getId() }}.{{ $id }}">
-                <button
-                    type="button"
-                    @click="blockEvent({{ $id }})"
-                    class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
-                >
-                    @if($block['image'])
-                        <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
-                    @else
-                        <p class="text-sm text-white">@lang('No preview available')</p>
-                    @endif
-                </button>
-                <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
-            </div>
-            <small>Note: Changing blocks after selecting is not allowed. remove the block if you wish to change it.</small>
-        @endif
-            <hr/>
+                @elseif(\Domain\Tenant\TenantFeatureSupport::inactive(\App\Features\CMS\SitesManagement::class) && is_null($getState()) )
+                    <div wire:key="{{ $getId() }}.{{ $id }}">
+                        <button
+                            type="button"
+                            @click="blockEvent({{ $id }})"
+                            class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
+                        >
+                            @if($block['image'])
+                                <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
+                            @else
+                                <p class="text-sm text-white">@lang('No preview available')</p>
+                            @endif
+                        </button>
+                        <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
+                    </div>
+                @elseif(!is_null($getState()) && $id == $getState())
+                    <div wire:key="{{ $getId() }}.{{ $id }}">
+                        <button
+                            type="button"
+                            @click="blockEvent({{ $id }})"
+                            class="flex flex-col items-center justify-center flex-shrink-0 rounded-lg cursor-pointer h-36 bg-neutral-800 w-60"
+                        >
+                            @if($block['image'])
+                                <img class="inline-block object-contain w-full h-full" src="{{ $block['image'] }}" alt="{{ $block['name'] }} preview"/>
+                            @else
+                                <p class="text-sm text-white">@lang('No preview available')</p>
+                            @endif
+                        </button>
+                        <p class="w-full text-sm text-center py-2">{{ $block['name'] }}</p>
+                    </div>
+                    <small>Note: Changing blocks after selecting is not allowed. remove the block if you wish to change it.</small>
+            @endif
+                <hr/>
         @endforeach
     </div>
 </x-slot>
