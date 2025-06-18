@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Clusters\Settings\Pages;
 
+use App\Features\Shopconfiguration\PaymentGateway\MayaGateway;
 use App\Features\Shopconfiguration\PaymentGateway\PaypalGateway;
 use App\Features\Shopconfiguration\PaymentGateway\StripeGateway;
 use App\FilamentTenant\Support\Concerns\AuthorizeEcommerceSettings;
@@ -66,6 +67,18 @@ class PaymentSettings extends TenantBaseSettings
                     ])
                     ->hidden(fn () => TenantFeatureSupport::inactive(\App\Features\Shopconfiguration\PaymentGateway\VisionpayGateway::class)),
 
+                Forms\Components\Section::make(trans('Maya'))
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\TextInput::make('maya_publishable_key'),
+                        Forms\Components\TextInput::make('maya_secret_key'),
+                        Forms\Components\Toggle::make('maya_production_mode')
+                            ->inline(false)
+                            ->label(fn ($state) => $state ? 'Paymaya (Live)' : 'Paymaya (sandbox)')
+                            ->helperText('If the feature is activated, it is necessary to provide production keys. However, if the feature is deactivated, payment processing will occur in sandbox mode')
+                            ->reactive(),
+                    ])
+                    ->hidden(fn () => TenantFeatureSupport::inactive(MayaGateway::class)),
             ]),
 
         ];
