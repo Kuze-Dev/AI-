@@ -73,11 +73,20 @@ class CreateBlueprintDataAction
                     if (Storage::disk(config('filament.default_filesystem_disk'))->exists($value)) {
                         $blueprintData->addMediaFromDisk($value, config('filament.default_filesystem_disk'))
                             ->toMediaCollection('blueprint_media');
+                    } elseif (is_image_url($value)) {
+                        $blueprintData->addMediaFromUrl($value)
+                            ->toMediaCollection('blueprint_media');
                     }
                 }
             } else {
-                $blueprintData->addMediaFromDisk($blueprintData->value, config('filament.default_filesystem_disk'))
-                    ->toMediaCollection('blueprint_media');
+                if (is_image_url($blueprintDataData->value)) {
+                    $blueprintData->addMediaFromUrl($blueprintDataData->value)
+                        ->toMediaCollection('blueprint_media');
+                } else {
+                    $blueprintData->addMediaFromDisk($blueprintData->value, config('filament.default_filesystem_disk'))
+                        ->toMediaCollection('blueprint_media');
+                }
+
             }
 
             $existingMedia = $blueprintData->getMedia('blueprint_media')->pluck('uuid')->toArray();
@@ -131,8 +140,14 @@ class CreateBlueprintDataAction
         }
         $flattenData = $this->extractDataAction->flattenArray($data);
 
+        $blueprintDataArray = [];
+
         foreach ($flattenData as $arrayData) {
-            $this->storeBlueprintData(BlueprintDataData::fromArray($model, $arrayData));
+            $blueprintDataArray[] = $this->storeBlueprintData(BlueprintDataData::fromArray($model, $arrayData));
         }
+
+        $newData = app(GetUpdateBlueprintDataArrayAction::class)->execute($model, $blueprintDataArray);
+
+        $model->update(['data' => $newData]);
     }
 }
