@@ -184,17 +184,17 @@ class ContentEntryImporter extends Importer
             'locale' => $this->data['locale'] ?? null,
             'route_url' => [
                 'url' => $this->data['route_url'] ?? '/'.$this->data['content'].'/'.Str::slug($this->data['title']),
-                'is_override' => !is_null($this->data['route_url']),
+                'is_override' => ! is_null($this->data['route_url']),
 
             ],
             'author_id' => filament_admin()->id,
             'published_at' => $publiishedat,
-            'status' => is_null($this->data['status']) ?? false,
+            'status' => is_null($this->data['status']),
             'meta_data' => [
                 'title' => $this->data['title'],
                 'description' => $this->data['title'],
             ],
-            'data' => $this->data['data'] ? json_decode($this->data['data'],true) : [],
+            'data' => $this->data['data'] ? json_decode($this->data['data'], true) : [],
             'sites' => $siteIDs,
             'taxonomy_terms' => $taxonomyIds,
         ]);

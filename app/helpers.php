@@ -44,6 +44,6 @@ if (! function_exists('is_image_url')) {
     function is_image_url(string $path): bool
     {
         return filter_var($path, FILTER_VALIDATE_URL) !== false &&
-               preg_match('/\.(jpe?g|png|gif|webp|bmp|svg)$/i', parse_url($path, PHP_URL_PATH));
+               preg_match('/\.(jpe?g|png|gif|webp|bmp|svg)$/i', (string) parse_url($path, PHP_URL_PATH));
     }
 }

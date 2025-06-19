@@ -79,11 +79,15 @@ class CreateBlueprintDataAction
                     }
                 }
             } else {
-                if (is_image_url($blueprintDataData->value)) {
-                    $blueprintData->addMediaFromUrl($blueprintDataData->value)
+
+                /** @var string $image_url_or_disk_path */
+                $image_url_or_disk_path = $blueprintDataData->value;
+
+                if (is_image_url($image_url_or_disk_path)) {
+                    $blueprintData->addMediaFromUrl($image_url_or_disk_path)
                         ->toMediaCollection('blueprint_media');
                 } else {
-                    $blueprintData->addMediaFromDisk($blueprintData->value, config('filament.default_filesystem_disk'))
+                    $blueprintData->addMediaFromDisk($image_url_or_disk_path, config('filament.default_filesystem_disk'))
                         ->toMediaCollection('blueprint_media');
                 }
 
