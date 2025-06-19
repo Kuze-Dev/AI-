@@ -41,6 +41,8 @@ enum ActivityLogEvent: string implements HasLabel
     case updated = 'updated';
     case deleted = 'deleted';
 
+    case attempted_delete = 'attempted_delete';
+
     case impersonated = 'impersonated';
 
     case some_random_event = 'some-random-event'; // testing
