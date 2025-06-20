@@ -64,6 +64,13 @@ trait ConstraintsRelationships
     protected function restrictDelete(string $relationName): void
     {
         if ($this->{$relationName}()->exists()) {
+
+            activity()
+                ->performedOn($this)
+                ->setEvent('attempted_delete')
+                ->causedBy(filament_admin())
+                ->log('Attempted to delete a model with a restricted relationship.');
+
             throw DeleteRestrictedException::make($this, $relationName);
         }
     }
