@@ -285,17 +285,17 @@ class EditPage extends EditRecord
                                 ->required()
                                 ->options(function () {
 
-                                    /** @var ContentEntry $site */
-                                    $site = $this->getRecord();
+                                    /** @var Page $page */
+                                    $page = $this->getRecord();
 
-                                    return $site->sites()->orderby('name')->pluck('name', 'id')->toArray();
+                                    return $page->sites()->orderby('name')->pluck('name', 'id')->toArray();
                                 })
                                 ->descriptions(function () {
 
-                                    /** @var ContentEntry $site */
-                                    $site = $this->getRecord();
+                                    /** @var Page $page */
+                                    $page = $this->getRecord();
 
-                                    return $site->sites()->orderby('name')->pluck('domain', 'id')->toArray();
+                                    return $page->sites()->orderby('name')->pluck('domain', 'id')->toArray();
                                 })
                                 ->reactive()
                                 ->afterStateUpdated(function (\Filament\Forms\Set $set, $state, self $livewire) {
