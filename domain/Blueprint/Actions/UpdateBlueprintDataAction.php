@@ -147,9 +147,19 @@ class UpdateBlueprintDataAction
                 ->reject(fn ($segment) => is_numeric($segment))
                 ->implode('.');
 
-            /** @var \Domain\Blueprint\DataTransferObjects\MediaFieldData */
-            $mediField = $this->getFieldByStatePathAction->execute($blueprint, $formattedStatePath);
-            $conversions = $mediField->conversions;
+            $mediaField = $this->getFieldByStatePathAction->execute($blueprint, $formattedStatePath);
+
+            if (! $mediaField instanceof \Domain\Blueprint\DataTransferObjects\MediaFieldData) {
+
+                $blueprintData->update([
+                    'model_id' => $blueprintDataData->model_id,
+                    'value' => $blueprintDataData->value,
+                ]);
+
+                return $blueprintData;
+            }
+
+            $conversions = $mediaField->conversions;
 
             $savedConversions = array_map(
                 fn (array $conversion) => ConversionData::fromArray($conversion),
