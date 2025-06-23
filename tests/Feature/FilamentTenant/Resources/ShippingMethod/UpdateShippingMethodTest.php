@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
-use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingMethod;
+use App\FilamentTenant\Resources\ShippingmethodResource\Pages\EditShippingsMethod;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
@@ -24,7 +24,7 @@ it('can render edit shipping method', function () {
 
     $record = ShippingMethodFactory::new()->createOne();
 
-    livewire(EditShippingMethod::class, ['record' => $record->getRouteKey()])
+    livewire(EditShippingsMethod::class, ['record' => $record->getRouteKey()])
         ->assertFormExists()
         ->assertSuccessful();
 });
@@ -38,7 +38,7 @@ it('can edit shipping method', function () {
         'shipper_state_id' => $state->id,
     ]);
 
-    livewire(EditShippingMethod::class, ['record' => $record->getRouteKey()])
+    livewire(EditShippingsMethod::class, ['record' => $record->getRouteKey()])
         ->fillForm([
             'title' => 'Store Pickup',
             'subtitle' => 'InStore Pickup',
@@ -68,7 +68,7 @@ it('can edit update shipping method status', function () {
 
     $record = ShippingMethodFactory::new()->createOne();
 
-    livewire(EditShippingMethod::class, ['record' => $record->getRouteKey()])
+    livewire(EditShippingsMethod::class, ['record' => $record->getRouteKey()])
         ->fillForm([
             'title' => 'Store Pickup',
             'subtitle' => 'InStore Pickup',
