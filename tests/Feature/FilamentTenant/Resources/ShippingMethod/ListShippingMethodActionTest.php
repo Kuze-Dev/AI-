@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
-use App\FilamentTenant\Resources\ShippingmethodResource\Pages\ListShippingMethods;
+use App\FilamentTenant\Resources\ShippingmethodResource\Pages\ListShippingsMethods;
 use Domain\ShippingMethod\Database\Factories\ShippingMethodFactory;
 use Filament\Pages\Actions\DeleteAction;
 
@@ -20,14 +20,14 @@ beforeEach(function () {
 });
 
 it('can render Shipping Method', function () {
-    livewire(ListShippingMethods::class)
+    livewire(ListShippingsMethods::class)
         ->assertSuccessful();
 });
 
 it('can list Shipping Method', function () {
     $shippingMethod = ShippingMethodFactory::new()->count(5)->create();
 
-    livewire(ListShippingMethods::class)
+    livewire(ListShippingsMethods::class)
         ->assertCanSeeTableRecords($shippingMethod);
 });
 

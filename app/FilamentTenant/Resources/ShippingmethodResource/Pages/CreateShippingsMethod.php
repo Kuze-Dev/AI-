@@ -9,7 +9,7 @@ use App\FilamentTenant\Resources\ShippingMethodResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateShippingMethod extends CreateRecord
+class CreateShippingsMethod extends CreateRecord
 {
     use LogsFormActivity;
 
