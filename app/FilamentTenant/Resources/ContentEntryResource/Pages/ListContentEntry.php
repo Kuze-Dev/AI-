@@ -7,9 +7,11 @@ namespace App\FilamentTenant\Resources\ContentEntryResource\Pages;
 use App\Features\CMS\SitesManagement;
 use App\FilamentTenant\Resources\ContentEntryResource;
 use App\FilamentTenant\Resources\ContentResource;
+use Domain\Content\Imports\ContentEntryImporter;
 use Domain\Content\Models\Content;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions;
+use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -41,6 +43,15 @@ class ListContentEntry extends ListRecords
             Actions\CreateAction::make()
                 ->label(trans('Create entry'))
                 ->url(self::getResource()::getUrl('create', [$this->ownerRecord])),
+            ImportAction::make()
+                ->label(trans('Import Content Entries'))
+                ->importer(ContentEntryImporter::class)
+                ->icon('heroicon-o-cloud-arrow-up')
+                ->hidden(fn () => ! filament_admin()->hasRole(config()->string('domain.role.super_admin')))
+                ->withActivityLog(
+                    event: 'imported',
+                    description: fn (ImportAction $action) => 'Imported '.$action->getModelLabel(),
+                ),
         ];
     }
 
