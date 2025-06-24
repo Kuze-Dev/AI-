@@ -34,7 +34,7 @@ return [
         Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
-        Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
+        // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
         App\Tenancy\Bootstrappers\BucketBootstrapper::class,
         App\Tenancy\Bootstrappers\ExcelBootstrapper::class,
         App\Tenancy\Bootstrappers\MailBootstrapper::class,
