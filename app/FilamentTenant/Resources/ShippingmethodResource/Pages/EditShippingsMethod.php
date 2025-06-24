@@ -15,7 +15,7 @@ use Filament\Resources\Pages\EditRecord;
 /**
  * @property-read \Domain\ShippingMethod\Models\ShippingMethod $record
  */
-class EditShippingMethod extends EditRecord
+class EditShippingsMethod extends EditRecord
 {
     use LogsFormActivity;
 
