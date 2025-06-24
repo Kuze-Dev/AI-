@@ -18,7 +18,7 @@ class MailBootstrapper implements TenancyBootstrapper
 
     protected ?string $originalMailSmtpHost;
 
-    protected ?string $originalMailSmtpPort;
+    protected ?int $originalMailSmtpPort;
 
     protected ?string $originalMailSmtpUsername;
 
@@ -34,8 +34,8 @@ class MailBootstrapper implements TenancyBootstrapper
         // Store the original mail driver
         $this->originalMailDriver = $this->app->make('config')['mail.default'];
         // smtp settings
-        $this->originalMailSmtpHost = $this->app->make('config')['mail.mailers.smtp.host'];
-        $this->originalMailSmtpPort = $this->app->make('config')['mail.mailers.smtp.port'];
+        $this->originalMailSmtpHost = $this->app->make('config')['mail.mailers.smtp.host'] ?? null;
+        $this->originalMailSmtpPort = $this->app->make('config')['mail.mailers.smtp.port'] ?? null;
         $this->originalMailSmtpUsername = $this->app->make('config')['mail..mailers.smtp.username'] ?? null;
         $this->originalMailSmtpPassword = $this->app->make('config')['mail.mailers.smtp.password'] ?? null;
         $this->originalMailSmtpEncryption = $this->app->make('config')['mail.mailers.smtp.encryption'] ?? null;
