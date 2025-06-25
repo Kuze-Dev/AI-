@@ -26,7 +26,6 @@ use Spatie\QueryBuilder\Exceptions\InvalidFilterValue;
 use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
-use Stancl\Tenancy\Middleware\ScopeSessions;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withEvents([
@@ -61,7 +60,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 InitializeTenancyByDomain::class,
                 PreventAccessFromCentralDomains::class,
                 EnsureTenantIsNotSuspended::class,
-                ScopeSessions::class,
                 ApiCallTrackMiddleware::class,
             ]);
     })
