@@ -8,7 +8,7 @@ use App\FilamentTenant\Resources\ShippingMethodResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListShippingMethods extends ListRecords
+class ListShippingsMethods extends ListRecords
 {
     protected static string $resource = ShippingMethodResource::class;
 
