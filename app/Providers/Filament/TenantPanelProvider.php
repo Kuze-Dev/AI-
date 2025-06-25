@@ -30,6 +30,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
+use Stancl\Tenancy\Middleware\ScopeSessions;
 
 class TenantPanelProvider extends PanelProvider
 {
@@ -104,6 +105,7 @@ class TenantPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                ScopeSessions::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,

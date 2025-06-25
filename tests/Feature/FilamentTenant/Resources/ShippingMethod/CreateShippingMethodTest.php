@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Features\ECommerce\ECommerceBase;
 use App\Features\Shopconfiguration\Shipping\ShippingStorePickup;
-use App\FilamentTenant\Resources\ShippingmethodResource\Pages\CreateShippingMethod;
+use App\FilamentTenant\Resources\ShippingmethodResource\Pages\CreateShippingsMethod;
 use Domain\Address\Database\Factories\StateFactory;
 use Domain\ShippingMethod\Models\ShippingMethod;
 
@@ -20,7 +20,7 @@ beforeEach(function () {
 });
 
 it('can render shipping method', function () {
-    livewire(CreateShippingMethod::class)
+    livewire(CreateShippingsMethod::class)
         ->assertFormExists()
         ->assertSuccessful();
 });
@@ -29,7 +29,7 @@ it('can create shipping method', function () {
 
     StateFactory::new()->createOne();
 
-    livewire(CreateShippingMethod::class)
+    livewire(CreateShippingsMethod::class)
         ->fillForm([
             'title' => 'Store Pickup',
             'subtitle' => 'InStore Pickup',

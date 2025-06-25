@@ -10,6 +10,7 @@ definitions:
     cp .env.testing .env
     php artisan key:generate
     php artisan about --only=environment
+    composer show -D
   steps:
     - step: &common-step
         caches:
