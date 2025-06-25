@@ -40,6 +40,7 @@ return [
         App\Tenancy\Bootstrappers\MailBootstrapper::class,
         App\Tenancy\Bootstrappers\GoogleMapBootstrapper::class,
         App\Tenancy\Bootstrappers\TenantCorsBootstrapper::class,
+        App\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class,
     ],
 
     /**

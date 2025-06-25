@@ -18,7 +18,7 @@ class MailBootstrapper implements TenancyBootstrapper
 
     protected ?string $originalMailSmtpHost;
 
-    protected ?int $originalMailSmtpPort;
+    protected null|int|string $originalMailSmtpPort;
 
     protected ?string $originalMailSmtpUsername;
 
@@ -56,7 +56,7 @@ class MailBootstrapper implements TenancyBootstrapper
 
             $this->app->make('config')->set('mail.default', $tenant->getInternal('mail_driver'));
             $this->app->make('config')->set('mail.mailers.smtp.host', $tenant->getInternal('mail_host'));
-            $this->app->make('config')->set('mail.mailers.smtp.port', $tenant->getInternal('mail_port'));
+            $this->app->make('config')->set('mail.mailers.smtp.port', $tenant->getInternal('mail_port')); // Default to 587 if not set
             $this->app->make('config')->set('mail.mailers.smtp.username', $tenant->getInternal('mail_username') ?? null);
             $this->app->make('config')->set('mail.mailers.smtp.password', $tenant->getInternal('mail_password') ?? null);
             $this->app->make('config')->set('mail.mailers.smtp.encryption', $tenant->getInternal('mail_encryption') ?? null);
