@@ -113,9 +113,9 @@ class ContentEntryImporter extends Importer
                     function (string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator): void {
 
                         if (! is_null($value)) {
-                            $taxonomiesId = TaxonomyTerm::whereIn('slug', explode(',', $value))->pluck('id')->toArray();
+                            $taxonomy_term_Ids = TaxonomyTerm::whereIn('slug', explode(',', $value))->pluck('id')->toArray();
 
-                            if (count($taxonomiesId) !== count(explode(',', $value))) {
+                            if (count($taxonomy_term_Ids) !== count(explode(',', $value))) {
 
                                 Notification::make()
                                     ->title(trans('Taxonomy Term Import Error'))
@@ -173,8 +173,8 @@ class ContentEntryImporter extends Importer
             [];
 
         /** @var array $taxonomyIds */
-        $taxonomyIds = (array_key_exists('taxonomies', $this->data) && ! is_null($this->data['taxonomies'])) ?
-            Taxonomy::whereIn('slug', explode(',', $this->data['taxonomies']))->pluck('id')->toArray() :
+        $taxonomyIds = (array_key_exists('taxonomy_terms', $this->data) && ! is_null($this->data['taxonomy_terms'])) ?
+            Taxonomy::whereIn('slug', explode(',', $this->data['taxonomy_terms']))->pluck('id')->toArray() :
              [];
 
         $publiishedat = now()->parse($this->data['published_at']);
