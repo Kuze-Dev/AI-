@@ -132,10 +132,56 @@ class TenantResource extends Resource
                 // ->disabledOn('edit')
                 // ->dehydrated(fn (string $context) => $context !== 'edit'),
                 Forms\Components\Section::make(trans('Mail Settings'))
+                    ->icon('heroicon-o-envelope')
                     ->collapsed(fn (string $context) => $context === 'edit')
+                    ->columns(['md' => 4])
                     ->schema([
+                        Forms\Components\Select::make(Tenant::internalPrefix().'mail_driver')
+                            ->afterStateHydrated(fn (Forms\Components\Select $component, ?Tenant $record) => $component->state($record?->getInternal('mail_driver')))
+                            ->options([
+                                'ses' => 'Amazon SES',
+                                'smtp' => 'SMTP',
+                            ])
+                            ->columnSpanFull()
+                            ->formatStateUsing(fn (?string $state) => match ($state) {
+                                'ses' => 'Amazon SES',
+                                'smtp' => 'SMTP',
+                                default => $state,
+                            })
+                            ->reactive()
+                            ->placeholder('Select Mail Driver'),
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'mail_host')
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('mail_host')))
+                            ->columnSpan(['md' => 2])
+                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') !== 'smtp')
+                            ->required(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') === 'smtp'),
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'mail_port')
+                            ->columnSpan(['md' => 2])
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('mail_port')))
+                            ->required(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') === 'smtp')
+                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') !== 'smtp'),
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'mail_username')
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('mail_username')))
+                            ->required(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') === 'smtp')
+                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') !== 'smtp')
+                            ->columnSpan(['md' => 2]),
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'mail_password')
+                            ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('mail_username')))
+                            ->required(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') === 'smtp')
+                            ->columnSpan(['md' => 2])
+                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') !== 'smtp'),
+                        Forms\Components\Select::make(Tenant::internalPrefix().'mail_encryption')
+                            ->required(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') === 'smtp')
+                            ->options([
+                                'tls' => 'TLS',
+                                'ssl' => 'SSL',
+                            ])
+                            ->default('tls')
+                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'mail_driver') !== 'smtp')
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make(Tenant::internalPrefix().'mail_from_address')
                             ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('mail_from_address')))
+                            ->helperText('Recommended to use noreply email address')
                             ->columnSpanFull(),
                     ]),
                 Forms\Components\Section::make(trans('Domains'))

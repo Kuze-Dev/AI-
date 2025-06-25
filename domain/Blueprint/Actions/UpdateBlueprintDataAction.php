@@ -312,20 +312,21 @@ class UpdateBlueprintDataAction
 
             $toRemove = [];
             foreach ($removeBlueprintData as $itemtodelete) {
-
                 $filtered = [];
+
                 if (is_array($itemtodelete->value)) {
                     $filtered = array_filter($itemtodelete->value, function ($value) {
-                        $pathInfo = pathinfo($value);
-                        if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
-                            return $value;
+                        if (! is_string($value)) {
+                            return false;
                         }
-                    });
 
+                        $pathInfo = pathinfo($value);
+
+                        return isset($pathInfo['extension']) && $pathInfo['extension'] !== '';
+                    });
                 }
 
                 $toRemove = array_merge($toRemove, $filtered);
-
             }
 
             DeleteS3FilesFromDeletedBlueprintDataJob::dispatch(array_unique($toRemove));
