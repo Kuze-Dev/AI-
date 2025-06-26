@@ -9,7 +9,6 @@ use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Site\Models\Site;
-use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\TenantFeatureSupport;
 use Filament\Actions\Imports\ImportColumn;
@@ -174,7 +173,7 @@ class ContentEntryImporter extends Importer
 
         /** @var array $taxonomyIds */
         $taxonomyIds = (array_key_exists('taxonomy_terms', $this->data) && ! is_null($this->data['taxonomy_terms'])) ?
-            Taxonomy::whereIn('slug', explode(',', $this->data['taxonomy_terms']))->pluck('id')->toArray() :
+            TaxonomyTerm::whereIn('slug', explode(',', $this->data['taxonomy_terms']))->pluck('id')->toArray() :
              [];
 
         $publiishedat = now()->parse($this->data['published_at']);
