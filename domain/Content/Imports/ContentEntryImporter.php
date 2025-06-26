@@ -188,7 +188,7 @@ class ContentEntryImporter extends Importer
             ],
             'author_id' => filament_admin()->id,
             'published_at' => $publiishedat,
-            'status' => is_null($this->data['status']),
+            'status' => $this->data['status'] ? true : false,
             'meta_data' => [
                 'title' => $this->data['title'],
                 'description' => $this->data['title'],
