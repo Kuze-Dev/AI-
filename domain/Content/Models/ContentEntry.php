@@ -52,7 +52,6 @@ use Support\RouteUrl\HasRouteUrl;
  * @property-read Admin|null $author
  * @property-read \Domain\Content\Models\Content $content
  * @property-read \Support\MetaData\Models\MetaData|null $metaData
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Support\RouteUrl\Models\RouteUrl> $routeUrls
  * @property-read int|null $route_urls_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, TaxonomyTerm> $taxonomyTerms
  * @property-read int|null $taxonomy_terms_count
