@@ -16,6 +16,7 @@ use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -94,7 +95,7 @@ class ContentEntryImporter extends Importer
                     ) {
                         $content_slug = $validator->getData()['content'];
 
-                        $content = cache()->remember(
+                        $content = Cache::remember(
                             "content_slug_{$content_slug}",
                             now()->addMinutes(15),
                             fn () => Content::with('blueprint')->where('slug', $content_slug)->firstorfail()
