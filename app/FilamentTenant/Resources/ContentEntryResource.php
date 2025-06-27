@@ -13,6 +13,7 @@ use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
 use Closure;
+use Domain\Content\Exports\ContentEntriesExporter;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\ContentEntry;
 use Domain\Internationalization\Models\Locale;
@@ -425,6 +426,28 @@ class ContentEntryResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ExportBulkAction::make()
+                    ->label(trans('Export Selected Content Entries'))
+                    ->exporter(ContentEntriesExporter::class)
+                    ->hidden(fn () => ! filament_admin()->hasRole(config()->string('domain.role.super_admin')))
+                    ->withActivityLog(
+                        event: 'bulk-exported',
+                        description: fn (Tables\Actions\ExportBulkAction $action) => 'Bulk Exported '.$action->getModelLabel(),
+                        properties: fn (Tables\Actions\ExportBulkAction $action) => [
+                            'selected_record_ids' => $action->getRecords()
+                                ?->map(
+                                    function (int|string|ContentEntry $model): ContentEntry {
+                                        if ($model instanceof ContentEntry) {
+                                            return $model;
+                                        }
+
+                                        /** @phpstan-ignore return.type */
+                                        return ContentEntry::whereKey($model)->first();
+                                    }
+                                ),
+                        ]
+                    ),
+
             ])
             ->defaultSort('order');
     }
