@@ -15,7 +15,11 @@ use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Support\RouteUrl\Models\RouteUrl;
 
 /**
  * @property-read ContentEntry $record
@@ -41,7 +45,41 @@ class ContentEntryImporter extends Importer
 
             ImportColumn::make('route_url')
                 ->example('/blog/my-blog-post')
-                ->rules(['nullable', 'string'])
+                ->rules(
+                    ['nullable',
+                        'string',
+                        function (
+                            string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator
+                        ): void {
+
+                            if (! is_null($value)) {
+
+                                $query = RouteUrl::whereUrl($value)
+                                    ->whereIn(
+                                        'id',
+                                        RouteUrl::query()
+                                            ->select('id')
+                                            ->where(
+                                                'updated_at',
+                                                fn ($query) => $query->select(DB::raw('MAX(`updated_at`)'))
+                                                    ->from((new RouteUrl)->getTable(), 'sub_query_table')
+                                                    ->whereColumn('sub_query_table.model_type', 'route_urls.model_type')
+                                                    ->whereColumn('sub_query_table.model_id', 'route_urls.model_id')
+                                            )
+                                    );
+
+                                $query->whereNot(
+                                    fn ($query): EloquentBuilder => $query
+                                        ->where('model_type', app(ContentEntry::class)->getMorphClass())
+                                );
+
+                                if ($query->exists()) {
+                                    $fail(trans('The :value is already been used.', ['value' => $value]));
+                                }
+                            }
+
+                        },
+                    ])
                 ->helperText('if null route_url will be generated based on title'),
 
             ImportColumn::make('published_at')
@@ -50,6 +88,35 @@ class ContentEntryImporter extends Importer
 
             ImportColumn::make('data')
                 ->helperText('JSON data for the content entry')
+                ->rules([
+                    function (
+                        string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator
+                    ) {
+                        $content_slug = $validator->getData()['content'];
+
+                        $content = cache()->remember(
+                            "content_slug_{$content_slug}",
+                            now()->addMinutes(15),
+                            fn () => Content::with('blueprint')->where('slug', $content_slug)->firstorfail()
+                        );
+
+                        $decodedData = json_decode($value, true);
+
+                        if (! is_array($decodedData)) {
+                            $fail('The data field must be a valid JSON object.');
+
+                            return;
+                        }
+
+                        $sectionValidator = Validator::make($decodedData, $content->blueprint->schema->getStrictValidationRules());
+
+                        if ($sectionValidator->fails()) {
+                            foreach ($sectionValidator->errors()->all() as $errorMessage) {
+                                $fail($errorMessage);
+                            }
+                        }
+                    },
+                ])
                 ->requiredMapping(),
 
             ImportColumn::make('status')

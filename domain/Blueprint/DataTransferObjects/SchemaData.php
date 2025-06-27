@@ -65,6 +65,92 @@ readonly class SchemaData implements Arrayable
         return $rules;
     }
 
+    public function getStrictValidationRules(): array
+    {
+        $rules = [];
+
+        foreach ($this->sections as $section) {
+
+            $rules[$section->state_name] = function ($attribute, $value, $fail) use ($section) {
+
+                $allowedFieldKeys = collect($section->fields)->pluck('state_name')->all();
+
+                $unknownFieldKeys = array_diff(array_keys($value), $allowedFieldKeys);
+
+                if (! empty($unknownFieldKeys)) {
+                    $fail("Unrecognized fields in {$attribute}: ".implode(', ', $unknownFieldKeys));
+                }
+            };
+
+            foreach ($section->fields as $field) {
+
+                if ($field instanceof \Domain\Blueprint\DataTransferObjects\RepeaterFieldData) {
+                    // Ensure it's an array
+                    $repeaterRule = $field->rules;
+
+                    if (! in_array('array', $repeaterRule, true)) {
+                        $repeaterRule[] = 'array';
+                    }
+
+                    $repeaterRule[] = function ($attribute, $value, $fail) use ($field) {
+                        $allowedKeys = collect($field->fields)->pluck('state_name')->all();
+
+                        foreach ($value as $index => $item) {
+                            $unknownKeys = array_diff(array_keys($item), $allowedKeys);
+
+                            if (! empty($unknownKeys)) {
+                                $fail("Unrecognized fields in {$attribute}.{$index}: ".implode(', ', $unknownKeys));
+                            }
+                        }
+                    };
+
+                    $rules[$section->state_name.'.'.$field->state_name] = array_merge(['present'], $repeaterRule);
+
+                    // Loop through nested fields inside repeater
+                    foreach ($field->fields as $repeaterField) {
+
+                        // Check if this field is also a nested RepeaterFieldData
+                        if ($repeaterField instanceof \Domain\Blueprint\DataTransferObjects\RepeaterFieldData) {
+                            // Ensure nested repeater is an array
+                            $nestedRepeaterRule = $repeaterField->rules;
+
+                            if (! in_array('array', $nestedRepeaterRule, true)) {
+                                $nestedRepeaterRule[] = 'array';
+                            }
+
+                            $nestedRepeaterRule[] = function ($attribute, $value, $fail) use ($repeaterField) {
+                                $allowedNestedKeys = collect($repeaterField->fields)->pluck('state_name')->all();
+
+                                foreach ($value as $index => $item) {
+                                    $unknownKeys = array_diff(array_keys($item), $allowedNestedKeys);
+                                    if (! empty($unknownKeys)) {
+                                        $fail("Unrecognized fields in {$attribute}.{$index}: ".implode(', ', $unknownKeys));
+                                    }
+                                }
+                            };
+
+                            $rules[$section->state_name.'.'.$field->state_name.'.*.'.$repeaterField->state_name] = array_merge(['present'], $nestedRepeaterRule);
+
+                            // Add validation rules for each field inside nested repeater
+                            foreach ($repeaterField->fields as $nestedField) {
+                                $rules[$section->state_name.'.'.$field->state_name.'.*.'.$repeaterField->state_name.'.*.'.$nestedField->state_name] = array_merge(['present'], $nestedField->rules);
+                            }
+                        } else {
+                            // Regular field inside top-level repeater
+                            $rules[$section->state_name.'.'.$field->state_name.'.*.'.$repeaterField->state_name] = array_merge(['present'], $repeaterField->rules);
+                        }
+                    }
+                } else {
+                    // Regular non-repeater field
+                    $rules[$section->state_name.'.'.$field->state_name] = array_merge(['present'], $field->rules);
+
+                }
+            }
+        }
+
+        return $rules;
+    }
+
     public function getFieldStatePaths(): array
     {
         $statepaths = [];
