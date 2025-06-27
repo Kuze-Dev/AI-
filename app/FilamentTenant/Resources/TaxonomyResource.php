@@ -235,7 +235,10 @@ class TaxonomyResource extends Resource
                                 ->schema([
                                     Forms\Components\Section::make('Term')
                                         ->schema([
-                                            Forms\Components\Hidden::make('id'),
+                                            Forms\Components\TextInput::make('id')
+                                                ->label('Term ID')
+                                                ->readOnly(),
+                                            // Forms\Components\Hidden::make('id'),
                                             Forms\Components\TextInput::make('name')
                                                 ->required()
                                                 ->reactive()
