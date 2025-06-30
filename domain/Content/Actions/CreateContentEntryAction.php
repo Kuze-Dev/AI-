@@ -49,7 +49,9 @@ class CreateContentEntryAction
             $contentEntry->sites()->sync($contentEntryData->sites);
         }
 
-        $this->createBlueprintDataAction->execute($contentEntry);
+        if (!is_null($contentEntryData->data)) {
+            $this->createBlueprintDataAction->execute($contentEntry);
+        }
 
         return $contentEntry;
     }
