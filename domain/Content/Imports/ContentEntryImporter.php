@@ -55,6 +55,28 @@ class ContentEntryImporter extends Importer
 
                             if (! is_null($value)) {
 
+                                $ignoreModel_ids = [];
+
+                                if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
+
+                                    $content_slug = $validator->getData()['content'];
+
+                                    $content = Cache::remember(
+                                        "content_slug_{$content_slug}",
+                                        now()->addMinutes(15),
+                                        fn () => Content::with('blueprint')->where('slug', $content_slug)->firstorfail()
+                                    );
+
+                                    $ignoreModel_ids = ContentEntry::where('content_id', '!=', $content->id)
+                                        ->wherehas('routeUrls', fn ($query) => $query->where('url', $value)
+                                        )
+                                        ->whereHas('sites',
+                                            fn ($query) => $query->whereNotIN('domain', explode(',', $validator->getData()['sites'])
+                                            )
+                                        )->get()->pluck('id')->toArray();
+
+                                }
+
                                 $query = RouteUrl::whereUrl($value)
                                     ->whereIn(
                                         'id',
@@ -69,10 +91,16 @@ class ContentEntryImporter extends Importer
                                             )
                                     );
 
-                                $query->whereNot(
-                                    fn ($query): EloquentBuilder => $query
-                                        ->where('model_type', app(ContentEntry::class)->getMorphClass())
-                                );
+                                if (! empty($ignoreModel_ids)) {
+                                    $query->whereNot(
+                                        function ($query) use ($ignoreModel_ids): EloquentBuilder {
+                                            return $query
+                                                ->where('model_type', app(ContentEntry::class)->getMorphClass())
+                                                ->whereIn('model_id', $ignoreModel_ids);
+                                        }
+                                    );
+
+                                }
 
                                 if ($query->exists()) {
                                     $fail(trans('The :value is already been used.', ['value' => $value]));
