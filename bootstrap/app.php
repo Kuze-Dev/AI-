@@ -9,6 +9,7 @@ use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureTenantFeaturesAreActive;
 use App\Http\Middleware\EnsureTenantIsNotSuspended;
 use App\Http\Middleware\RestrictApiAccess;
+use App\Http\Middleware\TenantApiAuthorizationMiddleware;
 use Domain\ServiceOrder\Commands\CreateServiceBillCommand;
 use Domain\ServiceOrder\Commands\InactivateServiceOrderCommand;
 use Domain\ServiceOrder\Commands\NotifyCustomerServiceBillDueDateCommand;
@@ -61,6 +62,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 PreventAccessFromCentralDomains::class,
                 EnsureTenantIsNotSuspended::class,
                 ApiCallTrackMiddleware::class,
+                TenantApiAuthorizationMiddleware::class,
             ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

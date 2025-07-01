@@ -299,6 +299,16 @@ class TenantResource extends Resource
                             ->afterStateHydrated(fn (Forms\Components\TagsInput $component, ?Tenant $record) => $component->state($record?->getInternal('cors_allowed_origins') ?? [])),
 
                     ]),
+                Forms\Components\Section::make(trans('Api Setting'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\Toggle::make(Tenant::internalPrefix().'strict_api')
+                            ->default(false)
+                            ->label('Strict API')
+                            ->helperText('Enable this to enabled TenantApiAuthorizationMiddleware.')
+                            ->afterStateHydrated(fn (Forms\Components\Toggle $component, ?Tenant $record) => $component->state($record?->getInternal('strict_api') ?? false)),
+
+                    ]),
                 Forms\Components\Section::make(trans('Suspension Option'))
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
