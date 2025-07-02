@@ -59,6 +59,12 @@ class ContentEntryImporter extends Importer
 
                                 if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
 
+                                    if (is_null($validator->getData()['sites'])) {
+                                        $fail('Sites field is required.');
+
+                                        return;
+                                    }
+
                                     $content_slug = $validator->getData()['content'];
 
                                     $content = Cache::remember(
@@ -301,7 +307,32 @@ class ContentEntryImporter extends Importer
 
         $content = Content::where('slug', $this->data['content'])->firstorfail();
 
-        app(CreateContentEntryAction::class)->execute($content, $contentEntryData);
+        try {
+
+            app(CreateContentEntryAction::class)->execute($content, $contentEntryData);
+
+        } catch (\Throwable $th) {
+
+            // Delete the latest content entry related to this content
+            $latestEntry = $content->contentEntries()->latest('id')->first();
+
+            if ($latestEntry) {
+                $latestEntry->delete();
+            }
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Import Error'))
+                ->body(trans('There was an error while importing the content entry on :entry_title , '.$th->getMessage(),
+                    [
+                        'entry_title' => $this->data['title'],
+                    ]
+                )
+                )->sendToDatabase(filament_admin());
+
+            $this->import->delete();
+
+        }
 
     }
 
