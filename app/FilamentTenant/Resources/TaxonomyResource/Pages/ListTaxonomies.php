@@ -25,6 +25,7 @@ class ListTaxonomies extends ListRecords
                 ExportAction::make()
                     ->label(trans('Export Taxonomies'))
                     ->exporter(TaxonomiesExporter::class)
+                    ->chunkSize(500)
                     ->withActivityLog(
                         event: 'exported',
                         description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),

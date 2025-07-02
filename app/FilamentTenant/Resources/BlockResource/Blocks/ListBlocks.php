@@ -27,6 +27,7 @@ class ListBlocks extends ListRecords
                 ExportAction::make()
                     ->label(trans('Export Content'))
                     ->exporter(BlockExporter::class)
+                    ->chunkSize(500)
                     ->withActivityLog(
                         event: 'exported',
                         description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),

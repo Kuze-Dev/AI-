@@ -30,6 +30,7 @@ class ListAdmins extends ListRecords
                 ),
             ExportAction::make()
                 ->exporter(AdminExporter::class)
+                ->chunkSize(500)
                 ->withActivityLog(
                     event: 'exported',
                     description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),
