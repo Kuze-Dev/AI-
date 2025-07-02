@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Content\Imports;
 
+use App\Features\CMS\Internationalization;
+use App\Features\CMS\SitesManagement;
 use Domain\Content\Actions\CreateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
@@ -42,7 +44,35 @@ class ContentEntryImporter extends Importer
             ImportColumn::make('title')
                 ->example('My Blog Post')
                 ->requiredMapping()
-                ->rules(['required']),
+                ->rules(['required', function (
+                    string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator
+                ) {
+
+                    if (! TenantFeatureSupport::someAreActive([
+                        SitesManagement::class,
+                        Internationalization::class,
+                    ])) {
+
+                        if (ContentEntry::where('title', $value)
+                            ->whereHas('content', fn ($e) => $e->where('slug', $validator->getData()['content']))
+                            ->exists()) {
+
+                            Notification::make()
+                                ->title(trans('Content Entry Import Error'))
+                                ->body(fn () => trans('the title :value is already been used.', ['value' => $value]))
+                                ->danger()
+                                ->when(config('queue.default') === 'sync',
+                                    fn (Notification $notification) => $notification
+                                        ->persistent()
+                                        ->send(),
+                                    fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                );
+
+                            $fail('The title is already been used for this contentEntry.');
+                        }
+                    }
+
+                }]),
 
             ImportColumn::make('route_url')
                 ->example('/blog/my-blog-post')
