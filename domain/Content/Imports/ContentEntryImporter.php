@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Content\Imports;
 
+use App\Features\CMS\Internationalization;
+use App\Features\CMS\SitesManagement;
 use Domain\Content\Actions\CreateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
@@ -42,7 +44,35 @@ class ContentEntryImporter extends Importer
             ImportColumn::make('title')
                 ->example('My Blog Post')
                 ->requiredMapping()
-                ->rules(['required']),
+                ->rules(['required', function (
+                    string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator
+                ) {
+
+                    if (! TenantFeatureSupport::someAreActive([
+                        SitesManagement::class,
+                        Internationalization::class,
+                    ])) {
+
+                        if (ContentEntry::where('title', $value)
+                            ->whereHas('content', fn ($e) => $e->where('slug', $validator->getData()['content']))
+                            ->exists()) {
+
+                            Notification::make()
+                                ->title(trans('Content Entry Import Error'))
+                                ->body(fn () => trans('the title :value is already been used.', ['value' => $value]))
+                                ->danger()
+                                ->when(config('queue.default') === 'sync',
+                                    fn (Notification $notification) => $notification
+                                        ->persistent()
+                                        ->send(),
+                                    fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                );
+
+                            $fail('The title is already been used for this contentEntry.');
+                        }
+                    }
+
+                }]),
 
             ImportColumn::make('route_url')
                 ->example('/blog/my-blog-post')
@@ -58,6 +88,12 @@ class ContentEntryImporter extends Importer
                                 $ignoreModel_ids = [];
 
                                 if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
+
+                                    if (is_null($validator->getData()['sites'])) {
+                                        $fail('Sites field is required.');
+
+                                        return;
+                                    }
 
                                     $content_slug = $validator->getData()['content'];
 
@@ -301,7 +337,32 @@ class ContentEntryImporter extends Importer
 
         $content = Content::where('slug', $this->data['content'])->firstorfail();
 
-        app(CreateContentEntryAction::class)->execute($content, $contentEntryData);
+        try {
+
+            app(CreateContentEntryAction::class)->execute($content, $contentEntryData);
+
+        } catch (\Throwable $th) {
+
+            // Delete the latest content entry related to this content
+            $latestEntry = $content->contentEntries()->latest('id')->first();
+
+            if ($latestEntry) {
+                $latestEntry->delete();
+            }
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Import Error'))
+                ->body(trans('There was an error while importing the content entry on :entry_title , '.$th->getMessage(),
+                    [
+                        'entry_title' => $this->data['title'],
+                    ]
+                )
+                )->sendToDatabase(filament_admin());
+
+            $this->import->delete();
+
+        }
 
     }
 

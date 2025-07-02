@@ -12,6 +12,7 @@ use App\FilamentTenant\Resources\ContentEntryResource\RelationManagers\ContentEn
 use App\FilamentTenant\Support\MetaDataForm;
 use App\FilamentTenant\Support\RouteUrlFieldset;
 use App\FilamentTenant\Support\SchemaFormBuilder;
+use App\Jobs\BulkDeleteJob;
 use Closure;
 use Domain\Content\Exports\ContentEntriesExporter;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
@@ -425,9 +426,15 @@ class ContentEntryResource extends Resource
 
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->label('Delete Selected Content Entries')
+                    ->modalHeading('Selected Content Entries will be deleted in the background.')
+                    ->successNotificationTitle('Deletion queued and will be processed shortly.')
+                    ->using(fn (\Illuminate\Database\Eloquent\Collection $records) => BulkDeleteJob::dispatch($records, filament_admin(), class_basename(ContentEntry::class))
+                    ),
                 Tables\Actions\ExportBulkAction::make()
                     ->label(trans('Export Selected Content Entries'))
+                    ->chunkSize(500)
                     ->exporter(ContentEntriesExporter::class)
                     ->hidden(fn () => ! filament_admin()->hasRole(config()->string('domain.role.super_admin')))
                     ->withActivityLog(
