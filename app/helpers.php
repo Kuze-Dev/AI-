@@ -7,6 +7,7 @@ use Domain\Customer\Models\Customer;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 if (! function_exists('filament_admin')) {
 
@@ -43,6 +44,15 @@ if (! function_exists('super_users')) {
 if (! function_exists('is_image_url')) {
     function is_image_url(string $path): bool
     {
+
+        $checkImage = Http::timeout(5)->head($path);
+
+        if (! ($checkImage->ok() &&
+            str_starts_with($checkImage->header('Content-Type'), 'image/'))
+        ) {
+            throw new Exception('The provided URL is not a valid image URL or the request failed.');
+        }
+
         return filter_var($path, FILTER_VALIDATE_URL) !== false &&
                preg_match('/\.(jpe?g|png|gif|webp|bmp|svg)$/i', (string) parse_url($path, PHP_URL_PATH));
     }
