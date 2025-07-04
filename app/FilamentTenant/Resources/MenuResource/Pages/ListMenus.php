@@ -24,6 +24,7 @@ class ListMenus extends ListRecords
             Actions\ActionGroup::make([
                 ExportAction::make()
                     ->label(trans('Export Menu'))
+                    ->chunkSize(500)
                     ->exporter(MenuExporter::class)
                     ->withActivityLog(
                         event: 'exported',

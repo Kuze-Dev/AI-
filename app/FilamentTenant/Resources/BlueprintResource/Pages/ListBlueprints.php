@@ -28,6 +28,7 @@ class ListBlueprints extends ListRecords
                 ExportAction::make()
                     ->label(trans('Export Blueprints'))
                     ->exporter(BlueprintExporter::class)
+                    ->chunkSize(500)
                     ->withActivityLog(
                         event: 'exported',
                         description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Content\Imports;
 
+use App\Features\CMS\Internationalization;
+use App\Features\CMS\SitesManagement;
 use Domain\Content\Actions\CreateContentEntryAction;
 use Domain\Content\DataTransferObjects\ContentEntryData;
 use Domain\Content\Models\Content;
@@ -42,7 +44,35 @@ class ContentEntryImporter extends Importer
             ImportColumn::make('title')
                 ->example('My Blog Post')
                 ->requiredMapping()
-                ->rules(['required']),
+                ->rules(['required', function (
+                    string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator
+                ) {
+
+                    if (! TenantFeatureSupport::someAreActive([
+                        SitesManagement::class,
+                        Internationalization::class,
+                    ])) {
+
+                        if (ContentEntry::where('title', $value)
+                            ->whereHas('content', fn ($e) => $e->where('slug', $validator->getData()['content']))
+                            ->exists()) {
+
+                            Notification::make()
+                                ->title(trans('Content Entry Import Error'))
+                                ->body(fn () => trans('the title :value is already been used.', ['value' => $value]))
+                                ->danger()
+                                ->when(config('queue.default') === 'sync',
+                                    fn (Notification $notification) => $notification
+                                        ->persistent()
+                                        ->send(),
+                                    fn (Notification $notification) => $notification->sendToDatabase(filament_admin(), isEventDispatched: true)
+                                );
+
+                            $fail('The title is already been used for this contentEntry.');
+                        }
+                    }
+
+                }]),
 
             ImportColumn::make('route_url')
                 ->example('/blog/my-blog-post')
@@ -54,6 +84,34 @@ class ContentEntryImporter extends Importer
                         ): void {
 
                             if (! is_null($value)) {
+
+                                $ignoreModel_ids = [];
+
+                                if (TenantFeatureSupport::active(\App\Features\CMS\SitesManagement::class)) {
+
+                                    if (is_null($validator->getData()['sites'])) {
+                                        $fail('Sites field is required.');
+
+                                        return;
+                                    }
+
+                                    $content_slug = $validator->getData()['content'];
+
+                                    $content = Cache::remember(
+                                        "content_slug_{$content_slug}",
+                                        now()->addMinutes(15),
+                                        fn () => Content::with('blueprint')->where('slug', $content_slug)->firstorfail()
+                                    );
+
+                                    $ignoreModel_ids = ContentEntry::where('content_id', '!=', $content->id)
+                                        ->wherehas('routeUrls', fn ($query) => $query->where('url', $value)
+                                        )
+                                        ->whereHas('sites',
+                                            fn ($query) => $query->whereNotIN('domain', explode(',', $validator->getData()['sites'])
+                                            )
+                                        )->get()->pluck('id')->toArray();
+
+                                }
 
                                 $query = RouteUrl::whereUrl($value)
                                     ->whereIn(
@@ -69,10 +127,16 @@ class ContentEntryImporter extends Importer
                                             )
                                     );
 
-                                $query->whereNot(
-                                    fn ($query): EloquentBuilder => $query
-                                        ->where('model_type', app(ContentEntry::class)->getMorphClass())
-                                );
+                                if (! empty($ignoreModel_ids)) {
+                                    $query->whereNot(
+                                        function ($query) use ($ignoreModel_ids): EloquentBuilder {
+                                            return $query
+                                                ->where('model_type', app(ContentEntry::class)->getMorphClass())
+                                                ->whereIn('model_id', $ignoreModel_ids);
+                                        }
+                                    );
+
+                                }
 
                                 if ($query->exists()) {
                                     $fail(trans('The :value is already been used.', ['value' => $value]));
@@ -93,29 +157,34 @@ class ContentEntryImporter extends Importer
                     function (
                         string $attribute, mixed $value, \Closure $fail, \Illuminate\Validation\Validator $validator
                     ) {
-                        $content_slug = $validator->getData()['content'];
+                        if (! is_null($value)) {
 
-                        $content = Cache::remember(
-                            "content_slug_{$content_slug}",
-                            now()->addMinutes(15),
-                            fn () => Content::with('blueprint')->where('slug', $content_slug)->firstorfail()
-                        );
+                            $content_slug = $validator->getData()['content'];
 
-                        $decodedData = json_decode($value, true);
+                            $content = Cache::remember(
+                                "content_slug_{$content_slug}",
+                                now()->addMinutes(15),
+                                fn () => Content::with('blueprint')->where('slug', $content_slug)->firstorfail()
+                            );
 
-                        if (! is_array($decodedData)) {
-                            $fail('The data field must be a valid JSON object.');
+                            $decodedData = json_decode($value, true);
 
-                            return;
-                        }
+                            if (! is_array($decodedData)) {
+                                $fail('The data field must be a valid JSON object.');
 
-                        $sectionValidator = Validator::make($decodedData, $content->blueprint->schema->getStrictValidationRules());
-
-                        if ($sectionValidator->fails()) {
-                            foreach ($sectionValidator->errors()->all() as $errorMessage) {
-                                $fail($errorMessage);
+                                return;
                             }
+
+                            $sectionValidator = Validator::make($decodedData, $content->blueprint->schema->getStrictValidationRules());
+
+                            if ($sectionValidator->fails()) {
+                                foreach ($sectionValidator->errors()->all() as $errorMessage) {
+                                    $fail($errorMessage);
+                                }
+                            }
+
                         }
+
                     },
                 ])
                 ->requiredMapping(),
@@ -268,7 +337,32 @@ class ContentEntryImporter extends Importer
 
         $content = Content::where('slug', $this->data['content'])->firstorfail();
 
-        app(CreateContentEntryAction::class)->execute($content, $contentEntryData);
+        try {
+
+            app(CreateContentEntryAction::class)->execute($content, $contentEntryData);
+
+        } catch (\Throwable $th) {
+
+            // Delete the latest content entry related to this content
+            $latestEntry = $content->contentEntries()->latest('id')->first();
+
+            if ($latestEntry) {
+                $latestEntry->delete();
+            }
+
+            Notification::make()
+                ->danger()
+                ->title(trans('Import Error'))
+                ->body(trans('There was an error while importing the content entry on :entry_title , '.$th->getMessage(),
+                    [
+                        'entry_title' => $this->data['title'],
+                    ]
+                )
+                )->sendToDatabase(filament_admin());
+
+            $this->import->delete();
+
+        }
 
     }
 

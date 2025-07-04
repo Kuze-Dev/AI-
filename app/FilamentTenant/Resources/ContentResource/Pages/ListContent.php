@@ -40,6 +40,7 @@ class ListContent extends ListRecords
             Actions\ActionGroup::make([
                 ExportAction::make()
                     ->label(trans('Export Content'))
+                    ->chunkSize(500)
                     ->exporter(ContentExporter::class)
                     ->withActivityLog(
                         event: 'exported',
