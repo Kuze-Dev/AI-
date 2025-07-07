@@ -110,16 +110,16 @@ class AdminResource extends Resource
                                 ->translateLabel()
                                 ->relationship(
                                     titleAttribute: 'name',
-                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
+                                    // modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
                                 )
                                 ->multiple()
                                 ->preload()
                                 ->searchable(),
                             Forms\Components\Select::make('permissions')
                                 ->translateLabel()
+                                ->getOptionLabelFromRecordUsing(fn ($record) => $record->guard_name.' - '.$record->name)
                                 ->relationship(
                                     titleAttribute: 'name',
-                                    modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
                                 )
                                 ->multiple()
                                 ->preload()
