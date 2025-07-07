@@ -101,6 +101,17 @@ class PermissionSeeder extends BasePermissionSeeder
                     except: ['deleteAny']
                 ),
             ],
+            'api' => [
+                ...$this->generateFilamentResourcePermissions(
+                    'contentEntry',
+                    except: ['deleteAny']
+                ),
+                ...$this->generateFilamentResourcePermissions('taxonomyTerm', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('globals', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('product', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('menu', except: ['deleteAny']),
+                ...$this->generateFilamentResourcePermissions('page', except: ['deleteAny']),
+            ],
         ];
     }
 }
