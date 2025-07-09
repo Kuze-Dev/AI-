@@ -226,7 +226,7 @@ return [
          */
         'extra_headers' => [
             'CacheControl' => 'max-age=315360000',
-            'ACL' => 'public-read',
+            'ACL' => 'private',
         ],
     ],
 
