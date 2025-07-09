@@ -214,6 +214,10 @@ class SchemaFormBuilder extends Component
             });
         }
 
+        if ((config('filesystems.default') === 's3') && (config('filesystems.disks.s3.url') !== null)) {
+            $fileUpload->visibility('private');
+        }
+
         $fileUpload->imageEditor($fileFieldData->image_editor);
 
         return $fileUpload;
