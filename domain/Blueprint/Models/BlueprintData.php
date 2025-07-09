@@ -146,6 +146,7 @@ class BlueprintData extends Model implements HasMedia
                             ->width($width)
                             ->height($height)
                             ->format($type)
+                            ->private()
                             // ->sharpen(10)
                             // ->quality(90)
                             ->fit($fit, $width, $height);
@@ -157,6 +158,7 @@ class BlueprintData extends Model implements HasMedia
                             // ->sharpen(10)
                             // ->quality(90)
                             ->keepOriginalImageFormat()
+                            ->private()
                             ->fit($fit, $width, $height);
                     }
                 }
