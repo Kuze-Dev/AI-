@@ -59,6 +59,7 @@ class ListContentEntry extends ListRecords
                 ExportAction::make()
                     ->label(trans('Export Content Entries'))
                     ->exporter(ContentEntriesExporter::class)
+                    ->chunkSize(500)
                     ->withActivityLog(
                         event: 'exported',
                         description: fn (ExportAction $action) => 'Exported '.$action->getModelLabel(),

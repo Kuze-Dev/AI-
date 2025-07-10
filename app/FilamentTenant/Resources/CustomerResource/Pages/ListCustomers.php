@@ -26,6 +26,7 @@ class ListCustomers extends ListRecords
                 ->color('primary')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->exporter(CustomerExporter::class)
+                ->chunkSize(500)
 //                ->authorize() // TODO: authorize customer export
                 ->withActivityLog(
                     event: 'exported',
