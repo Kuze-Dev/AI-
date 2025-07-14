@@ -232,6 +232,7 @@ class SchemaFormBuilder extends Component
                 ->imagePreviewHeight('256');
         }
 
+        $media->panelLayout('compact');
         // if ($mediaFieldData->conversions) {
         //     $media->image();
         // }

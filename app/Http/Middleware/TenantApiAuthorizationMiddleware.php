@@ -18,16 +18,16 @@ class TenantApiAuthorizationMiddleware
     public function handle(Request $request, Closure $next, ?string $redirectTo = null): Response
     {
 
-        if (config('custom.strict_api')) {
+        // if (config('custom.strict_api')) {
 
-            $token = $request->header('Authorization');
+        //     $token = $request->header('Authorization');
 
-            if (app(APISettings::class)->api_key !== $token) {
+        //     if (app(APISettings::class)->api_key !== $token) {
 
-                return response()->json(['error' => 'Unauthorized'], 401);
-            }
+        //         return response()->json(['error' => 'Unauthorized'], 401);
+        //     }
 
-        }
+        // }
 
         return $next($request);
     }
