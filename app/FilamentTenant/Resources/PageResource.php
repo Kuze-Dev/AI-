@@ -251,7 +251,8 @@ class PageResource extends Resource
                             ->itemLabel(fn (array $state) => self::getCachedBlocks()->firstWhere('id', $state['block_id'])?->name)
                             ->label('Blocks')
                             ->default([])
-                            ->collapsed(fn (string $context) => $context === 'edit')
+                            ->collapsible()
+                            // ->collapsed(fn (string $context) => $context === 'edit')
                             ->orderColumn('order')
                             ->schema([
                                 // Forms\Components\ViewField::make('block_id')
