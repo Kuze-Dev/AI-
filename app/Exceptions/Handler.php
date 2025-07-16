@@ -15,7 +15,7 @@ class Handler extends BaseHandler
     protected function unauthenticated($request, AuthenticationException $exception): Response
     {
         if ($request->is('api/*')) {
-            return response()->json(['message' => 'Unauthorized access'], Response::HTTP_FORBIDDEN);
+            return response()->json(['message' => 'Unauthorized access'], Response::HTTP_UNAUTHORIZED);
         }
 
         return parent::unauthenticated($request, $exception);

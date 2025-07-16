@@ -10,6 +10,7 @@ use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
 use Domain\Tenant\Support\ApiAbilitties;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\RouteAttributes\Attributes\Middleware;
@@ -58,7 +59,7 @@ class LoginController extends Controller
         }
 
         if (! Auth::guard('api')->attempt($data)) {
-            abort(401, trans('These credentials do not match our records.'));
+            throw new AuthenticationException(trans('These credentials do not match our records.'));
         }
 
         $customer = Customer::where(function ($q) use ($validated, $loginType) {
@@ -73,7 +74,7 @@ class LoginController extends Controller
             ->first();
 
         if ($customer === null) {
-            abort(401, trans('These credentials do not match our records.'));
+            throw new AuthenticationException(trans('These credentials do not match our records.'));
         }
 
         return response([
