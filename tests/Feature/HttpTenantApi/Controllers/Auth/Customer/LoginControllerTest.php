@@ -96,7 +96,7 @@ it('can not access private route with invalid token', function (?string $token) 
     getJson('api/test-private-route', [
         'Authorization' => $token,
     ])
-        ->assertUnauthorized();
+        ->assertStatus(403);
 })
     ->with([
         null,
@@ -112,5 +112,5 @@ it('can not access private route without header authorization', function () {
         ]);
 
     getJson('api/test-private-route')
-        ->assertUnauthorized();
+        ->assertStatus(403);
 });
