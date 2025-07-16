@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\Tenant\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class TenantApiKey extends Model
 {
     use HasApiTokens;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'app_name',
@@ -39,5 +39,4 @@ class TenantApiKey extends Model
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
-
 }

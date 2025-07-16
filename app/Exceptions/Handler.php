@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as BaseHandler;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Foundation\Exceptions\Handler as BaseHandler;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -13,7 +15,7 @@ class Handler extends BaseHandler
     protected function unauthenticated($request, AuthenticationException $exception): Response
     {
         if ($request->is('api/*')) {
-            return response()->json(['message' => 'Forbidden'], Response::HTTP_FORBIDDEN);
+            return response()->json(['message' => 'Unauthorized access'], Response::HTTP_FORBIDDEN);
         }
 
         return parent::unauthenticated($request, $exception);

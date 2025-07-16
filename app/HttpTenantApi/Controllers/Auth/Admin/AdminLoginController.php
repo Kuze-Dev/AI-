@@ -33,8 +33,11 @@ class AdminLoginController extends Controller
         if ($admin === null) {
             throw new AuthenticationException(trans('These credentials do not match our records.'));
         }
-        
-        $abilities = auth('admin-api')->user()->getPermissionNames()->toArray();
+
+        /** @var Admin $user */
+        $user = auth('admin-api')->user();
+
+        $abilities = $user->getPermissionNames()->toArray();
 
         return response([
             'token' => $admin

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Settings\APISettings;
 use Closure;
 use Domain\Tenant\Exceptions\SuspendTenantException;
 use Illuminate\Http\Request;
@@ -18,16 +17,18 @@ class TenantApiAuthorizationMiddleware
     public function handle(Request $request, Closure $next, ?string $redirectTo = null): Response
     {
 
-        // if (config('custom.strict_api')) {
+        if (config('custom.strict_api')) {
 
-        //     $token = $request->header('Authorization');
+            if ($request->is('api/*')) {
 
-        //     if (app(APISettings::class)->api_key !== $token) {
+                return app(\Illuminate\Auth\Middleware\Authenticate::class)
+                    ->handle($request, function ($request) use ($next) {
+                        return $next($request);
+                    }, 'sanctum');
+            }
 
-        //         return response()->json(['error' => 'Unauthorized'], 401);
-        //     }
-
-        // }
+            return $next($request);
+        }
 
         return $next($request);
     }

@@ -42,4 +42,21 @@ enum ApiAbilitties: string
             self::settings_site->value,
         ];
     }
+
+    public static function cmsCustomerAbilities(): array
+    {
+        return [
+            self::taxonomy_view->value,
+            self::taxonomyterms_view->value,
+            self::content_view->value,
+            self::contententry_view->value,
+            self::page_view->value,
+            self::global_view->value,
+            self::menu_view->value,
+            self::form_view->value,
+            self::form_submit->value,
+            self::generate_bucket_url->value,
+            self::cms_search->value,
+        ];
+    }
 }

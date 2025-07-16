@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\FilamentTenant\Resources\TenantApiKeyResource\Pages;
 
 use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\TenantApiKeyResource;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Actions\Action;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateTenantApiKey extends CreateRecord
 {
@@ -22,5 +24,4 @@ class CreateTenantApiKey extends CreateRecord
                 ->keyBindings(['mod+s']),
         ];
     }
-
 }

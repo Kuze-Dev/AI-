@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Domain\Customer\Enums\RegisterStatus;
 use Domain\Customer\Enums\Status;
 use Domain\Customer\Models\Customer;
+use Domain\Tenant\Support\ApiAbilitties;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -78,7 +79,11 @@ class LoginController extends Controller
 
         return response([
             'token' => $customer
-                ->createToken('customer')
+                ->createToken(
+                    name: 'customer',
+                    abilities: ApiAbilitties::cmsCustomerAbilities(),
+                    expiresAt: now()->addHour()
+                )
                 ->plainTextToken,
         ]);
     }
