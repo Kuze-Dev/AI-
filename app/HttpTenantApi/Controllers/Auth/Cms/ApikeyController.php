@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Domain\Tenant\Models\TenantApiKey;
 use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Post;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApikeyController extends Controller
 {
@@ -17,7 +18,7 @@ class ApikeyController extends Controller
     {
 
         if (! config('custom.strict_api')) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['message' => Response::$statusTexts[Response::HTTP_FORBIDDEN]], Response::HTTP_FORBIDDEN);
         }
 
         $validated = $this->validate($request, [
@@ -52,7 +53,7 @@ class ApikeyController extends Controller
         } catch (\Throwable $th) {
 
             if ($th instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
-                return response()->json(['error' => 'Unauthorized'], 401);
+                return response()->json(['message' => Response::$statusTexts[Response::HTTP_UNAUTHORIZED]], Response::HTTP_UNAUTHORIZED);
             }
 
             throw $th;
