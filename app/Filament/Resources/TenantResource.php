@@ -115,7 +115,7 @@ class TenantResource extends Resource
                             ->columnSpan(['md' => 2]),
                         // ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_endpoint'))),
                         Forms\Components\TextInput::make(Tenant::internalPrefix().'bucket_url')
-                            ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'bucket_driver') === 's3')
+                            // ->hidden(fn (Get $get) => $get(Tenant::internalPrefix().'bucket_driver') === 's3')
                             ->required(fn (?Tenant $record, Get $get) => ($record === null && in_array($get(Tenant::internalPrefix().'bucket_driver'), ['r2'], true)))
                             ->columnSpan(['md' => 2]),
                         // ->afterStateHydrated(fn (Forms\Components\TextInput $component, ?Tenant $record) => $component->state($record?->getInternal('bucket_url'))),
@@ -297,6 +297,16 @@ class TenantResource extends Resource
                     ->schema([
                         Forms\Components\TagsInput::make(Tenant::internalPrefix().'cors_allowed_origins')
                             ->afterStateHydrated(fn (Forms\Components\TagsInput $component, ?Tenant $record) => $component->state($record?->getInternal('cors_allowed_origins') ?? [])),
+
+                    ]),
+                Forms\Components\Section::make(trans('Api Setting'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\Toggle::make(Tenant::internalPrefix().'strict_api')
+                            ->default(false)
+                            ->label('Strict API')
+                            ->helperText('Enable this to enabled TenantApiAuthorizationMiddleware.')
+                            ->afterStateHydrated(fn (Forms\Components\Toggle $component, ?Tenant $record) => $component->state($record?->getInternal('strict_api') ?? false)),
 
                     ]),
                 Forms\Components\Section::make(trans('Suspension Option'))

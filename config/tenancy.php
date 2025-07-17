@@ -41,6 +41,7 @@ return [
         App\Tenancy\Bootstrappers\GoogleMapBootstrapper::class,
         App\Tenancy\Bootstrappers\TenantCorsBootstrapper::class,
         App\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class,
+        App\Tenancy\Bootstrappers\CustomConfigBootstrapper::class,
     ],
 
     /**

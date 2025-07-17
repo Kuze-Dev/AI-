@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Page;
 
 use App\Features\CMS\CMSBase;
+use App\Http\Middleware\TenantApiAuthorizationMiddleware;
+use App\HttpTenantApi\Controllers\BaseCms\BaseCmsController;
 use App\HttpTenantApi\Resources\PageResource;
 use Domain\Page\Models\Builders\PageBuilder;
 use Domain\Page\Models\Page;
+use Domain\Tenant\Support\ApiAbilitties;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -20,12 +23,14 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('pages', only: ['index', 'show']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Middleware(['feature.tenant:'.CMSBase::class, TenantApiAuthorizationMiddleware::class])
 ]
-class PageController
+class PageController extends BaseCmsController
 {
     public function index(): JsonApiResourceCollection
     {
+        $this->checkAbilities(ApiAbilitties::page_view->value);
+
         return PageResource::collection(
             QueryBuilder::for(
                 Page::with(['activeRouteUrl'])
@@ -71,6 +76,8 @@ class PageController
 
     public function show(Request $request, string $page): PageResource
     {
+        $this->checkAbilities(ApiAbilitties::page_view->value);
+
         /** @var Page $page */
         $page = QueryBuilder::for(Page::whereSlug($page))
             ->allowedIncludes([

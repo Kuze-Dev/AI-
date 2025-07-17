@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Globals;
 
 use App\Features\CMS\CMSBase;
+use App\Http\Middleware\TenantApiAuthorizationMiddleware;
+use App\HttpTenantApi\Controllers\BaseCms\BaseCmsController;
 use App\HttpTenantApi\Resources\GlobalsResource;
 use Domain\Globals\Models\Globals;
+use Domain\Tenant\Support\ApiAbilitties;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -16,12 +19,14 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('globals', only: ['index', 'show']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Middleware(['feature.tenant:'.CMSBase::class, TenantApiAuthorizationMiddleware::class])
 ]
-class GlobalsController
+class GlobalsController extends BaseCmsController
 {
     public function index(): JsonApiResourceCollection
     {
+        $this->checkAbilities(ApiAbilitties::global_view->value);
+
         return GlobalsResource::collection(
             QueryBuilder::for(Globals::with('blueprint'))
                 ->allowedFilters(
@@ -51,6 +56,8 @@ class GlobalsController
 
     public function show(string $global): GlobalsResource
     {
+        $this->checkAbilities(ApiAbilitties::global_view->value);
+
         return GlobalsResource::make(
             QueryBuilder::for(Globals::whereSlug($global))
                 ->allowedIncludes(
