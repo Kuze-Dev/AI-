@@ -214,6 +214,10 @@ class SchemaFormBuilder extends Component
             });
         }
 
+        $fileUpload->visibility(fn () => (config('filesystems.default') === 's3') && (config('filesystems.disks.s3.url') !== null) ?
+            'private' : 'public'
+        );
+
         $fileUpload->imageEditor($fileFieldData->image_editor);
 
         return $fileUpload;
@@ -231,6 +235,10 @@ class SchemaFormBuilder extends Component
                 ->panelLayout('grid')
                 ->imagePreviewHeight('256');
         }
+
+        $media->visibility(fn () => (config('filesystems.default') === 's3') && (config('filesystems.disks.s3.url') !== null) ?
+            'private' : 'public'
+        );
 
         if ($mediaFieldData->reorder) {
             $media->reorderable($mediaFieldData->reorder);
@@ -415,6 +423,9 @@ class SchemaFormBuilder extends Component
                 array_map(
                     fn (RichtextButton $button) => $button->value, $richtextFieldData->buttons)
             )
+            ->fileAttachmentsVisibility(fn () => (config('filesystems.default') === 's3') && (config('filesystems.disks.s3.url') !== null) ?
+                'private' : 'public'
+            )
             ->getUploadedAttachmentUrlUsing(function ($file) {
 
                 $storage = Storage::disk(config()->string('filament.default_filesystem_disk'));
@@ -470,7 +481,9 @@ class SchemaFormBuilder extends Component
 
         $tinyEditor = TinyEditor::make($tinyEditorData->state_name)
             ->fileAttachmentsDisk(config()->string('filament.default_filesystem_disk'))
-            ->fileAttachmentsVisibility('public')
+            ->fileAttachmentsVisibility(fn () => (config('filesystems.default') === 's3') && (config('filesystems.disks.s3.url') !== null) ?
+                'private' : 'public'
+            )
             ->showMenuBar()
             ->getUploadedAttachmentUrlUsing(function ($file) {
 
@@ -534,6 +547,9 @@ class SchemaFormBuilder extends Component
     {
         $tiptapEditor = TiptapEditor::make($tiptapEditorData->state_name)
             ->acceptedFileTypes($tiptapEditorData->accept)
+            ->visibility(fn () => (config('filesystems.default') === 's3') && (config('filesystems.disks.s3.url') !== null) ?
+                'private' : 'public'
+            )
             ->tools(
                 $tiptapEditorData->tools
             )
