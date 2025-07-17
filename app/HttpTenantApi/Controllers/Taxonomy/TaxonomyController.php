@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Taxonomy;
 
 use App\Features\CMS\CMSBase;
+use App\Http\Middleware\TenantApiAuthorizationMiddleware;
+use App\HttpTenantApi\Controllers\BaseCms\BaseCmsController;
 use App\HttpTenantApi\Resources\TaxonomyResource;
 use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Tenant\Support\ApiAbilitties;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -15,12 +18,15 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('taxonomies', only: ['index', 'show']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Middleware(['feature.tenant:'.CMSBase::class, TenantApiAuthorizationMiddleware::class])
 ]
-class TaxonomyController
+class TaxonomyController extends BaseCmsController
 {
     public function index(): JsonApiResourceCollection
     {
+
+        $this->checkAbilities(ApiAbilitties::taxonomy_view->value);
+
         return TaxonomyResource::collection(
             QueryBuilder::for(Taxonomy::query())
                 ->allowedFilters(
@@ -44,6 +50,9 @@ class TaxonomyController
 
     public function show(string $taxonomy): TaxonomyResource
     {
+
+        $this->checkAbilities(ApiAbilitties::taxonomy_view->value);
+
         return TaxonomyResource::make(
             QueryBuilder::for(Taxonomy::with([
                 'parentTerms.children',

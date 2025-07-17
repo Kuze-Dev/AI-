@@ -61,6 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 PreventAccessFromCentralDomains::class,
                 EnsureTenantIsNotSuspended::class,
                 ApiCallTrackMiddleware::class,
+
             ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -111,4 +112,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // https://spatie.be/docs/laravel-health/available-checks/schedule
         // $schedule->command(ScheduleCheckHeartbeatCommand::class)->everyMinute();
     })
+    ->withBindings([
+        Illuminate\Contracts\Debug\ExceptionHandler::class => App\Exceptions\Handler::class,
+    ])
     ->create();

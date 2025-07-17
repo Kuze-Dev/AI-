@@ -4,24 +4,29 @@ declare(strict_types=1);
 
 namespace App\HttpTenantApi\Controllers\Search;
 
+use App\Http\Middleware\TenantApiAuthorizationMiddleware;
+use App\HttpTenantApi\Controllers\BaseCms\BaseCmsController;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
 use BadMethodCallException;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
+use Domain\Tenant\Support\ApiAbilitties;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\RouteAttributes\Attributes\Get;
 use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
-class SearchController
+class SearchController extends BaseCmsController
 {
     private const array SEARCHABLE_MODELS = ['page', 'contentEntry'];
 
-    #[Get('/search')]
+    #[Get('/search', middleware: TenantApiAuthorizationMiddleware::class)]
     public function index(Request $request): JsonResponse
     {
+        $this->checkAbilities(ApiAbilitties::cms_search->value);
+
         $validated = $request->validate([
             'query' => 'required|string',
             'filter' => 'nullable|array',

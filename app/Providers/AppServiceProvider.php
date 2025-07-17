@@ -54,6 +54,7 @@ use Domain\Taxation\Models\TaxZone;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Domain\Tenant\Models\TenantApiCall;
+use Domain\Tenant\Models\TenantApiKey;
 use Domain\Tenant\TenantSupport;
 use Domain\Tier\Models\Tier;
 use Filament\Actions\Exports\Downloaders\XlsxDownloader;
@@ -157,6 +158,7 @@ class AppServiceProvider extends ServiceProvider
             ProductOptionValue::class,
             ServiceTransaction::class,
             Media::class,
+            TenantApiKey::class,
         ]);
 
         Password::defaults(

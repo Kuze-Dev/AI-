@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Content\V2;
 
 use App\Features\CMS\CMSBase;
+use App\HttpTenantApi\Controllers\BaseCms\BaseCmsController;
 use App\HttpTenantApi\Requests\CMS\CreateContentEntryRequest;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use Domain\Content\DataTransferObjects\ContentEntryData;
@@ -14,6 +15,7 @@ use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Site\Models\Site;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Tenant\Support\ApiAbilitties;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
@@ -32,11 +34,13 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
     Prefix('v2'),
     Middleware(['feature.tenant:'.CMSBase::class, 'auth:sanctum'])
 ]
-class ContentEntryV2Controller
+class ContentEntryV2Controller extends BaseCmsController
 {
     #[Get('/contents/{content}/entries', name: 'v2.contents.entries.index')]
     public function index(Content $content): JsonApiResourceCollection
     {
+        $this->checkAbilities(ApiAbilitties::contententry_view->value);
+
         return ContentEntryResource::collection(
             QueryBuilder::for($content->contentEntries()
                 ->where('status', true)
@@ -108,6 +112,8 @@ class ContentEntryV2Controller
     #[Get('/contents/{content}/entries/{contentEntry}', name: 'v2.contents.entries.show')]
     public function show(string $content, string $contentEntry): ContentEntryResource
     {
+        $this->checkAbilities(ApiAbilitties::contententry_view->value);
+
         return ContentEntryResource::make(
             QueryBuilder::for(
                 ContentEntry::whereSlug($contentEntry)

@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Content;
 
 use App\Features\CMS\CMSBase;
+use App\Http\Middleware\TenantApiAuthorizationMiddleware;
+use App\HttpTenantApi\Controllers\BaseCms\BaseCmsController;
 use App\HttpTenantApi\Resources\ContentResource;
 use Domain\Content\Models\Content;
 use Domain\Page\Enums\Visibility;
+use Domain\Tenant\Support\ApiAbilitties;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\RouteAttributes\Attributes\ApiResource;
@@ -16,12 +19,14 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('contents', only: ['index', 'show']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Middleware(['feature.tenant:'.CMSBase::class, TenantApiAuthorizationMiddleware::class])
 ]
-class ContentController
+class ContentController extends BaseCmsController
 {
     public function index(): JsonApiResourceCollection
     {
+        $this->checkAbilities(ApiAbilitties::content_view->value);
+
         return ContentResource::collection(
             QueryBuilder::for(Content::query()
                 ->where('visibility', '!=', Visibility::AUTHENTICATED->value)
@@ -36,6 +41,8 @@ class ContentController
 
     public function show(string $content): ContentResource
     {
+        $this->checkAbilities(ApiAbilitties::content_view->value);
+
         $contentModel = Content::whereSlug($content)->firstOrFail();
 
         abort_if(

@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\HttpTenantApi\Controllers\Content;
 
 use App\Features\CMS\CMSBase;
+use App\Http\Middleware\TenantApiAuthorizationMiddleware;
+use App\HttpTenantApi\Controllers\BaseCms\BaseCmsController;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use Domain\Content\Enums\PublishBehavior;
 use Domain\Content\Models\Builders\ContentEntryBuilder;
 use Domain\Content\Models\Content;
 use Domain\Content\Models\ContentEntry;
 use Domain\Page\Enums\Visibility;
+use Domain\Tenant\Support\ApiAbilitties;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -22,12 +25,14 @@ use TiMacDonald\JsonApi\JsonApiResourceCollection;
 
 #[
     ApiResource('contents.entries', only: ['index', 'show'], parameters: ['entries' => 'contentEntry']),
-    Middleware('feature.tenant:'.CMSBase::class)
+    Middleware(['feature.tenant:'.CMSBase::class, TenantApiAuthorizationMiddleware::class])
 ]
-class ContentEntryController
+class ContentEntryController extends BaseCmsController
 {
     public function index(Content $content): JsonApiResourceCollection
     {
+        $this->checkAbilities(ApiAbilitties::contententry_view->value);
+
         abort_if(
             $content->visibility === Visibility::AUTHENTICATED->value,
             403
@@ -103,6 +108,8 @@ class ContentEntryController
 
     public function show(string $content, string $contentEntry): ContentEntryResource
     {
+
+        $this->checkAbilities(ApiAbilitties::contententry_view->value);
 
         $contentModel = Content::whereSlug($content)->firstOrFail();
 
