@@ -232,10 +232,6 @@ class SchemaFormBuilder extends Component
                 ->imagePreviewHeight('256');
         }
 
-        // if ($mediaFieldData->conversions) {
-        //     $media->image();
-        // }
-
         if ($mediaFieldData->reorder) {
             $media->reorderable($mediaFieldData->reorder);
         }
