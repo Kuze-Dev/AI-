@@ -59,9 +59,9 @@ return [
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
-            'options' => [
-                'ACL' => 'private', // <- this is critical!
-            ],
+            // 'options' => [
+            //     'ACL' => 'private',
+            // ],
         ],
 
         'r2' => [
