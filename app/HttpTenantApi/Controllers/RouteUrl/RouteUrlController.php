@@ -118,7 +118,7 @@ class RouteUrlController extends BaseCmsController
         return TaxonomyResource::make($taxonomy);
     }
 
-    private function handleTaxonomyTermResource(Taxonomy $taxonomyTerm): TaxonomyTermResource
+    private function handleTaxonomyTermResource(TaxonomyTerm $taxonomyTerm): TaxonomyTermResource
     {
         $this->checkAbilities(ApiAbilitties::taxonomyterms_view->value);
 
