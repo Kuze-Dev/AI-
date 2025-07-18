@@ -32,7 +32,7 @@ class ContentEntryResource extends JsonApiResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             // TODO: remove this
-            'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
+            // 'blueprintData' => fn () => BlueprintDataResource::collection($this->blueprintData),
         ];
     }
 
