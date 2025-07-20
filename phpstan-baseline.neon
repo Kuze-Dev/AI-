@@ -49,6 +49,204 @@ parameters:
 			path: app/FilamentTenant/Support/RouteUrlFieldset.php
 
 		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Address\\Models\\Address\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Auth/Address/AddressController.php
+
+		-
+			message: '#^Parameter \#3 \$address_line_1 of class Domain\\Address\\DataTransferObjects\\AddressData constructor expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Auth/Address/AddressController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Domain\\Customer\\Queries\\CustomerQueryBuilder\<Domain\\Customer\\Models\\Customer\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Auth/Customer/AccountController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Tier\\Models\\Tier\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Auth/Customer/TierController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Cart\\Models\\Cart\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Cart/PrivateCart/CartController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Cart\\Models\\Cart\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Cart/PublicCart/GuestCartController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Cart\\Models\\CartLine\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Cart/PublicCart/GuestCheckoutController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Content\\Models\\Content\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Content/ContentController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Domain\\Content\\Models\\Builders\\ContentEntryBuilder\<Domain\\Content\\Models\\ContentEntry\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Content/ContentEntryController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Domain\\Content\\Models\\Builders\\ContentEntryBuilder\<Domain\\Content\\Models\\ContentEntry\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Content/V2/ContentEntryV2Controller.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Content\\Models\\Content\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Content/V2/ContentV2Controller.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Address\\Models\\Country\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Country/CountryController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Currency\\Models\\Currency\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Currency/CurrencyController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Discount\\Models\\Discount\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Discount/DiscountController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Favorite\\Models\\Favorite\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Favorite/FavoriteController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Form\\Models\\Form\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Form/FormController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Globals\\Models\\Globals\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Globals/GlobalsController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Menu\\Models\\Menu\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Menu/MenuController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Order\\Models\\Order\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Order/PrivateOrder/OrderController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Order\\Models\\Order\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Order/PublicOrder/GuestOrderController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Domain\\Page\\Models\\Builders\\PageBuilder\<Domain\\Page\\Models\\Page\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Page/PageController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\PaymentMethod\\Models\\PaymentMethod\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/PaymentMethod/PaymentMethodController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Domain\\Product\\Models\\Builders\\ProductBuilder\<Domain\\Product\\Models\\Product\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Product/ProductController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Review\\Models\\Review\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Review/ReviewController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Review\\Models\\Review\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Review/ReviewShowController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Service\\Models\\Service\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Service/ServiceController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Domain\\ServiceOrder\\Queries\\ServiceBillQueryBuilder given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/ServiceOrder/ServiceBillController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Domain\\ServiceOrder\\Queries\\ServiceOrderQueryBuilder\<Domain\\ServiceOrder\\Models\\ServiceOrder\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/ServiceOrder/ServiceOrderController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\ShippingMethod\\Models\\ShippingMethod\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Shipping/Public/ShippingMethodController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\ShippingMethod\\Models\\ShippingMethod\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Shipping/ShippingMethodv2Controller.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Site\\Models\\Site\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Site/SiteController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Taxonomy\\Models\\Taxonomy\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/HttpTenantApi/Controllers/Taxonomy/TaxonomyController.php
+
+		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Taxonomy\\Models\\TaxonomyTerm\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Taxonomy/TaxonomyTermController.php
+
+		-
 			message: '#^Call to function is_subclass_of\(\) with class\-string\<TiMacDonald\\JsonApi\\JsonApiResource\> and ''TiMacDonald\\\\JsonApi\\\\JsonApiResource'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
