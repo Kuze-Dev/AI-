@@ -25,7 +25,7 @@ class FilamentSelectFormMixin
             $this->getSearchResultsUsing(function (Forms\Components\Select $component, ?string $search) use ($model, $titleColumnName, $callback): array {
 
                 $query = $component->evaluate($model)::query();
-
+                /** @var string $keyName */
                 $keyName = $query->getModel()->getKeyName();
 
                 if ($callback) {
@@ -70,6 +70,7 @@ class FilamentSelectFormMixin
 
                 $query = $component->evaluate($model)::query();
 
+                /** @var string $keyName */
                 $keyName = $query->getModel()->getKeyName();
 
                 if ($callback) {
@@ -119,6 +120,7 @@ class FilamentSelectFormMixin
 
                 $query = $component->evaluate($model)::query();
 
+                /** @var string $keyName */
                 $keyName = $query->getModel()->getKeyName();
 
                 if ($callback) {
