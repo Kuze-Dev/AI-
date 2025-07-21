@@ -32,8 +32,8 @@ class MediaController extends BaseCmsController
                 Media::query()->whereIN('uuid', explode(',', $media_uuid))
             )
                 ->allowedFilters([
-                'uuid',
-            ])
+                    'uuid',
+                ])
                 ->jsonPaginate()
         );
     }

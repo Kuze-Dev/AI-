@@ -151,6 +151,12 @@ parameters:
 			path: app/HttpTenantApi/Controllers/Globals/GlobalsController.php
 
 		-
+			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Spatie\\MediaLibrary\\MediaCollections\\Models\\Media\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/HttpTenantApi/Controllers/Media/MediaController.php
+
+		-
 			message: '#^Parameter \#1 \$subject of static method Spatie\\QueryBuilder\\QueryBuilder\<Illuminate\\Database\\Eloquent\\Model\>\:\:for\(\) expects class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Relations\\Relation, Illuminate\\Database\\Eloquent\\Builder\<Domain\\Menu\\Models\\Menu\> given\.$#'
 			identifier: argument.type
 			count: 2
