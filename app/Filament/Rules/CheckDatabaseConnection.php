@@ -16,7 +16,7 @@ class CheckDatabaseConnection implements DataAwareRule, ValidationRule
     protected array $data = [];
 
     public function __construct(
-        readonly protected string $connectionTemplate,
+        protected readonly string $connectionTemplate,
     ) {}
 
     #[\Override]
