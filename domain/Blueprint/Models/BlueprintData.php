@@ -14,6 +14,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Spatie\Image\Enums\CropPosition;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -142,22 +143,35 @@ class BlueprintData extends Model implements HasMedia
                     }
 
                     if ($type) {
-                        $this->addMediaConversion($title)
-                            ->width($width)
-                            ->height($height)
-                            ->format($type)
-                            // ->sharpen(10)
-                            // ->quality(90)
-                            ->fit($fit, $width, $height);
+
+                        if ($fit === Fit::Crop) {
+                            $this->addMediaConversion($title)
+                                ->format($type)
+                                ->crop($width, $height, CropPosition::Center);
+
+                        } else {
+                            $this->addMediaConversion($title)
+                                ->width($width)
+                                ->height($height)
+                                ->format($type)
+                                ->fit($fit, $width, $height);
+                        }
+
                     } else {
-                        /** @phpstan-ignore method.notFound */
-                        $this->addMediaConversion($title)
-                            ->width($width)
-                            ->height($height)
-                            // ->sharpen(10)
-                            // ->quality(90)
-                            ->keepOriginalImageFormat()
-                            ->fit($fit, $width, $height);
+
+                        if ($fit === Fit::Crop) {
+                            $this->addMediaConversion($title)
+                                ->keepOriginalImageFormat()
+                                ->crop($width, $height, CropPosition::Center);
+
+                        } else {
+                            /** @phpstan-ignore method.notFound */
+                            $this->addMediaConversion($title)
+                                ->width($width)
+                                ->height($height)
+                                ->keepOriginalImageFormat()
+                                ->fit($fit, $width, $height);
+                        }
                     }
                 }
             }
