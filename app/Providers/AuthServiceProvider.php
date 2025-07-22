@@ -60,6 +60,7 @@ class AuthServiceProvider extends ServiceProvider
         \Domain\Site\Models\Site::class => \App\Policies\SitePolicy::class,
         \Domain\Service\Models\Service::class => \App\Policies\ServicePolicy::class,
         \Domain\ServiceOrder\Models\ServiceOrder::class => \App\Policies\ServiceOrderPolicy::class,
+        \Domain\Tenant\Models\TenantApiKey::class => \App\Policies\TenantApiKeyPolicy::class,
     ];
 
     public function boot(): void
