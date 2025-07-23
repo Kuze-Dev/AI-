@@ -40,11 +40,12 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
 
     public function envelope(): Envelope
     {
+
         return new Envelope(
             from: new Address($this->formEmailNotification->sender ?: app(FormSettings::class)->sender_email, $this->formEmailNotification->sender_name),
-            to: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->to ?? []),
-            cc: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->cc ?? []),
-            bcc: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->bcc ?? []),
+            to: array_merge(...array_map($this->explodeIterpolatedStringWithData(...), $this->formEmailNotification->to ?? [])),
+            cc: array_merge(...array_map($this->explodeIterpolatedStringWithData(...), $this->formEmailNotification->cc ?? [])),
+            bcc: array_merge(...array_map($this->explodeIterpolatedStringWithData(...), $this->formEmailNotification->bcc ?? [])),
             replyTo: array_map($this->interpolateStringWithData(...), $this->formEmailNotification->reply_to ?? [$this->formEmailNotification->sender_name]),
             subject: $this->interpolateStringWithData($this->formEmailNotification->subject),
         );
@@ -58,6 +59,18 @@ class FormEmailNotificationMail extends Mailable implements ShouldQueue
         }
 
         return $string;
+    }
+
+    protected function explodeIterpolatedStringWithData(string $string): array
+    {
+        $interpolated_string = $string;
+
+        if ($string !== $compiledString = Blade::compileEchos($string)) {
+
+            $interpolated_string = Blade::render($compiledString, $this->data);
+        }
+
+        return explode(',', $interpolated_string);
     }
 
     #[\Override]
