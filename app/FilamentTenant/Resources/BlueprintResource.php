@@ -739,6 +739,7 @@ class BlueprintResource extends Resource
                                             ManipulationType::TYPE => Forms\Components\Group::make()->schema([
                                                 Forms\Components\Select::make('type')
                                                     ->translateLabel()
+                                                    ->reactive()
                                                     ->options($FormatOptions)
                                                     ->formatStateUsing(fn () => $stateData($manipulationType)),
                                             ]),
@@ -748,12 +749,15 @@ class BlueprintResource extends Resource
                                                     ->translateLabel()
                                                     ->required()
                                                     ->options($Fitoptions)
+                                                    ->reactive()
                                                     ->formatStateUsing(fn () => $stateData($manipulationType))
+                                                    ->afterStateUpdated(fn (string $state, Forms\Set $set) => $state === ManipulationFit::FIT_STRETCH->value ? $set('type', null) : null)
                                                     ->hint(
                                                         Str::of('[Documentation](https://spatie.be/docs/image/v1/image-manipulations/resizing-images)')
                                                             ->inlineMarkdown()
                                                             ->toHtmlString()
                                                     )
+                                                    ->helperText('Note: if selected Stretch conversion type will not apply')
                                                     ->hintColor('primary')
                                                     ->hintIcon('heroicon-s-question-mark-circle'),
                                             ]),
