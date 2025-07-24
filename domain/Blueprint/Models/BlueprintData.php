@@ -149,6 +149,16 @@ class BlueprintData extends Model implements HasMedia
                                 ->format($type)
                                 ->crop($width, $height, CropPosition::Center);
 
+                        } elseif (
+                            $fit === Fit::Stretch
+                        ) {
+                            /** @phpstan-ignore method.notFound */
+                            $this->addMediaConversion($title)
+                                ->keepOriginalImageFormat()
+                                ->quality(100)
+                                ->sharpen(10)
+                                ->nonOptimized()
+                                ->fit($fit, $width, $height);
                         } else {
                             $this->addMediaConversion($title)
                                 ->width($width)
@@ -164,6 +174,16 @@ class BlueprintData extends Model implements HasMedia
                                 ->keepOriginalImageFormat()
                                 ->crop($width, $height, CropPosition::Center);
 
+                        } elseif (
+                            $fit === Fit::Stretch
+                        ) {
+                            /** @phpstan-ignore method.notFound */
+                            $this->addMediaConversion($title)
+                                ->keepOriginalImageFormat()
+                                ->quality(100)
+                                ->sharpen(30)
+                                ->nonOptimized()
+                                ->fit($fit, $width, $height);
                         } else {
                             /** @phpstan-ignore method.notFound */
                             $this->addMediaConversion($title)
@@ -247,22 +267,54 @@ class BlueprintData extends Model implements HasMedia
                         }
 
                         if ($type) {
-                            $this->addMediaConversion($title)
-                                ->width($width)
-                                ->height($height)
-                                ->format($type)
-                                // ->sharpen(10)
-                                // ->quality(90)
-                                ->fit($fit, $width, $height);
+                            if ($fit === Fit::Crop) {
+                                $this->addMediaConversion($title)
+                                    ->format($type)
+                                    ->crop($width, $height, CropPosition::Center);
+
+                            } elseif (
+                                $fit === Fit::Stretch
+                            ) {
+                                /** @phpstan-ignore method.notFound */
+                                $this->addMediaConversion($title)
+                                    ->keepOriginalImageFormat()
+                                    ->quality(100)
+                                    ->sharpen(10)
+                                    ->nonOptimized()
+                                    ->fit($fit, $width, $height);
+                            } else {
+                                $this->addMediaConversion($title)
+                                    ->width($width)
+                                    ->height($height)
+                                    ->format($type)
+                                    ->fit($fit, $width, $height);
+                            }
                         } else {
-                            /** @phpstan-ignore method.notFound */
-                            $this->addMediaConversion($title)
-                                ->width($width)
-                                ->height($height)
-                                // ->sharpen(10)
-                                // ->quality(90)
-                                ->keepOriginalImageFormat()
-                                ->fit($fit, $width, $height);
+
+                            if ($fit === Fit::Crop) {
+                                $this->addMediaConversion($title)
+                                    ->keepOriginalImageFormat()
+                                    ->crop($width, $height, CropPosition::Center);
+
+                            } elseif (
+                                $fit === Fit::Stretch
+                            ) {
+                                /** @phpstan-ignore method.notFound */
+                                $this->addMediaConversion($title)
+                                    ->keepOriginalImageFormat()
+                                    ->quality(100)
+                                    ->sharpen(30)
+                                    ->nonOptimized()
+                                    ->fit($fit, $width, $height);
+
+                            } else {
+                                /** @phpstan-ignore method.notFound */
+                                $this->addMediaConversion($title)
+                                    ->width($width)
+                                    ->height($height)
+                                    ->keepOriginalImageFormat()
+                                    ->fit($fit, $width, $height);
+                            }
                         }
                     }
                 }
