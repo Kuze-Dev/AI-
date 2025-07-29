@@ -32,6 +32,7 @@ class CreateAdmin extends CreateRecord
 
     public function afterCreate(): void
     {
-        event(new Registered($this->record));
+        $this->record->sendEmailVerificationNotification();
+        // event(new Registered($this->record));
     }
 }
