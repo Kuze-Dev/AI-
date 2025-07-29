@@ -69,4 +69,15 @@ class CreatePage extends CreateRecord
     {
         return app(CreatePageAction::class)->execute(PageData::fromArray($data));
     }
+
+    public function afterCreate(): void
+    {
+        /** @var Page $page */
+        $page = $this->record;
+
+        /** @var array $block_content_data */
+        $block_content_data = $page->blockContents->toArray();
+
+        $page->update(['block_content_data' => $block_content_data]);
+    }
 }
