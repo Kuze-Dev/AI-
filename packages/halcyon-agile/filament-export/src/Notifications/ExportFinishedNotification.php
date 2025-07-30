@@ -49,6 +49,7 @@ class ExportFinishedNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->greeting(trans('Export finished'))
             ->line($this->line())
+            ->from(config()->string('mail.from.address'), 'Export Notification')
             ->action(trans('Download'), $this->downloadUrl());
     }
 
