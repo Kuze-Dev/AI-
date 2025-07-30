@@ -84,6 +84,7 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
         'author_id',
         'name',
         'visibility',
+        'block_content_data',
         'published_at',
         'locale',
         'draftable_id',
@@ -103,6 +104,7 @@ class Page extends Model implements HasInternationalizationInterface, HasMetaDat
         return [
             'visibility' => Visibility::class,
             'published_at' => 'datetime',
+            'block_content_data' => 'json',
         ];
     }
 

@@ -110,7 +110,8 @@ class AdminResource extends Resource
                                 ->translateLabel()
                                 ->relationship(
                                     titleAttribute: 'name',
-                                    // modifyQueryUsing: fn (Builder $query) => $query->where('guard_name', 'admin')
+                                    modifyQueryUsing: fn (Builder $query) => filament_admin()->hasRole(config()->string('domain.role.super_admin')) ?
+                                        $query : $query->where('name', '!=', config()->string('domain.role.super_admin'))
                                 )
                                 ->multiple()
                                 ->preload()
@@ -120,6 +121,18 @@ class AdminResource extends Resource
                                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->guard_name.' - '.$record->name)
                                 ->relationship(
                                     titleAttribute: 'name',
+                                    modifyQueryUsing: function (Builder $query) {
+                                        $user = filament_admin();
+                                        $superAdminRole = config()->string('domain.role.super_admin');
+
+                                        if ($user->hasRole($superAdminRole)) {
+                                            return $query;
+                                        }
+
+                                        $userPermissionIds = $user->getAllPermissions()->pluck('id')->toArray();
+
+                                        return $query->whereIn('id', $userPermissionIds);
+                                    }
                                 )
                                 ->multiple()
                                 ->preload()

@@ -106,7 +106,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     hasSoftDeletes: true
                 ),
             ],
-            'api' => [
+            'admin-api' => [
                 ...$this->generateFilamentResourcePermissions(
                     'contentEntry',
                     except: ['deleteAny']
