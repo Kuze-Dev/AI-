@@ -492,6 +492,14 @@ class EditPage extends EditRecord
         $this->record->refresh();
         $this->hasCachedForms = false;
 
+        /** @var Page $page */
+        $page = $this->record;
+
+        /** @var array $block_content_data */
+        $block_content_data = $page->blockContents->toArray();
+
+        $page->update(['block_content_data' => $block_content_data]);
+
         $this->fillForm();
     }
 
@@ -641,12 +649,4 @@ class EditPage extends EditRecord
         // Rebuild the URL and add a leading "/"
         return '/'.implode('/', $segments);
     }
-
-    // protected function mutateFormDataBeforeFill(array $data): array
-    // {
-    //     dd($this->getRecord());
-    //     dd($data);
-
-    //     return $data;
-    // }
 }

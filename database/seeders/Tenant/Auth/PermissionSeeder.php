@@ -101,7 +101,7 @@ class PermissionSeeder extends BasePermissionSeeder
                     except: ['deleteAny']
                 ),
             ],
-            'api' => [
+            'admin-api' => [
                 ...$this->generateFilamentResourcePermissions(
                     'contentEntry',
                     except: ['deleteAny']
