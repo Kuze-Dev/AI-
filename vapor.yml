@@ -3,7 +3,7 @@ name: HASP
 environments:
   ecommerce-branch:
     domain:
-      - staging-ecommerce.haspcms-1.com
+      - staging-ecom.haspcms-1.com
       - staging-haspv3.haspcms-1.com
       - filtownshipv3.haspcms-1.com
     cache: hasp-cache
