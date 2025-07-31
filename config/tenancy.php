@@ -42,6 +42,7 @@ return [
         App\Tenancy\Bootstrappers\TenantCorsBootstrapper::class,
         App\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class,
         App\Tenancy\Bootstrappers\CustomConfigBootstrapper::class,
+        App\Tenancy\Bootstrappers\SpatiePermissionBootstrapper::class,
     ],
 
     /**
