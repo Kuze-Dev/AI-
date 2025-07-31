@@ -91,18 +91,18 @@ class TenancyServiceProvider extends ServiceProvider
             Events\EndingTenancy::class => [],
             Events\TenancyEnded::class => [
                 Listeners\RevertToCentralContext::class,
-                function (Events\TenancyEnded $event) {
-                    config(['permission.cache.key' => 'spatie.permission.cache']);
-                },
+                // function (Events\TenancyEnded $event) {
+                // config(['permission.cache.key' => 'spatie.permission.cache']);
+                // },
             ],
 
             Events\BootstrappingTenancy::class => [],
             Events\TenancyBootstrapped::class => [
-                function (Events\TenancyBootstrapped $event) {
-                    if ($event->tenancy->tenant) {
-                        config(['permission.cache.key' => 'spatie.permission.cache.tenant.'.$event->tenancy->tenant->getAttribute('id')]);
-                    }
-                },
+                // function (Events\TenancyBootstrapped $event) {
+                // if ($event->tenancy->tenant) {
+                // config(['permission.cache.key' => 'spatie.permission.cache.tenant.'.$event->tenancy->tenant->getAttribute('id')]);
+                // }
+                // },
             ],
             Events\RevertingToCentralContext::class => [],
             Events\RevertedToCentralContext::class => [],
