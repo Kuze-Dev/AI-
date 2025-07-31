@@ -12,6 +12,7 @@ environments:
     runtime: 'docker'
     tmp-storage: 1024
     cli-tmp-storage: 512
+    gateway-version: 2
     queue-tmp-storage: 10240
     build:
       - 'COMPOSER_MIRROR_PATH_REPOS=1 composer install --no-dev'
@@ -21,7 +22,7 @@ environments:
     domain:
       - haspcms.net
       - "*.haspcms.net"
-    timeout: 60
+    timeout: 90
     warm: 10
     cache: hasp-cache
     memory: 2048
