@@ -18,9 +18,12 @@ class SpatiePermissionBootstrapper implements TenancyBootstrapper
 
     public function bootstrap(Tenant $tenant): void
     {
+
         $this->registrar->cacheKey = 'spatie.permission.cache.tenant.'.$tenant->getTenantKey();
 
         $this->app->make('config')->set('permission.cache.key', 'tenant.'.$tenant->getTenantKey());
+
+        app()->make(\Spatie\Permission\PermissionRegistrar::class)->initializeCache();
 
     }
 
