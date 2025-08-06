@@ -388,6 +388,21 @@ class SchemaFormBuilder extends Component
             $repeater->maxItems($repeaterFieldData->max);
         }
 
+        if (count($repeaterFieldData->hidden_option)) {
+
+            $option = $repeaterFieldData->hidden_option['0'];
+            $enum = ConditionEnum::tryFrom($option['condition']);
+
+            $repeater->reactive();
+            $repeater->hidden(function (Get $get) use ($enum, $option) {
+                if ($enum) {
+                    return $enum->evaluate($get($option['base_state_name']), $option['value']);
+                }
+
+                return false;
+            });
+        }
+
         return $repeater;
     }
 

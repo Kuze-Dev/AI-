@@ -659,6 +659,29 @@ class BlueprintResource extends Resource
                     ->allowedOnlyWholeNumber()
                     ->columnSpan(2)
                     ->dehydrateStateUsing(fn (string|int|null $state) => filled($state) ? (int) $state : null),
+                Forms\Components\Repeater::make('hidden_option')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state) => $state['base_state_name'] ?? null)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->defaultItems(0)
+                    ->maxItems(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('base_state_name')
+                            ->helperText('State Name of related field')
+                            ->required(),
+                        Forms\Components\Select::make('condition')
+                            ->helperText('Select Condition')
+                            ->options(
+                                collect(ConditionEnum::cases())
+                                    ->mapWithKeys(fn (ConditionEnum $fieldType) => [$fieldType->value => Str::headline($fieldType->value)])
+                                    ->toArray()
+                            )
+                            ->required(),
+                        Forms\Components\TextInput::make('value')
+                            ->helperText('add , to separate the values if using in_array or not in_array')
+                            ->required(),
+                    ]),
                 self::getFieldsSchema()
                     ->columnSpanFull(),
             ],
