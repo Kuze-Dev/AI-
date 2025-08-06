@@ -22,6 +22,7 @@ class RepeaterFieldData extends FieldData
         public readonly ?int $min = null,
         public readonly ?int $max = null,
         public readonly ?int $columns = null,
+        public readonly array $hidden_option = [],
         public readonly ?string $helper_text = null,
     ) {}
 
@@ -45,6 +46,7 @@ class RepeaterFieldData extends FieldData
             min: $data['min'] ?? null,
             max: $data['max'] ?? null,
             helper_text: $data['helper_text'] ?? null,
+            hidden_option: $data['hidden_option'] ?? [],
         );
     }
 }
