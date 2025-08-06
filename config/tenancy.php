@@ -31,7 +31,7 @@ return [
     'bootstrappers' => [
         App\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class, // TODO: only a work around to work with separate database server
         // Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
-        Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
+        // Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
         // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
@@ -42,6 +42,7 @@ return [
         App\Tenancy\Bootstrappers\TenantCorsBootstrapper::class,
         App\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class,
         App\Tenancy\Bootstrappers\CustomConfigBootstrapper::class,
+        App\Tenancy\Bootstrappers\SpatiePermissionBootstrapper::class,
     ],
 
     /**

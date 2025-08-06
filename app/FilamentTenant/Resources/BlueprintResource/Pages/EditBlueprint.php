@@ -8,6 +8,7 @@ use App\Filament\Pages\Concerns\LogsFormActivity;
 use App\FilamentTenant\Resources\BlueprintResource;
 use Domain\Blueprint\Actions\UpdateBlueprintAction;
 use Domain\Blueprint\DataTransferObjects\BlueprintData;
+use Domain\Blueprint\DataTransferObjects\ConversionData;
 use Domain\Blueprint\DataTransferObjects\FieldData;
 use Domain\Blueprint\DataTransferObjects\RepeaterFieldData;
 use Domain\Blueprint\DataTransferObjects\SchemaData;
@@ -18,8 +19,6 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Artisan;
-use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
 class EditBlueprint extends EditRecord
 {
@@ -58,16 +57,16 @@ class EditBlueprint extends EditRecord
     protected function afterSave(): void
     {
         $blueprinDataCollection = ModelsBlueprintData::where('blueprint_id', $this->record->getRouteKey())->with('media')->get();
+
         foreach ($blueprinDataCollection as $blueprintData) {
-            $mediaCollection = $blueprintData->media;
+
             $sections = $this->record->getAttribute('schema')->sections;
             foreach ($sections as $section) {
                 foreach ($section->fields as $field) {
-                    $this->extractSchema($field, $section->state_name, $blueprintData->state_path, $mediaCollection);
+                    $this->extractSchema($field, $section->state_name, $blueprintData->state_path, $blueprintData);
                 }
             }
         }
-        // Artisan::call('media-library:regenerate');
 
         $this->afterSaveOverride();
 
@@ -76,17 +75,14 @@ class EditBlueprint extends EditRecord
         $this->fillForm();
     }
 
-    /**
-     * @param  \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, \Spatie\MediaLibrary\MediaCollections\Models\Media>  $mediaCollection
-     */
-    protected function extractSchema(RepeaterFieldData|FieldData $field, string $currentpath, string $state_path, MediaCollection $mediaCollection): void
+    protected function extractSchema(RepeaterFieldData|FieldData $field, string $currentpath, string $state_path, ModelsBlueprintData $blueprintData): void
     {
 
         $statePath = $currentpath.'.'.$field->state_name;
         if ($field->type === FieldType::REPEATER) {
             if (property_exists($field, 'fields') && is_array($field->fields)) {
                 foreach ($field->fields as $repeaterFields) {
-                    $this->extractSchema($repeaterFields, $statePath, $state_path, $mediaCollection);
+                    $this->extractSchema($repeaterFields, $statePath, $state_path, $blueprintData);
                 }
             }
         }
@@ -99,20 +95,26 @@ class EditBlueprint extends EditRecord
             }
             $newStatepath = implode('.', $arrayStatepath);
             if ($statePath === $newStatepath) {
-                $newMediaConversion = [];
-                foreach ($mediaCollection as $media) {
-                    if (property_exists($field, 'conversions')) {
-                        foreach ($field->conversions as $conversion) {
-                            if (array_key_exists($conversion->name, $media->generated_conversions)) {
-                                $newMediaConversion[$conversion->name] = true;
-                            }
-                        }
-                    }
+
+                /** @var \Domain\Blueprint\DataTransferObjects\MediaFieldData */
+                $mediaField = $field;
+
+                $conversions = $mediaField->conversions;
+
+                $savedConversions = array_map(
+                    fn (array $conversion) => ConversionData::fromArray($conversion),
+                    $blueprintData->blueprint_media_conversion ?? []
+                );
+
+                if (serialize($conversions) !== serialize($savedConversions) || is_null($blueprintData->blueprint_media_conversion)) {
+
+                    app(\Domain\Blueprint\Jobs\UpdateBlueprintDataMediaConversionJob::class)->dispatch(
+                        $blueprintData,
+                        $conversions
+                    );
+
                 }
-                foreach ($mediaCollection as $media) {
-                    $media->generated_conversions = $newMediaConversion;
-                    $media->save();
-                }
+
             }
         }
 
