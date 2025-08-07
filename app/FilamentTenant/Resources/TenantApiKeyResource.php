@@ -14,6 +14,7 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -31,14 +32,14 @@ class TenantApiKeyResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function shouldRegisterNavigation(): bool
+    #[\Override]
+    public static function getEloquentQuery(): Builder
     {
-        return config('custom.strict_api');
-    }
+        if (filament_admin()->hasRole(config()->string('domain.role.super_admin'))) {
+            return parent::getEloquentQuery();
+        }
 
-    public static function canAccess(): bool
-    {
-        return config('custom.strict_api');
+        return static::getModel()::query()->where('admin_id', filament_admin()->id);
     }
 
     public static function form(Form $form): Form
@@ -49,7 +50,7 @@ class TenantApiKeyResource extends Resource
                     ->columns(1)
                     ->schema([
                         Forms\Components\Hidden::make('admin_id')
-                            ->default(filament_admin()->id),
+                            ->formatStateUsing(fn (?int $state) => $state ? $state : filament_admin()->id),
                         Forms\Components\TextInput::make('app_name')
                             ->label('Application Name')
                             ->required()
@@ -111,6 +112,7 @@ class TenantApiKeyResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('secret_key')
                     ->label('Secret Key')
+                    ->formatStateUsing(fn (string $state) => Str::substr($state, 0, 10).'************')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('last_used_at')

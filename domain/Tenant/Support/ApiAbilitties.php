@@ -20,6 +20,7 @@ enum ApiAbilitties: string
     case cms_search = 'cms:search';
     case settings_form = 'settings:form';
     case settings_site = 'settings:site';
+    case media_view = 'media:view';
 
     /**
      * @return array<string>
@@ -40,6 +41,7 @@ enum ApiAbilitties: string
             self::cms_search->value,
             self::settings_form->value,
             self::settings_site->value,
+            self::media_view->value,
         ];
     }
 
@@ -57,6 +59,7 @@ enum ApiAbilitties: string
             self::form_submit->value,
             self::generate_bucket_url->value,
             self::cms_search->value,
+            self::media_view->value,
         ];
     }
 }

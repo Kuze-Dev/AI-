@@ -6,6 +6,8 @@ namespace App\HttpTenantApi\Controllers\RouteUrl;
 
 use App\Features\CMS\CMSBase;
 use App\Features\CMS\SitesManagement;
+use App\Http\Middleware\TenantApiAuthorizationMiddleware;
+use App\HttpTenantApi\Controllers\BaseCms\BaseCmsController;
 use App\HttpTenantApi\Resources\ContentEntryResource;
 use App\HttpTenantApi\Resources\PageResource;
 use App\HttpTenantApi\Resources\TaxonomyResource;
@@ -16,6 +18,7 @@ use Domain\Page\Enums\Visibility;
 use Domain\Page\Models\Page;
 use Domain\Taxonomy\Models\Taxonomy;
 use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Tenant\Support\ApiAbilitties;
 use Domain\Tenant\TenantFeatureSupport;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -25,8 +28,8 @@ use Spatie\RouteAttributes\Attributes\Where;
 use Support\RouteUrl\Models\RouteUrl;
 use TiMacDonald\JsonApi\JsonApiResource;
 
-#[Middleware('feature.tenant:'.CMSBase::class)]
-class RouteUrlController
+#[Middleware(['feature.tenant:'.CMSBase::class, TenantApiAuthorizationMiddleware::class])]
+class RouteUrlController extends BaseCmsController
 {
     #[
         Get('/route/{url?}'),
@@ -78,14 +81,17 @@ class RouteUrlController
         return match ($routeUrl->model::class) {
             Page::class => $this->handlePageResource($routeUrl->model),
             ContentEntry::class => $this->handleContentEntryResource($routeUrl->model),
-            Taxonomy::class => TaxonomyResource::make($routeUrl->model),
-            TaxonomyTerm::class => TaxonomyTermResource::make($routeUrl->model),
+            Taxonomy::class => $this->handleTaxonomyResource($routeUrl->model),
+            TaxonomyTerm::class => $this->handleTaxonomyTermResource($routeUrl->model),
             default => throw new InvalidArgumentException('No resource found for model '.$routeUrl->model::class),
         };
     }
 
     public function handlePageResource(Page $page): PageResource
     {
+
+        $this->checkAbilities(ApiAbilitties::page_view->value);
+
         abort_if($page->published_at === null && ! $page->isHomePage(), 404);
 
         return PageResource::make($page);
@@ -93,6 +99,8 @@ class RouteUrlController
 
     private function handleContentEntryResource(ContentEntry $contentEntry): ContentEntryResource
     {
+        $this->checkAbilities(ApiAbilitties::contententry_view->value);
+
         /** @var \Domain\Content\Models\Content */
         $content = Content::whereId($contentEntry->content_id)->firstOrFail();
 
@@ -101,5 +109,19 @@ class RouteUrlController
         abort_if($contentEntry->status === false, 404);
 
         return ContentEntryResource::make($contentEntry);
+    }
+
+    private function handleTaxonomyResource(Taxonomy $taxonomy): TaxonomyResource
+    {
+        $this->checkAbilities(ApiAbilitties::taxonomy_view->value);
+
+        return TaxonomyResource::make($taxonomy);
+    }
+
+    private function handleTaxonomyTermResource(TaxonomyTerm $taxonomyTerm): TaxonomyTermResource
+    {
+        $this->checkAbilities(ApiAbilitties::taxonomyterms_view->value);
+
+        return TaxonomyTermResource::make($taxonomyTerm);
     }
 }

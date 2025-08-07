@@ -100,6 +100,11 @@ class PermissionSeeder extends BasePermissionSeeder
                     'service',
                     except: ['deleteAny']
                 ),
+                ...$this->generateFilamentResourcePermissions(
+                    'tenantApiKey',
+                    except: ['deleteAny'],
+                    hasSoftDeletes: true
+                ),
             ],
             'admin-api' => [
                 ...$this->generateFilamentResourcePermissions(
@@ -111,6 +116,7 @@ class PermissionSeeder extends BasePermissionSeeder
                 ...$this->generateFilamentResourcePermissions('product', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('menu', except: ['deleteAny']),
                 ...$this->generateFilamentResourcePermissions('page', except: ['deleteAny']),
+
             ],
         ];
     }
