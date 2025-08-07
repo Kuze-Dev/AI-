@@ -16,6 +16,7 @@ use Domain\Page\Models\BlockContent;
 use Domain\Taxonomy\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CreateBlueprintDataAction
 {
@@ -26,6 +27,7 @@ class CreateBlueprintDataAction
 
     public function storeBlueprintData(BlueprintDataData $blueprintDataData): BlueprintData
     {
+
         /** @var \Domain\Blueprint\Models\Blueprint */
         $blueprint = Blueprint::where('id', $blueprintDataData->blueprint_id)->first();
 
@@ -54,18 +56,6 @@ class CreateBlueprintDataAction
             return $blueprintData;
         }
 
-        if (is_array($blueprintDataData->value)) {
-            $filtered = array_filter($blueprintDataData->value, function ($value) {
-                $pathInfo = pathinfo($value);
-                if (isset($pathInfo['extension']) && $pathInfo['extension'] !== '') {
-                    return $value;
-                }
-            });
-            if (empty($filtered)) {
-                return $blueprintData;
-            }
-        }
-
         if ($blueprintDataData->type === FieldType::MEDIA && $blueprintData->value) {
 
             if (is_array($blueprintDataData->value)) {
@@ -76,6 +66,9 @@ class CreateBlueprintDataAction
                     } elseif (is_image_url($value)) {
                         $blueprintData->addMediaFromUrl($value)
                             ->toMediaCollection('blueprint_media');
+                    } elseif ($media_from_uuid = Media::where('uuid', $value)->first()) {
+                        $blueprintData->addMediaFromUrl($media_from_uuid->getUrl())
+                            ->toMediaCollection('blueprint_media');
                     }
                 }
             } else {
@@ -85,6 +78,9 @@ class CreateBlueprintDataAction
 
                 if (is_image_url($image_url_or_disk_path)) {
                     $blueprintData->addMediaFromUrl($image_url_or_disk_path)
+                        ->toMediaCollection('blueprint_media');
+                } elseif ($media_from_uuid = Media::where('uuid', $image_url_or_disk_path)->first()) {
+                    $blueprintData->addMediaFromUrl($media_from_uuid->getUrl())
                         ->toMediaCollection('blueprint_media');
                 } else {
                     $blueprintData->addMediaFromDisk($image_url_or_disk_path, config('filament.default_filesystem_disk'))
