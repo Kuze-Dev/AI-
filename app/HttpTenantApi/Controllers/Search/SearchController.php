@@ -88,6 +88,10 @@ class SearchController
                     $filter['sites.id'] ?? null,
                     fn ($query, $siteIds) => $query->wherehas('sites', fn ($q) => $q->whereIn('site_id', explode(',', (string) $siteIds)))
                 )
+                ->when(
+                    $filter['content_slug'] ?? null,
+                    fn ($query, $content_slug) => $query->wherehas('content', fn ($q) => $q->whereIn('slug', explode(',', (string) $content_slug)))
+                )
                 ->limit(20)
                 ->get()
         );
