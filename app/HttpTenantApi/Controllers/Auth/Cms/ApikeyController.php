@@ -36,11 +36,6 @@ class ApikeyController extends Controller
             $tenantApiKey->last_used_at = now();
             $tenantApiKey->save();
 
-            // revoke all other tokens for this tenantApiKey
-            $tenantApiKey->tokens()->each(function ($token) {
-                $token->delete();
-            });
-
             return response([
                 'token' => $tenantApiKey
                     ->createToken(
