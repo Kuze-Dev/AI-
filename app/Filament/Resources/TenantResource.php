@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Features;
-use App\Features\Enums\FeatureEnum;
-use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
-use App\Filament\Resources\TenantResource\Forms\FeatureSelector;
-use App\Filament\Resources\TenantResource\Pages;
-use App\Filament\Rules\CheckDatabaseConnection;
-use App\Filament\Rules\FullyQualifiedDomainNameRule;
-// use App\Filament\Support\Forms\FeatureSelector;
-use App\FilamentTenant\Support\Divider;
-use Domain\Tenant\Models\Tenant;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Get;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Domain\Tenant\Models\Tenant;
+// use App\Filament\Support\Forms\FeatureSelector;
+use Filament\Resources\Resource;
+use App\Features\Enums\FeatureEnum;
+use App\Features\Service\OpenAIService;
+use App\FilamentTenant\Support\Divider;
+use App\Filament\Rules\CheckDatabaseConnection;
+use App\Filament\Resources\TenantResource\Pages;
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
+use App\Filament\Resources\TenantResource\Forms\FeatureSelector;
+use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
 
 class TenantResource extends Resource
 {
@@ -218,6 +219,10 @@ class TenantResource extends Resource
                                                 Features\CMS\Internationalization::class,
                                                 Features\CMS\SitesManagement::class,
                                                 Features\CMS\GoogleMapField::class,
+                                                Features\CMS\OpenAI::class,
+
+
+
                                             ],
                                         ),
                                     ]
@@ -292,6 +297,25 @@ class TenantResource extends Resource
                     ])->hidden(
                         fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\GoogleMapField::class)
                     ),
+                    /** OpenAI Settings with dynamic model selection */
+                Forms\Components\Section::make(trans('Open AI Settings'))
+                ->collapsed(fn (string $context) => $context === 'edit')
+                ->schema([
+                    Forms\Components\TextInput::make(Tenant::internalPrefix().'openai_api_key')
+                        ->columnSpanFull(),
+                    Forms\Components\Select::make(Tenant::internalPrefix().'openai_model')
+                        ->label('Default Model')
+                        ->options(function () {
+                            $service = app(OpenAIService::class);
+                            return collect($service->availableModels())
+                                ->mapWithKeys(fn($model) => [$model['id'] => $model['name']])
+                                ->toArray();
+                        })
+                        ->default('gpt-4o-mini')
+                        ->columnSpanFull(),
+                ])
+                ->hidden(fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\OpenAI::class)),
+
                 Forms\Components\Section::make(trans('Cors Setting'))
                     ->collapsed(fn (string $context) => $context === 'edit')
                     ->schema([
