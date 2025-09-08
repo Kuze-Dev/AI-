@@ -297,24 +297,14 @@ class TenantResource extends Resource
                     ])->hidden(
                         fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\GoogleMapField::class)
                     ),
-                    /** OpenAI Settings with dynamic model selection */
-                Forms\Components\Section::make(trans('Open AI Settings'))
-                ->collapsed(fn (string $context) => $context === 'edit')
-                ->schema([
-                    Forms\Components\TextInput::make(Tenant::internalPrefix().'openai_api_key')
-                        ->columnSpanFull(),
-                    Forms\Components\Select::make(Tenant::internalPrefix().'openai_model')
-                        ->label('Default Model')
-                        ->options(function () {
-                            $service = app(OpenAIService::class);
-                            return collect($service->availableModels())
-                                ->mapWithKeys(fn($model) => [$model['id'] => $model['name']])
-                                ->toArray();
-                        })
-                        ->default('gpt-4o-mini')
-                        ->columnSpanFull(),
-                ])
-                ->hidden(fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\OpenAI::class)),
+                    Forms\Components\Section::make(trans('Open AI Settings'))
+                    ->collapsed(fn (string $context) => $context === 'edit')
+                    ->schema([
+                        Forms\Components\TextInput::make(Tenant::internalPrefix().'openai_api_key')
+                            ->columnSpanFull(),
+                    ])
+                    ->hidden(fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\OpenAI::class)),
+
 
                 Forms\Components\Section::make(trans('Cors Setting'))
                     ->collapsed(fn (string $context) => $context === 'edit')

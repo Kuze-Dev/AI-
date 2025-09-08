@@ -4,33 +4,35 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Filament\Admin\Themes\Mint;
-use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
-use App\FilamentTenant\Pages\AccountDeactivatedNotice;
-use App\FilamentTenant\Widgets\DeployStaticSite;
-use App\FilamentTenant\Widgets\Report as ReportWidget;
-use App\Settings\SiteSettings;
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
-use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use App\Settings\SiteSettings;
+use Domain\Tenant\Models\Tenant;
+use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
+use App\Filament\Admin\Themes\Mint;
 use Filament\Widgets\AccountWidget;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
-use Illuminate\Session\Middleware\StartSession;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
+use Filament\Navigation\NavigationGroup;
+use Filament\Http\Middleware\Authenticate;
 use Stancl\Tenancy\Middleware\ScopeSessions;
+use App\FilamentTenant\Pages\TenantDashboard;
+use Illuminate\Session\Middleware\StartSession;
+use App\FilamentTenant\Widgets\DeployStaticSite;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use App\FilamentTenant\Pages\AccountDeactivatedNotice;
+use App\FilamentTenant\Widgets\Report as ReportWidget;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
+use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
 
 class TenantPanelProvider extends PanelProvider
 {
@@ -59,7 +61,7 @@ class TenantPanelProvider extends PanelProvider
 //            ->discoverWidgets(in: app_path('FilamentTenant/Widgets'), for: 'App\\FilamentTenant\\Widgets')
             ->discoverClusters(in: app_path('FilamentTenant/Clusters'), for: 'App\\FilamentTenant\\Clusters')
             ->pages([
-                Pages\Dashboard::class,
+                TenantDashboard::class,
             ])
             ->widgets([
                 AccountWidget::class,

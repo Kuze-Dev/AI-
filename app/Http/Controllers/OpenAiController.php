@@ -11,10 +11,9 @@ class OpenAiController extends Controller
     #[Get('test-openai', name: 'test.openai')]
     public function test(OpenAIService $openai): JsonResponse
     {
-        $reply = $openai->chat('what model of open ai I use?');
+        $result = $openai->analyze('what is ai');
 
-
-
-        return response()->json(['reply' => $reply]);
+        return response()->json($result);
     }
+
 }
