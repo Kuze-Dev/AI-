@@ -219,7 +219,6 @@ class TenantResource extends Resource
                                                 Features\CMS\Internationalization::class,
                                                 Features\CMS\SitesManagement::class,
                                                 Features\CMS\GoogleMapField::class,
-                                                Features\CMS\OpenAI::class,
 
 
 
@@ -284,6 +283,17 @@ class TenantResource extends Resource
                                         ),
                                     ]
                                 ),
+                                new Features\GroupFeature(
+                                    base: Features\AI\OpenAIBase::class,
+                                    extra: [
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\AI\Upload::class,
+                                                Features\AI\GoogleDocsUrl::class,
+                                            ],
+                                        ),
+                                    ]
+                                ),
                             ]),
                     ])
                     ->hidden(
@@ -303,7 +313,7 @@ class TenantResource extends Resource
                         Forms\Components\TextInput::make(Tenant::internalPrefix().'openai_api_key')
                             ->columnSpanFull(),
                     ])
-                    ->hidden(fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\OpenAI::class)),
+                    ->hidden(fn (?Tenant $record) => ! $record?->features()->active(\App\Features\AI\OpenAIBase::class)),
 
 
                 Forms\Components\Section::make(trans('Cors Setting'))

@@ -82,7 +82,11 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => trans('Service Management')),
                 NavigationGroup::make()->label(fn () => trans('Customer Management')),
                 NavigationGroup::make()->label(fn () => trans('System')),
+
             ])
+
+
+
             ->plugins([
                 FilamentPasswordConfirmationPlugin::make()->routeMiddleware(['tenant']),
                 \Hasnayeen\Themes\ThemesPlugin::make()
@@ -139,5 +143,6 @@ class TenantPanelProvider extends PanelProvider
                             ->name('account-deactivated.notice');
                     });
             });
+
     }
 }
