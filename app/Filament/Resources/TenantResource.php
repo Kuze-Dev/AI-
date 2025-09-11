@@ -14,7 +14,6 @@ use Domain\Tenant\Models\Tenant;
 // use App\Filament\Support\Forms\FeatureSelector;
 use Filament\Resources\Resource;
 use App\Features\Enums\FeatureEnum;
-use App\Features\Service\OpenAIService;
 use App\FilamentTenant\Support\Divider;
 use App\Filament\Rules\CheckDatabaseConnection;
 use App\Filament\Resources\TenantResource\Pages;
@@ -219,9 +218,6 @@ class TenantResource extends Resource
                                                 Features\CMS\Internationalization::class,
                                                 Features\CMS\SitesManagement::class,
                                                 Features\CMS\GoogleMapField::class,
-
-
-
                                             ],
                                         ),
                                     ]
@@ -246,6 +242,17 @@ class TenantResource extends Resource
                                                 Features\ECommerce\ProductBatchUpdate::class,
                                                 Features\ECommerce\AllowGuestOrder::class,
                                                 Features\ECommerce\RewardPoints::class,
+                                            ],
+                                        ),
+                                    ]
+                                ),
+                                new Features\GroupFeature(
+                                    base: Features\AI\OpenAIBase::class,
+                                    extra: [
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\AI\Upload::class,
+                                                Features\AI\GoogleDocsUrl::class,
                                             ],
                                         ),
                                     ]
@@ -283,17 +290,6 @@ class TenantResource extends Resource
                                         ),
                                     ]
                                 ),
-                                new Features\GroupFeature(
-                                    base: Features\AI\OpenAIBase::class,
-                                    extra: [
-                                        new Features\GroupFeatureExtra(
-                                            extra: [
-                                                Features\AI\Upload::class,
-                                                Features\AI\GoogleDocsUrl::class,
-                                            ],
-                                        ),
-                                    ]
-                                ),
                             ]),
                     ])
                     ->hidden(
@@ -307,13 +303,13 @@ class TenantResource extends Resource
                     ])->hidden(
                         fn (?Tenant $record) => ! $record?->features()->active(\App\Features\CMS\GoogleMapField::class)
                     ),
-                    Forms\Components\Section::make(trans('Open AI Settings'))
-                    ->collapsed(fn (string $context) => $context === 'edit')
-                    ->schema([
-                        Forms\Components\TextInput::make(Tenant::internalPrefix().'openai_api_key')
-                            ->columnSpanFull(),
-                    ])
-                    ->hidden(fn (?Tenant $record) => ! $record?->features()->active(\App\Features\AI\OpenAIBase::class)),
+                    // Forms\Components\Section::make(trans('Open AI Settings'))
+                    // ->collapsed(fn (string $context) => $context === 'edit')
+                    // ->schema([
+                    //     Forms\Components\TextInput::make(Tenant::internalPrefix().'openai_api_key')
+                    //         ->columnSpanFull(),
+                    // ])
+                    // ->hidden(fn (?Tenant $record) => ! $record?->features()->active(\App\Features\AI\OpenAIBase::class)),
 
 
                 Forms\Components\Section::make(trans('Cors Setting'))

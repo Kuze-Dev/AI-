@@ -9,12 +9,13 @@ use Domain\Tenant\Models\Tenant;
 
 class OpenAIBase implements FeatureContract
 {
-    public string $name = 'openai.base';
+    public string $name = 'ai.base';
 
     public function resolve(Tenant $scope): mixed
     {
         return false;
     }
+
 
     #[\Override]
     public function getLabel(): string

@@ -43,7 +43,6 @@ return [
         App\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class,
         App\Tenancy\Bootstrappers\CustomConfigBootstrapper::class,
         App\Tenancy\Bootstrappers\SpatiePermissionBootstrapper::class,
-        App\Tenancy\Bootstrappers\OpenAiBootstrapper::class,
     ],
 
     /**

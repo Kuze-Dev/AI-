@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use Dom\Document;
 use Filament\Pages;
 use Filament\Panel;
+use PhpParser\Comment\Doc;
 use Filament\PanelProvider;
 use App\Settings\SiteSettings;
 use Domain\Tenant\Models\Tenant;
@@ -14,12 +16,14 @@ use Filament\Support\Colors\Color;
 use App\Filament\Admin\Themes\Mint;
 use Filament\Widgets\AccountWidget;
 use Filament\Support\Enums\MaxWidth;
+use function Pest\Livewire\livewire;
 use Illuminate\Support\Facades\Route;
 use Filament\Navigation\NavigationGroup;
 use Filament\Http\Middleware\Authenticate;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\FilamentTenant\Pages\TenantDashboard;
 use Illuminate\Session\Middleware\StartSession;
+use App\FilamentTenant\Pages\TenantFullAIWidget;
 use App\FilamentTenant\Widgets\DeployStaticSite;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -31,6 +35,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+
 use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
 use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
 
@@ -62,6 +67,7 @@ class TenantPanelProvider extends PanelProvider
             ->discoverClusters(in: app_path('FilamentTenant/Clusters'), for: 'App\\FilamentTenant\\Clusters')
             ->pages([
                 TenantDashboard::class,
+                TenantFullAIWidget::class,
             ])
             ->widgets([
                 AccountWidget::class,
@@ -142,6 +148,11 @@ class TenantPanelProvider extends PanelProvider
                         Route::get('account-deactivated', AccountDeactivatedNotice::class)
                             ->name('account-deactivated.notice');
                     });
+
+                    Route::get('ai-widget', \App\Livewire\TenantFullAIWidgetPage::class)
+                    ->middleware('auth:admin')
+                    ->name('tenant.ai-widget');
+
             });
 
     }
