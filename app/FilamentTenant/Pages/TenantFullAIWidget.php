@@ -23,11 +23,6 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
     protected static string $view = 'filament-tenant.pages.ai-widget';
 
 
-
-
-
-
-
     public ?array $data = [];
 
     public function mount(): void

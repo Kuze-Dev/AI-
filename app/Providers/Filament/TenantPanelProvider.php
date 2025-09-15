@@ -9,6 +9,7 @@ use Filament\Pages;
 use Filament\Panel;
 use PhpParser\Comment\Doc;
 use Filament\PanelProvider;
+use Filament\Pages\Dashboard;
 use App\Settings\SiteSettings;
 use Domain\Tenant\Models\Tenant;
 use Filament\Navigation\MenuItem;
@@ -34,8 +35,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
 use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
 
@@ -66,7 +67,7 @@ class TenantPanelProvider extends PanelProvider
 //            ->discoverWidgets(in: app_path('FilamentTenant/Widgets'), for: 'App\\FilamentTenant\\Widgets')
             ->discoverClusters(in: app_path('FilamentTenant/Clusters'), for: 'App\\FilamentTenant\\Clusters')
             ->pages([
-                TenantDashboard::class,
+                Dashboard::class,
             ])
             ->widgets([
                 AccountWidget::class,
