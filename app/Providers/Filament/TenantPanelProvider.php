@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Route;
 use Filament\Navigation\NavigationGroup;
 use Filament\Http\Middleware\Authenticate;
 use Stancl\Tenancy\Middleware\ScopeSessions;
-use App\FilamentTenant\Pages\TenantDashboard;
 use Illuminate\Session\Middleware\StartSession;
 use App\FilamentTenant\Pages\TenantFullAIWidget;
 use App\FilamentTenant\Widgets\DeployStaticSite;
@@ -52,6 +51,7 @@ class TenantPanelProvider extends PanelProvider
             ->authPasswordBroker('admin')
             ->login()
             ->profile()
+
             ->passwordReset()
             ->emailVerification()
             ->userMenuItems([
@@ -68,6 +68,7 @@ class TenantPanelProvider extends PanelProvider
             ->discoverClusters(in: app_path('FilamentTenant/Clusters'), for: 'App\\FilamentTenant\\Clusters')
             ->pages([
                 Dashboard::class,
+                TenantFullAIWidget::class,
             ])
             ->widgets([
                 AccountWidget::class,
@@ -149,8 +150,8 @@ class TenantPanelProvider extends PanelProvider
                             ->name('account-deactivated.notice');
                     });
 
-                    Route::get('ai-widget', \App\Livewire\TenantFullAIWidgetPage::class)
-                    ->middleware('auth:admin')
+                Route::get('ai-widget', \App\FilamentTenant\Pages\TenantFullAIWidget::class)
+                    ->middleware(['auth:admin'])
                     ->name('tenant.ai-widget');
 
             });

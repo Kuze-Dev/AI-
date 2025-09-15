@@ -12,16 +12,19 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Illuminate\Contracts\View\View;
 
 class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 {
     use Forms\Concerns\InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cpu-chip';
     protected static ?string $title = 'AI Widget';
     protected static ?string $slug = 'ai-widget';
     protected static string $view = 'filament-tenant.pages.ai-widget';
+    protected static bool $shouldRegisterNavigation = false;
 
+    // Make the page full width
+    protected static ?string $maxWidth = 'full';
 
     public ?array $data = [];
 
@@ -43,7 +46,6 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                                     ->disk('public')
                                     ->directory('uploads')
                                     ->preserveFilenames()
-
                                     ->imagePreviewHeight('200')
                                     ->previewable(true)
                                     ->maxSize(10240)
@@ -106,5 +108,31 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
     protected function getFormActions(): array
     {
         return [];
+    }
+
+    // Override getMaxWidth method
+    public function getMaxWidth(): string
+    {
+        return 'full';
+    }
+
+    // Add this method to hide the sidebar and topbar
+    protected function hasLogo(): bool
+    {
+        return false;
+    }
+
+    // Hide the navigation
+    public function hasTopNavigation(): bool
+    {
+        return false;
+    }
+
+    // Override the view data to add custom styles
+    protected function getViewData(): array
+    {
+        return array_merge(parent::getViewData(), [
+            'hideNavigation' => true,
+        ]);
     }
 }
