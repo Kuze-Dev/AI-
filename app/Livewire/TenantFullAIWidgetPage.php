@@ -4,31 +4,41 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class TenantFullAIWidgetPage extends Component
 {
     use WithFileUploads;
 
     public $file;
-    public $googleDocsUrl;
+    public $uploadedFilePath;
 
-    public function save()
+    // Automatically handle file once it's selected
+    public function updatedFile()
     {
         $this->validate([
-            'file' => 'nullable|file|max:10240', // max 10MB
-            'googleDocsUrl' => 'nullable|url',
+            'file' => 'required|file|max:10240', // 10 MB
         ]);
 
-        // Example: store file if uploaded
-        if ($this->file) {
-            $path = $this->file->store('uploads', 'public');
-            session()->flash('message', "File uploaded to: $path");
+        $path = $this->file->store('uploads', 'public');
+
+        $this->uploadedFilePath = Storage::url($path);
+
+        Log::info('File uploaded instantly', ['path' => $this->uploadedFilePath]);
+
+        session()->flash('message', "File uploaded successfully!");
+    }
+
+    public function removeFile()
+    {
+        if ($this->uploadedFilePath) {
+            $storagePath = str_replace('/storage/', '', $this->uploadedFilePath);
+            Storage::disk('public')->delete($storagePath);
         }
 
-        // Example: just flash Google Docs URL
-        if ($this->googleDocsUrl) {
-            session()->flash('message', "Google Docs URL: {$this->googleDocsUrl}");
-        }
+        $this->reset(['file', 'uploadedFilePath']);
+        session()->flash('message', "File removed.");
     }
 
     public function render()

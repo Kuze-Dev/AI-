@@ -67,7 +67,6 @@ class TenantPanelProvider extends PanelProvider
             ->discoverClusters(in: app_path('FilamentTenant/Clusters'), for: 'App\\FilamentTenant\\Clusters')
             ->pages([
                 TenantDashboard::class,
-                TenantFullAIWidget::class,
             ])
             ->widgets([
                 AccountWidget::class,
