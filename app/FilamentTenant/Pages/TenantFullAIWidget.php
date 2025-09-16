@@ -53,20 +53,36 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                                     ->helperText('Maximum file size: 10MB'),
 
                                 Actions::make([
-                                    Actions\Action::make('checkErrors')
-                                        ->label('✓ Check For Errors')
-                                        ->action('checkErrors')
+                                    Actions\Action::make('submit')
                                         ->color('primary')
-                                        ->icon('heroicon-o-check-circle'),
                                 ]),
 
+
                                 Section::make()
-                                    ->schema([
-                                        TextInput::make('nav1')->default('Real-time View')->disabled(),
-                                        TextInput::make('nav2')->default('Deployment')->disabled(),
-                                        TextInput::make('nav3')->default('Analytics and Recommendations')->disabled(),
-                                    ])
-                                    ->columns(1),
+                                ->schema([
+                                    Actions::make([
+                                        Actions\Action::make('realtime')
+                                            ->label('Real-time View')
+                                            ->icon('heroicon-o-eye')
+                                            ->color('gray')
+                                            ->extraAttributes(['class' => 'w-full justify-start']),
+                                    ]),
+                                    Actions::make([
+                                        Actions\Action::make('deployment')
+                                            ->label('Deployment')
+                                            ->icon('heroicon-o-rocket-launch')
+                                            ->color('gray')
+                                            ->extraAttributes(['class' => 'w-full justify-start']),
+                                    ]),
+                                    Actions::make([
+                                        Actions\Action::make('analytics')
+                                            ->label('Analytics and Recommendations')
+                                            ->icon('heroicon-o-chart-bar')
+                                            ->color('gray')
+                                            ->extraAttributes(['class' => 'w-full justify-start']),
+                                    ]),
+                                ])
+                                ->columns(1),
                             ])
                             ->columnSpan(2),
 
@@ -96,14 +112,6 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
             ->statePath('data');
     }
 
-    public function checkErrors(): void
-    {
-        Notification::make()
-            ->title('Errors checked!')
-            ->body('We analyzed your file. See Issues and Results on the right.')
-            ->success()
-            ->send();
-    }
 
     protected function getFormActions(): array
     {

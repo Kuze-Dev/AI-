@@ -4,7 +4,7 @@
             min-height: 100vh;
             width: 100%;
             padding: 24px;
-            background: #f8fafc;
+            background: white;
             font-family: 'Inter', sans-serif;
         }
         .fi-sidebar, .fi-topbar, .fi-header, nav {
@@ -26,7 +26,7 @@
     </style>
 
     <div style="display:flex; justify-content:center;align-items:center;  gap:24px;width:100%;min-height:calc(100vh - 48px);">
-        <div style="border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.08); width: 80%; border:1px solid rgba(0,0,0,0.1);">
+        <div style="border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.08); max-width: 1200px; width: 100%;  border:1px solid rgba(0,0,0,0.1);">
             <!-- Header -->
             <div style="display:flex;flex-direction:column;gap:12px;padding:16px 24px;border-bottom:1px solid rgba(0,0,0,0.05);">
                 <div style="display:flex;align-items:center;gap:12px;">
