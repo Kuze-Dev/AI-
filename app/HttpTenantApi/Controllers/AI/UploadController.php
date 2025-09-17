@@ -19,6 +19,6 @@ class UploadController extends Controller
 
         $path = $request->file('document')->store('tenant-uploads', 'public');
 
-        return back()->with('success', 'File uploaded successfully: ' . $path);
+        return back()->with('success', 'File uploaded successfully: '.$path);
     }
 }
