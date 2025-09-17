@@ -32,7 +32,7 @@ class OpenAiService implements OpenAiServiceInterface
         I will give you:
 
         1. HTML Content – the raw HTML of a document.
-        2. List of Blueprints Context – a JSON schema describing sections and fields to extract.
+        2. A List of Blueprints Context – each with a unique "content_id" and JSON schema describing sections and fields to extract.
 
         Your task:
 
