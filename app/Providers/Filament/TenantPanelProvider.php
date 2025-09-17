@@ -9,6 +9,7 @@ use Filament\Pages;
 use Filament\Panel;
 use PhpParser\Comment\Doc;
 use Filament\PanelProvider;
+use Filament\Actions\Action;
 use Filament\Pages\Dashboard;
 use App\Settings\SiteSettings;
 use Domain\Tenant\Models\Tenant;
@@ -57,6 +58,12 @@ class TenantPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => MenuItem::make()
                     ->label(fn () => filament_admin()->full_name),
+                 'Widget' => MenuItem::make()
+                    ->label('Access Widget')
+                    ->icon('heroicon-o-command-line')
+                    ->url('/admin/ai-widget')
+                    ->openUrlInNewTab()
+
             ])
             ->colors([
                 'primary' => Color::Blue,

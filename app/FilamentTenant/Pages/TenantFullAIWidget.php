@@ -2,17 +2,23 @@
 
 namespace App\FilamentTenant\Pages;
 
-use Filament\Pages\Page;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Domain\Content\Models\Content;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Illuminate\Contracts\View\View;
+use Domain\Blueprint\Models\Blueprint;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Domain\OpenAi\Services\OpenAiService;
+use Filament\Forms\Components\FileUpload;
+use Domain\OpenAi\Context\ContentsContextBuilder;
+use Domain\OpenAi\Context\BlueprintContextBuilder;
+use Domain\OpenAi\Interfaces\DocumentParserInterface;
 
 class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 {
@@ -55,6 +61,7 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                                 Actions::make([
                                     Actions\Action::make('submit')
                                         ->color('primary')
+                                        ->action('submit')
                                 ]),
 
 
@@ -143,4 +150,44 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
             'hideNavigation' => true,
         ]);
     }
+
+    public function submit()
+    {
+        $fileInput = $this->data['file'] ?? null;
+
+        if (! $fileInput) {
+            Notification::make()
+                ->title('Please upload a file first.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile $file */
+        $file = collect($fileInput)->first();
+
+        $storedPath = $file->store('uploads', 'public');
+        $fullPath   = storage_path('app/public/' . $storedPath);
+
+        $html = app(DocumentParserInterface::class)->parseToHtml($fullPath);
+
+        // get all contents with blueprints
+        $contents = Content::with('blueprint')->whereHas('blueprint')->get();
+
+        // build combined context
+        $contexts = ContentsContextBuilder::build($contents);
+
+        // send the combined context to OpenAI at once
+        $response = app(OpenAiService::class)->generateSchema($html, $contexts);
+
+        $this->data['results'] = is_array($response)
+            ? json_encode($response, JSON_PRETTY_PRINT)
+            : $response;
+
+        Notification::make()
+            ->title('File processed successfully')
+            ->success()
+            ->send();
+    }
+
 }
