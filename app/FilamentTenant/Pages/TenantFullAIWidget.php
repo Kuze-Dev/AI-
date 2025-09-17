@@ -132,7 +132,7 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 
 
 
-    public function submit(): ?RedirectResponse
+    public function submit() : ?RedirectResponse
     {
         $fileInput = $this->data['file'] ?? null;
 
@@ -154,7 +154,6 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
         $contexts = ContentsContextBuilder::build($contents);
         $response = app(OpenAiService::class)->generateSchema($html, $contexts);
 
-        // Process the response and create the page
         $publishedAt = now();
         $content = Content::findOrFail($response['additional_data']['content_id']);
 
@@ -202,10 +201,6 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                 ]
             );
 
-            \Log::info('Redirect response', [
-                'redirect' => $redirect ? 'RedirectResponse' : 'null',
-                'url' => $redirect ? $redirect->getTargetUrl() : 'N/A'
-            ]);
 
             Notification::make()
                 ->title('File processed successfully')
