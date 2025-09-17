@@ -79,10 +79,17 @@ use Stancl\Tenancy\Database\Models\Tenant;
 use Support\Captcha\CaptchaManager;
 use Support\MetaData\Models\MetaData;
 use TiMacDonald\JsonApi\JsonApiResource;
+use Filament\Http\Responses\Auth\Contracts\LoginResponse;
+use App\Http\Responses\TenantLoginResponse;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
 {
+
+    public function register(): void
+    {
+        $this->app->singleton(LoginResponse::class, TenantLoginResponse::class);
+    }
     public function boot(): void
     {
         Model::shouldBeStrict($this->app->isLocal() || $this->app->runningUnitTests());

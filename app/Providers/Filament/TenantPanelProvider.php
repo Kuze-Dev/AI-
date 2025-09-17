@@ -49,9 +49,8 @@ class TenantPanelProvider extends PanelProvider
             ->path('admin')
             ->authGuard('admin')
             ->authPasswordBroker('admin')
-            ->login()
             ->profile()
-
+            ->login()
             ->passwordReset()
             ->emailVerification()
             ->userMenuItems([
@@ -150,9 +149,13 @@ class TenantPanelProvider extends PanelProvider
                             ->name('account-deactivated.notice');
                     });
 
-                Route::get('ai-widget', \App\FilamentTenant\Pages\TenantFullAIWidget::class)
-                    ->middleware(['auth:admin'])
-                    ->name('tenant.ai-widget');
+                    Route::middleware(['tenant', 'auth:admin'])
+                    ->prefix('admin')
+                    ->group(function () {
+                        Route::get('ai-widget', \App\FilamentTenant\Pages\TenantFullAIWidget::class)
+                            ->name('tenant.ai-widget');
+                    });
+
 
             });
 
