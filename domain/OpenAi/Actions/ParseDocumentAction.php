@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\OpenAi\Actions;
 
 use Domain\OpenAi\Interfaces\DocumentParserInterface;

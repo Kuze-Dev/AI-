@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\OpenAi\Context;
 
 class BlueprintContextBuilder
 {
     /**
      * @param  array|object  $blueprint  // sections/fields
-     * @param  array  $data             // actual values keyed by state_name
-     * @return array
+     * @param  array  $data  // actual values keyed by state_name
      */
     public static function build(array|object $blueprint, array $data = []): array
     {
@@ -52,8 +53,7 @@ class BlueprintContextBuilder
 
                 // Store both value and type
                 $sectionValues[$fieldState] = [
-                    'value' => $value,
-                    'type'  => $fieldType,
+                    'type' => $fieldType,
                 ];
             }
 
