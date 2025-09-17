@@ -8,17 +8,16 @@ use Filament\Pages\Page;
 use Domain\Content\Models\Content;
 use Filament\Forms\Components\Grid;
 use Illuminate\Contracts\View\View;
-use Domain\Blueprint\Models\Blueprint;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Domain\OpenAi\Services\OpenAiService;
-use Filament\Forms\Components\FileUpload;
 use Domain\OpenAi\Context\ContentsContextBuilder;
 use Domain\OpenAi\Context\BlueprintContextBuilder;
 use Domain\OpenAi\Interfaces\DocumentParserInterface;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Textarea;
 
 class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 {
@@ -64,86 +63,80 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                                         ->action('submit')
                                 ]),
 
-
                                 Section::make()
-                                ->schema([
-                                    Actions::make([
-                                        Actions\Action::make('realtime')
-                                            ->label('Real-time View')
-                                            ->icon('heroicon-o-eye')
-                                            ->color('gray')
-                                            ->extraAttributes(['class' => 'w-full justify-start']),
-                                    ]),
-                                    Actions::make([
-                                        Actions\Action::make('deployment')
-                                            ->label('Deployment')
-                                            ->icon('heroicon-o-rocket-launch')
-                                            ->color('gray')
-                                            ->extraAttributes(['class' => 'w-full justify-start']),
-                                    ]),
-                                    Actions::make([
-                                        Actions\Action::make('analytics')
-                                            ->label('Analytics and Recommendations')
-                                            ->icon('heroicon-o-chart-bar')
-                                            ->color('gray')
-                                            ->extraAttributes(['class' => 'w-full justify-start']),
-                                    ]),
-                                ])
-                                ->columns(1),
-                            ])
-                            ->columnSpan(2),
-
-                        Grid::make(1)
-                            ->schema([
-                                Section::make('Issues')
                                     ->schema([
-                                        Textarea::make('issues')
-                                            ->default("Entered text in the wrong place")
-                                            ->disabled()
-                                            ->rows(4),
+                                        Actions::make([
+                                            Actions\Action::make('realtime')
+                                                ->label('Real-time View')
+                                                ->icon('heroicon-o-eye')
+                                                ->color('gray')
+                                                ->extraAttributes(['class' => 'w-full justify-start']),
+                                        ]),
+                                        Actions::make([
+                                            Actions\Action::make('deployment')
+                                                ->label('Deployment')
+                                                ->icon('heroicon-o-rocket-launch')
+                                                ->color('gray')
+                                                ->extraAttributes(['class' => 'w-full justify-start']),
+                                        ]),
+                                        Actions::make([
+                                            Actions\Action::make('analytics')
+                                                ->label('Analytics and Recommendations')
+                                                ->icon('heroicon-o-chart-bar')
+                                                ->color('gray')
+                                                ->extraAttributes(['class' => 'w-full justify-start']),
+                                        ]),
                                     ])
+                                    ->columns(1),
+                            ])
+                            ->columnSpan(2)
+                            ->extraAttributes(['class' => 'h-full flex flex-col']),
+
+                        Section::make('Logging')
+                            ->schema([
+                                Textarea::make('issues')
+                                    ->label('Issues')
+                                    ->default("Entered text in the wrong place")
+                                    ->disabled()
+                                    ->rows(6)
                                     ->extraAttributes(['class' => 'border-red-500 bg-red-50']),
 
-                                Section::make('Results')
-                                    ->schema([
-                                        Textarea::make('results')
-                                            ->default("No errors found yet.")
-                                            ->disabled()
-                                            ->rows(4),
-                                    ])
+                                Textarea::make('results')
+                                    ->label('Results')
+                                    ->default("No errors found yet.")
+                                    ->disabled()
+                                    ->rows(6)
                                     ->extraAttributes(['class' => 'border-green-500 bg-green-50']),
                             ])
-                            ->columnSpan(1),
-                    ]),
+                            ->columns(1)
+                            ->columnSpan(1)
+                            ->extraAttributes(['class' => 'h-full flex flex-col']),
+                    ])
+                    ->extraAttributes(['class' => 'items-stretch']),
             ])
             ->statePath('data');
     }
-
 
     protected function getFormActions(): array
     {
         return [];
     }
 
-    // Override getMaxWidth method
     public function getMaxWidth(): string
     {
         return 'full';
     }
 
-    // Add this method to hide the sidebar and topbar
     protected function hasLogo(): bool
     {
         return false;
     }
 
-    // Hide the navigation
     public function hasTopNavigation(): bool
     {
         return false;
     }
 
-    // Override the view data to add custom styles
     protected function getViewData(): array
     {
         return array_merge(parent::getViewData(), [

@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
     <div class="grid grid-cols-2 gap-4 mb-4">
         @foreach ($navigationGroups as $navigationGroup )
-        
+
         <div class="w-full">
             <x-filament::section class="w-full max-w-full" collapsible>
                 <div class="w-full" style="min-height: 250px;">
@@ -24,7 +24,7 @@
                                 <span class="text-sm font-medium text-white text-center leading-tight whitespace-normal break-words flex items-center justify-center h-10 w-full max-w-[6rem] text-balance">
                                     {{ $item->getLabel() }}
                                 </span>
-                                
+
                             </x-filament::button>
                         @endforeach
                     </div>

@@ -81,10 +81,17 @@ use Filament\Actions\Exports\Downloaders\XlsxDownloader;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
+use Filament\Http\Responses\Auth\Contracts\LoginResponse;
+use App\Http\Responses\TenantLoginResponse;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
 {
+
+    public function register(): void
+    {
+        $this->app->singleton(LoginResponse::class, TenantLoginResponse::class);
+    }
     public function boot(): void
     {
         Model::shouldBeStrict($this->app->isLocal() || $this->app->runningUnitTests());
