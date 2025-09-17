@@ -28,14 +28,14 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
     protected static string $view = 'filament-tenant.pages.ai-widget';
     protected static bool $shouldRegisterNavigation = false;
 
-    // Make the page full width
-    protected static ?string $maxWidth = 'full';
+
 
     public ?array $data = [];
 
     public function mount(): void
     {
         $this->form->fill();
+
     }
 
     public function form(Form $form): Form
@@ -93,20 +93,24 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                             ->extraAttributes(['class' => 'h-full flex flex-col']),
 
                         Section::make('Logging')
-                            ->schema([
-                                Textarea::make('issues')
-                                    ->label('Issues')
-                                    ->default("Entered text in the wrong place")
-                                    ->disabled()
-                                    ->rows(6)
-                                    ->extraAttributes(['class' => 'border-red-500 bg-red-50']),
+                            ->schema([Textarea::make('issues')
+                            ->label('Issues')
+                            ->default("Entered text in the wrong place")
+                            ->disabled()
+                            ->rows(6)
+                            ->extraAttributes([
+                                'style' => 'border: 1px solid red; box-shadow: none;',
+                            ]),
+
 
                                 Textarea::make('results')
                                     ->label('Results')
                                     ->default("No errors found yet.")
                                     ->disabled()
                                     ->rows(6)
-                                    ->extraAttributes(['class' => 'border-green-500 bg-green-50']),
+                                    ->extraAttributes([
+                                        'style' => 'border: 1px solid green; box-shadow: none;',
+                                    ]),
                             ])
                             ->columns(1)
                             ->columnSpan(1)
@@ -117,32 +121,8 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
             ->statePath('data');
     }
 
-    protected function getFormActions(): array
-    {
-        return [];
-    }
 
-    public function getMaxWidth(): string
-    {
-        return 'full';
-    }
 
-    protected function hasLogo(): bool
-    {
-        return false;
-    }
-
-    public function hasTopNavigation(): bool
-    {
-        return false;
-    }
-
-    protected function getViewData(): array
-    {
-        return array_merge(parent::getViewData(), [
-            'hideNavigation' => true,
-        ]);
-    }
 
     public function submit()
     {

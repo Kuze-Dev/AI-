@@ -62,7 +62,6 @@ class TenantPanelProvider extends PanelProvider
                     ->icon('heroicon-o-command-line')
                     ->url('/admin/ai-widget')
                     ->openUrlInNewTab()
-
             ])
             ->colors([
                 'primary' => Color::Blue,
