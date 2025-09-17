@@ -4,94 +4,94 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use Illuminate\Support\Str;
-use Domain\Cart\Models\Cart;
-use Domain\Form\Models\Form;
-use Domain\Menu\Models\Menu;
-use Domain\Menu\Models\Node;
-use Domain\Page\Models\Page;
-use Domain\Site\Models\Site;
-use Domain\Tier\Models\Tier;
-use Illuminate\Http\Request;
-use Laravel\Pennant\Feature;
-use Domain\Page\Models\Block;
+use App\Http\Responses\TenantLoginResponse;
 use App\Settings\FormSettings;
-use Domain\Admin\Models\Admin;
-use Domain\Order\Models\Order;
-use Illuminate\Validation\Rule;
-use Sentry\Laravel\Integration;
-use Domain\Address\Models\State;
-use Domain\Cart\Models\CartLine;
-use Domain\Review\Models\Review;
-use Domain\Tenant\TenantSupport;
 use Domain\Address\Models\Address;
 use Domain\Address\Models\Country;
+use Domain\Address\Models\State;
+use Domain\Admin\Models\Admin;
+use Domain\Blueprint\Models\Blueprint;
+use Domain\Blueprint\Models\BlueprintData;
+use Domain\Cart\Models\Cart;
+use Domain\Cart\Models\CartLine;
 use Domain\Content\Models\Content;
-use Domain\Globals\Models\Globals;
-use Domain\Order\Models\OrderLine;
-use Domain\Product\Models\Product;
-use Domain\Service\Models\Service;
-use Domain\Payments\Models\Payment;
-use Domain\Taxation\Models\TaxZone;
-use Support\Captcha\CaptchaManager;
+use Domain\Content\Models\ContentEntry;
 use Domain\Currency\Models\Currency;
 use Domain\Customer\Models\Customer;
 use Domain\Discount\Models\Discount;
-use Domain\Favorite\Models\Favorite;
-use Domain\Page\Models\BlockContent;
-use Domain\Shipment\Models\Shipment;
-use Domain\Taxonomy\Models\Taxonomy;
-use Domain\Order\Models\OrderAddress;
-use Support\MetaData\Models\MetaData;
-use Domain\Blueprint\Models\Blueprint;
-use Domain\Form\Models\FormSubmission;
-use Domain\Tenant\Models\TenantApiKey;
-use Illuminate\Validation\Rules\Email;
-use Domain\Content\Models\ContentEntry;
-use Domain\Shipment\Models\ShippingBox;
-use Domain\Tenant\Models\TenantApiCall;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\ServiceProvider;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Illuminate\Cache\RateLimiting\Limit;
-use TiMacDonald\JsonApi\JsonApiResource;
-use Domain\Discount\Models\DiscountLimit;
-use Domain\Payments\Models\PaymentRefund;
-use Domain\Product\Models\ProductVariant;
-use Illuminate\Validation\Rules\Password;
-use Domain\Blueprint\Models\BlueprintData;
-use Stancl\Tenancy\Database\Models\Tenant;
-use Domain\ServiceOrder\Models\ServiceBill;
-use Illuminate\Support\Facades\RateLimiter;
-use Domain\OpenAi\DocumentParser\DocxParser;
-use Domain\ServiceOrder\Models\ServiceOrder;
 use Domain\Discount\Models\DiscountCondition;
-use Domain\Form\Models\FormEmailNotification;
-use Domain\Product\Models\ProductOptionValue;
-use Domain\Internationalization\Models\Locale;
-use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Discount\Models\DiscountLimit;
 use Domain\Discount\Models\DiscountRequirement;
-use Domain\ShippingMethod\Models\ShippingMethod;
-use Domain\ServiceOrder\Models\ServiceTransaction;
-use Illuminate\Routing\Middleware\ThrottleRequests;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Domain\Favorite\Models\Favorite;
+use Domain\Form\Models\Form;
+use Domain\Form\Models\FormEmailNotification;
+use Domain\Form\Models\FormSubmission;
+use Domain\Globals\Models\Globals;
+use Domain\Internationalization\Models\Locale;
+use Domain\Menu\Models\Menu;
+use Domain\Menu\Models\Node;
+use Domain\OpenAi\DocumentParser\DocxParser;
 use Domain\OpenAi\Interfaces\DocumentParserInterface;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Domain\Order\Models\Order;
+use Domain\Order\Models\OrderAddress;
+use Domain\Order\Models\OrderLine;
+use Domain\Page\Models\Block;
+use Domain\Page\Models\BlockContent;
+use Domain\Page\Models\Page;
+use Domain\PaymentMethod\Models\PaymentMethod;
+use Domain\Payments\Models\Payment;
+use Domain\Payments\Models\PaymentRefund;
+use Domain\Product\Models\Product;
+use Domain\Product\Models\ProductOptionValue;
+use Domain\Product\Models\ProductVariant;
+use Domain\Review\Models\Review;
+use Domain\Service\Models\Service;
+use Domain\ServiceOrder\Models\ServiceBill;
+use Domain\ServiceOrder\Models\ServiceOrder;
+use Domain\ServiceOrder\Models\ServiceTransaction;
+use Domain\Shipment\Models\Shipment;
+use Domain\Shipment\Models\ShippingBox;
+use Domain\ShippingMethod\Models\ShippingMethod;
+use Domain\Site\Models\Site;
+use Domain\Taxation\Models\TaxZone;
+use Domain\Taxonomy\Models\Taxonomy;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Domain\Tenant\Models\TenantApiCall;
+use Domain\Tenant\Models\TenantApiKey;
+use Domain\Tenant\TenantSupport;
+use Domain\Tier\Models\Tier;
 use Filament\Actions\Exports\Downloaders\XlsxDownloader;
+use Filament\Http\Responses\Auth\Contracts\LoginResponse;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\MissingAttributeException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Email;
+use Illuminate\Validation\Rules\Password;
+use Laravel\Pennant\Feature;
+use Sentry\Laravel\Integration;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
-use Filament\Http\Responses\Auth\Contracts\LoginResponse;
-use App\Http\Responses\TenantLoginResponse;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Stancl\Tenancy\Database\Models\Tenant;
+use Support\Captcha\CaptchaManager;
+use Support\MetaData\Models\MetaData;
+use TiMacDonald\JsonApi\JsonApiResource;
 
 /** @property \Illuminate\Foundation\Application $app */
 class AppServiceProvider extends ServiceProvider
 {
-
     public function register(): void
     {
         $this->app->singleton(LoginResponse::class, TenantLoginResponse::class);
     }
+
     public function boot(): void
     {
         Model::shouldBeStrict($this->app->isLocal() || $this->app->runningUnitTests());
@@ -239,7 +239,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(DocumentParserInterface::class, DocxParser::class);
-
 
     }
 }

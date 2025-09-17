@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Features;
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Get;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Domain\Tenant\Models\Tenant;
-// use App\Filament\Support\Forms\FeatureSelector;
-use Filament\Resources\Resource;
 use App\Features\Enums\FeatureEnum;
-use App\FilamentTenant\Support\Divider;
-use App\Filament\Rules\CheckDatabaseConnection;
-use App\Filament\Resources\TenantResource\Pages;
-use App\Filament\Rules\FullyQualifiedDomainNameRule;
-use App\Filament\Resources\TenantResource\Forms\FeatureSelector;
 use App\Filament\Resources\ActivityResource\RelationManagers\ActivitiesRelationManager;
+use App\Filament\Resources\TenantResource\Forms\FeatureSelector;
+use App\Filament\Resources\TenantResource\Pages;
+use App\Filament\Rules\CheckDatabaseConnection;
+use App\Filament\Rules\FullyQualifiedDomainNameRule;
+// use App\Filament\Support\Forms\FeatureSelector;
+use App\FilamentTenant\Support\Divider;
+use Domain\Tenant\Models\Tenant;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class TenantResource extends Resource
 {

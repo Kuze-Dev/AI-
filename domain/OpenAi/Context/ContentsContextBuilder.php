@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\OpenAi\Context;
 
 use App\Models\Content;
@@ -7,19 +9,7 @@ use App\Models\Content;
 class ContentsContextBuilder
 {
     /**
-     * Build a combined context array for all contents.
-     *
-     * Output shape:
-     * [
-     *   content_id => [
-     *     section_state_name => [
-     *       field_state_name => value (or null)
-     *     ]
-     *   ]
-     * ]
-     *
-     * @param  iterable<\App\Models\Content>  $contents
-     * @return array
+     * @param  iterable<Domain\Content\Models\Content>  $contents
      */
     public static function build(iterable $contents): array
     {

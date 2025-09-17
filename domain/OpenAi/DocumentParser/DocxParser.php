@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Domain\OpenAi\DocumentParser;
 
 use Domain\OpenAi\Interfaces\DocumentParserInterface;
@@ -15,7 +17,7 @@ class DocxParser implements DocumentParserInterface
         foreach ($phpWord->getSections() as $section) {
             foreach ($section->getElements() as $element) {
                 if (method_exists($element, 'getText')) {
-                    $text .= $element->getText() . "\n";
+                    $text .= $element->getText()."\n";
                 }
             }
         }
@@ -40,5 +42,4 @@ class DocxParser implements DocumentParserInterface
 
         return trim($htmlContent);
     }
-
 }

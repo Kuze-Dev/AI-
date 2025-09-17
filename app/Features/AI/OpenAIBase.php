@@ -16,7 +16,6 @@ class OpenAIBase implements FeatureContract
         return false;
     }
 
-
     #[\Override]
     public function getLabel(): string
     {
