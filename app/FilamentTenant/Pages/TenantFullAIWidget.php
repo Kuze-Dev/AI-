@@ -174,20 +174,8 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
         $contexts = ContentsContextBuilder::build($contents);
         $response = app(OpenAiService::class)->generateSchema($html, $contexts);
 
-        $redirect = $this->createPage($response);
-
-        Notification::make()
-            ->title('File processed successfully')
-            ->success()
-            ->send();
-
-        return $redirect;
-    }
-
-    public function createPage(array $response): ?RedirectResponse
-    {
+        // Process the response and create the page
         $publishedAt = now();
-
         $content = Content::findOrFail($response['additional_data']['content_id']);
 
         // Sites
@@ -203,46 +191,48 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
         // Build the entry data from the response
         $contentEntryData = ContentEntryData::fromArray([
             'title' => $response['additional_data']['title'],
-
             'locale' => $this->data['locale'] ?? null,
-
             'route_url' => [
-                // use additional_data route_url or fallback
                 'url' => $response['additional_data']['route_url']
                     ?? '/'.$content->slug.'/'.Str::slug($response['additional_data']['title'] ?? 'untitled'),
                 'is_override' => isset($response['additional_data']['route_url']),
             ],
-
             'author_id' => filament_admin()->id,
-
             'published_at' => $publishedAt,
-
             'status' => ! empty($this->data['status']),
-
             'meta_data' => [
                 'title' => $response['metadata']['title'] ?? $response['additional_data']['title'] ?? '',
                 'description' => $response['metadata']['description'] ?? '',
                 'keywords' => $response['metadata']['keywords'] ?? '',
             ],
-
             'data' => $response['data'] ?? [],
-
             'sites' => $siteIDs,
             'taxonomy_terms' => $taxonomyIds,
         ]);
 
         try {
-            // ✅ Capture the created entry
             $contentEntry = app(CreateContentEntryAction::class)
                 ->execute($content, $contentEntryData);
 
-            dd($contentEntry);
-
-            // ✅ Redirect to Filament edit page for that ContentEntry
-            return redirect()->route(
+            $redirect = $this->redirectRoute(
                 'filament.tenant.resources.contents.entries.edit',
-                $contentEntry->slug
+                [
+                    'ownerRecord' => $content,
+                    'record' => $contentEntry
+                ]
             );
+
+            \Log::info('Redirect response', [
+                'redirect' => $redirect ? 'RedirectResponse' : 'null',
+                'url' => $redirect ? $redirect->getTargetUrl() : 'N/A'
+            ]);
+
+            Notification::make()
+                ->title('File processed successfully')
+                ->success()
+                ->send();
+
+            return $redirect;
 
         } catch (\Throwable $th) {
             // Delete the latest content entry related to this content
@@ -259,8 +249,8 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                     ['entry_title' => $response['additional_data']['title']]
                 ))
                 ->sendToDatabase(filament_admin());
-        }
 
-        return null;
+            return null;
+        }
     }
 }

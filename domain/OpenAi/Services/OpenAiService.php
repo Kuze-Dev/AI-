@@ -32,11 +32,12 @@ class OpenAiService implements OpenAiServiceInterface
         I will give you:
 
         1. HTML Content – the raw HTML of a document.
-        2. Blueprint Context – a JSON schema describing sections and fields to extract.
+        2. List of Blueprints Context – a JSON schema describing sections and fields to extract.
 
         Your task:
 
         - Read the HTML content carefully.
+        - Select the blueprint that best matches the content structure.
         - Use the blueprint context to identify which parts of the HTML match each field and format them according to the type of field.
         - Return a JSON object with exactly three keys: "data", "metadata", and "additional_data".
         - Return only raw JSON. Do NOT include backticks, triple quotes, or any code block formatting. Do NOT include any extra text or commentary.
@@ -62,7 +63,7 @@ class OpenAiService implements OpenAiServiceInterface
         HTML Content:
         {$content}
 
-        Blueprint Context (JSON):
+        List of Blueprints Context (JSON):
         {$blueprintJson}
 
         Expected Output Example:
@@ -113,6 +114,10 @@ class OpenAiService implements OpenAiServiceInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException('Invalid JSON returned from OpenAI: '.json_last_error_msg());
         }
+
+        \Log::info($parsed);
+        \Log::info('blueprint', $blueprint);
+        \Log::info($content);
 
         return $parsed;
     }
