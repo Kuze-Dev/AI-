@@ -36,15 +36,7 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 
     protected static bool $shouldRegisterNavigation = false;
 
-
-
     public ?array $data = [];
-
-    public function mount(): void
-    {
-        $this->form->fill();
-
-    }
 
     public function form(Form $form): Form
     {
@@ -85,7 +77,8 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                                                 ->label('Deployment')
                                                 ->icon('heroicon-o-rocket-launch')
                                                 ->color('gray')
-                                                ->extraAttributes(['class' => 'w-full justify-start']),
+                                                ->extraAttributes(['class' => 'w-full justify-start'])
+                                                ->url(route('filament.tenant.pages.deployment')),
                                         ]),
                                         Actions::make([
                                             Actions\Action::make('analytics')
@@ -102,14 +95,13 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 
                         Section::make('Logging')
                             ->schema([Textarea::make('issues')
-                            ->label('Issues')
-                            ->default("Entered text in the wrong place")
-                            ->disabled()
-                            ->rows(6)
-                            ->extraAttributes([
-                                'style' => 'border: 1px solid red; box-shadow: none;',
-                            ]),
-
+                                ->label('Issues')
+                                ->default('Entered text in the wrong place')
+                                ->disabled()
+                                ->rows(6)
+                                ->extraAttributes([
+                                    'style' => 'border: 1px solid red; box-shadow: none;',
+                                ]),
 
                                 Textarea::make('results')
                                     ->label('Results')
@@ -129,10 +121,7 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
             ->statePath('data');
     }
 
-
-
-
-    public function submit() : ?RedirectResponse
+    public function submit(): ?RedirectResponse
     {
         $fileInput = $this->data['file'] ?? null;
 
@@ -197,10 +186,9 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                 'filament.tenant.resources.contents.entries.edit',
                 [
                     'ownerRecord' => $content,
-                    'record' => $contentEntry
+                    'record' => $contentEntry,
                 ]
             );
-
 
             Notification::make()
                 ->title('File processed successfully')
