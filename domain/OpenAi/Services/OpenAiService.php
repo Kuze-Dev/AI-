@@ -39,6 +39,13 @@ class OpenAiService implements OpenAiServiceInterface
         - Read the HTML content carefully.
         - Select the blueprint that best matches the content structure.
         - Use the blueprint context to identify which parts of the HTML match each field and format them according to the type of field.
+        - If no blueprint fits, return :
+        {
+            "error": "What is the reason why it failed"
+        }
+        - Otherwise:
+        - Use the blueprint context to identify which parts of the HTML match each field and format them according to the type of field.
+        - Return a JSON object with exactly three keys: "data", "metadata", and "additional_data".
         - Return a JSON object with exactly three keys: "data", "metadata", and "additional_data".
         - Return only raw JSON. Do NOT include backticks, triple quotes, or any code block formatting. Do NOT include any extra text or commentary.
 
@@ -72,6 +79,7 @@ class OpenAiService implements OpenAiServiceInterface
             "state_section_name": {
               "state_field_name": "Extracted text from the content",
               "state_field_name": "Extracted text from the content"
+              "state_field_name": "Extracted number from the content"
             }
           },
           "metadata": {
@@ -80,7 +88,7 @@ class OpenAiService implements OpenAiServiceInterface
             "keywords": "keyword1, keyword2, keyword3"
           },
           "additional_data": {
-            "route_url": "/example-slug",
+            "route_url": "get if there is an route url provided",
             "content_id": 123,
             "title": "Extracted title"
           }
