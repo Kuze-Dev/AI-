@@ -34,17 +34,11 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 
     protected static string $view = 'filament-tenant.pages.ai-widget';
 
+
     protected static bool $shouldRegisterNavigation = false;
-
-
 
     public ?array $data = [];
 
-    public function mount(): void
-    {
-        $this->form->fill();
-
-    }
 
     public function form(Form $form): Form
     {
@@ -101,15 +95,15 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                             ->extraAttributes(['class' => 'h-full flex flex-col']),
 
                         Section::make('Logging')
-                            ->schema([Textarea::make('issues')
-                            ->label('Issues')
-                            ->default("Entered text in the wrong place")
-                            ->disabled()
-                            ->rows(6)
-                            ->extraAttributes([
-                                'style' => 'border: 1px solid red; box-shadow: none;',
-                            ]),
-
+                            ->schema([
+                                Textarea::make('issues')
+                                    ->label('Issues')
+                                    ->default("Entered text in the wrong place")
+                                    ->disabled()
+                                    ->rows(6)
+                                    ->extraAttributes([
+                                        'style' => 'border: 1px solid red; box-shadow: none;',
+                                    ]),
 
                                 Textarea::make('results')
                                     ->label('Results')
@@ -117,19 +111,17 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                                     ->disabled()
                                     ->rows(6)
                                     ->extraAttributes([
-                                        'style' => 'border: 1px solid green; box-shadow: none;',
-                                    ]),
-                            ])
-                            ->columns(1)
-                            ->columnSpan(1)
-                            ->extraAttributes(['class' => 'h-full flex flex-col']),
+                                                'style' => 'border: 1px solid green; box-shadow: none;',
+                                            ]),
+                                    ])
+                                    ->columns(1)
+                                    ->columnSpan(1)
+                                    ->extraAttributes(['class' => 'h-full flex flex-col']),
                     ])
                     ->extraAttributes(['class' => 'items-stretch']),
             ])
             ->statePath('data');
     }
-
-
 
 
     public function submit() : ?RedirectResponse
@@ -145,14 +137,28 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
             return null;
         }
 
-        /** @var \Livewire\Features\SupportFileUploads\TemporaryUploadedFile $file */
+        /** @var array<int, \Livewire\Features\SupportFileUploads\TemporaryUploadedFile> $fileInput */
         $file = collect($fileInput)->first();
         $storedPath = $file->store('uploads', 'public');
         $fullPath = storage_path('app/public/'.$storedPath);
         $html = app(DocumentParserInterface::class)->parseToHtml($fullPath);
         $contents = Content::with('blueprint')->whereHas('blueprint')->get();
         $contexts = ContentsContextBuilder::build($contents);
+
+        dd($html);
         $response = app(OpenAiService::class)->generateSchema($html, $contexts);
+
+            // 👇 handle if error came back
+        if (isset($response['error'])) {
+            $this->data['issues'] = $response['error'];
+            Notification::make()
+                ->title('Blueprint Matching Error')
+                ->body($response['error'])
+                ->danger()
+                ->send();
+
+            return null;
+        }
 
         $publishedAt = now();
         $content = Content::findOrFail($response['additional_data']['content_id']);
@@ -167,7 +173,6 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
             ? TaxonomyTerm::whereIn('slug', explode(',', $this->data['taxonomy_terms']))->pluck('id')->toArray()
             : [];
 
-        // Build the entry data from the response
         $contentEntryData = ContentEntryData::fromArray([
             'title' => $response['additional_data']['title'],
             'locale' => $this->data['locale'] ?? null,

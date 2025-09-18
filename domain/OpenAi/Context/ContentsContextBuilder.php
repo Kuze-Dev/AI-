@@ -41,8 +41,9 @@ class ContentsContextBuilder
 
             // Push to result array as an object with content_id
             $result[] = [
-                'content_id' => $content->id,  // 👈 include the ID explicitly
-                'blueprint'  => $blueprintContext, // 👈 actual blueprint schema
+                'content' => $content->slug,
+                'content_id' => $content->id,
+                'blueprint' => $blueprintContext,
             ];
         }
 
