@@ -68,6 +68,7 @@ class TenantPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
                 TenantFullAIWidget::class,
+                \App\FilamentTenant\Pages\DeploymentPage::class,
             ])
             ->widgets([
                 AccountWidget::class,
@@ -152,6 +153,9 @@ class TenantPanelProvider extends PanelProvider
                     ->group(function () {
                         Route::get('ai-widget', \App\FilamentTenant\Pages\TenantFullAIWidget::class)
                             ->name('tenant.ai-widget');
+
+                        Route::get('deployment', \App\FilamentTenant\Pages\DeploymentPage::class)
+                            ->name('tenant.deployment');
                     });
 
             });
