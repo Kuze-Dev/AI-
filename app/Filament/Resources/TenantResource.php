@@ -223,6 +223,16 @@ class TenantResource extends Resource
                                     ]
                                 ),
                                 new Features\GroupFeature(
+                                    base: Features\AI\OpenAIBase::class,
+                                    extra: [
+                                        new Features\GroupFeatureExtra(
+                                            extra: [
+                                                Features\AI\UploadBase::class,
+                                            ],
+                                        ),
+                                    ]
+                                ),
+                                new Features\GroupFeature(
                                     base: Features\Customer\CustomerBase::class,
                                     extra: [
                                         new Features\GroupFeatureExtra(
@@ -280,16 +290,7 @@ class TenantResource extends Resource
                                         ),
                                     ]
                                 ),
-                                new Features\GroupFeature(
-                                    base: Features\AI\OpenAIBase::class,
-                                    extra: [
-                                        new Features\GroupFeatureExtra(
-                                            extra: [
-                                                Features\AI\UploadBase::class,
-                                            ],
-                                        ),
-                                    ]
-                                ),
+
                             ]),
                     ])
                     ->hidden(
