@@ -4,23 +4,29 @@ declare(strict_types=1);
 
 namespace App\Http\Responses;
 
-use Filament\Http\Responses\Auth\Contracts\LoginResponse as LoginResponseContract;
+use App\Features\AI\UploadBase;
 use Illuminate\Http\RedirectResponse;
+use Domain\Tenant\TenantFeatureSupport;
 use Livewire\Features\SupportRedirects\Redirector;
+use Filament\Http\Responses\Auth\Contracts\LoginResponse as LoginResponseContract;
 
 class TenantLoginResponse implements LoginResponseContract
 {
-    public function toResponse($request): RedirectResponse
-    {
+
+public function toResponse($request): RedirectResponse
+{
+    if (TenantFeatureSupport::active(UploadBase::class)) {
         $url = route('filament.tenant.pages.ai-widget');
-
-        $redirector = redirect()->intended($url);
-
-        // If it's a Livewire redirector, convert it to a real RedirectResponse
-        if ($redirector instanceof Redirector) {
-            return $redirector->response($url);
-        }
-
-        return $redirector;
+    } else {
+        $url = route('filament.tenant.pages.dashboard');
     }
+
+    $redirector = redirect()->intended($url);
+
+    if ($redirector instanceof Redirector) {
+        return $redirector->response($url);
+    }
+
+    return $redirector;
+}
 }
