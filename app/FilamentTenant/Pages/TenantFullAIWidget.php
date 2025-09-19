@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages;
 
-use Domain\Content\Actions\CreateContentEntryAction;
-use Domain\Content\DataTransferObjects\ContentEntryData;
-use Domain\Content\Models\Content;
-use Domain\OpenAi\Context\ContentsContextBuilder;
-use Domain\OpenAi\Interfaces\DocumentParserInterface;
-use Domain\OpenAi\Services\OpenAiService;
-use Domain\Site\Models\Site;
-use Domain\Taxonomy\Models\TaxonomyTerm;
 use Filament\Forms;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
+use Domain\Site\Models\Site;
+use Domain\Content\Models\Content;
+use Filament\Forms\Components\Grid;
+use Illuminate\Http\RedirectResponse;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Section;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Forms\Components\Textarea;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Notifications\Notification;
+use Domain\OpenAi\Services\OpenAiService;
+use Filament\Forms\Components\FileUpload;
+use Domain\OpenAi\Context\ContentsContextBuilder;
+use Domain\Content\Actions\CreateContentEntryAction;
+use Domain\OpenAi\Interfaces\DocumentParserInterface;
+use Domain\Content\DataTransferObjects\ContentEntryData;
 
 class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 {
@@ -35,6 +36,12 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
     protected static string $view = 'filament-tenant.pages.ai-widget';
 
     protected static bool $shouldRegisterNavigation = false;
+
+    public static function canAccess(): bool
+    {
+        return TenantFeatureSupport::active(\App\Features\AI\UploadBase::class);
+    }
+
 
     public ?array $data = [];
 
@@ -78,7 +85,7 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                                                 ->icon('heroicon-o-rocket-launch')
                                                 ->color('gray')
                                                 ->extraAttributes(['class' => 'w-full justify-start'])
-                                                ->url(route('filament.tenant.pages.deployment')),
+                                                ->action(fn () => redirect()->route('filament.tenant.pages.deployment')),
                                         ]),
                                         Actions::make([
                                             Actions\Action::make('analytics')
