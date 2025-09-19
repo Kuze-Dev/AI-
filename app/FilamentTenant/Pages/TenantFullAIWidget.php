@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace App\FilamentTenant\Pages;
 
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Pages\Page;
-use Illuminate\Support\Str;
-use Domain\Site\Models\Site;
-use Domain\Content\Models\Content;
-use Filament\Forms\Components\Grid;
-use Illuminate\Http\RedirectResponse;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Section;
-use Domain\Tenant\TenantFeatureSupport;
-use Filament\Forms\Components\Textarea;
-use Domain\Taxonomy\Models\TaxonomyTerm;
-use Filament\Notifications\Notification;
-use Domain\OpenAi\Services\OpenAiService;
-use Filament\Forms\Components\FileUpload;
-use Domain\OpenAi\Context\ContentsContextBuilder;
 use Domain\Content\Actions\CreateContentEntryAction;
-use Domain\OpenAi\Interfaces\DocumentParserInterface;
 use Domain\Content\DataTransferObjects\ContentEntryData;
+use Domain\Content\Models\Content;
+use Domain\OpenAi\Context\ContentsContextBuilder;
+use Domain\OpenAi\Interfaces\DocumentParserInterface;
+use Domain\OpenAi\Services\OpenAiService;
+use Domain\Site\Models\Site;
+use Domain\Taxonomy\Models\TaxonomyTerm;
+use Filament\Forms;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 
 class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 {
@@ -38,12 +37,6 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
     protected static bool $shouldRegisterNavigation = false;
 
     public ?array $data = [];
-
-    public static function canAccess(): bool
-    {
-        return TenantFeatureSupport::active(\App\Features\AI\UploadBase::class);
-    }
-
 
     public function form(Form $form): Form
     {
@@ -85,15 +78,14 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                                                 ->icon('heroicon-o-rocket-launch')
                                                 ->color('gray')
                                                 ->extraAttributes(['class' => 'w-full justify-start'])
-                                                ->action(fn () => redirect()->route('filament.tenant.pages.deployment')),
+                                                ->url(route('filament.tenant.pages.deployment')),
                                         ]),
                                         Actions::make([
                                             Actions\Action::make('analytics')
                                                 ->label('Analytics and Recommendations')
                                                 ->icon('heroicon-o-chart-bar')
                                                 ->color('gray')
-                                                ->extraAttributes(['class' => 'w-full justify-start'])
-                                                ->action(fn () => redirect()->route('filament.tenant.pages.analytics-and-recommendations')),
+                                                ->extraAttributes(['class' => 'w-full justify-start']),
                                         ]),
                                     ])
                                     ->columns(1),
@@ -103,14 +95,13 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
 
                         Section::make('Logging')
                             ->schema([Textarea::make('issues')
-                            ->label('Issues')
-                            ->default("Entered text in the wrong place")
-                            ->disabled()
-                            ->rows(6)
-                            ->extraAttributes([
-                                'style' => 'border: 1px solid red; box-shadow: none;',
-                            ]),
-
+                                ->label('Issues')
+                                ->default('Entered text in the wrong place')
+                                ->disabled()
+                                ->rows(6)
+                                ->extraAttributes([
+                                    'style' => 'border: 1px solid red; box-shadow: none;',
+                                ]),
 
                                 Textarea::make('results')
                                     ->label('Results')
@@ -130,10 +121,7 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
             ->statePath('data');
     }
 
-
-
-
-    public function submit() : ?RedirectResponse
+    public function submit(): ?RedirectResponse
     {
         $fileInput = $this->data['file'] ?? null;
 
@@ -198,10 +186,9 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
                 'filament.tenant.resources.contents.entries.edit',
                 [
                     'ownerRecord' => $content,
-                    'record' => $contentEntry
+                    'record' => $contentEntry,
                 ]
             );
-
 
             Notification::make()
                 ->title('File processed successfully')
