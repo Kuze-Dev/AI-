@@ -12,21 +12,22 @@ use Filament\Http\Responses\Auth\Contracts\LoginResponse as LoginResponseContrac
 
 class TenantLoginResponse implements LoginResponseContract
 {
-
-public function toResponse($request): RedirectResponse
-{
-    if (TenantFeatureSupport::active(UploadBase::class)) {
-        $url = route('filament.tenant.pages.ai-widget');
-    } else {
+    public function toResponse($request): RedirectResponse
+    {
+        // Default redirect
         $url = route('filament.tenant.pages.dashboard');
+
+        // Only check tenant features if tenancy is initialized
+        if (tenancy()->initialized && TenantFeatureSupport::active(UploadBase::class)) {
+            $url = route('filament.tenant.pages.ai-widget');
+        }
+
+        $redirector = redirect()->intended($url);
+
+        if ($redirector instanceof Redirector) {
+            return $redirector->response($url);
+        }
+
+        return $redirector;
     }
-
-    $redirector = redirect()->intended($url);
-
-    if ($redirector instanceof Redirector) {
-        return $redirector->response($url);
-    }
-
-    return $redirector;
-}
 }
