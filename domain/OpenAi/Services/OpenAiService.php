@@ -36,16 +36,14 @@ class OpenAiService implements OpenAiServiceInterface
 
         Your task:
 
-        - Read the HTML content carefully.
-        - Select the blueprint that best matches the content structure.
-        - Use the blueprint context to identify which parts of the HTML match each field and format them according to the type of field.
+        - Read the HTML and carefully identify the primary contents and sections in the HTML.
+        - After identifying the primary content body match it to the field maintaining the HTML styles like bold, italic, etc.
         - If no blueprint fits, return :
         {
             "error": "What is the reason why it failed"
         }
         - Otherwise:
         - Use the blueprint context to identify which parts of the HTML match each field and format them according to the type of field.
-        - Return a JSON object with exactly three keys: "data", "metadata", and "additional_data".
         - Return a JSON object with exactly three keys: "data", "metadata", and "additional_data".
         - Return only raw JSON. Do NOT include backticks, triple quotes, or any code block formatting. Do NOT include any extra text or commentary.
 

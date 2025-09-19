@@ -145,10 +145,10 @@ class TenantFullAIWidget extends Page implements Forms\Contracts\HasForms
         $contents = Content::with('blueprint')->whereHas('blueprint')->get();
         $contexts = ContentsContextBuilder::build($contents);
 
-        dd($html);
+        // dd($html);
         $response = app(OpenAiService::class)->generateSchema($html, $contexts);
 
-            // 👇 handle if error came back
+            // handle if error came back
         if (isset($response['error'])) {
             $this->data['issues'] = $response['error'];
             Notification::make()
