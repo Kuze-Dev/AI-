@@ -5,7 +5,7 @@
             min-height: 100vh;
             width: 100%;
             padding: 0;
-            background: #f9fafb;
+            background: white;
             font-family: 'Inter', sans-serif;
         }
         .fullscreen-deployment-widget .fi-sidebar,
@@ -36,8 +36,7 @@
             justify-content: space-between;
             padding: 12px 24px;
             border-bottom: 1px solid rgba(0,0,0,0.08);
-            background: #fff;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            background: #f9fafb;
         }
         .topbar-left {
             font-size: 16px;
@@ -90,10 +89,15 @@
                          class="w-9 h-9 rounded-full border border-gray-200">
                 </button>
                 <div x-show="open"
-                     @click.away="open = false"
-                     x-transition
-                     class="absolute mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50"
-                     style="right: 0; transform: translateX(-20px);">
+         @click.away="open = false"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 transform scale-95 translate-y-[-10px]"
+         x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
+         x-transition:leave-end="opacity-0 transform scale-95 translate-y-[-10px]"
+         class="absolute mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50"
+         style="right: 0; left: auto; transform: translateX(-20px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);">
                     <form method="POST" action="{{ filament()->getLogoutUrl() }}">
                         @csrf
                         <button type="submit"
@@ -129,36 +133,49 @@
             <div style="padding:24px; " >
 
                 <!-- Overview Cards -->
-<div class="flex justify-center" style="margin-bottom: 24px; gap:24px;">
-    <div class="p-4 border rounded-lg bg-white shadow-sm" style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:120px;">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:28px; height:28px; color:#2563eb;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8h18M3 16h18M4 12h16" />
-        </svg>
-        <h4 class="text-sm font-medium text-gray-600">Queued</h4>
-        <p class="text-2xl font-bold" style="color:#2563eb;">0</p>
-    </div>
-    <div class="p-4 border rounded-lg bg-white shadow-sm" style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:120px;">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:28px; height:28px; color:#ca8a04;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <h4 class="text-sm font-medium text-gray-600">Running</h4>
-        <p class="text-2xl font-bold" style="color:#ca8a04;">0</p>
-    </div>
-    <div class="p-4 border rounded-lg bg-white shadow-sm" style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:120px;">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:28px; height:28px; color:#dc2626;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <h4 class="text-sm font-medium text-gray-600">Failed</h4>
-        <p class="text-2xl font-bold" style="color:#dc2626;">0</p>
-    </div>
-    <div class="p-4 border rounded-lg bg-white shadow-sm" style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:120px;">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:28px; height:28px; color:#16a34a;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <h4 class="text-sm font-medium text-gray-600">Successful</h4>
-        <p class="text-2xl font-bold" style="color:#16a34a;">0</p>
-    </div>
+                <div class="flex justify-center" style="margin-bottom: 24px; gap:24px; display:flex; justify-content:center;">
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:120px; padding:16px; border:1px solid #e5e7eb; border-radius:8px; background:white; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:all 0.2s ease-in-out; cursor:pointer;"
+     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)'; this.style.backgroundColor='#f9fafb';"
+     onmouseout="this.style.transform='none'; this.style.boxShadow='0 1px 2px rgba(0,0,0,0.05)'; this.style.backgroundColor='white';">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:28px; height:28px; color:#2563eb;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8h18M3 16h18M4 12h16" />
+    </svg>
+    <h4 style="font-size:14px; font-weight:500; color:#4b5563;">Queued</h4>
+    <p style="font-size:20px; font-weight:700; color:#2563eb;">0</p>
 </div>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:120px; padding:16px; border:1px solid #e5e7eb; border-radius:8px; background:white; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:all 0.2s ease-in-out; cursor:pointer;"
+     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)'; this.style.backgroundColor='#f9fafb';"
+     onmouseout="this.style.transform='none'; this.style.boxShadow='0 1px 2px rgba(0,0,0,0.05)'; this.style.backgroundColor='white';">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:28px; height:28px; color:#ca8a04;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <h4 style="font-size:14px; font-weight:500; color:#4b5563;">Running</h4>
+    <p style="font-size:20px; font-weight:700; color:#ca8a04;">0</p>
+</div>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:120px; padding:16px; border:1px solid #e5e7eb; border-radius:8px; background:white; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:all 0.2s ease-in-out; cursor:pointer;"
+     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)'; this.style.backgroundColor='#f9fafb';"
+     onmouseout="this.style.transform='none'; this.style.boxShadow='0 1px 2px rgba(0,0,0,0.05)'; this.style.backgroundColor='white';">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:28px; height:28px; color:#dc2626;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <h4 style="font-size:14px; font-weight:500; color:#4b5563;">Failed</h4>
+    <p style="font-size:20px; font-weight:700; color:#dc2626;">0</p>
+</div>
+
+<div style="display:flex; flex-direction:column; align-items:center; gap:6px; min-width:120px; padding:16px; border:1px solid #e5e7eb; border-radius:8px; background:white; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:all 0.2s ease-in-out; cursor:pointer;"
+     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)'; this.style.backgroundColor='#f9fafb';"
+     onmouseout="this.style.transform='none'; this.style.boxShadow='0 1px 2px rgba(0,0,0,0.05)'; this.style.backgroundColor='white';">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:28px; height:28px; color:#16a34a;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+    </svg>
+    <h4 style="font-size:14px; font-weight:500; color:#4b5563;">Successful</h4>
+    <p style="font-size:20px; font-weight:700; color:#16a34a;">0</p>
+</div>
+</div>
+
 
                 <!-- Pre-Deployment Checks -->
                 <div class="p-4 border rounded-lg bg-white shadow-sm">

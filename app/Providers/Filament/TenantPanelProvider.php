@@ -4,34 +4,35 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Filament\Admin\Themes\Mint;
-use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
-use App\FilamentTenant\Pages\AccountDeactivatedNotice;
-use App\FilamentTenant\Pages\TenantFullAIWidget;
-use App\FilamentTenant\Widgets\DeployStaticSite;
-use App\FilamentTenant\Widgets\Report as ReportWidget;
-use App\Settings\SiteSettings;
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
-use Filament\Navigation\NavigationGroup;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Pages\Dashboard;
+use App\Settings\SiteSettings;
+use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
+use App\Filament\Admin\Themes\Mint;
 use Filament\Widgets\AccountWidget;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
-use Illuminate\Session\Middleware\StartSession;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
+use Domain\Tenant\TenantFeatureSupport;
+use Filament\Navigation\NavigationGroup;
+use Filament\Http\Middleware\Authenticate;
 use Stancl\Tenancy\Middleware\ScopeSessions;
+use Illuminate\Session\Middleware\StartSession;
+use App\FilamentTenant\Pages\TenantFullAIWidget;
+use App\FilamentTenant\Widgets\DeployStaticSite;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use App\FilamentTenant\Pages\AccountDeactivatedNotice;
+use App\FilamentTenant\Widgets\Report as ReportWidget;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use App\FilamentTenant\Livewire\Auth\TwoFactorAuthentication;
+use JulioMotol\FilamentPasswordConfirmation\FilamentPasswordConfirmationPlugin;
 
 class TenantPanelProvider extends PanelProvider
 {
@@ -50,12 +51,12 @@ class TenantPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => MenuItem::make()
                     ->label(fn () => filament_admin()->full_name),
-                'Widget' => MenuItem::make()
+                'widget' => MenuItem::make()
                     ->label('Access Widget')
                     ->icon('heroicon-o-command-line')
                     ->url('/admin/ai-widget')
-                    ->openUrlInNewTab(),
-
+                    ->openUrlInNewTab()
+                    ->visible(fn (): bool => TenantFeatureSupport::active(\App\Features\AI\UploadBase::class)),
             ])
             ->colors([
                 'primary' => Color::Blue,
@@ -67,8 +68,6 @@ class TenantPanelProvider extends PanelProvider
             ->discoverClusters(in: app_path('FilamentTenant/Clusters'), for: 'App\\FilamentTenant\\Clusters')
             ->pages([
                 Dashboard::class,
-                TenantFullAIWidget::class,
-                \App\FilamentTenant\Pages\DeploymentPage::class,
             ])
             ->widgets([
                 AccountWidget::class,
@@ -146,16 +145,6 @@ class TenantPanelProvider extends PanelProvider
                     ->group(function () {
                         Route::get('account-deactivated', AccountDeactivatedNotice::class)
                             ->name('account-deactivated.notice');
-                    });
-
-                Route::middleware(['tenant', 'auth:admin'])
-                    ->prefix('admin')
-                    ->group(function () {
-                        Route::get('ai-widget', \App\FilamentTenant\Pages\TenantFullAIWidget::class)
-                            ->name('tenant.ai-widget');
-
-                        Route::get('deployment', \App\FilamentTenant\Pages\DeploymentPage::class)
-                            ->name('tenant.deployment');
                     });
 
             });
